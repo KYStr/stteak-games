@@ -29,3 +29,16 @@
 .touch #hud .minimap-legend{grid-template-columns:1fr} /* 窄圖例分兩列，保字級而非塞成極小canvas字。 */
 @media(max-width:700px){#hud #hud-title,#hud #sector,#hud #reason{font-size:.75rem}#hud .race-top>div{padding:6px 8px}#hud .drift-panel{flex:1 1 0;padding:6px}#hud .race-bottom{gap:10px}#hud .speed>span{display:block;width:fit-content;margin:4px 0 0}#hud .minimap-panel{width:96px}#hud .minimap-legend{grid-template-columns:1fr;padding:5px 6px}.touch #hud .minimap-panel{width:90px}} /* 手機保12px下限，單位換行以留文字空間；canvas96/90寬沿既有分支。 */
 @media(max-height:480px){.touch #hud .minimap-panel{display:none}} /* 原觸控短橫螢幕已隱藏地圖，整組圖例同隱藏，不擠佔原控制區。 */
+/* 0014：只提高車庫正文與操作說明可讀性；保留原header/HUD、Pause blur與遊戲邏輯。 */
+#garage{font-size:max(12px,.75rem);--muted:#c0d0d6;background:linear-gradient(90deg,#071018f2 70%,#071018d9);scroll-padding-block:12px} /* 局部暗底最低85%不透明，沿夜藍風格；原位置尺寸與正常垂直捲動不變。 */
+#garage button{font-size:max(12px,.75rem);line-height:1.5;min-width:0;overflow-wrap:anywhere;scroll-margin-block:12px} /* 卡片與正常按鈕保字級及焦點捲動餘量，不設固定高度、不縮字塞首屏。 */
+#garage .eyebrow,#garage .section-heading h2,#garage .section-heading>span,#garage .track-number,#garage small,#garage kbd,#garage .targets,#garage .subtle{font-size:max(12px,.75rem);line-height:1.5;font-weight:500;overflow-wrap:anywhere} /* 枚舉實際副文並納kbd，避免原全域10px或手機9/11px繼續壓小。 */
+#garage .eyebrow,#garage .section-heading>span,#garage .track-number,#garage small,#garage kbd,#garage .subtle,#garage .save-note{color:#c0d0d6} /* 固定明亮輔助色，不依賴背後賽道明暗或陰影。 */
+#garage .intro,#garage .save-note{font-size:max(13px,.8125rem);line-height:1.7;overflow-wrap:anywhere} /* 介紹與底部控制／保存說明更清楚，文字增高可自然落到折下。 */
+#garage .intro{color:#c6d8de} /* 保原冷色語彙而提高正文對比，不新增內容層。 */
+#garage h1 small{font-size:max(13px,.8125rem)} /* 英文副標原13px不被通用small下限反向縮小。 */
+#garage .targets{color:#e0d2b5} /* 獎牌門檻沿暖金色並增加亮度，數值與文案完全不改。 */
+#garage .section-heading{flex-wrap:wrap;row-gap:6px} /* 較大文字在窄窗正常換列，不裁切右側記錄或車色按鈕。 */
+#garage .track-options,#garage .car-options{grid-template-columns:repeat(3,minmax(0,1fr))} /* 保原三卡排列，允列內容縮小換行而不靠最小內容寬擠出視窗。 */
+#garage .segmented{grid-template-columns:repeat(2,minmax(0,1fr))} /* 模式仍兩欄，字大時各自正常換行而非固定高度。 */
+#garage .track-options button{overflow:visible} /* 明確解除原track button的hidden裁切，保SVG與文字自然流，不以未新增clip當作沒裁字的證明。 */

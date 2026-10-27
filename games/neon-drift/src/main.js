@@ -10,7 +10,7 @@ import { createFrameProfiler,FRAME_PHASE } from './profiler.js';
 import { createFrameHistory } from './frame-history.js';
 import { createNotifications } from './notifications.js';
 
-const BUILD='neon-drift-readability-0013',VERSION='1.0.11'; // 獨立HUD可讀性候選身分，不沿0012既有證據或分數。
+const BUILD='neon-drift-readability-0014',VERSION='1.0.12'; // 獨立車庫可讀性候選身分，不沿0013既有證據或分數。
 const $=s=>document.querySelector(s);
 const fmt=t=>`${String(Math.floor(Math.max(0,t)/60)).padStart(2,'0')}:${(Math.max(0,t)%60).toFixed(2).padStart(5,'0')}`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
