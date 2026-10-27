@@ -1,10 +1,10 @@
-name: Orbit sandbox WebGL2 capability # 只測環境能力與公開啟動畫面，不宣稱遊戲完整驗收。
-run-name: Orbit0014 one-shot capability by ${{ github.actor }} # run身份由GitHub自身提供，不插入任意字串。
+name: Sandbox Chromium launch diagnosis # 只讀狀態與一次啟動診斷，不測WebGL或導覽任何遊戲。
+run-name: One-shot sandbox launch diagnosis by ${{ github.actor }} # run身份由GitHub自身提供，不插入任意字串。
 on: # 沒有push、PR、schedule或其他自動觸發。
   workflow_dispatch: # 只有owner手動派發一次。
     inputs: # 不接受自選URL、指令或瀏覽器旗標。
-      confirm_public_probe: # 明示確認公開最小probe，不是持續付費或長測授權。
-        description: '僅本次沙箱WebGL2與Orbit公開入口；無artifact、無長測、失敗即停' # 完成就停，不為超過120秒而idle。
+      confirm_launch_diagnosis: # 明示確認公開啟動診斷，不是持續付費或長測授權。
+        description: '僅本次啟動診斷；不導覽遊戲、不改安全設定、不重試' # 完成就停，不為超過120秒而idle。
         type: boolean # 用明確布林選項，避免字串歧義。
         default: false # 預設不執行。
         required: true # 必須由owner明確確認。
@@ -14,13 +14,13 @@ concurrency: # 所有分支共用固定群組，沒有矩陣或分片。
   cancel-in-progress: false # 新派發不干擾既有證據；不要主動排第二輪。
 jobs: # 只有一個標準runner job。
   probe: # 十五分鐘連續遊玩沒有job或隱藏入口。
-    if: ${{ github.repository == 'KYStr/stteak-games' && github.repository_owner == 'KYStr' && github.actor == 'KYStr' && !github.event.repository.private && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && github.run_attempt == 1 && inputs.confirm_public_probe }} # 在開runner前核固定owner、公開repo、main、首次手動與明示確認。
+    if: ${{ github.repository == 'KYStr/stteak-games' && github.repository_owner == 'KYStr' && github.actor == 'KYStr' && !github.event.repository.private && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && github.run_attempt == 1 && inputs.confirm_launch_diagnosis }} # 在開runner前核固定owner、公開repo、main、首次手動與明示確認。
     runs-on: ubuntu-24.04 # 標準公開Linux runner；不用larger或self-hosted。
-    timeout-minutes: 7 # 安裝、mock、probe和輸出合計七分鐘硬截止。
+    timeout-minutes: 4 # 安裝、mock、診斷和短log合計四分鐘硬截止。
     env: # 不映射任何secret、token或歷史私人QA資料。
       QA_REPOSITORY_PRIVATE: ${{ github.event.repository.private }} # 從GitHub事件取得真實公開性，不依名字猜測。
-      QA_CONFIRM_PUBLIC_PROBE: ${{ inputs.confirm_public_probe }} # 只作布林比對，不放進shell。
-      QA_MODE: probe # 只有這個模式存在。
+      QA_CONFIRM_LAUNCH_DIAGNOSIS: ${{ inputs.confirm_launch_diagnosis }} # 只作布林比對，不放進shell。
+      QA_MODE: launch-diagnostic # 只有這個模式存在。
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' # npm依賴安裝不能暗中下載browser。
       npm_config_fetch_retries: '0' # 本包不增加npm重試輪數。
       npm_config_audit: 'false' # 安裝時不送無關審計流量，安全更新另審。
@@ -36,7 +36,7 @@ jobs: # 只有一個標準runner job。
         env: # 原文payload可公開；JSON與LICENSE依法不能加程式註解，欄位意義在下方中文說明。
           QA_SOURCE_0: | # 固定原文 package.json；程式逐行中文註解，JSON與LICENSE保留合法原格式。
             {
-              "name": "stteak-public-capability-probe",
+              "name": "stteak-public-launch-diagnostic",
               "version": "0.1.0",
               "private": true,
               "type": "module",
@@ -46,19 +46,19 @@ jobs: # 只有一個標準runner job。
                 "test": "node --test tests/*.test.mjs",
                 "check": "node scripts/check.mjs",
                 "gate": "node scripts/gate.mjs",
-                "probe": "node scripts/probe.mjs"
+                "probe": "node scripts/diagnose.mjs"
               },
               "devDependencies": { "playwright": "1.64.1" }
             }
           QA_SOURCE_1: | # 固定原文 package-lock.json；程式逐行中文註解，JSON與LICENSE保留合法原格式。
             {
-              "name": "stteak-public-capability-probe",
+              "name": "stteak-public-launch-diagnostic",
               "version": "0.1.0",
               "lockfileVersion": 3,
               "requires": true,
               "packages": {
                 "": {
-                  "name": "stteak-public-capability-probe",
+                  "name": "stteak-public-launch-diagnostic",
                   "version": "0.1.0",
                   "license": "MIT",
                   "devDependencies": {
@@ -121,50 +121,7 @@ jobs: # 只有一個標準runner job。
             LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
             OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
             SOFTWARE.
-          QA_SOURCE_3: | # 固定原文 scripts/core.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            export const TARGET = Object.freeze({ url: 'https://orbit-fall-private-qa.agentkystr.chatgpt.site/', build: 'orbit-fall-0014', expectedRuntimeSha256: '313575493db1f9ec915fe408e712ffe4530b3cdbfe9991e5ef0d1dfb8a461f3a' }); // 固定唯一公開目標；雜湊是來源記錄而非遠端位元組驗證。
-            export const LIMITS = Object.freeze({ totalMs: 90000, operationMs: 15000, launchMs: 15000, navigationMs: 20000, screenshotMs: 5000, closeMs: 5000, pngBytes: 2097152 }); // 九十秒包含啟動與結束，任何失敗均不重試。
-            export class Fault extends Error { constructor(code) { super(code); this.code = code; } } // 只允許自訂固定代碼進報告，不保存外部錯誤中的網址或秘密。
-            export function exactTarget(value) { try { return new URL(value).href === TARGET.url; } catch { return false; } } // 禁止轉址、查詢、片段與其他頁面的資料收集。
-            export function validMenu(state) { return !!state?.locationValid && !state.bootVisible && state.overlayVisible && state.versionVisible && state.storyVisible && !state.continueVisible && !state.confirmVisible && state.canvasVisible; } // 僅判斷啟動畫面前提，不把選單當可遊玩通過。
-            export function classifyError(error) { return error instanceof Fault ? error.code : error?.name === 'TimeoutError' ? 'operation-timeout' : 'operation-rejected'; } // 未知異常只留種類，不能猜測產品根因。
-            export async function executeProbe(adapter, now = () => performance.now()) { // 注入介面方便純記憶體測試，不需要啟動瀏覽器。
-              const started = now(); // 使用單調時間，不以系統時鐘跳動延長測試。
-              const report = { schemaVersion: 1, scope: 'runner-webgl-and-boot-only', outcome: 'blocked', target: TARGET, runtimeBytesVerified: false, capability: { status: 'not-run' }, boot: { status: 'not-run' }, operation: { status: 'not-run', reason: 'prior-story-and-pause-evidence-not-retested' }, stability: { status: 'not-run', reason: 'continuous-play-scenario-not-implemented' }, screenshots: [], faults: [], elapsedMs: 0 }; // 分開能力、啟動、操作與穩定性，不填未驗分數。
-              let stopped = false; // 第一個失敗後不再送出任何新測試動作。
-              const guard = () => { if (stopped || now() - started >= LIMITS.totalMs - LIMITS.closeMs) throw new Fault('probe-deadline'); }; // 預留關閉時間；真正九十秒硬界由入口程序另控。
-              const step = async (action, budget = LIMITS.operationMs) => { guard(); const value = await adapter.bounded(action, Math.min(budget, LIMITS.totalMs - LIMITS.closeMs - (now() - started))); guard(); return value; }; // 每次動作前後檢查截止；競速超時後主流程永久停止，不接晚回覆續行。
-              const gate = () => { guard(); if (!exactTarget(adapter.url())) throw new Fault('entry-url-mismatch'); }; // 只輸出不符代碼，不記錄含憑證的轉址網址。
-              try { // 全流程只有一條路徑，沒有自動降級或第二輪。
-                await step(() => adapter.launch()); // 只啟動一個有沙箱的官方測試瀏覽器。
-                report.capability = await step(() => adapter.capability()); // 只在空白頁新建脫離文件的畫布，不碰遊戲物件或資料。
-                if (report.capability.status !== 'available' || report.capability.api !== 'webgl2') throw new Fault('webgl2-unavailable'); // WebGL2不可用立即結束，不開遊戲、不加入危險旗標。
-                const status = await step(() => adapter.navigate(), LIMITS.navigationMs); // 只導覽一次，不重載、不換瀏覽器。
-                report.boot.httpStatus = status; // 只記正式入口回應狀態，不保存回應本文。
-                gate(); // 登入或其他轉址在截圖、讀取介面前停止。
-                if (status !== 200) throw new Fault('entry-http-not-200'); // 非正常入口不可繼續操作。
-                await step(() => adapter.waitMenu()); // 必要等待有界，等到可見就立即返回。
-                gate(); // 防止等待期間發生轉址。
-                const visible = await step(() => adapter.visible()); // 僅讀取已知可見介面對應的布林值。
-                report.boot.visible = visible; // 不保存任意頁面文字或隱藏欄位。
-                if (!validMenu(visible)) throw new Fault('boot-visible-prerequisite-mismatch'); // 看不到指定選單則是前提阻擋，不憑空判遊戲失敗。
-                gate(); // 截圖前再核位置；不對登入頁留圖。
-                const screenshot = await step(() => adapter.screenshot()); // 原始PNG只取一次，不錄影、不擷取完整DOM。
-                gate(); // 截圖期間若離開目標，結果不得簽認可用。
-                report.screenshots.push(screenshot); // 保存檔名、大小、SHA；圖片本體獨立存放。
-                report.boot.status = 'evidence-collected-pending-image-review'; // 只有人工看原圖後才能接受狹義啟動證據。
-                report.outcome = 'evidence-collected-pending-review'; // 工具成功並不等於遊戲整體或十五分鐘測試通過。
-              } catch (error) { // 任一錯誤都停止後續測試動作。
-                stopped = true; report.faults.push(classifyError(error)); // 不保存錯誤堆疊、網路回應或其他秘密。
-                report.outcome = 'blocked'; // 環境／前提不足與產品缺陷保持區分。
-              } finally { // 成功、失敗都嘗試結束同一個瀏覽器，不建立新工作階段。
-                stopped = true; // 清理期間永不恢復測試。
-                try { await adapter.close(); } catch { report.faults.push('cleanup-incomplete'); report.outcome = 'blocked'; } // 清理失敗不得假報成功，入口硬截止仍有效。
-                report.elapsedMs = Math.max(0, Math.round(now() - started)); // 記錄實際觀察耗時而非推估計費。
-              } // 其他遊戲與十五分鐘驗收一律未測。
-              return structuredClone(report); // 回傳獨立快照，晚到承諾不能修改交付結果。
-            } // 最小能力／啟動probe結束。
-          QA_SOURCE_4: | # 固定原文 scripts/gate.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
+          QA_SOURCE_3: | # 固定原文 scripts/gate.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
             import { pathToFileURL } from "node:url"; // 閘門僅用Node內建工具，不安裝依賴或連網。
             export function inspectGate(env) { // 公開runner方案不沿用私人repo或私人免費分鐘聲明。
               const problems = []; // 不輸出未知環境值，避免把秘密放入公開日誌。
@@ -173,101 +130,106 @@ jobs: # 只有一個標準runner job。
               if (env.QA_REPOSITORY_PRIVATE !== "false") problems.push("public-repository-required"); // repo轉私有時立即阻擋，不能消耗私人免費額度。
               if (env.GITHUB_REF !== "refs/heads/main" || env.GITHUB_WORKFLOW_REF !== "KYStr/stteak-games/.github/workflows/orbit-capability.yml@refs/heads/main") problems.push("fixed-main-workflow-required"); // 限定主分支上精確的單一workflow檔。
               if (env.GITHUB_EVENT_NAME !== "workflow_dispatch" || env.GITHUB_RUN_ATTEMPT !== "1") problems.push("first-manual-dispatch-required"); // 沒有自動觸發或既有run重跑。
-              if (env.QA_CONFIRM_PUBLIC_PROBE !== "true") problems.push("one-public-probe-confirmation-required"); // 每輪明示承認本次只測能力與公開啟動畫面。
+              if (env.QA_CONFIRM_LAUNCH_DIAGNOSIS !== "true") problems.push("one-launch-diagnosis-confirmation-required"); // 每輪明示承認本次只收啟動診斷，不測WebGL或公開遊戲。
               if (!/^[0-9a-f]{40}$/.test(env.GITHUB_SHA || "") || env.GITHUB_WORKFLOW_SHA !== env.GITHUB_SHA || !/^[1-9][0-9]*$/.test(env.GITHUB_RUN_ID || "")) problems.push("valid-run-identity-required"); // 精確記錄workflow與run身份，不接受不明來源的值。
-              if (env.QA_MODE !== "probe") problems.push("only-probe-implemented"); // 不存在十五分鐘idle或長測隱藏模式。
+              if (env.QA_MODE !== "launch-diagnostic") problems.push("only-launch-diagnosis-implemented"); // 不存在十五分鐘idle或長測隱藏模式。
               return problems; // 空陣列表示固定公開條件成立，不表示遊戲或硬體性能已通過。
             } // 純函式可離線測試所有反例。
             if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) { // 被mock測試匯入時不執行CLI。
               const problems = inspectGate(process.env); // 不讀私鑰、token檔或其他使用者資料。
               if (problems.length) { console.error(JSON.stringify({ outcome: "blocked", gateProblems: problems })); process.exitCode = 2; } // 失敗在Playwright載入前停止。
-              else console.log("Public fixed-repository manual probe gates satisfied; no artifact or cache storage configured."); // 只宣告前提檢查，不宣告browser可用。
+              else console.log("Public fixed-repository manual launch-diagnosis gates satisfied; no game navigation or security modification."); // 只宣告前提檢查，不宣告browser可用。
             } // CLI閘門結束。
-          QA_SOURCE_5: | # 固定原文 scripts/probe.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { mkdir, writeFile } from 'node:fs/promises'; // 只寫短報告及原始PNG，不保存HTML、來源碼或登入資料。
-            import { createHash } from 'node:crypto'; // 對原始圖片做SHA校驗，避免證據與檔名錯配。
-            import { executeProbe, TARGET, LIMITS, Fault } from './core.mjs'; // 共用單一固定目標及明確時間上限。
-            import { inspectGate } from './gate.mjs'; // 正式入口自己重新核閘門，不能跳過前一個workflow步驟。
-            const problems = inspectGate(process.env); // 任何外部瀏覽器動作之前先看授權與免費額度聲明。
-            if (problems.length) { console.error(JSON.stringify({ outcome: 'blocked', gateProblems: problems })); process.exit(2); } // 不合條件不載入Playwright，更不啟動瀏覽器。
-            await mkdir('artifacts', { recursive: true }); // 證據只有專用目錄，workflow不廣泛收集工作目錄。
-            let browser, context, page, closed = false, fatal = null; // 管理唯一瀏覽器生命週期與第一個失敗。
-            const events = { pageerror: 0, crash: 0, unexpectedNavigation: 0 }; // 只留有限計數，不記錯誤訊息、堆疊或網址。
-            async function bounded(action, milliseconds) { // Promise競速不假裝能取消底層操作；超時會鎖住後續流程並關閉唯一瀏覽器。
-              let timer; // 每次有界等待只持有一個計時器。
-              try { return await Promise.race([Promise.resolve().then(action), new Promise((_, reject) => { timer = setTimeout(() => reject(new Fault('operation-deadline')), milliseconds); })]); } // 不重試，不在逾時後補送操作。
-              finally { clearTimeout(timer); } // 成功與失敗都移除自身計時器。
-            } // 有界等待工具結束。
-            const healthy = () => { if (closed || fatal) throw new Fault(fatal || 'already-closed'); }; // 異常發生後只容許清理，不新增測試動作。
-            async function close() { // 僅關閉本次建立的瀏覽器，不碰其他瀏覽器或系統設定。
-              closed = true; // 晚到的導航／截圖承諾不能再保存證據或繼續測試。
-              if (browser) await bounded(() => browser.close(), LIMITS.closeMs); // 最多花五秒清理；外層程序硬界會處理卡住的程序群組。
-            } // 不重新連線、不建立替代工作階段。
-            const hardStop = setTimeout(async () => { // JavaScript進度失控時仍留下狹義阻擋記錄；workflow另有程序群組硬界。
-              closed = true; // 先鎖住晚回覆，再嘗試落地最小報告。
-              await writeFile('artifacts/emergency.json', JSON.stringify({ outcome: 'blocked', fault: 'process-watchdog', cleanupConfirmed: false })); // 不聲稱超時即代表瀏覽器已正常清理。
-              try { await close(); } catch {} // 只清理唯一既有瀏覽器，沒有自動重開。
-              process.exit(124); // 十分明確地以失敗結束，不輸出假通過。
-            }, 80000); // 八十秒預警、五秒清理；workflow八十五秒TERM、再五秒KILL，總界九十秒。
-            process.once('SIGTERM', () => { closed = true; void close().finally(() => process.exit(124)); }); // 收到workflow截止後只清理，不繼續讀圖或操作。
-            try { // 正式流程不讀使用者電腦與dot本身瀏覽器。
-              const { chromium } = await import('playwright'); // 只有閘門通過才載入已鎖版的官方開源測試函式庫。
-              const adapter = { // 把瀏覽器API限制在這份最小介面，不提供隱藏遊戲狀態通道。
-                bounded, // 每一個非清理動作都有獨立與總截止雙重限制。
-                launch: async () => { // 只啟動GitHub runner內新建的隔離測試瀏覽器。
-                  const launched = await chromium.launch({ headless: true, chromiumSandbox: true, timeout: LIMITS.launchMs }); // 明確開啟沙箱；不加入自訂旗標、不降低CSP/TLS/OS安全設定。
-                  if (closed) { await launched.close(); throw new Fault('late-browser-launch'); } // 啟動承諾若晚到只關閉，不建立分頁或導覽。
-                  browser = launched; healthy(); // 指派後立刻再核是否有停止訊號。
-                  context = await browser.newContext({ viewport: { width: 1366, height: 768 }, acceptDownloads: false }); // 新建暫時內容環境，無storageState、cookie、使用者profile或下載。
-                  healthy(); page = await context.newPage(); healthy(); // 只開一頁，未知失敗後不得再開分頁。
-                  page.setDefaultTimeout(LIMITS.operationMs); page.setDefaultNavigationTimeout(LIMITS.navigationMs); // 自動等待有界，不把環境卡住當無限等待。
-                  page.on('pageerror', () => { events.pageerror = Math.min(40, events.pageerror + 1); fatal = 'pageerror-observed'; }); // 不保存可能含秘密的任意錯誤字串。
-                  page.on('crash', () => { events.crash = Math.min(40, events.crash + 1); fatal = 'page-crash-observed'; }); // 崩潰後不補開瀏覽器。
-                  page.on('framenavigated', frame => { if (frame === page.mainFrame() && page.url() !== 'about:blank' && page.url() !== TARGET.url) { events.unexpectedNavigation = Math.min(40, events.unexpectedNavigation + 1); fatal = 'unexpected-navigation'; } }); // 導覽離開唯一正式入口即鎖住，不讀登入頁。
-                }, // 啟動只做測試程序設定，不讀遊戲資料。
-                capability: async () => { // 能力探測發生在about:blank，不在遊戲canvas上操作。
-                  healthy(); const value = await page.evaluate(() => { // 僅測WebGL上下文是否可建立，不執行遊戲內部函式。
-                    const canvas = document.createElement('canvas'); // 脫離文件的臨時元素，不插入任何頁面DOM。
-                    const gl = canvas.getContext('webgl2'); // 固定遊戲的Three需求是WebGL2；不探測WebGL1、不fallback。
-                    if (!gl) return { status: 'unavailable', api: null, rendererClass: 'unknown', hardwarePerformanceVerified: false }; // 缺乏WebGL2立即阻擋，不使用不安全SwiftShader開關。
-                    const extension = gl.getExtension('WEBGL_debug_renderer_info'); // 只查測試環境公開圖形能力，不查遊戲狀態。
-                    const renderer = extension ? String(gl.getParameter(extension.UNMASKED_RENDERER_WEBGL)) : ''; // 原始renderer名稱只在記憶體做分類，不保存設備識別字串。
-                    return { status: 'available', api: 'webgl2', rendererClass: /swiftshader|llvmpipe|softpipe|software/i.test(renderer) ? 'software' : 'unknown', hardwarePerformanceVerified: false }; // 不能由非軟體字樣推定硬體GPU或真機性能通過。
-                  }); // 空白頁能力不等於遊戲canvas已成功渲染。
-                  healthy(); return value; // 任何已發生的異常均優先阻擋。
-                }, // 能力完成後直接進入口，不刻意等待120秒。
-                navigate: async () => { healthy(); const response = await page.goto(TARGET.url, { waitUntil: 'domcontentloaded', timeout: LIMITS.navigationMs }); healthy(); return response?.status() ?? null; }, // 唯一正常根網址導覽，不附查詢／片段捷徑。
-                url: () => { healthy(); return page.url(); }, // 只供精確比對，不將任意網址寫入報告。
-                waitMenu: async () => { healthy(); await page.locator('#story').waitFor({ state: 'visible', timeout: LIMITS.operationMs }); healthy(); }, // 必要啟動等待完成即停，不重做故事點擊驗收。
-                visible: async () => { // 只回傳指定可見UI布林值；不讀storage、診斷物件、計時或物理狀態。
-                  healthy(); const value = await page.evaluate(target => { // 再在瀏覽器內核位置，縮小轉址競態的資料收集範圍。
-                    if (location.href !== target.url) return { locationValid: false }; // 錯頁不讀任何文字。
-                    const visible = element => { if (!element || !element.getClientRects().length) return false; for (let node = element; node; node = node.parentElement) { const style = getComputedStyle(node); if (node.hidden || style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse' || Number(style.opacity) === 0) return false; } const box = element.getBoundingClientRect(); return box.width > 0 && box.height > 0 && box.right > 0 && box.bottom > 0 && box.left < innerWidth && box.top < innerHeight; }; // 以祖先樣式與視窗交集確認可見，不能把隱藏DOM當畫面證據。
-                    const element = id => document.getElementById(id); const panel = element('panel'); // 只取既有正式介面已知ID，不遍歷其他頁面內容。
-                    return { locationValid: true, bootVisible: visible(element('boot')), overlayVisible: visible(element('overlay')), versionVisible: visible(panel) && panel.innerText.includes(target.build), storyVisible: visible(element('story')), continueVisible: visible(element('continue')), confirmVisible: visible(element('confirm-new')), canvasVisible: visible(element('world')) }; // 僅保留版本相符與畫面前提，不保存可見文字原文。
-                  }, TARGET); // 頁面程式只看公開UI，沒有修改遊戲。
-                  healthy(); return value; // 評估後若有頁面異常則不繼續。
-                }, // 不提供原生按鍵是因本probe不需要重做已證操作。
-                screenshot: async () => { // 只保留一張視窗原圖，不錄影與追蹤。
-                  healthy(); const png = await page.screenshot({ type: 'png', fullPage: false, timeout: LIMITS.screenshotMs }); healthy(); // 保留原始畫面，不修改或拼接證據。
-                  if (page.url() !== TARGET.url) throw new Fault('screenshot-url-mismatch'); // 截圖中途轉址時不保存該圖。
-                  if (png.length > LIMITS.pngBytes) throw new Fault('artifact-size-limit'); // 單張原圖最多2MiB，過大則阻擋，不暗中降品質。
-                  await writeFile('artifacts/boot.png', png); healthy(); // 檔案只有遊戲公開畫面，無登入頁、HAR或cookie。
-                  return { file: 'boot.png', bytes: png.length, sha256: createHash('sha256').update(png).digest('hex') }; // 便於後續獨立查看與確認證據原樣。
-                }, // 截圖失敗不重截。
-                close, // 封存前關閉本次唯一瀏覽器。
-              }; // 所有瀏覽器能力都已顯示在這裡，沒有隱藏fallback。
-              const report = await executeProbe(adapter); // 僅執行一次預先指定的能力與啟動流程。
-              report.environment = { runner: 'github-hosted-standard-linux', browser: browser?.version() ?? null, node: process.version, sandboxRequested: true, events }; // 沙箱請求與環境記錄不是硬體性能認證。
-              report.provenance = { repository: process.env.GITHUB_REPOSITORY, commit: process.env.GITHUB_SHA, workflowCommit: process.env.GITHUB_WORKFLOW_SHA, runId: process.env.GITHUB_RUN_ID, attempt: process.env.GITHUB_RUN_ATTEMPT }; // 只記不含秘密的GitHub執行身份。
-              await writeFile('artifacts/report.json', JSON.stringify(report, null, 2) + '\n'); // 結構化證據分欄，稍後僅以有序公開job log傳回，不上傳artifact。
-              console.log(JSON.stringify({ outcome: report.outcome, faults: report.faults, elapsedMs: report.elapsedMs })); // 日誌只輸出最短結果，不印整個頁面或任意環境值。
-              process.exitCode = report.outcome === 'evidence-collected-pending-review' ? 0 : 2; // 綠燈只代表probe產證成功，明確保留人工審圖與遊戲未驗狀態。
-            } catch { // 匯入或入口意外失敗也不盲目重試。
-              try { await close(); } catch {} // 盡力清理唯一既有瀏覽器。
-              await writeFile('artifacts/emergency.json', JSON.stringify({ outcome: 'blocked', fault: 'runner-unexpected-error', cleanupConfirmed: !browser || !browser.isConnected() })); // 僅記固定代碼，避免外部錯誤洩漏機密。
-              process.exitCode = 2; // 不以意外例外假報成功。
-            } finally { clearTimeout(hardStop); } // 正常封存後移除watchdog；外層硬截止仍由workflow管理。
+          QA_SOURCE_4: | # 固定原文 scripts/diagnostic-core.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
+            export const EXPECTED = Object.freeze({ revision: "1248", version: "156.0.8078.4", executable: "/home/runner/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell" }); // 固定同版官方Linux x64 headless shell；不是完整Chrome的executablePath。
+            export const KERNEL = Object.freeze([{ key: "apparmorRestrictUnprivilegedUserns", path: "/proc/sys/kernel/apparmor_restrict_unprivileged_userns", type: "bit" }, { key: "unprivilegedUsernsClone", path: "/proc/sys/kernel/unprivileged_userns_clone", type: "bit" }, { key: "maxUserNamespaces", path: "/proc/sys/user/max_user_namespaces", type: "integer" }, { key: "apparmorEnabled", path: "/sys/module/apparmor/parameters/enabled", type: "yn" }]); // 只讀四個固定白名單檔，不呼叫sysctl寫入或讀取audit/private logs。
+            export const LIMITS = Object.freeze({ totalMs: 25000, closeMs: 3000, launchMs: 15000, versionMs: 3000 }); // 診斷完成即停，沒有WebGL、分頁或遊戲導覽。
+            export class Fault extends Error { constructor(code) { super(code); this.code = code; } } // 只供下列固定枚舉使用，不把外部錯誤當自訂碼。
+            const fixedFaults = new Set(["diagnostic-deadline", "operation-deadline", "executable-not-ready", "executable-version-unverified", "late-launch", "already-closed", "cleanup-still-connected"]); // 不在白名單的Fault也只能輸出unknown。
+            export function classifyAllowed(error) { // 原始錯誤只在記憶體比對，絕不寫入JSON、console、hash或檔案。
+              const text = typeof error?.message === "string" ? error.message.slice(0, 32768) : ""; // 有界字串避免不受控錯誤訊息吃資源。
+              const indicators = []; // 只能輸出固定類別，不保存匹配原文、路徑、PID或命令列。
+              if (/Chromium sandboxing failed!|No usable sandbox!|crbug\.com\/(?:357670|638180)/.test(text)) indicators.push("sandbox-failure-reported"); // 官方Playwright／Chromium明確訊號，仍不宣稱已知道是哪個OS策略造成。
+              if (/Failed to (?:move to new namespace|unshare)[\s\S]{0,300}Operation not permitted/.test(text)) indicators.push("namespace-operation-denied-reported"); // 需要namespace與拒絕字樣同時出現，不能由一般EPERM猜sandbox。
+              if (/Executable (?:doesn.t|does not) exist|spawn[^\n]{0,300}ENOENT/.test(text) || error?.code === "ENOENT") indicators.push("executable-missing-reported"); // 與實際固定檔案stat另行交叉判斷。
+              if (/Host system is missing dependencies|error while loading shared libraries/.test(text)) indicators.push("host-library-missing-reported"); // 不輸出未知library名稱或路徑。
+              if (["EACCES", "EPERM"].includes(error?.code) || /\b(?:EACCES|EPERM)\b|Permission denied/.test(text)) indicators.push("permission-denied-reported"); // 一般權限拒絕不能直接當sandbox根因。
+              if (error?.name === "TimeoutError" || error?.code === "ETIMEDOUT") indicators.push("timeout-reported"); // 不從耗時短或長猜測根因。
+              if (/Target page, context or browser has been closed/.test(text)) indicators.push("target-closed-reported"); // 保留泛用早退訊號，優先級低於明確錯誤。
+              const signalMatch = /\b(?:signal=|signal: )(?<signal>SIGABRT|SIGTRAP|SIGSEGV|SIGKILL|SIGTERM|SIGILL)\b/.exec(text); // 僅接受少數固定signal名稱，不輸出任意stderr。
+              if (signalMatch) indicators.push("process-signal-reported"); // 是否為sandbox所致需其他證據，不由signal自行推斷。
+              const code = error instanceof Fault && fixedFaults.has(error.code) ? error.code : indicators[0] || "unclassified-rejection"; // 有限枚舉之外一律未知，不能漏出message。
+              return { code, indicators, signal: signalMatch?.groups.signal || null, name: error?.name === "TimeoutError" ? "TimeoutError" : error instanceof Error ? "Error" : "other" }; // 不保存原錯誤或堆疊。
+            } // 分類只是新的可觀測資訊，不改安全策略。
+            export function parseKernelValue(text, type) { // 只允許固定類型值，不輸出任意系統檔案字串。
+              const value = typeof text === "string" && text.length <= 32 ? text.trim() : ""; // 限制讀回長度與格式。
+              if (type === "bit" && /^[01]$/.test(value)) return { status: "read", value: Number(value) }; // 0或1只描述當下讀值，不證明具體profile是否允許browser。
+              if (type === "yn" && /^[YN]$/.test(value)) return { status: "read", value: value === "Y" }; // AppArmor整體啟用也不等於這個binary一定被拒。
+              if (type === "integer" && /^\d{1,10}$/.test(value) && Number(value) <= 2147483647) return { status: "read", value: Number(value) }; // namespace上限只保留有界非負整數。
+              return { status: "unrecognized", value: null }; // 無法解析時不回傳原文。
+            } // 不包含任何設定寫入。
+            export function parseVersion(text) { // 僅保留官方四段數字版本，不保存binary任意stdout。
+              const match = typeof text === "string" && /^(?:Chromium|Google Chrome(?: for Testing)?|Chrome Headless Shell) (\d{1,3}\.\d{1,6}\.\d{1,6}\.\d{1,6})\s*$/.exec(text); // 拒絕額外路徑、token或不符格式字串。
+              return { status: match && match[1] === EXPECTED.version ? "verified" : "unrecognized-or-mismatch", version: match?.[1] || null }; // 與固定版本不同就不繼續launch。
+            } // --version是一次無頁面的版本查詢，不是替代browser測試。
+            export async function executeDiagnosis(adapter, now = () => performance.now()) { // 注入介面供純mock，不在本地開任何程序。
+              const started = now(); const report = { schemaVersion: 1, scope: "runner-sandbox-launch-diagnosis-only", outcome: "blocked", stage: "not-run", kernel: {}, executable: { status: "not-run" }, binaryVersion: { status: "not-run" }, launch: { status: "not-run", handleAcquired: false, processCreation: "not-observed" }, cleanup: { status: "not-run", processInventoryVerified: false }, capability: { status: "not-run" }, boot: { status: "not-run" }, operation: { status: "not-run" }, stability: { status: "not-run" }, screenshots: [], faults: [] }; // 全部遊戲與WebGL測項明列未做。
+              const step = async (stage, action, ms = 5000) => { report.stage = stage; const left = LIMITS.totalMs - LIMITS.closeMs - (now() - started); if (left <= 0) throw new Fault("diagnostic-deadline"); const value = await adapter.bounded(action, Math.min(left, ms)); if (now() - started >= LIMITS.totalMs - LIMITS.closeMs) throw new Fault("diagnostic-deadline"); return value; }; // 分段與總截止雙界；晚完成不接下一步。
+              try { // 只走一次診斷路徑，不重啟、不降級、不開頁面。
+                report.kernel = await step("read-kernel", () => adapter.readKernel()); // 只讀固定四個狀態，缺值不擅自修環境。
+                report.executable = await step("inspect-executable", () => adapter.inspectExecutable()); // 核官方metadata與實際headless shell，而非誤查完整版Chrome。
+                if (report.executable.status !== "ready") throw new Fault("executable-not-ready"); // 檔案缺失或不符直接停，沒有補下載／切binary。
+                report.binaryVersion = await step("binary-version", () => adapter.readVersion(), LIMITS.versionMs + 500); // 一次--version輸出只做白名單解析。
+                if (report.binaryVersion.status !== "verified") throw new Fault("executable-version-unverified"); // 版本不符不硬試browser。
+                report.launch.status = "attempted"; report.launch.processCreation = "unknown"; // launch被呼叫後不能用拒絕推論完全沒建立子程序。
+                await step("launch", () => adapter.launch(), LIMITS.launchMs + 500); // 唯一一次維持sandbox=true的launch，不傳自訂args。
+                report.launch = { status: "acknowledged", handleAcquired: true, processCreation: "browser-handle-acquired" }; // 只有承諾成功才說拿到browser handle。
+                report.outcome = "diagnostic-collected"; // 仍沒有WebGL或遊戲驗收，不能寫PASS。
+              } catch (error) { report.faults.push({ stage: report.stage, ...classifyAllowed(error) }); if (report.launch.status === "attempted") report.launch.status = "rejected-or-unconfirmed"; } // 新增stage和有限錯誤類別，原文始終不公開。
+              finally { // 即使launch失敗也會明確記錄清理可觀測範圍。
+                try { report.cleanup = await adapter.close(); } catch (error) { report.cleanup = { status: "incomplete", processInventoryVerified: false }; report.faults.push({ stage: "close", ...classifyAllowed(error) }); report.outcome = "blocked"; } // 清理失敗不假報成功，也不全局kill其他程序。
+                report.elapsedMs = Math.max(0, Math.round(now() - started)); // 實際診斷耗時，不是遊戲性能數據。
+              } // 結束後不得建立context/page或再launch。
+              return structuredClone(report); // 回傳固定快照，晚到承諾不能改報告。
+            } // 最小唯讀狀態與單次啟動診斷結束。
+          QA_SOURCE_5: | # 固定原文 scripts/diagnose.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
+            import { readFile, stat, access, mkdir, writeFile } from "node:fs/promises"; // 只讀固定系統狀態／官方binary，寫本輪短報告。
+            import { constants } from "node:fs"; // 僅檢查執行權，不chmod或修改binary。
+            import { execFile } from "node:child_process"; // 只用於固定binary的一次--version，無shell或任意指令。
+            import { promisify } from "node:util"; // 捕捉stdout/stderr到記憶體，絕不直接印原始輸出。
+            import { inspectGate } from "./gate.mjs"; // 固定原owner/public/main/first-dispatch，不接受本地環境。
+            import { EXPECTED, KERNEL, LIMITS, Fault, classifyAllowed, parseKernelValue, parseVersion, executeDiagnosis } from "./diagnostic-core.mjs"; // 所有輸出由白名單契約控制。
+            const problems = inspectGate(process.env); if (problems.length || process.platform !== "linux" || process.arch !== "x64") { console.error(JSON.stringify({ outcome: "blocked", gateProblems: problems.length ? problems : ["linux-x64-required"] })); process.exit(2); } // 在匯入Playwright或執行binary前拒絕非核准環境。
+            await mkdir("artifacts", { recursive: true }); // 這只是臨時目錄，不使用upload-artifact。
+            let browser = null, closed = false; // 僅保有唯一一次launch得到的handle。
+            async function bounded(action, ms) { let timer; try { return await Promise.race([Promise.resolve().then(action), new Promise((_, reject) => { timer = setTimeout(() => reject(new Fault("operation-deadline")), ms); })]); } finally { clearTimeout(timer); } } // 超時後主流程不續行，外層程序群組仍有硬界。
+            async function close() { // 只清理本次handle，不修改OS安全政策或殺其他程序。
+              closed = true; if (!browser) return { status: "no-browser-handle", processInventoryVerified: false, underlyingProcessCleanup: "not-observed" }; // launch拒絕不代表底層從未建程序，明確留下未知。
+              await bounded(() => browser.close(), LIMITS.closeMs); if (browser.isConnected()) throw new Fault("cleanup-still-connected"); return { status: "close-acknowledged", processInventoryVerified: false, underlyingProcessCleanup: "browser-close-ack-only" }; // close確認也不冒稱全機程序盤點完成。
+            } // 清理不提供重開或額外診斷操作。
+            const watchdog = setTimeout(async () => { closed = true; await writeFile("artifacts/emergency.json", JSON.stringify({ outcome: "blocked", scope: "runner-sandbox-launch-diagnosis-only", fault: "diagnostic-watchdog", cleanupConfirmed: false })); try { await close(); } catch {} process.exit(124); }, LIMITS.totalMs); // 二十五秒watchdog再最多三秒清理；外層三十秒TERM、五秒KILL。
+            process.once("SIGTERM", () => { closed = true; void close().finally(() => process.exit(124)); }); // 被截止時不繼續查狀態或啟動browser。
+            try { // 本次僅當root另核准新的診斷run時才真正執行。
+              const { chromium } = await import("playwright"); const runFile = promisify(execFile); // 版本仍固定1.64.1，無新增套件。
+              const adapter = { // 不提供newPage/newContext/goto/keyboard/screenshot等方法。
+                bounded, // 每個非清理階段都有有界等待。
+                readKernel: async () => { const results = {}; for (const item of KERNEL) { try { const text = await bounded(() => readFile(item.path, "utf8"), 500); results[item.key] = parseKernelValue(text, item.type); } catch (error) { results[item.key] = { status: error?.code === "ENOENT" ? "missing" : "unreadable", value: null }; } } return results; }, // 四個固定檔只讀，未知值與錯誤原文不輸出。
+                inspectExecutable: async () => { // 只有官方同版本manifest相符時才檢查已觀測的固定shell。
+                  const metadata = JSON.parse(await readFile("node_modules/playwright-core/browsers.json", "utf8")); const entry = metadata.browsers?.find(item => item.name === "chromium-headless-shell"); // 不調用隱藏遊戲狀態，只讀官方依賴metadata。
+                  if (entry?.revision !== EXPECTED.revision || entry?.browserVersion !== EXPECTED.version) return { status: "metadata-mismatch", expectedRevision: EXPECTED.revision, expectedVersion: EXPECTED.version }; // 不追latest或改binary路徑來救測試。
+                  try { const value = await stat(EXPECTED.executable); if (!value.isFile()) return { status: "not-regular-file" }; await access(EXPECTED.executable, constants.X_OK); return { status: "ready", kind: "official-headless-shell-linux64", revision: EXPECTED.revision, expectedVersion: EXPECTED.version }; } catch (error) { return { status: error?.code === "ENOENT" ? "missing" : "not-executable-or-unreadable", error: classifyAllowed(error) }; } // 不輸出HOME、完整路徑、mode或其他任意環境值。
+                }, // 讀檔與執行權核對不改任何安全設定。
+                readVersion: async () => { try { const value = await runFile(EXPECTED.executable, ["--version"], { timeout: LIMITS.versionMs, killSignal: "SIGKILL", maxBuffer: 4096, encoding: "utf8" }); return parseVersion(value.stdout); } catch (error) { return { status: "version-command-rejected", version: null, error: classifyAllowed(error) }; } }, // 只傳--version，stderr與原stdout不印出；失敗即不launch。
+                launch: async () => { if (closed) throw new Fault("already-closed"); const launched = await chromium.launch({ headless: true, chromiumSandbox: true, timeout: LIMITS.launchMs }); if (closed) { await launched.close(); throw new Fault("late-launch"); } browser = launched; }, // 同官方預設headless shell、同沙箱要求、一次launch，沒有自訂args或executablePath。
+                close, // 不建立分頁也能關閉唯一browser。
+              }; // 唯一browser能力僅啟動與關閉。
+              const report = await executeDiagnosis(adapter); // 將stage與有限錯誤類別保存，而非讓原始原因再次完全消失。
+              report.provenance = { repository: process.env.GITHUB_REPOSITORY, commit: process.env.GITHUB_SHA, workflowCommit: process.env.GITHUB_WORKFLOW_SHA, runId: process.env.GITHUB_RUN_ID, attempt: process.env.GITHUB_RUN_ATTEMPT }; // 只公開固定repo的執行身份。
+              report.environment = { node: process.version, sandboxRequested: true, browserVersion: browser ? parseVersion("Chromium " + browser.version()).version : null, rootExecution: process.getuid() === 0 }; // 限定Node與已核binary版本、沙箱請求、是否root布林；不印任意環境變數。
+              await writeFile("artifacts/report.json", JSON.stringify(report, null, 2) + "\n"); // 短JSON只走已核log傳輸，不產圖片或artifact。
+              console.log(JSON.stringify({ outcome: report.outcome, stage: report.stage, faults: report.faults, elapsedMs: report.elapsedMs })); process.exitCode = report.outcome === "diagnostic-collected" ? 0 : 2; // 診斷綠燈不是WebGL／遊戲PASS。
+            } catch (error) { try { await close(); } catch {} await writeFile("artifacts/emergency.json", JSON.stringify({ outcome: "blocked", scope: "runner-sandbox-launch-diagnosis-only", fault: classifyAllowed(error), cleanupConfirmed: browser ? !browser.isConnected() : false })); process.exitCode = 2; } // 入口意外失敗也只輸出白名單類別，無raw error。
+            finally { clearTimeout(watchdog); } // 正常封存後結束，不自動接回原遊戲probe。
           QA_SOURCE_6: | # 固定原文 scripts/log-transfer.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
             import { createHash } from "node:crypto"; // 所有資料回收都以原始位元組SHA256核對。
             export const TRANSFER = Object.freeze({ chunkChars: 4096, pngLimit: 2097152, reportLimit: 65536, logLimit: 8388608 }); // 每塊四KiB字元；PNG最多二MiB，整份log解析最多八MiB。
@@ -312,7 +274,7 @@ jobs: # 只有一個標準runner job。
               } // 全檔讀完仍缺資料就阻擋，不重新開瀏覽器補圖。
               if (current || !outputs.report) throw new Error("missing-complete-report"); // 光有PNG或綠燈不是完整證據。
               const report = JSON.parse(outputs.report.bytes.toString("utf8")); // 報告需為合法JSON，不能是HTML或錯誤頁。
-              if (!report || !["blocked", "evidence-collected-pending-review"].includes(report.outcome)) throw new Error("invalid-report-outcome"); // 僅接受已審兩種狀態，不接受假PASS。
+              if (!report || !["blocked", "evidence-collected-pending-review", "diagnostic-collected"].includes(report.outcome)) throw new Error("invalid-report-outcome"); // 僅接受已審兩種狀態，不接受假PASS。
               const screenshot = report.screenshots?.[0]; // 本probe最多一張圖，不接受未知多圖payload。
               if ((report.screenshots?.length || 0) > 1 || (screenshot && (!outputs.png || screenshot.sha256 !== outputs.png.meta.sha256 || screenshot.bytes !== outputs.png.bytes.length)) || (!screenshot && outputs.png)) throw new Error("report-image-mismatch"); // 圖與報告必須同一run、同一大小與同一SHA。
               if (report.outcome === "evidence-collected-pending-review" && !screenshot) throw new Error("success-without-image"); // 缺真圖不能當啟動畫面已取證。
@@ -326,94 +288,57 @@ jobs: # 只有一個標準runner job。
             try { reportBytes = await readFile("artifacts/report.json"); } catch { try { reportBytes = await readFile("artifacts/emergency.json"); } catch { console.error("QA_EVIDENCE_BLOCKED no-result-file"); process.exit(2); } } // 沒有報告就明確阻擋，不補造結果。
             const report = JSON.parse(reportBytes.toString("utf8")); // 僅傳輸正式driver產生的固定欄位，不dump任何HTML或HTTP本文。
             const streams = [encodeTransfer("report", reportBytes, provenance)]; // 先輸出短JSON，失敗輪也保留原因。
-            if (report.screenshots?.length === 1) { // 只有正式報告列出的唯一公開遊戲原圖才可傳出。
-              if (report.screenshots[0].file !== "boot.png") throw new Error("unexpected-image-name"); // 固定檔名，禁止路徑穿越或私有QA圖片混入。
-              const png = await readFile("artifacts/boot.png"); const lines = encodeTransfer("png", png, provenance); // 不讀任何其他歷史圖，不改畫質。
-              const meta = JSON.parse(lines[0].slice(15)); if (meta.sha256 !== report.screenshots[0].sha256 || meta.bytes !== report.screenshots[0].bytes) throw new Error("image-report-integrity"); // 先核本輪原圖與報告，才准公開log。
-              streams.push(lines); // 最多一張二MiB圖，沒有附帶來源碼或資料夾。
-            } // 無圖的blocked輪不輸出假圖。
+            if (report.screenshots?.length) throw new Error("diagnostic-must-not-contain-images"); // 本輪禁止任何PNG或遊戲畫面，避免偷偷擴張為遊戲probe。
             for (const lines of streams) for (const line of lines) await new Promise((resolve, reject) => process.stdout.write(line + "\n", error => error ? reject(error) : resolve())); // 尊重stdout背壓，逐行送完再結束，避免exit截斷尾端。
           QA_SOURCE_8: | # 固定原文 scripts/check.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { readFile, readdir } from "node:fs/promises"; // 只檢查本包原始碼與鎖檔，不下載依賴或啟動瀏覽器。
-            import { execFileSync } from "node:child_process"; // 僅執行Node語法檢查，不執行probe。
-            import assert from "node:assert/strict"; // 任何候選不一致立即失敗。
-            for (const directory of ["scripts", "tests"]) { // 不掃repo遊戲來源或其他workspace檔案。
-              for (const file of await readdir(directory)) { // 僅檢查現有候選JavaScript模組。
-                if (!file.endsWith(".mjs")) continue; const path = `${directory}/${file}`; const source = await readFile(path, "utf8"); // 不跟隨未知檔案或安裝目錄。
-                execFileSync(process.execPath, ["--check", path], { stdio: "pipe" }); // 語法驗證不會載入Playwright。
-                for (const [index, line] of source.split("\n").entries()) if (line.trim()) assert.match(line, /\/\/.*[\u3400-\u9fff]/, `${path}:${index + 1} 缺少中文行註解`); // 每個非空程式行需中文說明。
-              } // 包括本檢查程式也自我核語法與註解。
-            } // 純本地程式檢查完成。
-            const pkg = JSON.parse(await readFile("package.json", "utf8")); const lock = JSON.parse(await readFile("package-lock.json", "utf8")); // JSON格式另有逐欄中文文件，不加非法註解。
-            assert.equal(pkg.private, true); assert.equal(pkg.license, "MIT"); assert.equal(pkg.devDependencies.playwright, "1.64.1"); // private只防npm意外發布，不是GitHub repo可見性gate。
-            assert.equal(lock.packages[""].license, "MIT"); // 自有程式依使用者明示許可採MIT。
-            for (const name of ["node_modules/playwright", "node_modules/playwright-core"]) { const value = lock.packages[name]; assert.equal(value.version, "1.64.1"); assert.equal(value.license, "Apache-2.0"); assert.match(value.integrity, /^sha512-/); assert.match(value.resolved, /^https:\/\/registry\.npmjs\.org\//); } // 第三方原授權、精確版本與官方完整性都保留。
-            const probe = await readFile("scripts/probe.mjs", "utf8"); assert.match(probe, /chromiumSandbox: true/); assert.doesNotMatch(probe, /args\s*:/); assert.doesNotMatch(probe, /getContext\(["']webgl["']\)/); // 無自訂旗標、沙箱明確開啟、無WebGL1降級。
-            console.log("PASS: syntax, Chinese line comments, exact lock, sandbox requested, WebGL2-only; no browser started."); // 不把靜態檢查當真實runner或遊戲通過。
-          QA_SOURCE_9: | # 固定原文 tests/core.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from 'node:test'; // 只用Node內建測試，不安裝、啟動或連接瀏覽器。
-            import assert from 'node:assert/strict'; // 斷言失敗即測試失敗。
-            import { executeProbe, exactTarget, validMenu, classifyError, TARGET, LIMITS, Fault } from '../scripts/core.mjs'; // 測同一份正式流程，而非抄寫另一套假邏輯。
-            import { inspectGate } from '../scripts/gate.mjs'; // 費用與環境閘門完全離線測試。
-            const menu = { locationValid: true, bootVisible: false, overlayVisible: true, versionVisible: true, storyVisible: true, continueVisible: false, confirmVisible: false, canvasVisible: true }; // 合成可見UI布林，不是真實遊戲畫面。
-            function fixture(options = {}) { // 虛擬介面只記呼叫順序，不接網路或使用者瀏覽器。
-              const calls = []; let clock = 0; // 虛擬單調時鐘避免耗費真實長時間。
-              const action = async (name, value) => { calls.push(name); clock += options.elapsed?.[name] || 1; if (options.failure === name) throw new Fault(`${name}-blocked`); return value; }; // 可反駁每個階段失敗後是否確實停止。
-              const adapter = { bounded: async fn => fn(), launch: () => action('launch'), capability: () => action('capability', options.capability || { status: 'available', api: 'webgl2', rendererClass: 'software', hardwarePerformanceVerified: false }), navigate: () => action('navigate', options.http ?? 200), url: () => options.url || TARGET.url, waitMenu: () => action('waitMenu'), visible: () => action('visible', options.menu || menu), screenshot: () => action('screenshot', { file: 'mock-only-not-a-real-image', bytes: 0, sha256: 'mock' }), close: () => action('close') }; // 模擬不製作可冒充真圖的檔案。
-              return { calls, adapter, now: () => clock }; // 回傳純記憶體測試控制。
-            } // 沒有任何外部副作用。
-            test('能力及啟動產證不等於操作或穩定性通過', async () => { const mock = fixture(); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'evidence-collected-pending-review'); assert.equal(result.operation.status, 'not-run'); assert.equal(result.stability.status, 'not-run'); assert.equal(result.runtimeBytesVerified, false); assert.deepEqual(mock.calls, ['launch', 'capability', 'navigate', 'waitMenu', 'visible', 'screenshot', 'close']); }); // 完成即停，沒有故事、Escape或十五分鐘idle。
-            for (const stage of ['launch', 'capability', 'navigate', 'waitMenu', 'visible', 'screenshot']) { // 每個依賴階段都要驗證第一錯誤即停。
-              test(`${stage}失敗不重試且一定清理`, async () => { const mock = fixture({ failure: stage }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.equal(mock.calls.filter(value => value === stage).length, 1); assert.equal(mock.calls.at(-1), 'close'); assert.equal(mock.calls.indexOf(stage), mock.calls.length - 2); }); // 不以重新啟動或改旗標救測試。
-            } // 共六個中斷點。
-            test('無WebGL不導覽遊戲', async () => { const mock = fixture({ capability: { status: 'unavailable' } }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['launch', 'capability', 'close']); assert.deepEqual(result.faults, ['webgl2-unavailable']); }); // 最便宜能力否證要先執行。
-            test('轉到登入頁不讀DOM或截圖', async () => { const mock = fixture({ url: 'https://example.com/login?token=secret' }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.ok(!mock.calls.includes('visible')); assert.ok(!mock.calls.includes('screenshot')); assert.ok(!JSON.stringify(result).includes('secret')); }); // 既不登入，也不把轉址秘密帶進報告。
-            test('HTTP錯誤不繼續等選單', async () => { const mock = fixture({ http: 503 }); await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['launch', 'capability', 'navigate', 'close']); }); // 不將入口服務問題誤當遊戲功能失敗。
-            for (const key of Object.keys(menu)) { // 每個可見前提都必須獨立有反例。
-              test(`可見前提${key}反例會阻擋`, async () => { const mock = fixture({ menu: { ...menu, [key]: !menu[key] } }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.ok(!mock.calls.includes('screenshot')); }); // 不以部分DOM符合替代完整啟動畫面前提。
-            } // 未截圖的不宣告有視覺證據。
-            test('總截止後不送新動作', async () => { const mock = fixture({ elapsed: { launch: LIMITS.totalMs } }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['launch', 'close']); assert.deepEqual(result.faults, ['probe-deadline']); }); // 等待過慢不借用後續階段時間。
-            test('清理失敗不得成功', async () => { const mock = fixture({ failure: 'close' }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.ok(result.faults.includes('cleanup-incomplete')); }); // 不能把有圖當資源已關閉。
-            test('回傳結果為獨立快照', async () => { const mock = fixture(); const result = await executeProbe(mock.adapter, mock.now); const before = JSON.stringify(result); menu.storyVisible = false; assert.equal(JSON.stringify(result), before); menu.storyVisible = true; }); // 原始物件後改不能回寫封存結果。
-            test('目標只接受唯一HTTPS根網址', () => { for (const url of [TARGET.url + '?x=1', TARGET.url + '#x', TARGET.url + 'other', 'http://orbit-fall-private-qa.agentkystr.chatgpt.site/', 'invalid']) assert.equal(exactTarget(url), false); assert.equal(exactTarget(TARGET.url), true); assert.equal(validMenu(null), false); }); // 無私人入口或查詢捷徑。
-            test('外部錯誤訊息不進報告', () => { assert.equal(classifyError(new Error('token=secret')), 'operation-rejected'); assert.equal(classifyError({ name: 'TimeoutError', message: 'cookie=secret' }), 'operation-timeout'); }); // 原始外部訊息永不被當診斷內容保存。
-            test('有界動作超時後晚完成不接續新動作', async () => { const mock = fixture(); let finish; mock.adapter.launch = () => new Promise(resolve => { finish = resolve; }); mock.adapter.bounded = async action => { void action(); await Promise.resolve(); throw new Fault('operation-deadline'); }; const result = await executeProbe(mock.adapter, mock.now); const snapshot = JSON.stringify(result); finish(); await Promise.resolve(); assert.deepEqual(mock.calls, ['close']); assert.equal(JSON.stringify(result), snapshot); }); // 模擬超時與晚完成，確認沒有導航、截圖或第二輪。
-            test('只有WebGL1也必須提前阻擋', async () => { const mock = fixture({ capability: { status: 'available', api: 'webgl' } }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['launch', 'capability', 'close']); assert.deepEqual(result.faults, ['webgl2-unavailable']); }); // Three需求不能被較舊API的可用性冒充。
-          QA_SOURCE_10: | # 固定原文 tests/public.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from "node:test"; // 純Node測試，不啟動瀏覽器、不連GitHub或遊戲。
-            import assert from "node:assert/strict"; // 任何傳輸不完整都必須反駁通過。
-            import { createHash } from "node:crypto"; // 合成資料的SHA校驗，不產生假遊戲證據。
-            import { inspectGate } from "../scripts/gate.mjs"; // 測正式公開repo閘門。
-            import { encodeTransfer, decodeTransfers, identity, TRANSFER } from "../scripts/log-transfer.mjs"; // 編解碼使用同一份正式程式。
-            const allowed = { GITHUB_ACTIONS: "true", RUNNER_ENVIRONMENT: "github-hosted", RUNNER_OS: "Linux", GITHUB_REPOSITORY: "KYStr/stteak-games", GITHUB_REPOSITORY_OWNER: "KYStr", GITHUB_ACTOR: "KYStr", QA_REPOSITORY_PRIVATE: "false", GITHUB_REF: "refs/heads/main", GITHUB_WORKFLOW_REF: "KYStr/stteak-games/.github/workflows/orbit-capability.yml@refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", GITHUB_RUN_ATTEMPT: "1", QA_CONFIRM_PUBLIC_PROBE: "true", GITHUB_SHA: "a".repeat(40), GITHUB_WORKFLOW_SHA: "a".repeat(40), GITHUB_RUN_ID: "12345", QA_MODE: "probe" }; // 合成身份不代表真實run。
-            test("固定公開主分支首次手動派發可通過閘門", () => assert.deepEqual(inspectGate(allowed), [])); // 只測授權前提，不宣稱browser可用。
-            for (const key of Object.keys(allowed)) test(`缺少${key}必須阻擋`, () => assert.ok(inspectGate({ ...allowed, [key]: "" }).length)); // 每項身份、分支、公開性與確認都不可省略。
-            for (const [key, value] of [["QA_REPOSITORY_PRIVATE", "true"], ["GITHUB_RUN_ATTEMPT", "2"], ["GITHUB_REF", "refs/heads/other"], ["GITHUB_REPOSITORY", "Someone/stteak-games"], ["GITHUB_ACTOR", "Someone"], ["QA_MODE", "long"]]) test(`${key}錯值阻擋`, () => assert.ok(inspectGate({ ...allowed, [key]: value }).length)); // 私有、重跑、fork、非owner與長測不能走同一入口。
-            const expected = identity(allowed); // 回收端假定此身份來自獨立讀回，不從stream猜。
-            const hash = value => createHash("sha256").update(value).digest("hex"); // 只核合成測試資料完整性。
-            function sample(bytes = 9000) { // 合成PNG格式簽名字節，不是實際畫面，不落地成png檔。
-              const png = Buffer.alloc(bytes, 37); Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(png); // 檔頭只能測傳輸簽名，不能當有效圖片或遊戲證據。
-              const report = Buffer.from(JSON.stringify({ outcome: "evidence-collected-pending-review", screenshots: [{ file: "boot.png", bytes: png.length, sha256: hash(png) }] })); // 假報告僅存在測試記憶體內。
-              const lines = [...encodeTransfer("report", report, expected), ...encodeTransfer("png", png, expected)]; return { png, report, lines }; // 每個stream都帶同一合成run身份。
-            } // 無API請求、沒有真截圖。
-            test("有時間戳及一般log時可精確回收原bytes", () => { const data = sample(); const log = ["setup output", ...data.lines.map(line => "2026-10-27T08:00:00.1234567Z " + line), "normal footer"].join("\r\n"); const result = decodeTransfers(log, expected); assert.deepEqual(result.outputs.png.bytes, data.png); assert.deepEqual(result.outputs.report.bytes, data.report); }); // 接受官方rawlog時間前綴，不依靠UI文字截取。
-            test("二MiB上界可完整往返且每行小於四千三百字元", () => { const data = sample(TRANSFER.pngLimit); assert.ok(data.lines.slice(1).every(line => line.length < 4300)); assert.deepEqual(decodeTransfers(data.lines.join("\n"), expected).outputs.png.bytes, data.png); }); // 最大合法圖只測合成記憶體資料，不消耗runner或artifact額度。
-            test("過大PNG與報告一律拒絕", () => { assert.throws(() => encodeTransfer("png", Buffer.alloc(TRANSFER.pngLimit + 1), expected)); assert.throws(() => encodeTransfer("report", Buffer.alloc(TRANSFER.reportLimit + 1), expected)); }); // 不偷偷多圖分輪或改畫質。
-            test("blocked無PNG可回收且不冒稱有圖", () => { const bytes = Buffer.from(JSON.stringify({ outcome: "blocked", faults: ["webgl-unavailable"], screenshots: [] })); const result = decodeTransfers(encodeTransfer("report", bytes, expected).join("\n"), expected); assert.equal(result.report.outcome, "blocked"); assert.equal(result.outputs.png, undefined); }); // 能力失敗即停，不硬拿遊戲圖。
-            test("缺一塊拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 2/")); data.lines.splice(index, 1); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不因首尾存在就接受中間缺圖資料。
-            test("重複塊拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); data.lines.splice(index, 0, data.lines[index]); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不自動去重掩蓋來源問題。
-            test("亂序拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); [data.lines[index], data.lines[index + 1]] = [data.lines[index + 1], data.lines[index]]; assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不靠重新排序掩蓋log回收不完整。
-            test("末尾截斷拒絕", () => { const data = sample(); data.lines.pop(); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 必須看見完整結尾與精確SHA。
-            test("GitHub秘密遮罩或UI省略字元拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); data.lines[index] = data.lines[index].slice(0, -3) + "***"; assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 無法回復時回報傳輸blocked，不再測遊戲。
-            test("合法base64字元被改仍以SHA拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); data.lines[index] = data.lines[index].slice(0, -1) + (data.lines[index].endsWith("A") ? "B" : "A"); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不是只看base64可解碼就接受。
-            test("錯run或錯commit拒絕", () => { const data = sample(); assert.throws(() => decodeTransfers(data.lines.join("\n"), { ...expected, runId: "999" })); assert.throws(() => decodeTransfers(data.lines.join("\n"), { ...expected, commit: "b".repeat(40) })); }); // 防止舊圖或別的執行混入。
-            test("重複完整stream拒絕", () => { const data = sample(); assert.throws(() => decodeTransfers([...data.lines, ...data.lines].join("\n"), expected)); }); // 不接受合併多個run的日誌。
-            test("只有圖或成功報告缺圖拒絕", () => { const data = sample(); assert.throws(() => decodeTransfers(encodeTransfer("png", data.png, expected).join("\n"), expected)); assert.throws(() => decodeTransfers(encodeTransfer("report", data.report, expected).join("\n"), expected)); }); // 綠燈、圖片與報告不能彼此替代。
-            test("只有shell回顯標記不算真stream", () => assert.throws(() => decodeTransfers("console.log(\"QA_TRANSFER_V1 ...\")", expected))); // 行內程式文字不當執行證據。
-            test("PNG簽名錯誤拒絕", () => { const data = sample(); data.png[0] = 1; const report = Buffer.from(JSON.stringify({ outcome: "evidence-collected-pending-review", screenshots: [{ file: "boot.png", bytes: data.png.length, sha256: hash(data.png) }] })); assert.throws(() => decodeTransfers([...encodeTransfer("report", report, expected), ...encodeTransfer("png", data.png, expected)].join("\n"), expected)); }); // 任意二進位資料不能冒稱原始PNG。
-            test("超過log上限拒絕", () => assert.throws(() => decodeTransfers("x".repeat(TRANSFER.logLimit + 1), expected))); // 本地回收本身也有資源上限。
+            import { readFile, readdir } from "node:fs/promises"; // 純本地語法、註解與安全契約檢查，不執行任何browser或版本命令。
+            import { execFileSync } from "node:child_process"; // 只呼叫Node的--check。
+            import assert from "node:assert/strict"; // 任何不符都停止後續runner安裝。
+            for (const directory of ["scripts", "tests"]) for (const file of await readdir(directory)) { // 僅已知目錄，不讀其他使用者檔案。
+              if (!file.endsWith(".mjs")) continue; const path = `${directory}/${file}`; const source = await readFile(path, "utf8"); // 不掃依賴套件或遊戲原碼。
+              execFileSync(process.execPath, ["--check", path], { stdio: "pipe" }); // 語法檢查不會載入或執行模組。
+              for (const [index, line] of source.split("\n").entries()) if (line.trim()) assert.match(line, /\/\/.*[\u3400-\u9fff]/, `${path}:${index + 1} 缺中文行註解`); // 每個非空程式行都要中文說明。
+            } // 所有本地候選完成靜態檢查。
+            const driver = await readFile("scripts/diagnose.mjs", "utf8"); assert.match(driver, /chromiumSandbox: true/); assert.doesNotMatch(driver, /\.newPage\(|\.newContext\(|\.goto\(|\.evaluate\(|\.screenshot\(|args\s*:/); // 沒有頁面、遊戲、WebGL或自訂啟動旗標入口。
+            assert.equal((driver.match(/chromium\.launch\(/g) || []).length, 1); assert.match(driver, /\["--version"\]/); // 一次launch與固定無頁面版本查詢，不提供任意CLI參數。
+            const pkg = JSON.parse(await readFile("package.json", "utf8")); const lock = JSON.parse(await readFile("package-lock.json", "utf8")); assert.equal(pkg.license, "MIT"); assert.equal(pkg.private, true); // 自有程式MIT，private只防npm誤發。
+            for (const path of ["node_modules/playwright", "node_modules/playwright-core"]) { assert.equal(lock.packages[path].version, "1.64.1"); assert.equal(lock.packages[path].license, "Apache-2.0"); assert.match(lock.packages[path].integrity, /^sha512-/); } // 沿用同官方版本，不換browser或OS迴避限制。
+            console.log("PASS: offline syntax/comments, fixed lock, one sandbox launch, no page/game/evaluate/flags; no browser or version command executed."); // 只宣告離線驗證。
+          QA_SOURCE_9: | # 固定原文 tests/diagnostic.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
+            import test from "node:test"; // 全部純記憶體mock，不讀本機sysctl也不啟動browser。
+            import assert from "node:assert/strict"; // 白名單與停止條件都用反例驗證。
+            import { classifyAllowed, parseKernelValue, parseVersion, executeDiagnosis, EXPECTED, KERNEL, Fault, LIMITS } from "../scripts/diagnostic-core.mjs"; // 測正式診斷程式，不抄假流程。
+            import { inspectGate } from "../scripts/gate.mjs"; // 公開repo與單次診斷授權仍必須成立。
+            import { encodeTransfer, decodeTransfers } from "../scripts/log-transfer.mjs"; // 無圖短JSON仍經既有SHA協定核對。
+            const allowed = { GITHUB_ACTIONS: "true", RUNNER_ENVIRONMENT: "github-hosted", RUNNER_OS: "Linux", GITHUB_REPOSITORY: "KYStr/stteak-games", GITHUB_REPOSITORY_OWNER: "KYStr", GITHUB_ACTOR: "KYStr", QA_REPOSITORY_PRIVATE: "false", GITHUB_REF: "refs/heads/main", GITHUB_WORKFLOW_REF: "KYStr/stteak-games/.github/workflows/orbit-capability.yml@refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", GITHUB_RUN_ATTEMPT: "1", QA_CONFIRM_LAUNCH_DIAGNOSIS: "true", GITHUB_SHA: "a".repeat(40), GITHUB_WORKFLOW_SHA: "a".repeat(40), GITHUB_RUN_ID: "12345", QA_MODE: "launch-diagnostic" }; // 合成身份不是真實run。
+            test("診斷完整固定公開gate才通過", () => assert.deepEqual(inspectGate(allowed), [])); // 不沿用舊probe確認選項。
+            for (const key of Object.keys(allowed)) test(`缺少${key}即阻擋`, () => assert.ok(inspectGate({ ...allowed, [key]: "" }).length)); // 非原owner、私有repo、其他分支與重跑均受固定值檢查。
+            test("舊probe模式不能誤開診斷", () => assert.ok(inspectGate({ ...allowed, QA_MODE: "probe", QA_CONFIRM_LAUNCH_DIAGNOSIS: "" }).length)); // 必須另一次明示確認診斷目的。
+            for (const [text, code] of [["Chromium sandboxing failed! token=secret", "sandbox-failure-reported"], ["No usable sandbox!", "sandbox-failure-reported"], ["crbug.com/638180", "sandbox-failure-reported"], ["Failed to move to new namespace: Operation not permitted", "namespace-operation-denied-reported"], ["Executable does not exist", "executable-missing-reported"], ["Host system is missing dependencies", "host-library-missing-reported"], ["error while loading shared libraries: secret.so", "host-library-missing-reported"], ["Permission denied /private/secret", "permission-denied-reported"], ["Target page, context or browser has been closed", "target-closed-reported"], ["process did exit signal=SIGTRAP", "process-signal-reported"], ["unknown token=secret", "unclassified-rejection"]]) test(`錯誤僅輸出白名單${code}`, () => { const result = classifyAllowed(new Error(text)); assert.equal(result.code, code); assert.ok(!JSON.stringify(result).includes("secret")); }); // 不漏任何匹配原文、token、路徑或library名。
+            test("一般EPERM不能假認sandbox已證", () => { const error = new Error("operation denied"); error.code = "EPERM"; const value = classifyAllowed(error); assert.equal(value.code, "permission-denied-reported"); assert.ok(!value.indicators.includes("sandbox-failure-reported")); }); // OS狀態與真正launch markers分開判讀。
+            test("未知Fault不能帶任意字串進log", () => assert.equal(classifyAllowed(new Fault("token=secret")).code, "unclassified-rejection")); // 自訂碼也有白名單。
+            test("TimeoutError保留固定種類", () => { const error = new Error("secret"); error.name = "TimeoutError"; assert.equal(classifyAllowed(error).code, "timeout-reported"); }); // 不由實際耗時猜timeout。
+            for (const [text, type, value] of [["1\n", "bit", 1], ["0", "bit", 0], ["Y\n", "yn", true], ["N", "yn", false], ["6191547", "integer", 6191547], ["0", "integer", 0]]) test(`只讀系統值${type}合法解析`, () => assert.deepEqual(parseKernelValue(text, type), { status: "read", value })); // 只記有界值，不修改設定。
+            for (const text of ["token=secret", "2", "-1", "1 extra", "9".repeat(40)]) test("系統任意字串不輸出", () => { const result = parseKernelValue(text, "bit"); assert.deepEqual(result, { status: "unrecognized", value: null }); }); // 無法解析就未知，不沿用原文。
+            test("命名空間上限溢位拒絕", () => assert.equal(parseKernelValue("9999999999", "integer").status, "unrecognized")); // 防止無界整數。
+            test("只允許四個固定唯讀檔", () => { assert.equal(KERNEL.length, 4); assert.ok(KERNEL.every(item => item.path.startsWith("/proc/sys/") || item.path === "/sys/module/apparmor/parameters/enabled")); }); // 不新增auditlog、profile或其他系統資料讀取。
+            test("固定官方版本四種標頭可核", () => { for (const name of ["Chromium", "Google Chrome", "Google Chrome for Testing", "Chrome Headless Shell"]) assert.deepEqual(parseVersion(`${name} ${EXPECTED.version}\n`), { status: "verified", version: EXPECTED.version }); }); // 只輸出數字版本。
+            test("版本stdout含秘密或不同版本不放行", () => { assert.deepEqual(parseVersion(`Chromium ${EXPECTED.version} token=secret`), { status: "unrecognized-or-mismatch", version: null }); assert.equal(parseVersion("Chromium 1.2.3.4").status, "unrecognized-or-mismatch"); }); // 不把任意stdout帶入公開log。
+            function fixture(options = {}) { // 所有操作只在記憶體計數，不讀系統或建立程序。
+              const calls = []; let clock = 0; let handle = false; const action = async (name, value) => { calls.push(name); clock += options.elapsed?.[name] || 1; if (options.failure === name) throw options.error || new Error("unknown secret"); return value; }; // 每一階段都能反駁早停契約。
+              const adapter = { bounded: async fn => fn(), readKernel: () => action("kernel", { apparmorRestrictUnprivilegedUserns: { status: "read", value: 1 } }), inspectExecutable: () => action("executable", { status: options.executable || "ready" }), readVersion: () => action("version", { status: options.version || "verified", version: EXPECTED.version }), launch: async () => { await action("launch"); handle = true; }, close: () => action("close", { status: handle ? "close-acknowledged" : "no-browser-handle", processInventoryVerified: false, underlyingProcessCleanup: handle ? "browser-close-ack-only" : "not-observed" }) }; // 無context/page/WebGL/goto方法，因此不能做遊戲驗收。
+              return { calls, adapter, now: () => clock }; // 暴露合成時鐘供截止反例。
+            } // 不修改正式時間限制。
+            test("成功只宣告診斷收集且沒有遊戲測試", async () => { const mock = fixture(); const report = await executeDiagnosis(mock.adapter, mock.now); assert.equal(report.outcome, "diagnostic-collected"); assert.deepEqual(mock.calls, ["kernel", "executable", "version", "launch", "close"]); for (const key of ["capability", "boot", "operation", "stability"]) assert.equal(report[key].status, "not-run"); assert.equal(report.screenshots.length, 0); }); // 一次launch完成就close，不接回原probe。
+            for (const stage of ["kernel", "executable", "version", "launch"]) test(`${stage}失敗立即停止只清理`, async () => { const mock = fixture({ failure: stage }); const report = await executeDiagnosis(mock.adapter, mock.now); assert.equal(report.outcome, "blocked"); assert.equal(mock.calls.at(-1), "close"); assert.equal(mock.calls.indexOf(stage), mock.calls.length - 2); assert.ok(!JSON.stringify(report).includes("secret")); }); // 不重試、不改flag，也不把錯誤原文帶進報告。
+            test("不存在執行檔不做version或launch", async () => { const mock = fixture({ executable: "missing" }); const report = await executeDiagnosis(mock.adapter, mock.now); assert.deepEqual(mock.calls, ["kernel", "executable", "close"]); assert.equal(report.launch.status, "not-run"); }); // 預先否證能省掉無意義launch。
+            test("版本未核不launch", async () => { const mock = fixture({ version: "unrecognized-or-mismatch" }); await executeDiagnosis(mock.adapter, mock.now); assert.deepEqual(mock.calls, ["kernel", "executable", "version", "close"]); }); // 不換binary或補下載。
+            test("launch拒絕保留未知程序建立與清理", async () => { const mock = fixture({ failure: "launch", error: new Error("No usable sandbox!") }); const report = await executeDiagnosis(mock.adapter, mock.now); assert.equal(report.launch.status, "rejected-or-unconfirmed"); assert.equal(report.launch.processCreation, "unknown"); assert.equal(report.cleanup.underlyingProcessCleanup, "not-observed"); assert.equal(report.faults[0].stage, "launch"); assert.equal(report.faults[0].code, "sandbox-failure-reported"); }); // 不能把無handle當從未建子程序或已全面清理。
+            test("cleanup失敗不能診斷綠燈", async () => { const mock = fixture({ failure: "close" }); const report = await executeDiagnosis(mock.adapter, mock.now); assert.equal(report.outcome, "blocked"); assert.equal(report.cleanup.status, "incomplete"); }); // 關閉承諾失敗不得假報成功。
+            test("總截止後不啟新動作", async () => { const mock = fixture({ elapsed: { kernel: LIMITS.totalMs } }); const report = await executeDiagnosis(mock.adapter, mock.now); assert.deepEqual(mock.calls, ["kernel", "close"]); assert.equal(report.faults[0].code, "diagnostic-deadline"); }); // 不能為診斷追加等待或新round。
+            test("診斷無PNG報告可從有序log回收", async () => { const mock = fixture(); const report = await executeDiagnosis(mock.adapter, mock.now); const id = { repository: "KYStr/stteak-games", runId: "12345", commit: "a".repeat(40), attempt: "1" }; const bytes = Buffer.from(JSON.stringify(report)); const result = decodeTransfers(encodeTransfer("report", bytes, id).join("\n"), id); assert.deepEqual(result.outputs.report.bytes, bytes); assert.equal(result.outputs.png, undefined); }); // 此版傳輸只增加diagnostic-collected合法值，不需要圖。
           QA_FILE_INDEX: | # JSON逐欄：path相對檔名、env來源變數、bytes位元組長度、sha256內容校驗；不是執行指令。
-            [{"path":"package.json","env":"QA_SOURCE_0","bytes":392,"sha256":"f0ac519f2f9ff827e77abea1847960536d335a632ff0d622d9ec730e8c704331"},{"path":"package-lock.json","env":"QA_SOURCE_1","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"path":"LICENSE","env":"QA_SOURCE_2","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"scripts/core.mjs","env":"QA_SOURCE_3","bytes":5859,"sha256":"87611458846b15a9121f8ab5932fe3493e9abbb37921706acf76e311938724ea"},{"path":"scripts/gate.mjs","env":"QA_SOURCE_4","bytes":2676,"sha256":"bb37db63b771bf08afb11d73a5a771ad248a00c9d22246915cfd46ea2ffb80e5"},{"path":"scripts/probe.mjs","env":"QA_SOURCE_5","bytes":11675,"sha256":"6e217a09101e3c254ac7717fa8fcb2698fb757f9c3264ecc8c9329622a9c5051"},{"path":"scripts/log-transfer.mjs","env":"QA_SOURCE_6","bytes":7615,"sha256":"a8d65f1da2d0a556b1d352e17570b337357dda7348b2b3d6b6bb2dbb2dd6736d"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_7","bytes":1987,"sha256":"a865fda7646a03b4c6258cea7efdabb54bbcb197e66cb2ed5200c7038b389b20"},{"path":"scripts/check.mjs","env":"QA_SOURCE_8","bytes":2394,"sha256":"2b3163d6ff8cffe0cbc810eb24ce5c87ffe553419e474568a9f28eb153130c5e"},{"path":"tests/core.test.mjs","env":"QA_SOURCE_9","bytes":7096,"sha256":"9dd9bfe9894103a0b19003217b85fb3a686138e1232df201140b295dd0892618"},{"path":"tests/public.test.mjs","env":"QA_SOURCE_10","bytes":7826,"sha256":"f16938b878194b756e600821818c6da94becaba7b9b88c8403e839c9d389b8c5"}]
+            [{"path":"package.json","env":"QA_SOURCE_0","bytes":396,"sha256":"e2b2790d9e484f21534a2d333e2dac4a5a326165d3f88cc96fdb7fce234a0602"},{"path":"package-lock.json","env":"QA_SOURCE_1","bytes":1306,"sha256":"c31662c3b1473ddd719b05f795a2c17a1b2914df439eae58ce17b27665167164"},{"path":"LICENSE","env":"QA_SOURCE_2","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"scripts/gate.mjs","env":"QA_SOURCE_3","bytes":2736,"sha256":"e6e0fca0023e3e885d235fc935c3ede84186450065ee63de139f9e021c850119"},{"path":"scripts/diagnostic-core.mjs","env":"QA_SOURCE_4","bytes":8891,"sha256":"e74d741e98519a423d1ac4f785cec623fcaf850d2791d907d9a9c2635ed3b71f"},{"path":"scripts/diagnose.mjs","env":"QA_SOURCE_5","bytes":7231,"sha256":"2a6dec80916b6b61adf0d5ac1a16ad7a9572f6c828e5359ffc0a03784457b285"},{"path":"scripts/log-transfer.mjs","env":"QA_SOURCE_6","bytes":7639,"sha256":"1b6573462ae468818d6230f9a0555ffa69e7dea6ce2cee4d3cdf5c85ae3cf2d6"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_7","bytes":1365,"sha256":"00ef7166788858a812432d651921b3bac72ea32ff50ec77f317c71fb441a2db4"},{"path":"scripts/check.mjs","env":"QA_SOURCE_8","bytes":2195,"sha256":"8392120e9b6851e0b7c8f29be01ae3be01a0ea5c9e1c9eb10b156b7d08f7521a"},{"path":"tests/diagnostic.test.mjs","env":"QA_SOURCE_9","bytes":9802,"sha256":"80dc4aedfaf1777c8cdeb288359f1bdaf9679870216cf8e5c45ac3273ed01f4d"}]
         run: | # 下列shell與JavaScript每行均有中文解釋；只做逐byte校驗及臨時檔生成。
           node --input-type=module -e ' // 使用固定Node與標準模組，不執行外部下載程式。
           import { mkdir, writeFile, readFile } from "node:fs/promises"; // 檔案只寫本工作目錄。
@@ -435,9 +360,9 @@ jobs: # 只有一個標準runner job。
         run: npm ci --ignore-scripts --no-audit --no-fund # 不執行依賴安裝script，不配置登入token。
       - name: Install only official Chromium headless shell # 只有root核准派發後runner才可執行；本地準備不執行。
         run: node node_modules/playwright/cli.js install --with-deps --only-shell chromium # 不裝Firefox/WebKit，不改sandbox或OS安全設定。
-      - name: One sandbox WebGL2 and boot probe # 能力不足即blocked，不使用危險旗標或重開browser。
-        id: capability # 供結果回讀識別，不觸發下游長測。
-        run: timeout --signal=TERM --kill-after=5s 85s node scripts/probe.mjs # 同一程序群組八十五秒TERM、再五秒KILL，上界九十秒。
-      - name: Emit only bounded public evidence to raw log # 不使用upload-artifact、不使用cache，日誌只含本輪公開圖及短報告。
-        if: ${{ !cancelled() && steps.capability.outcome != 'skipped' && steps.capability.outcome != '' }} # 只有probe真的開始才輸出；前置安裝失敗不補造結果。
-        run: node scripts/emit-evidence.mjs # 逐塊等待stdout寫完；缺圖／缺報告／SHA不符即失敗，不再開browser。
+      - name: One bounded sandbox launch diagnosis # 只收白名單原因與只讀前提，不建立context/page或開遊戲。
+        id: diagnosis # 只識別本次啟動診斷，不觸發遊戲或長測。
+        run: timeout --signal=TERM --kill-after=5s 30s node scripts/diagnose.mjs # 同一程序群組三十秒TERM、再五秒KILL，上界三十五秒。
+      - name: Emit only bounded diagnostic report to raw log # 沒有任何PNG、artifact或cache，只有固定欄位短JSON。
+        if: ${{ !cancelled() && steps.diagnosis.outcome != 'skipped' && steps.diagnosis.outcome != '' }} # 只有診斷真的開始才輸出；前置安裝失敗不補造結果。
+        run: node scripts/emit-evidence.mjs # 逐塊等待stdout寫完；缺報告或SHA不符即失敗，不再開browser。
