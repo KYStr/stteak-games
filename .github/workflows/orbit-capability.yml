@@ -1,876 +1,118 @@
-name: One reviewed public game scenario # 單一已審正常操作，不宣稱遊戲完整驗收。
-run-name: One ${{ inputs.scenario }} scenario by ${{ github.actor }} # 僅固定白名單選項，不接受任意程式或URL。
-on: # 沒有push、PR、schedule或其他自動觸發。
-  workflow_dispatch: # 只有owner手動派發一次。
-    inputs: # 不接受自選URL、指令或瀏覽器旗標。
-      confirm_native_chrome: # 明示確認公開最小probe，不是持續付費或長測授權。
-        description: '原生Chrome沙箱＋官方CJK字型＋單一已審正常操作；無長測或自動重試' # 完成就停，不為超過120秒而idle。
-        type: boolean # 用明確布林選項，避免字串歧義。
+name: Read only native package identity # 零browser／零遊戲／零安裝的固定身份診斷。
+run-name: Native package metadata only by ${{ github.actor }} # 不接受自由命令或目標URL。
+on: # 僅owner手動派發，沒有push／PR／schedule。
+  workflow_dispatch: # 每輪須重新明確確認，沒有自動重試。
+    inputs: # 只有布林同意，不存在browser旗標或版本輸入。
+      confirm_metadata_only: # 只讀metadata不等於授權launch。
+        description: '僅20秒唯讀Chrome套件身份；不執行Chrome或遊戲、不安裝或變更設定' # 明確有限目的。
+        type: boolean # 不使用模糊字串確認。
         default: false # 預設不執行。
-        required: true # 必須由owner明確確認。
-      scenario: # 每輪只能選一個已審遊戲情境，沒有矩陣或連續跑四款。
-        description: '唯一正常UI情境；完成即停' # 選項不接受自訂URL或腳本。
-        type: choice # GitHub固定選單，runtime仍核白名單。
-        required: true # 不依預設推測使用者要測哪款。
-        default: crown-camp-first-trial-pointer # 本固定候選只提供Crown營地到試煉1單擊。
-        options: # 後續情境只有逐份審過才可加入。
-          - crown-camp-first-trial-pointer # 兩次新鮮可點UI→唯一正常mouse→可見試煉1，無D。
-permissions: {} # 不checkout、不讀寫GitHub內容、不給token任何可選scope。
-concurrency: # 所有分支共用固定群組，沒有矩陣或分片。
-  group: stteak-single-public-capability # 最多一個正在執行的probe。
-  cancel-in-progress: false # 新派發不干擾既有證據；不要主動排第二輪。
-jobs: # 只有一個標準runner job。
-  probe: # 十五分鐘連續遊玩沒有job或隱藏入口。
-    if: ${{ github.repository == 'KYStr/stteak-games' && github.repository_owner == 'KYStr' && github.actor == 'KYStr' && !github.event.repository.private && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && github.run_attempt == 1 && inputs.confirm_native_chrome }} # 在開runner前核固定owner、公開repo、main、首次手動與明示確認。
-    runs-on: ubuntu-24.04 # 標準公開Linux runner；不用larger或self-hosted。
-    timeout-minutes: 5 # 含最多兩分鐘字型步驟與九十秒browser，整job五分鐘硬截止。
-    env: # 不映射任何secret、token或歷史私人QA資料。
-      QA_REPOSITORY_PRIVATE: ${{ github.event.repository.private }} # 從GitHub事件取得真實公開性，不依名字猜測。
-      QA_CONFIRM_NATIVE_CHROME: ${{ inputs.confirm_native_chrome }} # 只作布林比對，不放進shell。
-      QA_MODE: native-chrome # 保留原生Chrome模式，不存在長測。
-      QA_SCENARIO: ${{ inputs.scenario }} # 只用精確白名單模組，不接受路徑或URL。
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' # npm依賴安裝不能暗中下載browser。
-      npm_config_fetch_retries: '0' # 本包不增加npm重試輪數。
-      npm_config_audit: 'false' # 安裝時不送無關審計流量，安全更新另審。
-      npm_config_fund: 'false' # 無付款或募資動作。
-    steps: # 失敗即停止後續測試，只有證據輸出可在失敗後執行。
-      - name: Fixed official Node without credentials # 不需要repo讀權或PAT，只讀公開發行資產／runner toolcache。
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # 官方v7.1.0完整commit鎖定。
-        with: # 不把預設github.token傳給action。
-          node-version: '24.22.1' # 固定已核官方LTS修補版本。
-          token: '' # 明確匿名，不為安裝公開Node提高權限。
-          package-manager-cache: false # 不產Actions cache儲存。
-      - name: Materialize exact reviewed public test payload # 只建立本工作臨時檔，無checkout或repo寫入。
-        env: # 原文payload可公開；JSON與LICENSE依法不能加程式註解，欄位意義在下方中文說明。
-          QA_SOURCE_0: | # 固定原文 package.json；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            {
-              "name": "stteak-public-capability-probe",
-              "version": "0.1.0",
-              "private": true,
-              "type": "module",
-              "license": "MIT",
-              "engines": { "node": ">=24 <25" },
-              "scripts": {
-                "test": "node --test tests/*.test.mjs",
-                "check": "node scripts/check.mjs",
-                "gate": "node scripts/gate.mjs",
-                "probe": "node scripts/probe.mjs"
-              },
-              "devDependencies": { "playwright": "1.64.1" }
-            }
-          QA_SOURCE_1: | # 固定原文 package-lock.json；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            {
-              "name": "stteak-public-capability-probe",
-              "version": "0.1.0",
-              "lockfileVersion": 3,
-              "requires": true,
-              "packages": {
-                "": {
-                  "name": "stteak-public-capability-probe",
-                  "version": "0.1.0",
-                  "license": "MIT",
-                  "devDependencies": {
-                    "playwright": "1.64.1"
-                  },
-                  "engines": {
-                    "node": ">=24 <25"
-                  }
-                },
-                "node_modules/playwright": {
-                  "version": "1.64.1",
-                  "resolved": "https://registry.npmjs.org/playwright/-/playwright-1.64.1.tgz",
-                  "integrity": "sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA==",
-                  "dev": true,
-                  "license": "Apache-2.0",
-                  "dependencies": {
-                    "playwright-core": "1.64.1"
-                  },
-                  "bin": {
-                    "playwright": "cli.js"
-                  },
-                  "engines": {
-                    "node": ">=20"
-                  }
-                },
-                "node_modules/playwright-core": {
-                  "version": "1.64.1",
-                  "resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.64.1.tgz",
-                  "integrity": "sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ==",
-                  "dev": true,
-                  "license": "Apache-2.0",
-                  "bin": {
-                    "playwright-core": "cli.js"
-                  },
-                  "engines": {
-                    "node": ">=20"
-                  }
-                }
-              }
-            }
-          QA_SOURCE_2: | # 固定原文 LICENSE；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            MIT License
-            
-            Copyright (c) 2026 gent a
-            
-            Permission is hereby granted, free of charge, to any person obtaining a copy
-            of this software and associated documentation files (the "Software"), to deal
-            in the Software without restriction, including without limitation the rights
-            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-            copies of the Software, and to permit persons to whom the Software is
-            furnished to do so, subject to the following conditions:
-            
-            The above copyright notice and this permission notice shall be included in all
-            copies or substantial portions of the Software.
-            
-            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-            SOFTWARE.
-          QA_SOURCE_3: | # 固定原文 scripts/core.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { classifyAllowed } from './diagnostics.mjs'; // 復用診斷run的固定錯誤白名單，不保存原始錯誤。
-            export const TARGET = Object.freeze({ url: 'https://orbit-fall-private-qa.agentkystr.chatgpt.site/', build: 'orbit-fall-0014', expectedRuntimeSha256: '313575493db1f9ec915fe408e712ffe4530b3cdbfe9991e5ef0d1dfb8a461f3a' }); // 固定唯一公開目標；雜湊是來源記錄而非遠端位元組驗證。
-            export const LIMITS = Object.freeze({ totalMs: 90000, preflightMs: 30000, operationMs: 15000, launchMs: 15000, navigationMs: 20000, screenshotMs: 8000, closeMs: 5000, pngBytes: 2097152 }); // 九十秒包含啟動與結束，任何失敗均不重試。
-            export class Fault extends Error { constructor(code) { super(code); this.code = code; } } // 只允許自訂固定代碼進報告，不保存外部錯誤中的網址或秘密。
-            export function exactTarget(value, target = TARGET) { try { return new URL(value).href === target.url; } catch { return false; } } // 禁止轉址、查詢、片段與其他頁面的資料收集。
-            export function validMenu(state) { return !!state?.locationValid && !state.bootVisible && state.overlayVisible && state.versionVisible && state.storyVisible && !state.continueVisible && !state.confirmVisible && state.canvasVisible; } // 僅判斷啟動畫面前提，不把選單當可遊玩通過。
-            const fixedCodes = new Set(['probe-deadline', 'operation-deadline', 'native-chrome-unverified', 'webgl2-unavailable', 'entry-url-mismatch', 'entry-http-not-200', 'boot-visible-prerequisite-mismatch', 'cleanup-incomplete', 'cleanup-still-connected', 'already-closed', 'late-browser-launch', 'pageerror-observed', 'page-crash-observed', 'unexpected-navigation', 'screenshot-url-mismatch', 'artifact-size-limit', 'scenario-blocked']); // 自訂錯誤也僅允許固定類別。
-            export function classifyError(error) { return error instanceof Fault && fixedCodes.has(error.code) ? error.code : classifyAllowed(error).code; } // 未知異常只留種類，不能猜測產品根因。
-            export async function executeProbe(adapter, now = () => performance.now()) { // 注入介面方便純記憶體測試，不需要啟動瀏覽器。
-              const target = adapter.target || TARGET; // 可選目標只由正式入口固定白名單模組提供，不能由URL輸入覆寫。
-              const started = now(); // 使用單調時間，不以系統時鐘跳動延長測試。
-              const report = { schemaVersion: 1, scope: adapter.runScenario ? 'native-chrome-one-reviewed-ui-scenario' : 'native-chrome-webgl-and-boot-only', stage: 'not-run', native: { status: 'not-run' }, launch: { status: 'not-run', handleAcquired: false, processCreation: 'not-observed' }, cleanup: { status: 'not-run', processInventoryVerified: false }, faultDetails: [], outcome: 'blocked', target, runtimeBytesVerified: false, capability: { status: 'not-run' }, boot: { status: 'not-run' }, operation: { status: 'not-run', reason: 'prior-story-and-pause-evidence-not-retested' }, stability: { status: 'not-run', reason: 'continuous-play-scenario-not-implemented' }, screenshots: [], faults: [], elapsedMs: 0 }; // 分開能力、啟動、操作與穩定性，不填未驗分數。
-              let stopped = false; // 第一個失敗後不再送出任何新測試動作。
-              const guard = () => { if (stopped || now() - started >= LIMITS.totalMs - LIMITS.closeMs) throw new Fault('probe-deadline'); }; // 預留關閉時間；真正九十秒硬界由入口程序另控。
-              const step = async (stage, action, budget = LIMITS.operationMs) => { report.stage = stage; guard(); const value = await adapter.bounded(action, Math.min(budget, LIMITS.totalMs - LIMITS.closeMs - (now() - started))); guard(); return value; }; // 每次動作前後檢查截止；競速超時後主流程永久停止，不接晚回覆續行。
-              const gate = () => { guard(); if (!exactTarget(adapter.url(), target)) throw new Fault('entry-url-mismatch'); }; // 只輸出不符代碼，不記錄含憑證的轉址網址。
-              try { // 全流程只有一條路徑，沒有自動降級或第二輪。
-                report.native = await step('native-preflight', () => adapter.inspectNative(), LIMITS.preflightMs); // 原生套件、固定路徑與Ubuntu原profile必須全部確認。
-                if (report.native.status !== 'ready') throw new Fault('native-chrome-unverified'); // 不補安裝、不搬binary、不變更profile與OS。
-                report.launch = { status: 'attempted', handleAcquired: false, processCreation: 'unknown' }; // launch拒絕不能推論完全沒建立子程序。
-                await step('launch', () => adapter.launch(), LIMITS.launchMs); // 唯一一次原生channel啟動。
-                report.launch = { status: 'acknowledged', handleAcquired: true, processCreation: 'browser-handle-acquired' }; // 只確認browser handle已取得。
-                await step('page-setup', () => adapter.preparePage()); // 只啟動一個有沙箱的官方測試瀏覽器。
-                report.capability = await step('capability', () => adapter.capability()); // 只在空白頁新建脫離文件的畫布，不碰遊戲物件或資料。
-                if (report.capability.status !== 'available' || report.capability.api !== 'webgl2') throw new Fault('webgl2-unavailable'); // WebGL2不可用立即結束，不開遊戲、不加入危險旗標。
-                const status = await step('navigate', () => adapter.navigate(), LIMITS.navigationMs); // 只導覽一次，不重載、不換瀏覽器。
-                report.boot.httpStatus = status; // 只記正式入口回應狀態，不保存回應本文。
-                gate(); // 登入或其他轉址在截圖、讀取介面前停止。
-                if (status !== 200) throw new Fault('entry-http-not-200'); // 非正常入口不可繼續操作。
-                if (adapter.runScenario) { // 新正常操作僅在同一個已核browser與固定goto之後執行。
-                  report.operation = { status: 'attempted-result-unconfirmed', reason: 'scenario-started-no-result-yet' }; // 已開始情境若總界逾時，不能誤記not-run。
-                  report.operation = await step('scenario', () => adapter.runScenario(), 45000); // 各scenario另有單步界，仍共用原九十秒總界。
-                  gate(); // 情境返回後再次核位置，其他頁面結果不可接受。
-                  if (report.operation.screenshot) report.screenshots.push(report.operation.screenshot); // 沿用唯一原圖傳輸，不增加多圖或artifact。
-                  if (report.operation.status !== 'evidence-collected-pending-image-review' || report.screenshots.length !== 1) throw new Fault('scenario-blocked'); // 未完整產證或前提失敗只blocked。
-                  report.boot.status = 'scenario-prerequisite-only-not-reaccepted'; report.outcome = 'evidence-collected-pending-review'; // 必要boot不重簽，人工仍須看最終圖與scope。
-                } else { // 舊純測試保留原probe路徑；正式選單不再只重做boot。
-                await step('waitMenu', () => adapter.waitMenu()); // 必要等待有界，等到可見就立即返回。
-                gate(); // 防止等待期間發生轉址。
-                const visible = await step('visible', () => adapter.visible()); // 僅讀取已知可見介面對應的布林值。
-                report.boot.visible = visible; // 不保存任意頁面文字或隱藏欄位。
-                if (!validMenu(visible)) throw new Fault('boot-visible-prerequisite-mismatch'); // 看不到指定選單則是前提阻擋，不憑空判遊戲失敗。
-                gate(); // 截圖前再核位置；不對登入頁留圖。
-                const screenshot = await step('screenshot', () => adapter.screenshot()); // 原始PNG只取一次，不錄影、不擷取完整DOM。
-                gate(); // 截圖期間若離開目標，結果不得簽認可用。
-                report.screenshots.push(screenshot); // 保存檔名、大小、SHA；圖片本體獨立存放。
-                report.boot.status = 'evidence-collected-pending-image-review'; // 只有人工看原圖後才能接受狹義啟動證據。
-                report.outcome = 'evidence-collected-pending-review'; // 工具成功並不等於遊戲整體或十五分鐘測試通過。
-                } // 原能力probe相容分支結束。
-              } catch (error) { // 任一錯誤都停止後續測試動作。
-                stopped = true; report.faults.push(classifyError(error)); report.faultDetails.push({ stage: report.stage, ...classifyAllowed(error), code: classifyError(error) }); if (report.launch.status === 'attempted') report.launch.status = 'rejected-or-unconfirmed'; // 不保存錯誤堆疊、網路回應或其他秘密。
-                report.outcome = 'blocked'; // 環境／前提不足與產品缺陷保持區分。
-              } finally { // 成功、失敗都嘗試結束同一個瀏覽器，不建立新工作階段。
-                stopped = true; // 清理期間永不恢復測試。
-                try { report.cleanup = await adapter.close(); } catch (error) { report.cleanup = { status: 'incomplete', processInventoryVerified: false }; report.faults.push('cleanup-incomplete'); report.faultDetails.push({ stage: 'close', ...classifyAllowed(error), code: classifyError(error) }); report.outcome = 'blocked'; } // 清理失敗不得假報成功，入口硬截止仍有效。
-                report.elapsedMs = Math.max(0, Math.round(now() - started)); // 記錄實際觀察耗時而非推估計費。
-              } // 其他遊戲與十五分鐘驗收一律未測。
-              return structuredClone(report); // 回傳獨立快照，晚到承諾不能修改交付結果。
-            } // 最小能力／啟動probe結束。
-          QA_SOURCE_4: | # 固定原文 scripts/select-scenario.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { pathToFileURL } from 'node:url'; // 純選單不載入Playwright或啟動browser。
-            import * as crown from './scenario-crown.mjs'; // 只有已審固定模組，不從輸入組合import路徑。
-            const scenarios = Object.freeze({ 'crown-camp-first-trial-pointer': crown }); // 一次只選一款，不迴圈執行選單所有項。
-            export function selectedScenario(id) { if (!Object.hasOwn(scenarios, id)) throw new Error('reviewed-scenario-required'); return scenarios[id]; } // 未知值或缺值即停止，不fallback到其他遊戲。
-            if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) { selectedScenario(process.env.QA_SCENARIO); console.log('One fixed reviewed scenario selected; no browser started.'); } // 便宜步驟先拒絕未知選項。
-          QA_SOURCE_5: | # 固定原文 scripts/scenario-crown.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { classifyAllowed } from './diagnostics.mjs'; // 只沿用R2固定白名單，不輸出外部原文或堆疊。
-            export const TARGET = Object.freeze({ url: 'https://hollow-crown-private-qa.agentkystr.chatgpt.site/', build: 'hollow-crown-cloud-rebuild-20261027-01', version: '1.0.0-rc.9-rebuild.1', expectedRuntimeSha256: 'ff772ba80cb9819e4cbc1b6da932d35f4afe4f8e3e7002946815d54163d687a5' }); // 固定既有正式版，不冒稱遠端所有bytes重驗。
-            export const LIMITS = Object.freeze({ scenarioMs: 30000, requiredMs: 24000, readyMs: 4000, firstReadMs: 4000, readMs: 1500, clickMs: 5000, snapshotMs: 8000, observationMs: 9500, freshnessMs: 1000, movementPx: 0.5, pngBytes: 2097152 }); // 最壞24秒操作、30秒自身界；父入口36秒與80/90秒不擴。
-            export const SELECTORS = Object.freeze({ start: '#overlay .camp-panel .menu-main button.primary[data-action="tutorial"]' }); // 主開始與教學練習並存，只接受唯一精確主按鈕。
-            const TEXT = Object.freeze({ build: `${TARGET.version} · ${TARGET.build} · 本機存檔`, start: '開始 · 學習守誓', first: '以 WASD 或左搖桿移動。先在庭院移動一小段。', step: '試煉 1 / 5', chapter: '守誓者的試煉' }); // 只比正式公開可見文案，不讀內部教學step。
-            export class PointerFault extends Error { constructor(code) { super(code); this.code = code; } } // 固定失敗碼才可進報告。
-            const fail = code => { throw new PointerFault(code); }; // 不嘗試修環境、改點或重讀。
-            const CODES = new Set(['scenario-stopped-or-deadline', 'target-url-mismatch', 'operation-deadline', 'probe-deadline', 'pageerror-observed', 'page-crash-observed', 'unexpected-navigation', 'already-closed', 'screenshot-url-mismatch', 'artifact-size-limit', 'dom-count-limit', 'png-count-limit', 'invalid-png-metadata', 'insufficient-whole-plan-budget', 'entry-a-prerequisite', 'entry-b-prerequisite', 'target-moved', 'insufficient-input-observation-reserve', 'stale-target-observation', 'tutorial-visible-feedback-mismatch']); // 只列本模組與既有shared安全錯誤，不放任意外來code。
-            export function failureDetails(error) { const detail = classifyAllowed(error); return { name: detail.name, code: CODES.has(error?.code) ? error.code : detail.code, errorCode: detail.errorCode }; } // 保留operation-deadline與TimeoutError差別，不從時間推定根因。
-            export function visibleCrownStart({ target, selectors, phase }) { // 唯讀公開DOM幾何與固定文字，沒有click、scroll或handler。
-              if (location.href !== target.url) return { locationValid: false }; // 錯頁不讀文字、座標或其他資料。
-              const q = selector => document.querySelector(selector); // 只用固定白名單，不抓body全文。
-              const shown = (element, entire = false) => { // button及文字要求完整viewport與ancestor clip。
-                if (!element || !element.getClientRects().length) return false; const b = element.getBoundingClientRect(); let left = Math.max(0, b.left), top = Math.max(0, b.top), right = Math.min(innerWidth, b.right), bottom = Math.min(innerHeight, b.bottom); // 保存原矩形，不clamp為可點座標。
-                for (let node = element; node; node = node.parentElement) { const s = getComputedStyle(node); if (node.hidden || s.display === 'none' || ['hidden', 'collapse'].includes(s.visibility) || Number(s.opacity) === 0) return false; if (node !== element) { const r = node.getBoundingClientRect(); if (/(auto|scroll|hidden|clip)/.test(s.overflowX)) { left = Math.max(left, r.left); right = Math.min(right, r.right); } if (/(auto|scroll|hidden|clip)/.test(s.overflowY)) { top = Math.max(top, r.top); bottom = Math.min(bottom, r.bottom); } } } // 隱藏或裁切即拒絕，不移除遮罩。
-                return right > left && bottom > top && (!entire || left <= b.left && top <= b.top && right >= b.right && bottom >= b.bottom); // 兩次DOM不冒充連續兩動畫幀stable。
-              }; // 可見幾何純讀結束。
-              const clean = (value, limit = 300) => { const text = String(value ?? '').replace(/\s+/g, ' ').trim(); return text.length <= limit ? text : null; }; const text = (selector, limit) => { const e = q(selector); return shown(e, true) ? clean(e.innerText, limit) : null; }; // 隱藏或超長欄位不輸出任意內容。
-              const result = { locationValid: true, viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio }, buildLabel: text('#build-label', 180), canvasVisible: shown(q('#world')), canvasFocused: document.activeElement === q('#world'), campTitle: text('#overlay .camp-panel h1', 30), overlayVisible: shown(q('#overlay')), hudVisible: shown(q('#hud')), tutorialVisible: shown(q('#tutorial')) }; // 只看玩家可見UI與正常DOM焦點。
-              if (phase === 'after') return { ...result, tutorialStep: text('#tutorial strong', 30), tutorialText: text('#tutorial', 300), chapter: text('#chapter', 40), roomName: text('#room-name', 40) }; // 只驗試煉1，不讀座標、血量、隱藏進度或D效果。
-              const matches = [...document.querySelectorAll(selectors.start)]; result.target = { selector: selectors.start, matches: matches.length }; if (matches.length !== 1) return result; // 全DOM必須恰一個，不以visible過濾掉重複項。
-              const element = matches[0], box = element.getBoundingClientRect(), rect = Object.fromEntries(['left', 'top', 'right', 'bottom', 'width', 'height'].map(key => [key, box[key]])), center = { x: box.left + box.width / 2, y: box.top + box.height / 2 }; // 中心僅由當次DOM原矩形導出。
-              let ariaDisabledOrInert = false, pointerEnabled = true; for (let node = element; node; node = node.parentElement) { if (node.inert || node.hasAttribute('inert') || node.getAttribute('aria-disabled') === 'true') ariaDisabledOrInert = true; if (getComputedStyle(node).pointerEvents === 'none') pointerEnabled = false; } // 遵守原生disabled、inert與pointer權限，不以座標繞過。
-              const fullyVisible = shown(element, true), hit = fullyVisible && Number.isFinite(center.x) && Number.isFinite(center.y) && center.x >= 0 && center.y >= 0 && center.x < innerWidth && center.y < innerHeight ? document.elementFromPoint(center.x, center.y) : null; // 同次中心hit-test；遮擋或錯按鈕即不接受。
-              Object.assign(result.target, { tag: element.tagName, text: fullyVisible ? clean(element.innerText, 40) : null, fullyVisible, disabled: element.disabled === true || element.matches(':disabled'), ariaDisabledOrInert, pointerEnabled, centerHit: !!hit && (hit === element || element.contains(hit)), rect, center }); return result; // 只回有限布林文字與六項rect，不插入或改寫DOM。
-            } // 此函式只能被受限adapter以page.evaluate唯讀呼叫。
-            export function validEntry(s) { // 同版全新營地，不清檔或改模式來符合前提。
-              if (!s?.locationValid || s.viewport?.width !== 1920 || s.viewport?.height !== 1080 || s.viewport?.dpr !== 1 || s.buildLabel !== TEXT.build || !s.canvasVisible || s.campTitle !== '餘燼之冠' || !s.overlayVisible || s.hudVisible || s.tutorialVisible) return false; // 原R2營地前提保持，build改為完整固定字串比對。
-              const t = s.target, r = t?.rect, c = t?.center; if (t?.selector !== SELECTORS.start || t.matches !== 1 || t.tag !== 'BUTTON' || t.text !== TEXT.start || t.fullyVisible !== true || t.disabled !== false || t.ariaDisabledOrInert !== false || t.pointerEnabled !== true || t.centerHit !== true) return false; // 禁止穿過遮擋或忽略不允許輸入的狀態。
-              if (!r || !c || !['left', 'top', 'right', 'bottom', 'width', 'height'].every(k => Number.isFinite(r[k])) || !Number.isFinite(c.x) || !Number.isFinite(c.y)) return false; // 不送NaN或Infinity。
-              return r.left >= 0 && r.top >= 0 && r.right <= 1920 && r.bottom <= 1080 && r.width > 0 && r.height > 0 && Math.abs(r.right - r.left - r.width) <= 0.01 && Math.abs(r.bottom - r.top - r.height) <= 0.01 && Math.abs(c.x - (r.left + r.width / 2)) <= 0.01 && Math.abs(c.y - (r.top + r.height / 2)) <= 0.01; // 完整原矩形與同次中心不可修正或換成舊圖座標。
-            } // 可點前提不宣稱連續動畫幀stable認證。
-            export function sameRect(a, b) { return validEntry(a) && validEntry(b) && ['left', 'top', 'right', 'bottom', 'width', 'height'].every(k => Math.abs(a.target.rect[k] - b.target.rect[k]) <= LIMITS.movementPx); } // 位移超半CSS像素就停，不追蹤目標。
-            export function validTutorial(s) { return s?.locationValid === true && s.viewport?.width === 1920 && s.viewport?.height === 1080 && s.viewport?.dpr === 1 && s.buildLabel === TEXT.build && s.canvasVisible && s.canvasFocused && !s.overlayVisible && s.hudVisible && s.tutorialVisible && s.tutorialStep === TEXT.step && s.tutorialText?.includes(TEXT.first) && s.chapter === TEXT.chapter && s.roomName === TEXT.chapter; } // focus必須由遊戲begin自然產生；只驗試煉1，不送移動。
-            export function createPointerAdapter(page, { healthy, bounded, snapshot }) { // 接既有唯一page，絕不啟動browser或導航。
-              const gate = () => { healthy(); if (page.url() !== TARGET.url) fail('target-url-mismatch'); }; // shared健康已永久鎖錯址與截止，這裡再同步核root。
-              return { healthy: gate, url: () => page.url(), bounded, waitReady: async timeout => { gate(); await page.locator(SELECTORS.start).waitFor({ state: 'visible', timeout }); gate(); }, visible: async phase => { gate(); if (!['entry', 'after'].includes(phase)) fail('entry-a-prerequisite'); const value = await page.evaluate(visibleCrownStart, { target: TARGET, selectors: SELECTORS, phase }); gate(); return value; }, click: async (center, beforeInvoke) => { gate(); if (!Number.isFinite(center?.x) || !Number.isFinite(center?.y) || center.x <= 0 || center.y <= 0 || center.x >= 1920 || center.y >= 1080) fail('entry-b-prerequisite'); beforeInvoke(); await page.mouse.click(center.x, center.y, { button: 'left', clickCount: 1, delay: 0 }); gate(); }, snapshot: async () => { gate(); const value = await snapshot(); gate(); return value; } }; // 真正mouse前最後同步guard無await，唯一正常move/down/up API無force或DOMclick。
-            } // 不提供鍵盤、mouse.up補救、替代控制或任意selector。
-            export async function executePointerScenario(io, { deadlineMs, now = () => performance.now() } = {}) { // 純mock可注入單調時鐘；正式入口仍受shared80/90界。
-              const started = now(), parentEnd = deadlineMs ?? started + LIMITS.scenarioMs, end = Math.min(parentEnd, started + LIMITS.scenarioMs), elapsed = () => Math.max(0, Math.round(now() - started)); // 自身30秒不加在父期限之外。
-              const input = { id: 'camp-start-pointer', status: 'not-attempted', ack: 'not-attempted', effect: 'not-established' }; // 全場只有一個輸入物件，沒有KeyD或第二點擊。
-              const report = { id: 'crown-native-camp-first-trial-pointer-v1', scope: 'normal-camp-to-first-trial-only', status: 'blocked', stage: 'not-run', lastStage: 'not-run', firstFailure: null, target: TARGET, actions: [input], checkpoints: [], diagnostic: { status: 'not-run' }, faults: [], runtimeBytesVerified: false, visibleTransition: 'not-established', hypothesisProven: false, fullGamePass: false, fullGamesPassed: '0/8', scoreChanges: null }; // 不把方法成功升格locator根因或全遊戲分數。
-              let stopped = false, sealed = false, unknown = false, domCount = 0, pngCount = 0, sampleBStarted = null, observationEnd = null, current = { stage: 'not-run', startedMs: 0, budgetMs: null }; // 永久停止與只讀收尾lease分離，不重新開玩法。
-              const gate = observation => { io.healthy(); if (io.url() !== TARGET.url) fail('target-url-mismatch'); if (sealed || stopped && !observation || now() >= (observation ? observationEnd : end)) fail('scenario-stopped-or-deadline'); }; // fatal與同頁優先，診斷也不能繞過它。
-              const recordFailure = error => { const row = { stage: report.lastStage, ...failureDetails(error), atMs: elapsed(), stepStartedMs: current.startedMs, stepBudgetMs: current.budgetMs, stepElapsedMs: Math.max(0, elapsed() - current.startedMs) }; report.faults.push(row); if (!report.firstFailure) { report.firstFailure = { ...row }; report.stage = row.stage; } }; // 第一失敗不被末圖或末DOM覆蓋，外部原訊息一律不記。
-              const step = async (stage, budget, call, observation = false) => { report.lastStage = stage; if (!report.firstFailure) report.stage = stage; current = { stage, startedMs: elapsed(), budgetMs: null }; gate(observation); const expiry = Math.min(now() + budget, observation ? observationEnd : end); current.budgetMs = expiry - now(); const value = await io.bounded(() => { gate(observation); if (now() >= expiry) fail('operation-deadline'); return call(); }, current.budgetMs); if (now() >= expiry) fail('operation-deadline'); gate(observation); return value; }; // 每步絕對期限與真正排程前後守門，晚到值不續流程。
-              const read = async (label, observation = false) => { if (domCount >= 3) fail('dom-count-limit'); domCount++; const began = elapsed(); const value = await step(`observe-${label}`, label === 'entry-a' ? LIMITS.firstReadMs : LIMITS.readMs, () => io.visible(label === 'after' ? 'after' : 'entry'), observation); report.checkpoints.push({ label, role: observation ? 'diagnostic-after-unknown-input' : 'scenario', startedMs: began, finishedMs: elapsed(), visible: value }); return value; }; // A四秒、B與末讀1.5秒；最多三次，不輪詢等好結果。
-              const capture = async observation => { if (pngCount >= 1) fail('png-count-limit'); pngCount++; const began = elapsed(), value = await step('final-snapshot', LIMITS.snapshotMs, () => io.snapshot(), observation); if (value?.file !== 'boot.png' || !Number.isInteger(value?.bytes) || value.bytes < 8 || value.bytes > LIMITS.pngBytes || !/^[a-f0-9]{64}$/.test(value?.sha256 ?? '')) fail('invalid-png-metadata'); report.screenshot = { file: value.file, bytes: value.bytes, sha256: value.sha256, startedMs: began, finishedMs: elapsed(), role: observation ? 'diagnostic-after-unknown-input' : 'scenario-final-first-trial' }; }; // shared8秒token與記憶體封存保存原bytes；本模組不造圖。
-              try { // 一條最短正常路徑，前提失敗無fallback圖或替代輸入。
-                if (!Number.isFinite(parentEnd) || end - started < LIMITS.requiredMs) fail('insufficient-whole-plan-budget'); // 操作至少24秒餘額；正式shared入口更保守要求36秒。
-                await step('wait-camp', LIMITS.readyMs, () => io.waitReady(LIMITS.readyMs)); // 同R2一次可見等待，沒有隱藏ready通道。
-                const a = await read('entry-a'); if (!validEntry(a)) fail('entry-a-prerequisite'); // A最多四秒，只證準備能力不當作B新鮮度。
-                sampleBStarted = now(); const b = await read('entry-b'); if (!validEntry(b)) fail('entry-b-prerequisite'); if (!sameRect(a, b)) fail('target-moved'); // B整個request時間算進1秒門檻，rect改變不追蹤重找。
-                await step('single-native-mouse-click', LIMITS.clickMs, () => io.click(b.target.center, () => { gate(false); if (end - now() < LIMITS.clickMs + LIMITS.observationMs) fail('insufficient-input-observation-reserve'); if (now() - sampleBStarted > LIMITS.freshnessMs) fail('stale-target-observation'); input.status = 'attempted'; input.ack = 'pending'; input.effect = 'unknown'; input.atMs = elapsed(); input.observationAgeMs = Math.max(0, Math.round(now() - sampleBStarted)); input.point = { ...b.target.center }; })); // 最後同步守門通過才標attempted並立即送唯一mouse，無await間隙。
-                input.ack = 'resolved'; input.ackAtMs = elapsed(); await capture(false); const after = await read('after'); // ack不等於效果，先原圖再讀有限後態，不宣稱同時。
-                if (!validTutorial(after)) fail('tutorial-visible-feedback-mismatch'); input.effect = 'first-trial-visible-fields-observed'; report.visibleTransition = 'camp-to-first-trial-observed'; report.status = 'evidence-collected-pending-image-review'; // 只簽正常入口待審圖，不簽移動或完整教學。
-              } catch (error) { // 所有失敗都停止新輸入，不猜產品故障。
-                stopped = true; recordFailure(error); if (input.status === 'attempted' && input.ack === 'pending') { unknown = true; input.ack = ['operation-deadline', 'scenario-stopped-or-deadline'].includes(error?.code) || error?.name === 'TimeoutError' ? 'pending' : 'rejected'; } // 未完整ack永遠effect unknown，不能用後圖追認。
-                if (unknown && pngCount === 0 && now() < end) { observationEnd = Math.min(end, now() + LIMITS.observationMs); report.diagnostic = { status: 'attempted', causalEffect: 'unknown', atMs: elapsed() }; try { await capture(true); const after = await read('after', true); report.diagnostic.status = 'captured-pending-independent-review'; report.diagnostic.firstTrialVisibleFieldsMatch = !!validTutorial(after); } catch (diagnosticError) { recordFailure(diagnosticError); report.diagnostic.status = 'incomplete'; } } // 只預定一次PNG→DOM；PNG失敗不再DOM，不補up或重點。
-              } finally { stopped = true; sealed = true; report.elapsedMs = elapsed(); report.stopped = true; report.counts = { inputAttempts: input.status === 'attempted' ? 1 : 0, domAttempts: domCount, imageAttempts: pngCount }; } // 封存後晚承諾無權改返回值，父關閉唯一browser。
-              return structuredClone(report); // 有限獨立JSON，不帶Buffer或內部遊戲state。
-            } // 單次正常pointer診斷結束。
-            export async function runScenario({ page, healthy, bounded, snapshot, deadlineMs }) { return executePointerScenario(createPointerAdapter(page, { healthy, bounded, snapshot }), { deadlineMs }); } // 薄接共同介面，沒有CI、browser或安全設定重建。
-          QA_SOURCE_6: | # 固定原文 scripts/scenario-health.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { Fault } from './core.mjs'; // 使用既有固定錯誤類別，不新增原始錯誤輸出或安全fallback。
-            export function createScenarioHealth({ healthy, page, target, workDeadline, latch, now = () => performance.now() }) { // 僅由正式入口在唯一goto、HTTP200與URL gate後建立，不用於about:blank能力探測。
-              healthy(); // 原有closed、pageerror、crash與navigation永久鎖先核，不重新定義或清空它。
-              const stop = code => { latch(code); throw new Fault(code); }; // 同步判錯立刻寫入原有永久fatal鎖；即使返回目標頁也不能恢復。
-              if (!Number.isFinite(workDeadline) || workDeadline - now() < 36000) stop('probe-deadline'); // 開始前必須保有Crown完整三十六秒餘額，不能用清理時間補不足。
-              return () => { healthy(); if (now() >= workDeadline) stop('probe-deadline'); if (page.url() !== target.url) stop('unexpected-navigation'); healthy(); }; // 每個scenario API與snapshot前後同時核原健康、共享絕對截止及同步精確URL。
-            } // 沒有導航、重試、讀DOM或修改遊戲；原80秒watchdog與85秒TERM加5秒KILL不變。
-            export function unexpectedMainNavigation(url, targetUrl, targetNavigationStarted) { return url !== targetUrl && (targetNavigationStarted || url !== 'about:blank'); } // about:blank只允許能力探測期；正式goto開始後連瞬時blank再回root也必須永久鎖。
-          QA_SOURCE_7: | # 固定原文 scripts/snapshot-lease.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { createHash } from 'node:crypto'; // 僅對本次原PNG記憶體字節核SHA，不改圖或讀其他檔案。
-            import { Fault, LIMITS } from './core.mjs'; // 沿用固定八秒與二MiB限制及固定錯誤類別。
-            export function createSnapshotLease({ page, healthy, latch, now = () => performance.now() }) { // 只包裝唯一既有page，不提供新browser或導航能力。
-              let used = false, attempt = null, candidate = null, persistenceUsed = false; // 一輪只有一個圖片槽及一個host落盤槽，不因失敗恢復。
-              const invalidateActive = () => { if (attempt?.active) { attempt.active = false; attempt.valid = false; candidate = null; latch('operation-deadline'); } }; // 外層bounded只在截圖活躍時使token永久失效，不改其他輸入timeout政策。
-              const capture = async () => { // 正常末圖與既定診斷末圖共用本唯一入口。
-                healthy(); if (used) throw new Fault('artifact-size-limit'); used = true; const current = { active: true, valid: true, acknowledged: false, deadline: now() + LIMITS.screenshotMs }; attempt = current; // 先耗用單槽再啟API；token物件只在記憶體，不進報告。
-                const check = () => { healthy(); if (!current.valid || !current.active || now() >= current.deadline) { current.valid = false; current.active = false; candidate = null; latch('operation-deadline'); throw new Fault('operation-deadline'); } }; // 同頁健康與自身絕對expiry每個接受點都必須成立。
-                try { // 截圖拒絕或晚到都沒有檔案副作用。
-                  check(); const png = await page().screenshot({ type: 'png', fullPage: false, timeout: LIMITS.screenshotMs }); check(); // 同一page取唯一原圖；外層逾時失效後晚回也會被check拒絕。
-                  if (!Buffer.isBuffer(png) || png.length < 1 || png.length > LIMITS.pngBytes) throw new Fault('artifact-size-limit'); // 過額或缺bytes直接阻擋，不壓縮、不補截。
-                  const metadata = { file: 'boot.png', bytes: png.length, sha256: createHash('sha256').update(png).digest('hex') }; check(); // hash完成仍須在同次五秒內，不把慢hash視為已確認。
-                  current.acknowledged = true; current.active = false; candidate = { png, metadata, token: current }; return { ...metadata }; // 只保原Buffer及已確認metadata，尚未寫檔；外層report亦須明列才可保存。
-                } catch (error) { current.active = false; current.valid = false; candidate = null; throw error; } // 例外永久耗用圖片槽，沒有晚到程式修改已封存結果。
-              }; // 此入口完全無writeFile或磁碟副作用。
-              const persistForReport = async (report, writeFile) => { // executeProbe返回並正常close後，僅做host資料核對與落盤，不呼叫healthy或browserAPI。
-                const images = report.screenshots || []; if (images.length === 0) { used = true; persistenceUsed = true; if (attempt) { attempt.valid = false; attempt.active = false; } candidate = null; return { status: 'not-listed-not-written' }; } // outer timeout或未知結果沒有report列圖，候選記憶體即丟棄。
-                const value = candidate; const listed = images[0]; if (persistenceUsed || images.length !== 1 || !value || !value.token.valid || !value.token.acknowledged || value.token.active || ['file', 'bytes', 'sha256'].some(key => listed?.[key] !== value.metadata[key]) || value.png.length !== listed.bytes || createHash('sha256').update(value.png).digest('hex') !== listed.sha256) throw new Fault('artifact-size-limit'); // file/bytes/SHA及已ack有效token全部一致才接受，不能用report憑空造圖。
-                persistenceUsed = true; candidate = null; await writeFile('artifacts/boot.png', value.png); return { status: 'reported-original-png-written' }; // 正常或合法blocked診斷圖均只寫既有原Buffer一次，不改emitter或傳輸契約。
-              }; // host落盤沒有closed誤擋，但仍受原程序watchdog與總硬截止。
-              return { capture, persistForReport, invalidateActive, inFlight: () => !!attempt?.active }; // 最小固定接口，沒有重設token、取消後復活或第二圖入口。
-            } // 原PNG是否可簽仍需有序回收與人工看圖，此helper不宣稱產品通過。
-          QA_SOURCE_8: | # 固定原文 scripts/diagnostics.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            export const KERNEL = Object.freeze([{ key: "apparmorRestrictUnprivilegedUserns", path: "/proc/sys/kernel/apparmor_restrict_unprivileged_userns", type: "bit" }, { key: "unprivilegedUsernsClone", path: "/proc/sys/kernel/unprivileged_userns_clone", type: "bit" }, { key: "maxUserNamespaces", path: "/proc/sys/user/max_user_namespaces", type: "integer" }, { key: "apparmorEnabled", path: "/sys/module/apparmor/parameters/enabled", type: "yn" }]); // 只讀四個固定白名單檔，不呼叫sysctl寫入或讀取audit/private logs。
-            export function classifyAllowed(error) { // 原始錯誤只在記憶體比對，絕不寫入JSON、console、hash或檔案。
-              const text = typeof error?.message === "string" ? error.message.slice(0, 32768) : ""; // 有界字串避免不受控錯誤訊息吃資源。
-              const allowedNames = ["Error", "AbortError", "TimeoutError", "TypeError", "RangeError", "DOMException"]; const allowedCodes = ["ABORT_ERR", "ETIMEDOUT", "ENOENT", "EACCES", "EPERM", "EIO", "EBADF", "EMFILE", "ENFILE", "ENOMEM", "ERR_STREAM_PREMATURE_CLOSE", "ERR_CRYPTO_HASH_FINALIZED", "ERR_CRYPTO_HASH_UPDATE_FAILED", "ERR_OSSL_EVP_UNSUPPORTED", "ERR_INVALID_ARG_TYPE", "ERR_INVALID_ARG_VALUE", "ERR_OUT_OF_RANGE"]; // 只保留固定Node／OS錯誤碼，不收任意字串。
-              const indicators = []; // 只能輸出固定類別，不保存匹配原文、路徑、PID或命令列。
-              if (/Chromium sandboxing failed!|No usable sandbox!|crbug\.com\/(?:357670|638180)/.test(text)) indicators.push("sandbox-failure-reported"); // 官方Playwright／Chromium明確訊號，仍不宣稱已知道是哪個OS策略造成。
-              if (/Failed to (?:move to new namespace|unshare)[\s\S]{0,300}Operation not permitted/.test(text)) indicators.push("namespace-operation-denied-reported"); // 需要namespace與拒絕字樣同時出現，不能由一般EPERM猜sandbox。
-              if (/Executable (?:doesn.t|does not) exist|spawn[^\n]{0,300}ENOENT/.test(text) || error?.code === "ENOENT") indicators.push("executable-missing-reported"); // 與實際固定檔案stat另行交叉判斷。
-              if (/Host system is missing dependencies|error while loading shared libraries/.test(text)) indicators.push("host-library-missing-reported"); // 不輸出未知library名稱或路徑。
-              if (["EACCES", "EPERM"].includes(error?.code) || /\b(?:EACCES|EPERM)\b|Permission denied/.test(text)) indicators.push("permission-denied-reported"); // 一般權限拒絕不能直接當sandbox根因。
-              if (error?.name === "AbortError" || error?.code === "ABORT_ERR") indicators.push("abort-reported"); // 取消與逾時分開，不能只憑Abort推論哪個截止觸發。
-              if (error?.name === "TimeoutError" || error?.code === "ETIMEDOUT") indicators.push("timeout-reported"); // 不從耗時短或長猜測根因。
-              if (/Target page, context or browser has been closed/.test(text)) indicators.push("target-closed-reported"); // 保留泛用早退訊號，優先級低於明確錯誤。
-              const signalMatch = /\b(?:signal=|signal: )(?<signal>SIGABRT|SIGTRAP|SIGSEGV|SIGKILL|SIGTERM|SIGILL)\b/.exec(text); // 僅接受少數固定signal名稱，不輸出任意stderr。
-              if (signalMatch) indicators.push("process-signal-reported"); // 是否為sandbox所致需其他證據，不由signal自行推斷。
-              const code = indicators[0] || "unclassified-rejection"; // 有限枚舉之外一律未知，不能漏出message。
-              return { code, indicators, signal: signalMatch?.groups.signal || null, name: allowedNames.includes(error?.name) ? error.name : "other", errorCode: allowedCodes.includes(error?.code) ? error.code : null, causeName: allowedNames.includes(error?.cause?.name) ? error.cause.name : null }; // 不保存原錯誤或堆疊。
-            } // 分類只是新的可觀測資訊，不改安全策略。
-            export function parseKernelValue(text, type) { // 只允許固定類型值，不輸出任意系統檔案字串。
-              const value = typeof text === "string" && text.length <= 32 ? text.trim() : ""; // 限制讀回長度與格式。
-              if (type === "bit" && /^[01]$/.test(value)) return { status: "read", value: Number(value) }; // 0或1只描述當下讀值，不證明具體profile是否允許browser。
-              if (type === "yn" && /^[YN]$/.test(value)) return { status: "read", value: value === "Y" }; // AppArmor整體啟用也不等於這個binary一定被拒。
-              if (type === "integer" && /^\d{1,10}$/.test(value) && Number(value) <= 2147483647) return { status: "read", value: Number(value) }; // namespace上限只保留有界非負整數。
-              return { status: "unrecognized", value: null }; // 無法解析時不回傳原文。
-            } // 不包含任何設定寫入。
-          QA_SOURCE_9: | # 固定原文 scripts/native.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { readFile, lstat, realpath } from 'node:fs/promises'; // 固定系統檔只讀，不安裝或修改原生Chrome與profile。
-            import { createReadStream } from 'node:fs'; // 流式核已安裝binary，不把整個binary載入記憶體。
-            import { createHash } from 'node:crypto'; // MD5僅比對原生dpkg資料庫，不冒稱新的數位簽章驗證。
-            import { execFile } from 'node:child_process'; // 固定dpkg唯讀查詢與一次已核binary版本，沒有shell。
-            import { promisify } from 'node:util'; // 任意stdout與stderr只在記憶體解析，不輸出到公開log。
-            import { KERNEL, parseKernelValue, classifyAllowed } from './diagnostics.mjs'; // 復用原診斷的四個固定讀值與白名單錯誤類別。
-            export const NATIVE = Object.freeze({ version: '155.0.8059.39', packageVersion: '155.0.8059.39-1', binary: '/opt/google/chrome/chrome', profile: '/etc/apparmor.d/chrome', sums: '/var/lib/dpkg/info/google-chrome-stable.md5sums' }); // 根據已核官方Ubuntu2404 image與Playwright chrome channel原路徑固定。
-            export const IMAGE = Object.freeze({ os: 'ubuntu24', version: '20261012.334.1', tag: 'ubuntu24/20261012.334' }); // 精確綁定run03官方image來源，不接受main漂移。
-            export const COMMANDS = Object.freeze({ package: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-W', '-f=${Package}\n${Version}\n${Architecture}\n${Status}\n${Maintainer}\n', 'google-chrome-stable']], binaryOwner: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-S', NATIVE.binary]], profileOwner: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-S', NATIVE.profile]], profileSums: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-W', '-f=${Conffiles}', 'apparmor']], version: [NATIVE.binary, ['--version']] }); // 固定查詢不含apt、sudo、安裝、profile載入或安全設定寫入。
-            export function parsePackage(text) { return text === `google-chrome-stable\n${NATIVE.packageVersion}\namd64\ninstall ok installed\nChrome Linux Team <chromium-dev@chromium.org>\n`; } // 比對官方套件身份、精確版與安裝狀態，任意值不回傳。
-            export function expectedDigest(text, kind) { // 只找固定binary或固定profile的原生套件checksum行。
-              if (typeof text !== 'string' || text.length > 262144) return null; const lines = text.split('\n'); // 有界metadata，未知格式fail-closed。
-              const pattern = kind === 'binary' ? /^([a-f0-9]{32})  opt\/google\/chrome\/chrome$/ : /^ \/etc\/apparmor\.d\/chrome ([a-f0-9]{32})$/; // 不接受別的檔案、obsolete設定或路徑前綴相似。
-              const matches = lines.map(line => pattern.exec(line)).filter(Boolean); return matches.length === 1 ? matches[0][1] : null; // 重複或缺checksum即停止，不自行下載參照。
-            } // checksum比對只建立與runner套件資料庫的一致性。
-            export function canonicalProfile(text) { // 只接受已核原生Chrome profile結構；不是建造、替換或載入profile。
-              if (typeof text !== 'string' || text.length > 16384) return false; const normalized = text.split('\n').map(line => line.replace(/#.*$/, '').trim()).filter(Boolean).join(' '); // 不保存原始配置內容。
-              return /^abi <abi\/[45]\.0>, include <tunables\/global> profile chrome \/opt\/google\/chrome\/chrome flags=\(unconfined\) \{ userns, (?:@\{exec_path\} mr, )?include if exists <local\/chrome> \}$/.test(normalized); // Ubuntu原生Chrome政策；禁止將任意新binary放進允許路徑。
-            } // profile檔存在與一致不等於每個子程序的有效sandbox都已審計。
-            export function nativeVersion(text) { return typeof text === 'string' && text.trim() === `Google Chrome ${NATIVE.version}`; } // 一次版本命令只接受固定數字版，不公開原stdout。
-            export const HASH_LIMIT_MS = 15000; // 單次完整hash最多十五秒；外層preflight三十秒與整程序九十秒硬界不變。
-            export async function hashOnce(openStream, signal, assertActive, now = () => performance.now()) { // 同一正式邏輯可用記憶體stream測，不重讀、不產假binary。
-              const start = now(); const result = { status: 'failed', stage: 'initialize-hash', limitMs: HASH_LIMIT_MS, bytesProcessed: 0, elapsedMs: 0, fullyRead: false, abortSignaled: false, abortReasonName: null }; let digest = null; // 不輸出部分digest或任意錯誤內容。
-              try { // 整個stream與hash只建立一次，不存在fallback或第二輪。
-                assertActive(); const hash = createHash('md5'); result.stage = 'open-stream'; const stream = openStream(); result.stage = 'read-update'; // 保留到底在開檔還是逐塊讀取失敗。
-                for await (const chunk of stream) { assertActive(); hash.update(chunk); result.bytesProcessed += chunk.length; } // 每塊只計數與更新，完整性檢查仍涵蓋全部bytes。
-                result.fullyRead = true; assertActive(); result.stage = 'finalize'; if (signal.aborted) { const error = new Error('hash-aborted'); error.name = 'AbortError'; error.code = 'ABORT_ERR'; throw error; } digest = hash.digest('hex'); result.status = 'complete'; result.stage = 'complete'; // 只有自然讀完且未截止才能產完整digest。
-              } catch (error) { result.error = classifyAllowed(error); } // 錯誤保留固定name/code/cause，不吞掉AbortError。
-              finally { result.elapsedMs = Math.max(0, Math.round(now() - start)); result.abortSignaled = signal.aborted === true; result.abortReasonName = ['TimeoutError', 'AbortError', 'Error'].includes(signal.reason?.name) ? signal.reason.name : null; } // 直接觀測本次signal，而非由耗時推論timeout。
-              return { digest, observation: result }; // digest只供內部完整比較，公開報告僅放observation。
-            } // 單次有界流式hash結束。
-            export const PATHS = Object.freeze([ // 固定少量路徑與型態；只讀觀測，不掃描整台主機。
-              { key: 'opt', path: '/opt', type: 'directory', opt: true }, { key: 'optGoogle', path: '/opt/google', type: 'directory', opt: true }, { key: 'optChrome', path: '/opt/google/chrome', type: 'directory', opt: true }, { key: 'binary', path: NATIVE.binary, type: 'file', opt: true, executable: true }, // 已核tag對opt遞迴777；可寫僅觀測，不宣稱此為供應鏈安全邊界。
-              { key: 'etc', path: '/etc', type: 'directory' }, { key: 'apparmor', path: '/etc/apparmor.d', type: 'directory' }, { key: 'profile', path: NATIVE.profile, type: 'file' }, { key: 'profileLocalDirectory', path: '/etc/apparmor.d/local', type: 'directory' }, // etc與profile仍要求root及group/world不可寫。
-              { key: 'var', path: '/var', type: 'directory' }, { key: 'varLib', path: '/var/lib', type: 'directory' }, { key: 'dpkg', path: '/var/lib/dpkg', type: 'directory' }, { key: 'dpkgInfo', path: '/var/lib/dpkg/info', type: 'directory' }, { key: 'dpkgStatus', path: '/var/lib/dpkg/status', type: 'file' }, // 受保護的原生dpkg資料庫才可當checksum與套件身份參照。
-              { key: 'binarySums', path: NATIVE.sums, type: 'file' }, { key: 'chromeList', path: '/var/lib/dpkg/info/google-chrome-stable.list', type: 'file' }, { key: 'apparmorList', path: '/var/lib/dpkg/info/apparmor.list', type: 'file' }, // 固定歸屬／內容metadata也需受保護。
-            ]); // 不增加其他工作負載或任意路徑讀取。
-            export function pathAccepted(value, spec) { return value?.status === 'read' && value.canonical === true && value.nonSymlink === true && (spec.opt === true || value.rootOwned === true) && value.typeMatches === true && (!spec.executable || value.executable === true) && (spec.opt === true || value.groupWritable === false && value.worldWritable === false); } // opt的uid與可寫僅觀測；canonical／非link／型態及受保護checksum仍fail-closed。
-            export function imageProvenance() { return { status: 'pending-parent-verification', requiredImage: 'ubuntu-24.04', requiredVersion: IMAGE.version, requiredTag: IMAGE.tag, actual: null }; } // 這是待父任務核官方header的驗收條件，不是假造runtime環境觀測。
-            export async function inspectNative(io) { // 同一preflight預算收集獨立唯讀缺口，來源不可信永不執行版本或launch。
-              const result = { status: 'blocked', stage: 'image', kind: 'runner-preinstalled-google-chrome-stable', expectedVersion: NATIVE.version, image: io.image(), checks: {}, paths: {}, kernel: {}, errors: [], binaryIntegrity: { metadataRead: { status: 'not-run', limitMs: 1000 }, metadataParse: 'not-run', hash: { status: 'not-run' }, comparison: 'not-run' }, skippedChecks: [], effectiveProfileAudited: false }; // 信任官方新VM與本job已審步驟，不宣稱防禦同機惡意程序。
-              const check = async (key, action, trusted = true) => { if (!trusted) { result.checks[key] = false; result.skippedChecks.push(key); return; } try { result.checks[key] = await action() === true; } catch (error) { result.checks[key] = false; result.errors.push({ check: key, stage: result.stage, ...classifyAllowed(error) }); } }; // 獨立檢查只保存固定代碼／布林，不公開原始錯誤。
-              result.stage = 'paths'; for (const spec of PATHS) { try { result.paths[spec.key] = await io.path(spec); } catch (error) { result.paths[spec.key] = { status: 'unreadable', error: classifyAllowed(error) }; } result.checks[spec.key + 'Path'] = pathAccepted(result.paths[spec.key], spec); } // 收齊固定所有路徑子條件，不因第一個false隱藏後續缺口。
-              result.stage = 'kernel'; await check('restrictionsRetained', async () => { result.kernel = await io.kernel(); const k = result.kernel; return k.apparmorEnabled?.value === true && k.apparmorRestrictUnprivilegedUserns?.value === 1 && k.unprivilegedUsernsClone?.value === 1 && k.maxUserNamespaces?.value > 0; }); // 原四項狀態維持唯讀，不調整限制。
-              const dbTrusted = ['var', 'varLib', 'dpkg', 'dpkgInfo', 'dpkgStatus', 'binarySums', 'chromeList', 'apparmorList'].every(key => result.checks[key + 'Path']); // metadata來源不受保護就不使用其中內容作證。
-              result.stage = 'package'; await check('officialPackageMetadata', async () => parsePackage(await io.command('package')), dbTrusted); await check('packageOwnsBinary', async () => (await io.command('binaryOwner')).trim() === `google-chrome-stable: ${NATIVE.binary}`, dbTrusted); await check('ubuntuPackageOwnsProfile', async () => (await io.command('profileOwner')).trim() === `apparmor: ${NATIVE.profile}`, dbTrusted); // 固定受保護admindir，不接受自選資料庫。
-              const binaryTrusted = dbTrusted && result.checks.officialPackageMetadata && result.checks.packageOwnsBinary && ['opt', 'optGoogle', 'optChrome', 'binary'].every(key => result.checks[key + 'Path']); // opt可寫不是拒絕理由，原路徑、非link與型態仍必須成立；opt的uid由可信image背景解讀。
-              await check('packageBinaryChecksum', async () => { // metadata讀取、解析、binary hash及實際比對明確分段，不再一律unknown。
-                result.stage = 'binary-metadata-read'; const started = performance.now(); let text; try { text = await io.read(NATIVE.sums); result.binaryIntegrity.metadataRead.status = 'read'; result.binaryIntegrity.metadataRead.bytesRead = Buffer.byteLength(text); } catch (error) { result.binaryIntegrity.metadataRead.status = 'rejected'; throw error; } finally { result.binaryIntegrity.metadataRead.elapsedMs = Math.max(0, Math.round(performance.now() - started)); } // metadata讀取失敗不hash，固定stage保留原因。
-                result.stage = 'binary-metadata-parse'; const digest = expectedDigest(text, 'binary'); result.binaryIntegrity.metadataParse = digest ? 'parsed' : 'invalid-or-missing'; if (!digest) return false; // 沒有唯一合法checksum不假稱binary內容不同。
-                result.stage = 'binary-hash'; const hashed = await io.hash(NATIVE.binary); result.binaryIntegrity.hash = hashed.observation; if (hashed.observation.status !== 'complete' || !hashed.observation.fullyRead || !hashed.digest) { if (hashed.observation.error) result.errors.push({ check: 'packageBinaryChecksum', stage: 'binary-hash', ...hashed.observation.error }); return false; } // 失敗保留處理bytes與截止訊號，不重hash也不放行。
-                result.stage = 'binary-compare'; result.binaryIntegrity.comparison = hashed.digest === digest ? 'match' : 'mismatch'; return result.binaryIntegrity.comparison === 'match'; // 只有完整digest才作等值比較，錯誤與內容不符明確區分。
-              }, binaryTrusted); // 原來源／路徑／受保護metadata前提完全保留。
-            
-              const profileTrusted = dbTrusted && result.checks.ubuntuPackageOwnsProfile && ['etc', 'apparmor', 'profile', 'profileLocalDirectory'].every(key => result.checks[key + 'Path']); let profile = null; // etc與profile維持嚴格root及不可寫。
-              result.stage = 'profile-integrity'; await check('packageProfileChecksum', async () => { profile = await io.read(NATIVE.profile); const digest = expectedDigest(await io.command('profileSums'), 'profile'); return !!digest && createHash('md5').update(profile).digest('hex') === digest; }, profileTrusted); await check('nativeProfileStructure', async () => canonicalProfile(profile), profileTrusted && profile !== null); // 內容checksum與原生結構各自留下結果。
-              await check('noLocalProfileRules', () => io.noLocalRules(), profileTrusted); await check('noDisabledProfileMarker', () => io.absent('/etc/apparmor.d/disable/chrome'), profileTrusted); await check('noComplainProfileMarker', () => io.absent('/etc/apparmor.d/force-complain/chrome'), profileTrusted); // 不建立、載入或改寫任何政策。
-              result.stage = 'preflight-summary'; result.blockedChecks = Object.keys(result.checks).filter(key => !result.checks[key]); if (result.blockedChecks.length) return result; // 多收唯讀資訊不等於繼續執行不可信binary。
-              result.stage = 'binary-version'; await check('binaryVersion', async () => nativeVersion(await io.command('version'))); if (!result.checks.binaryVersion) { result.blockedChecks.push('binaryVersion'); return result; } // 全部來源前提確認後才一次固定版本命令。
-              result.version = NATIVE.version; result.status = 'ready'; result.stage = 'complete'; return result; // 只允許外層唯一sandbox launch，不代表遊戲或完整安全審計通過。
-            } // 最小原生前提結束，不增加其他工作負載。
-            export function createNativeIO(assertActive) { // 只在正式GitHub閘門通過後建立，離線測試不呼叫此實作。
-              const run = promisify(execFile); // 不使用shell，固定命令無插入點。
-              const read = async path => { assertActive(); const value = await readFile(path, { encoding: 'utf8', signal: AbortSignal.timeout(1000) }); assertActive(); return value; }; // 所有小檔唯讀等待都有界。
-              const path = async spec => { assertActive(); const value = await lstat(spec.path); assertActive(); const canonical = await realpath(spec.path) === spec.path; assertActive(); return { status: 'read', canonical, nonSymlink: !value.isSymbolicLink(), rootOwned: value.uid === 0, typeMatches: spec.type === 'file' ? value.isFile() : value.isDirectory(), groupWritable: !!(value.mode & 0o020), worldWritable: !!(value.mode & 0o002), executable: !!(value.mode & 0o111) }; }; // 固定布林子條件，不公開任意uid、mode、路徑或環境原文。
-              return { // 此介面只有讀取與已核版本查詢，沒有寫入系統或安裝方法。
-                read, path, image: imageProvenance, // 固定呼叫方控制允許路徑，不接使用者參數。
-                command: async key => { assertActive(); if (!Object.hasOwn(COMMANDS, key)) throw new Error('unknown-command'); const [file, args] = COMMANDS[key]; const output = await run(file, args, { timeout: 3000, killSignal: 'SIGKILL', maxBuffer: 262144, encoding: 'utf8' }); assertActive(); return output.stdout; }, // 原stdout只回記憶體parser，stderr不公開。
-                kernel: async () => { const values = {}; for (const item of KERNEL) { try { values[item.key] = parseKernelValue(await read(item.path), item.type); } catch { values[item.key] = { status: 'unreadable', value: null }; } } return values; }, // 四個固定狀態讀取，未知值就不啟動。
-                hash: async path => { assertActive(); const signal = AbortSignal.timeout(HASH_LIMIT_MS); return hashOnce(() => createReadStream(path, { signal }), signal, assertActive); }, // 一次十五秒有界stream；不重hash、不改安全設定，內部觀測包含取消原因。
-                absent: async path => { assertActive(); try { await lstat(path); return false; } catch (error) { if (error?.code === 'ENOENT') return true; throw error; } }, // 只接受確定不存在，不把權限拒絕當缺檔。
-                noLocalRules: async () => { assertActive(); const local = '/etc/apparmor.d/local/chrome'; try { if (!pathAccepted(await path({ path: local, type: 'file' }), { type: 'file' })) return false; return (await read(local)).split('\n').every(line => !line.replace(/#.*$/, '').trim()); } catch (error) { if (error?.code === 'ENOENT') return true; throw error; } }, // 既有空白／註解檔可接受，任何實際規則不擅自解讀或修改。
-              }; // 無替代binary、OS、安全旗標或browser安裝入口。
-            } // 原生唯讀介面結束。
-          QA_SOURCE_10: | # 固定原文 scripts/gate.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { pathToFileURL } from "node:url"; // 閘門僅用Node內建工具，不安裝依賴或連網。
-            export function inspectGate(env) { // 公開runner方案不沿用私人repo或私人免費分鐘聲明。
-              const problems = []; // 不輸出未知環境值，避免把秘密放入公開日誌。
-              if (env.GITHUB_ACTIONS !== "true" || env.RUNNER_ENVIRONMENT !== "github-hosted" || env.RUNNER_OS !== "Linux") problems.push("standard-github-linux-required"); // 僅標準GitHub Linux runner，拒絕本地或自行代換環境。
-              if (env.GITHUB_REPOSITORY !== "KYStr/stteak-games" || env.GITHUB_REPOSITORY_OWNER !== "KYStr" || env.GITHUB_ACTOR !== "KYStr") problems.push("fixed-owner-repository-actor-required"); // 固定原擁有者的單一公開repo，不在fork或其他actor下執行。
-              if (env.QA_REPOSITORY_PRIVATE !== "false") problems.push("public-repository-required"); // repo轉私有時立即阻擋，不能消耗私人免費額度。
-              if (env.GITHUB_REF !== "refs/heads/main" || env.GITHUB_WORKFLOW_REF !== "KYStr/stteak-games/.github/workflows/orbit-capability.yml@refs/heads/main") problems.push("fixed-main-workflow-required"); // 限定主分支上精確的單一workflow檔。
-              if (env.GITHUB_EVENT_NAME !== "workflow_dispatch" || env.GITHUB_RUN_ATTEMPT !== "1") problems.push("first-manual-dispatch-required"); // 沒有自動觸發或既有run重跑。
-              if (env.QA_CONFIRM_NATIVE_CHROME !== "true") problems.push("native-chrome-confirmation-required"); // 每輪明示承認本次只測能力與公開啟動畫面。
-              if (!/^[0-9a-f]{40}$/.test(env.GITHUB_SHA || "") || env.GITHUB_WORKFLOW_SHA !== env.GITHUB_SHA || !/^[1-9][0-9]*$/.test(env.GITHUB_RUN_ID || "")) problems.push("valid-run-identity-required"); // 精確記錄workflow與run身份，不接受不明來源的值。
-              if (env.QA_MODE !== "native-chrome") problems.push("only-probe-implemented"); // 不存在十五分鐘idle或長測隱藏模式。
-              if (["CHROME_DEVEL_SANDBOX", "CHROME_WRAPPER", "LD_PRELOAD", "LD_LIBRARY_PATH", "PWDEBUG", "DEBUG"].some(key => !!env[key])) problems.push("native-environment-overrides-forbidden"); // 不用環境變數改sandbox或讓第三方輸出原始診斷。
-              return problems; // 空陣列表示固定公開條件成立，不表示遊戲或硬體性能已通過。
-            } // 純函式可離線測試所有反例。
-            if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) { // 被mock測試匯入時不執行CLI。
-              const problems = inspectGate(process.env); // 不讀私鑰、token檔或其他使用者資料。
-              if (problems.length) { console.error(JSON.stringify({ outcome: "blocked", gateProblems: problems })); process.exitCode = 2; } // 失敗在Playwright載入前停止。
-              else console.log("Public fixed-repository manual probe gates satisfied; no artifact or cache storage configured."); // 只宣告前提檢查，不宣告browser可用。
-            } // CLI閘門結束。
-          QA_SOURCE_11: | # 固定原文 scripts/probe.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { createSnapshotLease } from './snapshot-lease.mjs'; // 唯一截圖token與記憶體收據；封存report列圖後才host落盤。
-            import { createScenarioHealth, unexpectedMainNavigation } from './scenario-health.mjs'; // 只在正式goto/HTTP200後建立同步URL與共用截止的永久健康鎖。
-            import { selectedScenario } from './select-scenario.mjs'; // 唯一白名單模組，不接受任意動態路徑。
-            import { inspectNative, createNativeIO, NATIVE } from './native.mjs'; // 只讀原生套件／路徑／profile與版本；失敗不啟動。
-            import { classifyAllowed } from './diagnostics.mjs'; // 任意例外只保留固定白名單。
-            import { mkdir, writeFile } from 'node:fs/promises'; // 只寫短報告及原始PNG，不保存HTML、來源碼或登入資料。
-            import { executeProbe, LIMITS, Fault } from './core.mjs'; // 共用單一固定目標及明確時間上限。
-            import { inspectGate } from './gate.mjs'; // 正式入口自己重新核閘門，不能跳過前一個workflow步驟。
-            const problems = inspectGate(process.env); // 任何外部瀏覽器動作之前先看授權與免費額度聲明。
-            if (process.platform !== "linux" || process.arch !== "x64" || process.getuid?.() === 0) problems.push("nonroot-linux-x64-required"); // 只允許既有標準Linux x64非root runner。
-            if (problems.length) { console.error(JSON.stringify({ outcome: 'blocked', gateProblems: problems })); process.exit(2); } // 不合條件不載入Playwright，更不啟動瀏覽器。
-            const scenario = selectedScenario(process.env.QA_SCENARIO); const TARGET = scenario.TARGET; // 身份閘門通過後選定唯一固定遊戲。
-            await mkdir('artifacts', { recursive: true }); // 證據只有專用目錄，workflow不廣泛收集工作目錄。
-            let browser, context, page, closed = false, fatal = null, targetNavigationStarted = false, snapshotLease; // 管理唯一瀏覽器生命週期與第一個失敗。
-            const events = { pageerror: 0, crash: 0, unexpectedNavigation: 0 }; // 只留有限計數，不記錯誤訊息、堆疊或網址。
-            async function bounded(action, milliseconds) { // Promise競速不假裝能取消底層操作；超時會鎖住後續流程並關閉唯一瀏覽器。
-              let timer; // 每次有界等待只持有一個計時器。
-              try { return await Promise.race([Promise.resolve().then(action), new Promise((_, reject) => { timer = setTimeout(() => { if (snapshotLease?.inFlight()) snapshotLease.invalidateActive(); reject(new Fault('operation-deadline')); }, milliseconds); })]); } // 不重試，不在逾時後補送操作。
-              finally { clearTimeout(timer); } // 成功與失敗都移除自身計時器。
-            } // 有界等待工具結束。
-            const healthy = () => { if (closed || fatal) throw new Fault(fatal || 'already-closed'); }; // 異常發生後只容許清理，不新增測試動作。
-            async function close() { // 僅關閉本次建立的瀏覽器，不碰其他瀏覽器或系統設定。
-              closed = true; // 晚到的導航／截圖承諾不能再保存證據或繼續測試。
-              if (!browser) return { status: 'no-browser-handle', processInventoryVerified: false, underlyingProcessCleanup: 'not-observed' }; // 無handle不代表底層從未建立程序。
-              await bounded(() => browser.close(), LIMITS.closeMs); if (browser.isConnected()) throw new Fault('cleanup-still-connected'); return { status: 'close-acknowledged', processInventoryVerified: false, underlyingProcessCleanup: 'browser-close-ack-only' }; // 最多花五秒清理；外層程序硬界會處理卡住的程序群組。
-            } // 不重新連線、不建立替代工作階段。
-            const processStarted = performance.now(); const workDeadline = processStarted + 80000; // 與既有八十秒watchdog同時基，scenario不能借用清理保留時間。
-            const hardStop = setTimeout(async () => { // JavaScript進度失控時仍留下狹義阻擋記錄；workflow另有程序群組硬界。
-              closed = true; // 先鎖住晚回覆，再嘗試落地最小報告。
-              await writeFile('artifacts/emergency.json', JSON.stringify({ outcome: 'blocked', fault: 'process-watchdog', cleanupConfirmed: false })); // 不聲稱超時即代表瀏覽器已正常清理。
-              try { await close(); } catch {} // 只清理唯一既有瀏覽器，沒有自動重開。
-              process.exit(124); // 十分明確地以失敗結束，不輸出假通過。
-            }, 80000); // 八十秒預警、五秒清理；workflow八十五秒TERM、再五秒KILL，總界九十秒。
-            process.once('SIGTERM', () => { closed = true; void close().finally(() => process.exit(124)); }); // 收到workflow截止後只清理，不繼續讀圖或操作。
-            try { // 正式流程不讀使用者電腦與dot本身瀏覽器。
-              const { chromium } = await import('playwright'); // 只有閘門通過才載入已鎖版的官方開源測試函式庫。
-              let scenarioHealthy; snapshotLease = createSnapshotLease({ page: () => page, healthy: () => scenarioHealthy(), latch: code => { fatal ||= code; } }); // 全scenario共用一張圖，不能因失敗再重截。
-              const adapter = { // 把瀏覽器API限制在這份最小介面，不提供隱藏遊戲狀態通道。
-                target: TARGET, // 固定選定目標供共用核心核URL，不開另一遊戲。
-                runScenario: () => { scenarioHealthy = createScenarioHealth({ healthy, page, target: TARGET, workDeadline, latch: code => { fatal ||= code; } }); scenarioHealthy(); return scenario.runScenario({ page, healthy: scenarioHealthy, bounded, snapshot: () => adapter.screenshot() }); }, // 核心只在goto/HTTP200/URL gate後呼叫；同頁與絕對截止薄包裝，無新browser工廠。
-                inspectNative: () => inspectNative(createNativeIO(healthy)), // 在唯一launch前唯讀驗證，不修改安全設定。
-                bounded, // 每一個非清理動作都有獨立與總截止雙重限制。
-                launch: async () => { // 只啟動GitHub runner內新建的隔離測試瀏覽器。
-                  const launched = await chromium.launch({ channel: 'chrome', headless: true, chromiumSandbox: true, timeout: LIMITS.launchMs }); // 明確開啟沙箱；不加入自訂旗標、不降低CSP/TLS/OS安全設定。
-                  if (closed) { await launched.close(); throw new Fault('late-browser-launch'); } // 啟動承諾若晚到只關閉，不建立分頁或導覽。
-                  browser = launched; healthy(); // 指派後立刻再核是否有停止訊號。
-                }, // launch階段只取得handle，context錯誤不再誤標成launch。
-                preparePage: async () => { healthy(); if (browser.version() !== NATIVE.version) throw new Fault('native-chrome-unverified'); // 只有原生Chrome成功後才建立一個空白分頁。
-                  context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1, acceptDownloads: false }); // 新建暫時內容環境，無storageState、cookie、使用者profile或下載。
-                  healthy(); page = await context.newPage(); healthy(); // 只開一頁，未知失敗後不得再開分頁。
-                  page.setDefaultTimeout(LIMITS.operationMs); page.setDefaultNavigationTimeout(LIMITS.navigationMs); // 自動等待有界，不把環境卡住當無限等待。
-                  page.on('pageerror', () => { events.pageerror = Math.min(40, events.pageerror + 1); fatal = 'pageerror-observed'; }); // 不保存可能含秘密的任意錯誤字串。
-                  page.on('crash', () => { events.crash = Math.min(40, events.crash + 1); fatal = 'page-crash-observed'; }); // 崩潰後不補開瀏覽器。
-                  page.on('framenavigated', frame => { if (frame === page.mainFrame() && unexpectedMainNavigation(frame.url(), TARGET.url, targetNavigationStarted)) { events.unexpectedNavigation = Math.min(40, events.unexpectedNavigation + 1); fatal = 'unexpected-navigation'; } }); // 導覽離開唯一正式入口即鎖住，不讀登入頁。
-                }, // 啟動只做測試程序設定，不讀遊戲資料。
-                capability: async () => { // 能力探測發生在about:blank，不在遊戲canvas上操作。
-                  healthy(); const value = await page.evaluate(() => { // 僅測WebGL上下文是否可建立，不執行遊戲內部函式。
-                    const canvas = document.createElement('canvas'); // 脫離文件的臨時元素，不插入任何頁面DOM。
-                    const gl = canvas.getContext('webgl2'); // 固定遊戲的Three需求是WebGL2；不探測WebGL1、不fallback。
-                    if (!gl) return { status: 'unavailable', api: null, rendererClass: 'unknown', hardwarePerformanceVerified: false }; // 缺乏WebGL2立即阻擋，不使用不安全SwiftShader開關。
-                    const extension = gl.getExtension('WEBGL_debug_renderer_info'); // 只查測試環境公開圖形能力，不查遊戲狀態。
-                    const renderer = extension ? String(gl.getParameter(extension.UNMASKED_RENDERER_WEBGL)) : ''; // 原始renderer名稱只在記憶體做分類，不保存設備識別字串。
-                    return { status: 'available', api: 'webgl2', rendererClass: /swiftshader|llvmpipe|softpipe|software/i.test(renderer) ? 'software' : 'unknown', hardwarePerformanceVerified: false }; // 不能由非軟體字樣推定硬體GPU或真機性能通過。
-                  }); // 空白頁能力不等於遊戲canvas已成功渲染。
-                  healthy(); return value; // 任何已發生的異常均優先阻擋。
-                }, // 能力完成後直接進入口，不刻意等待120秒。
-                navigate: async () => { healthy(); targetNavigationStarted = true; const response = await page.goto(TARGET.url, { waitUntil: 'domcontentloaded', timeout: LIMITS.navigationMs }); healthy(); return response?.status() ?? null; }, // 唯一正常根網址導覽，不附查詢／片段捷徑。
-                url: () => { healthy(); return page.url(); }, // 只供精確比對，不將任意網址寫入報告。
-                waitMenu: async () => { healthy(); await page.locator('#story').waitFor({ state: 'visible', timeout: LIMITS.operationMs }); healthy(); }, // 必要啟動等待完成即停，不重做故事點擊驗收。
-                visible: async () => { // 只回傳指定可見UI布林值；不讀storage、診斷物件、計時或物理狀態。
-                  healthy(); const value = await page.evaluate(target => { // 再在瀏覽器內核位置，縮小轉址競態的資料收集範圍。
-                    if (location.href !== target.url) return { locationValid: false }; // 錯頁不讀任何文字。
-                    const visible = element => { if (!element || !element.getClientRects().length) return false; for (let node = element; node; node = node.parentElement) { const style = getComputedStyle(node); if (node.hidden || style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse' || Number(style.opacity) === 0) return false; } const box = element.getBoundingClientRect(); return box.width > 0 && box.height > 0 && box.right > 0 && box.bottom > 0 && box.left < innerWidth && box.top < innerHeight; }; // 以祖先樣式與視窗交集確認可見，不能把隱藏DOM當畫面證據。
-                    const element = id => document.getElementById(id); const panel = element('panel'); // 只取既有正式介面已知ID，不遍歷其他頁面內容。
-                    return { locationValid: true, bootVisible: visible(element('boot')), overlayVisible: visible(element('overlay')), versionVisible: visible(panel) && panel.innerText.includes(target.build), storyVisible: visible(element('story')), continueVisible: visible(element('continue')), confirmVisible: visible(element('confirm-new')), canvasVisible: visible(element('world')) }; // 僅保留版本相符與畫面前提，不保存可見文字原文。
-                  }, TARGET); // 頁面程式只看公開UI，沒有修改遊戲。
-                  healthy(); return value; // 評估後若有頁面異常則不繼續。
-                }, // 不提供原生按鍵是因本probe不需要重做已證操作。
-                screenshot: () => snapshotLease.capture(), // 正常與診斷共用唯一八秒token；只保記憶體原PNG，不在未確認時寫檔。
-                close, // 封存前關閉本次唯一瀏覽器。
-              }; // 所有瀏覽器能力都已顯示在這裡，沒有隱藏fallback。
-              const report = await executeProbe(adapter); await snapshotLease.persistForReport(report, writeFile); // 僅執行一次預先指定的能力與啟動流程。
-              report.environment = { cjkFontPackage: 'fonts-noto-cjk', cjkFontVersion: '1:20230817+repack1-3', viewport: { width: 1920, height: 1080, deviceScaleFactor: 1 }, runner: 'github-hosted-standard-linux', browser: browser?.version() ?? null, channel: 'chrome', rootExecution: false, node: process.version, sandboxRequested: true, events }; // 沙箱請求與環境記錄不是硬體性能認證。
-              report.provenance = { repository: process.env.GITHUB_REPOSITORY, commit: process.env.GITHUB_SHA, workflowCommit: process.env.GITHUB_WORKFLOW_SHA, runId: process.env.GITHUB_RUN_ID, attempt: process.env.GITHUB_RUN_ATTEMPT }; // 只記不含秘密的GitHub執行身份。
-              await writeFile('artifacts/report.json', JSON.stringify(report, null, 2) + '\n'); // 結構化證據分欄，稍後僅以有序公開job log傳回，不上傳artifact。
-              console.log(JSON.stringify({ outcome: report.outcome, faults: report.faults, elapsedMs: report.elapsedMs })); // 日誌只輸出最短結果，不印整個頁面或任意環境值。
-              process.exitCode = report.outcome === 'evidence-collected-pending-review' ? 0 : 2; // 綠燈只代表probe產證成功，明確保留人工審圖與遊戲未驗狀態。
-            } catch (error) { // 匯入或入口意外失敗也不盲目重試。
-              try { await close(); } catch {} // 盡力清理唯一既有瀏覽器。
-              await writeFile('artifacts/emergency.json', JSON.stringify({ outcome: 'blocked', fault: classifyAllowed(error), cleanupConfirmed: browser ? !browser.isConnected() : false })); // 僅記固定代碼，避免外部錯誤洩漏機密。
-              process.exitCode = 2; // 不以意外例外假報成功。
-            } finally { clearTimeout(hardStop); } // 正常封存後移除watchdog；外層硬截止仍由workflow管理。
-          QA_SOURCE_12: | # 固定原文 scripts/log-transfer.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { createHash } from "node:crypto"; // 所有資料回收都以原始位元組SHA256核對。
-            export const TRANSFER = Object.freeze({ chunkChars: 4096, pngLimit: 2097152, reportLimit: 65536, logLimit: 8388608 }); // 每塊四KiB字元；PNG最多二MiB，整份log解析最多八MiB。
-            const digest = bytes => createHash("sha256").update(bytes).digest("hex"); // SHA只能證明傳輸一致，不能替代真圖判讀。
-            export function identity(env) { // 只包含已公開repo與run身份，不輸出任意環境字串。
-              if (env.GITHUB_REPOSITORY !== "KYStr/stteak-games" || !/^[1-9][0-9]*$/.test(env.GITHUB_RUN_ID || "") || !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA || "") || env.GITHUB_RUN_ATTEMPT !== "1") throw new Error("invalid-transfer-identity"); // 非預期身份不進公開log。
-              return { repository: "KYStr/stteak-games", runId: env.GITHUB_RUN_ID, commit: env.GITHUB_SHA, attempt: "1" }; // 不含owner憑證或下載URL。
-            } // 回收端另外以root觀測的run與commit核對。
-            export function encodeTransfer(kind, bytes, provenance) { // 產生可重建原位元組的有序文字，不產artifact。
-              if (!Buffer.isBuffer(bytes) || !["report", "png"].includes(kind)) throw new Error("invalid-transfer-kind"); // 僅允許兩種已審公開證據。
-              if (bytes.length < 1 || bytes.length > (kind === "png" ? TRANSFER.pngLimit : TRANSFER.reportLimit)) throw new Error("transfer-size-limit"); // 過大直接阻擋，不能暗中降畫質或拆成多輪。
-              const data = bytes.toString("base64"); const chunks = Math.ceil(data.length / TRANSFER.chunkChars); const sha256 = digest(bytes); // 原始PNG只做無損base64，不修改影像。
-              const meta = { ...provenance, kind, bytes: bytes.length, chunks, chunkChars: TRANSFER.chunkChars, sha256 }; // JSON欄位中文說明另見交付文件。
-              const lines = ["QA_TRANSFER_V1 " + JSON.stringify(meta)]; // 固定標記與GitHub shell回顯可區分，不使用工作流命令前綴。
-              for (let index = 0; index < chunks; index += 1) lines.push(`QA_CHUNK_V1 ${kind} ${index + 1}/${chunks} ${data.slice(index * TRANSFER.chunkChars, (index + 1) * TRANSFER.chunkChars)}`); // 每塊帶一基序號與總數，缺塊或亂序不可靜默接受。
-              lines.push(`QA_END_V1 ${kind} ${sha256}`); return lines; // 結尾SHA與metadata及解碼位元組三方核對。
-            } // 此函式不寫console、不接網路，方便離線測試。
-            export function decodeTransfers(rawLog, expected) { // 僅處理已取回的完整raw job log，不抓取網路或使用token。
-              if (Buffer.byteLength(rawLog, "utf8") > TRANSFER.logLimit) throw new Error("log-size-limit"); // 防止不受控大檔吃掉本地資源。
-              const outputs = {}; let current = null; // 每次只接一個完整stream，最多report與png各一份。
-              for (const raw of rawLog.split(/\r?\n/)) { // 同時接受下載log的LF與CRLF，不信任UI折行後的字串。
-                const line = raw.replace(/^\d{4}-\d{2}-\d{2}T[\d:.]+Z\s+/, ""); // 只去掉官方rawlog的時間前綴，不任意搜尋行內標記。
-                if (line.startsWith("QA_TRANSFER_V1 ")) { // 新stream必須從獨立完整metadata行開始。
-                  if (current) throw new Error("unfinished-transfer"); const meta = JSON.parse(line.slice(15)); // 未結束前不接受新檔，截斷要明確失敗。
-                  if (!["report", "png"].includes(meta.kind) || outputs[meta.kind]) throw new Error("duplicate-or-unknown-transfer"); // 拒絕不同輪或重複資料混進同一包。
-                  for (const key of ["repository", "runId", "commit", "attempt"]) if (meta[key] !== expected[key]) throw new Error("transfer-identity-mismatch"); // expected必須來自root另外讀回的公開run，而非信任log自己聲稱。
-                  const limit = meta.kind === "png" ? TRANSFER.pngLimit : TRANSFER.reportLimit; // 分別限制圖片與短報告。
-                  if (!Number.isInteger(meta.bytes) || meta.bytes < 1 || meta.bytes > limit || meta.chunkChars !== TRANSFER.chunkChars || !Number.isInteger(meta.chunks) || meta.chunks !== Math.ceil(4 * Math.ceil(meta.bytes / 3) / TRANSFER.chunkChars) || !/^[0-9a-f]{64}$/.test(meta.sha256)) throw new Error("invalid-transfer-metadata"); // 拒絕誇大長度、偽總塊或無效hash。
-                  current = { meta, parts: [] }; // 只保留有界base64塊，不修改原文字。
-                } else if (line.startsWith("QA_CHUNK_V1 ")) { // 每一塊必須與當前stream相符。
-                  const match = /^QA_CHUNK_V1 (report|png) ([1-9][0-9]*)\/([1-9][0-9]*) ([A-Za-z0-9+/]+={0,2})$/.exec(line); // 星號mask、UI省略號、非法base64或折行全部拒絕。
-                  if (!current || !match || match[1] !== current.meta.kind || Number(match[2]) !== current.parts.length + 1 || Number(match[3]) !== current.meta.chunks) throw new Error("chunk-order-or-format"); // 重複、遺漏與亂序不能靠重新排序掩蓋。
-                  const expectedLength = Number(match[2]) === current.meta.chunks ? 4 * Math.ceil(current.meta.bytes / 3) - TRANSFER.chunkChars * (current.meta.chunks - 1) : TRANSFER.chunkChars; // 末塊也必須是精確長度。
-                  if (match[4].length !== expectedLength || current.parts.length >= current.meta.chunks) throw new Error("chunk-length"); current.parts.push(match[4]); // 絕不接受超出聲稱總量的資料。
-                } else if (line.startsWith("QA_END_V1 ")) { // 結束記錄不能補救先前缺塊。
-                  if (!current || line !== `QA_END_V1 ${current.meta.kind} ${current.meta.sha256}` || current.parts.length !== current.meta.chunks) throw new Error("incomplete-transfer"); // 完整性與有序性先過關才解碼。
-                  const data = current.parts.join(""); const bytes = Buffer.from(data, "base64"); // 僅解碼已核字元集合的有界內容。
-                  if (bytes.toString("base64") !== data || bytes.length !== current.meta.bytes || digest(bytes) !== current.meta.sha256) throw new Error("transfer-sha-or-bytes"); // 原始bytes、canonical base64與SHA全一致才輸出。
-                  if (current.meta.kind === "png" && !bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) throw new Error("not-png"); // 確認格式簽名，不把任意檔案冒稱截圖。
-                  outputs[current.meta.kind] = { bytes, meta: current.meta }; current = null; // 完成一個stream後才接受另一個。
-                } // 其餘一般安裝／執行log不當證據，也不儲存進回收產物。
-              } // 全檔讀完仍缺資料就阻擋，不重新開瀏覽器補圖。
-              if (current || !outputs.report) throw new Error("missing-complete-report"); // 光有PNG或綠燈不是完整證據。
-              const report = JSON.parse(outputs.report.bytes.toString("utf8")); // 報告需為合法JSON，不能是HTML或錯誤頁。
-              if (!report || !["blocked", "evidence-collected-pending-review"].includes(report.outcome)) throw new Error("invalid-report-outcome"); // 僅接受已審兩種狀態，不接受假PASS。
-              const screenshot = report.screenshots?.[0]; // 本probe最多一張圖，不接受未知多圖payload。
-              if ((report.screenshots?.length || 0) > 1 || (screenshot && (!outputs.png || screenshot.sha256 !== outputs.png.meta.sha256 || screenshot.bytes !== outputs.png.bytes.length)) || (!screenshot && outputs.png)) throw new Error("report-image-mismatch"); // 圖與報告必須同一run、同一大小與同一SHA。
-              if (report.outcome === "evidence-collected-pending-review" && !screenshot) throw new Error("success-without-image"); // 缺真圖不能當啟動畫面已取證。
-              return { report, outputs }; // 尚須人工查看PNG；回收成功不證明遊戲操作、連續遊玩或硬體性能。
-            } // 回收器不自動執行瀏覽器或補跑CI。
-          QA_SOURCE_13: | # 固定原文 scripts/emit-evidence.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { readFile } from "node:fs/promises"; // 只讀本輪臨時目錄的固定證據檔，不讀repo其他內容。
-            import { encodeTransfer, identity } from "./log-transfer.mjs"; // 共用經mock驗證的有序base64傳輸格式。
-            const provenance = identity(process.env); // 只公開run、commit、repo與attempt，沒有token或私有資料。
-            let reportBytes; // 正常報告與緊急報告最多取其中一份。
-            try { reportBytes = await readFile("artifacts/report.json"); } catch { try { reportBytes = await readFile("artifacts/emergency.json"); } catch { console.error("QA_EVIDENCE_BLOCKED no-result-file"); process.exit(2); } } // 沒有報告就明確阻擋，不補造結果。
-            const report = JSON.parse(reportBytes.toString("utf8")); // 僅傳輸正式driver產生的固定欄位，不dump任何HTML或HTTP本文。
-            const streams = [encodeTransfer("report", reportBytes, provenance)]; // 先輸出短JSON，失敗輪也保留原因。
-            if (report.screenshots?.length === 1) { // 只有正式報告列出的唯一公開遊戲原圖才可傳出。
-              if (report.screenshots[0].file !== "boot.png") throw new Error("unexpected-image-name"); // 固定檔名，禁止路徑穿越或私有QA圖片混入。
-              const png = await readFile("artifacts/boot.png"); const lines = encodeTransfer("png", png, provenance); // 不讀任何其他歷史圖，不改畫質。
-              const meta = JSON.parse(lines[0].slice(15)); if (meta.sha256 !== report.screenshots[0].sha256 || meta.bytes !== report.screenshots[0].bytes) throw new Error("image-report-integrity"); // 先核本輪原圖與報告，才准公開log。
-              streams.push(lines); // 最多一張二MiB圖，沒有附帶來源碼或資料夾。
-            } // 無圖的blocked輪不輸出假圖。
-            for (const lines of streams) for (const line of lines) await new Promise((resolve, reject) => process.stdout.write(line + "\n", error => error ? reject(error) : resolve())); // 尊重stdout背壓，逐行送完再結束，避免exit截斷尾端。
-          QA_SOURCE_14: | # 固定原文 scripts/check.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import { readFile, readdir } from "node:fs/promises"; // 只檢查本包原始碼與鎖檔，不下載依賴或啟動瀏覽器。
-            import { execFileSync } from "node:child_process"; // 僅執行Node語法檢查，不執行probe。
-            import assert from "node:assert/strict"; // 任何候選不一致立即失敗。
-            for (const directory of ["scripts", "tests"]) { // 不掃repo遊戲來源或其他workspace檔案。
-              for (const file of await readdir(directory)) { // 僅檢查現有候選JavaScript模組。
-                if (!file.endsWith(".mjs")) continue; const path = `${directory}/${file}`; const source = await readFile(path, "utf8"); // 不跟隨未知檔案或安裝目錄。
-                execFileSync(process.execPath, ["--check", path], { stdio: "pipe" }); // 語法驗證不會載入Playwright。
-                for (const [index, line] of source.split("\n").entries()) if (line.trim()) assert.match(line, /\/\/.*[\u3400-\u9fff]/, `${path}:${index + 1} 缺少中文行註解`); // 每個非空程式行需中文說明。
-              } // 包括本檢查程式也自我核語法與註解。
-            } // 純本地程式檢查完成。
-            const pkg = JSON.parse(await readFile("package.json", "utf8")); const lock = JSON.parse(await readFile("package-lock.json", "utf8")); // JSON格式另有逐欄中文文件，不加非法註解。
-            assert.equal(pkg.private, true); assert.equal(pkg.license, "MIT"); assert.equal(pkg.devDependencies.playwright, "1.64.1"); // private只防npm意外發布，不是GitHub repo可見性gate。
-            assert.equal(lock.packages[""].license, "MIT"); // 自有程式依使用者明示許可採MIT。
-            for (const name of ["node_modules/playwright", "node_modules/playwright-core"]) { const value = lock.packages[name]; assert.equal(value.version, "1.64.1"); assert.equal(value.license, "Apache-2.0"); assert.match(value.integrity, /^sha512-/); assert.match(value.resolved, /^https:\/\/registry\.npmjs\.org\//); } // 第三方原授權、精確版本與官方完整性都保留。
-            const probe = await readFile("scripts/probe.mjs", "utf8"); assert.match(probe, /chromiumSandbox: true/); assert.doesNotMatch(probe, /args\s*:/); assert.doesNotMatch(probe, /getContext\(["']webgl["']\)/); // 無自訂旗標、沙箱明確開啟、無WebGL1降級。
-            console.log("PASS: syntax, Chinese line comments, exact lock, sandbox requested, WebGL2-only; no browser started."); // 不把靜態檢查當真實runner或遊戲通過。
-            assert.match(probe, /channel: 'chrome'/); assert.doesNotMatch(probe, /executablePath\s*:/); const native = await readFile('scripts/native.mjs', 'utf8'); assert.doesNotMatch(native, /(?:writeFile|chmod|chown|copyFile|symlink)\s*\(/); // 原生channel且唯讀檢查，不覆寫binary或政策。
-          QA_SOURCE_15: | # 固定原文 tests/core.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from 'node:test'; // 只用Node內建測試，不安裝、啟動或連接瀏覽器。
-            import assert from 'node:assert/strict'; // 斷言失敗即測試失敗。
-            import { executeProbe, exactTarget, validMenu, classifyError, TARGET, LIMITS, Fault } from '../scripts/core.mjs'; // 測同一份正式流程，而非抄寫另一套假邏輯。
-            import { inspectGate } from '../scripts/gate.mjs'; // 費用與環境閘門完全離線測試。
-            const menu = { locationValid: true, bootVisible: false, overlayVisible: true, versionVisible: true, storyVisible: true, continueVisible: false, confirmVisible: false, canvasVisible: true }; // 合成可見UI布林，不是真實遊戲畫面。
-            function fixture(options = {}) { // 虛擬介面只記呼叫順序，不接網路或使用者瀏覽器。
-              const calls = []; let clock = 0; // 虛擬單調時鐘避免耗費真實長時間。
-              const action = async (name, value) => { calls.push(name); clock += options.elapsed?.[name] || 1; if (options.failure === name) throw new Fault(`${name}-blocked`); return value; }; // 可反駁每個階段失敗後是否確實停止。
-              const adapter = { bounded: async fn => fn(), inspectNative: () => action('native', { status: options.native || 'ready' }), preparePage: () => action('page-setup'), launch: () => action('launch'), capability: () => action('capability', options.capability || { status: 'available', api: 'webgl2', rendererClass: 'software', hardwarePerformanceVerified: false }), navigate: () => action('navigate', options.http ?? 200), url: () => options.url || TARGET.url, waitMenu: () => action('waitMenu'), visible: () => action('visible', options.menu || menu), screenshot: () => action('screenshot', { file: 'mock-only-not-a-real-image', bytes: 0, sha256: 'mock' }), close: () => action('close', { status: 'close-acknowledged', processInventoryVerified: false }) }; // 模擬不製作可冒充真圖的檔案。
-              return { calls, adapter, now: () => clock }; // 回傳純記憶體測試控制。
-            } // 沒有任何外部副作用。
-            test('能力及啟動產證不等於操作或穩定性通過', async () => { const mock = fixture(); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'evidence-collected-pending-review'); assert.equal(result.operation.status, 'not-run'); assert.equal(result.stability.status, 'not-run'); assert.equal(result.runtimeBytesVerified, false); assert.deepEqual(mock.calls, ['native', 'launch', 'page-setup', 'capability', 'navigate', 'waitMenu', 'visible', 'screenshot', 'close']); }); // 完成即停，沒有故事、Escape或十五分鐘idle。
-            for (const stage of ['native', 'launch', 'page-setup', 'capability', 'navigate', 'waitMenu', 'visible', 'screenshot']) { // 每個依賴階段都要驗證第一錯誤即停。
-              test(`${stage}失敗不重試且一定清理`, async () => { const mock = fixture({ failure: stage }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.equal(mock.calls.filter(value => value === stage).length, 1); assert.equal(mock.calls.at(-1), 'close'); assert.equal(mock.calls.indexOf(stage), mock.calls.length - 2); }); // 不以重新啟動或改旗標救測試。
-            } // 共六個中斷點。
-            test('無WebGL不導覽遊戲', async () => { const mock = fixture({ capability: { status: 'unavailable' } }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['native', 'launch', 'page-setup', 'capability', 'close']); assert.deepEqual(result.faults, ['webgl2-unavailable']); }); // 最便宜能力否證要先執行。
-            test('轉到登入頁不讀DOM或截圖', async () => { const mock = fixture({ url: 'https://example.com/login?token=secret' }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.ok(!mock.calls.includes('visible')); assert.ok(!mock.calls.includes('screenshot')); assert.ok(!JSON.stringify(result).includes('secret')); }); // 既不登入，也不把轉址秘密帶進報告。
-            test('HTTP錯誤不繼續等選單', async () => { const mock = fixture({ http: 503 }); await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['native', 'launch', 'page-setup', 'capability', 'navigate', 'close']); }); // 不將入口服務問題誤當遊戲功能失敗。
-            for (const key of Object.keys(menu)) { // 每個可見前提都必須獨立有反例。
-              test(`可見前提${key}反例會阻擋`, async () => { const mock = fixture({ menu: { ...menu, [key]: !menu[key] } }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.ok(!mock.calls.includes('screenshot')); }); // 不以部分DOM符合替代完整啟動畫面前提。
-            } // 未截圖的不宣告有視覺證據。
-            test('總截止後不送新動作', async () => { const mock = fixture({ elapsed: { launch: LIMITS.totalMs } }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['native', 'launch', 'close']); assert.deepEqual(result.faults, ['probe-deadline']); }); // 等待過慢不借用後續階段時間。
-            test('清理失敗不得成功', async () => { const mock = fixture({ failure: 'close' }); const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.outcome, 'blocked'); assert.ok(result.faults.includes('cleanup-incomplete')); }); // 不能把有圖當資源已關閉。
-            test('回傳結果為獨立快照', async () => { const mock = fixture(); const result = await executeProbe(mock.adapter, mock.now); const before = JSON.stringify(result); menu.storyVisible = false; assert.equal(JSON.stringify(result), before); menu.storyVisible = true; }); // 原始物件後改不能回寫封存結果。
-            test('目標只接受唯一HTTPS根網址', () => { for (const url of [TARGET.url + '?x=1', TARGET.url + '#x', TARGET.url + 'other', 'http://orbit-fall-private-qa.agentkystr.chatgpt.site/', 'invalid']) assert.equal(exactTarget(url), false); assert.equal(exactTarget(TARGET.url), true); assert.equal(validMenu(null), false); }); // 無私人入口或查詢捷徑。
-            test('外部錯誤訊息不進報告', () => { assert.equal(classifyError(new Error('token=secret')), 'unclassified-rejection'); assert.equal(classifyError({ name: 'TimeoutError', message: 'cookie=secret' }), 'timeout-reported'); }); // 原始外部訊息永不被當診斷內容保存。
-            test('有界動作超時後晚完成不接續新動作', async () => { const mock = fixture(); let finish; mock.adapter.launch = () => new Promise(resolve => { finish = resolve; }); mock.adapter.inspectNative = async () => ({ status: 'ready' }); let boundedCalls = 0; mock.adapter.bounded = async action => { if (++boundedCalls === 1) return action(); void action(); await Promise.resolve(); throw new Fault('operation-deadline'); }; const result = await executeProbe(mock.adapter, mock.now); const snapshot = JSON.stringify(result); finish(); await Promise.resolve(); assert.deepEqual(mock.calls, ['close']); assert.equal(JSON.stringify(result), snapshot); }); // 模擬超時與晚完成，確認沒有導航、截圖或第二輪。
-            test('只有WebGL1也必須提前阻擋', async () => { const mock = fixture({ capability: { status: 'available', api: 'webgl' } }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['native', 'launch', 'page-setup', 'capability', 'close']); assert.deepEqual(result.faults, ['webgl2-unavailable']); }); // Three需求不能被較舊API的可用性冒充。
-            test('原生身份不確定就不啟動', async () => { const mock = fixture({ native: 'blocked' }); const result = await executeProbe(mock.adapter, mock.now); assert.deepEqual(mock.calls, ['native', 'close']); assert.equal(result.stage, 'native-preflight'); assert.equal(result.launch.status, 'not-run'); assert.deepEqual(result.faults, ['native-chrome-unverified']); }); // 前提不符不能用launch試運氣。
-            test('launch錯誤保留固定分類與stage而無raw', async () => { const mock = fixture(); mock.adapter.launch = async () => { throw new Error('Chromium sandboxing failed! signal=SIGTRAP token=secret'); }; const result = await executeProbe(mock.adapter, mock.now); assert.equal(result.stage, 'launch'); assert.equal(result.faultDetails[0].code, 'sandbox-failure-reported'); assert.equal(result.faultDetails[0].signal, 'SIGTRAP'); assert.equal(result.launch.status, 'rejected-or-unconfirmed'); assert.ok(!JSON.stringify(result).includes('secret')); }); // 不重犯run01完全遮蔽分類，也不公開任意錯誤。
-            test('preflight有三十秒單次預算且仍共用九十秒總界', async () => { const mock = fixture(); const budgets = []; mock.adapter.bounded = async (action, ms) => { budgets.push(ms); return action(); }; await executeProbe(mock.adapter, mock.now); assert.equal(budgets[0], 30000); assert.equal(LIMITS.totalMs, 90000); }); // 延長hash不會仍被舊十五秒外層切斷，也不延長整程序上界。
-            test('preflight逾時後晚完成永不launch', async () => { const mock = fixture(); let finish; mock.adapter.inspectNative = () => new Promise(resolve => { finish = resolve; }); mock.adapter.bounded = async action => { void action(); await Promise.resolve(); throw new Fault('operation-deadline'); }; const report = await executeProbe(mock.adapter, mock.now); const frozen = JSON.stringify(report); finish({ status: 'ready' }); await Promise.resolve(); assert.deepEqual(mock.calls, ['close']); assert.equal(report.launch.status, 'not-run'); assert.equal(JSON.stringify(report), frozen); }); // 即使完整hash晚到也不續開browser或導覽。
-            test('已審情境只執行一次且不另取boot圖', async () => { const mock = fixture(); mock.adapter.runScenario = async () => ({ status: 'evidence-collected-pending-image-review', screenshot: { file: 'boot.png', bytes: 0, sha256: 'mock' } }); const report = await executeProbe(mock.adapter, mock.now); assert.equal(report.operation.status, 'evidence-collected-pending-image-review'); assert.equal(report.screenshots.length, 1); assert.ok(!mock.calls.includes('waitMenu')); assert.ok(!mock.calls.includes('screenshot')); assert.equal(mock.calls.at(-1), 'close'); }); // 共用核心不重做啟動驗收或新增第二圖。
-            test('情境blocked保留有限報告而不fallback', async () => { const mock = fixture(); let calls = 0; mock.adapter.runScenario = async () => { calls += 1; return { status: 'blocked', stage: 'fixed-example' }; }; const report = await executeProbe(mock.adapter, mock.now); assert.equal(report.outcome, 'blocked'); assert.equal(report.operation.stage, 'fixed-example'); assert.equal(calls, 1); assert.equal(report.screenshots.length, 0); assert.ok(!mock.calls.includes('screenshot')); }); // 失敗不另跑能力probe或其他遊戲。
-            test('情境整體逾時不得回報not-run或接受晚結果', async () => { const mock = fixture(); let finish; mock.adapter.runScenario = () => new Promise(resolve => { finish = resolve; }); mock.adapter.bounded = async (action, ms) => { if (ms !== 45000) return action(); void action(); await Promise.resolve(); throw new Fault('operation-deadline'); }; const result = await executeProbe(mock.adapter, mock.now); const before = JSON.stringify(result); finish({ status: 'evidence-collected-pending-image-review', screenshot: {} }); await Promise.resolve(); assert.equal(result.operation.status, 'attempted-result-unconfirmed'); assert.equal(result.outcome, 'blocked'); assert.equal(JSON.stringify(result), before); assert.equal(mock.calls.at(-1), 'close'); }); // 已送出的情境不能在timeout後假稱沒執行，也不能由晚圖翻成成功。
-          QA_SOURCE_16: | # 固定原文 tests/crown.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from 'node:test'; // 僅純mock，絕不啟動browser或remote。
-            import assert from 'node:assert/strict'; // 固定斷言，不把替身資料當產品證據。
-            import vm from 'node:vm'; // 在假DOM環境直接執行正式唯讀callback。
-            import { readFile } from 'node:fs/promises'; // 只核候選程式文字與禁用API。
-            import { TARGET, LIMITS, SELECTORS, PointerFault, failureDetails, visibleCrownStart, validEntry, sameRect, validTutorial, createPointerAdapter, executePointerScenario } from '../scripts/scenario-crown.mjs'; // 測正式exports，不另寫放寬版邏輯。
-            const entry = () => ({ locationValid: true, viewport: { width: 1920, height: 1080, dpr: 1 }, buildLabel: `${TARGET.version} · ${TARGET.build} · 本機存檔`, canvasVisible: true, canvasFocused: false, campTitle: '餘燼之冠', overlayVisible: true, hudVisible: false, tutorialVisible: false, target: { selector: SELECTORS.start, matches: 1, tag: 'BUTTON', text: '開始 · 學習守誓', fullyVisible: true, disabled: false, ariaDisabledOrInert: false, pointerEnabled: true, centerHit: true, rect: { left: 100, top: 500, right: 324, bottom: 552, width: 224, height: 52 }, center: { x: 212, y: 526 } } }); // 純公開UI替身，不含遊戲內部state。
-            const tutorial = () => ({ ...entry(), canvasFocused: true, campTitle: null, overlayVisible: false, hudVisible: true, tutorialVisible: true, tutorialStep: '試煉 1 / 5', tutorialText: '試煉 1 / 5 以 WASD 或左搖桿移動。先在庭院移動一小段。 J／左鍵刺擊', chapter: '守誓者的試煉', roomName: '守誓者的試煉' }); // 只驗第一提示，不用移動結果替代。
-            const png = () => ({ file: 'boot.png', bytes: 100, sha256: 'a'.repeat(64) }); // metadata替身，不生成任何PNG。
-            function harness(options = {}) { // 可控時鐘與延遲，全是程序內假資料。
-              let clock = 0, reads = 0, fatal = false, boundedCount = 0, lateResolve; const calls = [], budgets = []; // 不讀真實frame或效能指標。
-              const io = { healthy: () => { if (fatal) throw new PointerFault('pageerror-observed'); }, url: () => options.badURL ? 'https://invalid.example/' : TARGET.url, bounded: async (call, ms) => { budgets.push(ms); boundedCount++; clock += options.scheduleAt?.[boundedCount] ?? 0; if (options.lateClick && boundedCount === 4) { const pending = call(); pending.catch(() => {}); throw new PointerFault('operation-deadline'); } return call(); }, waitReady: async () => { calls.push('wait'); clock += options.readyCost ?? 10; if (options.waitFail) throw new Error('private-wait-message'); }, visible: async phase => { reads++; calls.push(`dom:${phase}`); clock += phase === 'after' ? options.finalCost ?? 10 : reads === 1 ? options.aCost ?? 30 : options.bCost ?? 40; if (options.readFail === reads) throw new TypeError('private-dom-message'); const value = phase === 'after' ? options.noTutorial ? entry() : tutorial() : entry(); options.mutate?.(value, reads); return value; }, click: async (point, beforeInvoke) => { clock += options.invokeDelay ?? 0; beforeInvoke(); calls.push('mouse'); assert.deepEqual(point, { x: options.centerX ?? 212, y: 526 }); clock += options.clickCost ?? 20; if (options.fatalClick) fatal = true; if (options.clickTimeout) throw new PointerFault('operation-deadline'); if (options.clickReject) throw new Error('private-click-message'); if (options.lateClick) return new Promise(resolve => { lateResolve = resolve; }); }, snapshot: async () => { calls.push('png'); clock += options.pngCost ?? 30; if (options.pngFail) throw new PointerFault('operation-deadline'); if (options.fatalPNG) fatal = true; return { ...png(), ...options.png }; } }; // 每個替身只模擬公開API契約。
-              return { io, calls, budgets, run: args => executePointerScenario(io, { now: () => clock, ...args }), resolveLate: () => lateResolve?.() }; // 封存結果可與晚到承諾獨立比較。
-            } // 測試介面不載入Playwright。
-            test('正常只有一mouse三DOM一圖並觀察營地到試煉1', async () => { const h = harness(), r = await h.run(); assert.equal(r.status, 'evidence-collected-pending-image-review'); assert.deepEqual(h.calls, ['wait', 'dom:entry', 'dom:entry', 'mouse', 'png', 'dom:after']); assert.deepEqual(h.budgets, [4000, 4000, 1500, 5000, 8000, 1500]); assert.deepEqual(r.counts, { inputAttempts: 1, domAttempts: 3, imageAttempts: 1 }); assert.equal(r.firstFailure, null); assert.equal(r.actions[0].ack, 'resolved'); assert.equal(r.visibleTransition, 'camp-to-first-trial-observed'); assert.equal(r.hypothesisProven, false); assert.equal(r.fullGamesPassed, '0/8'); }); // 不把mock或這個窄流程算全遊戲通過。
-            for (const [key, value] of [['matches', 2], ['selector', '#wrong'], ['tag', 'DIV'], ['text', '教學練習'], ['fullyVisible', false], ['disabled', true], ['ariaDisabledOrInert', true], ['pointerEnabled', false], ['centerHit', false]]) for (const phase of [1, 2]) test(`A/B第${phase}次${key}不符零輸入無fallback圖`, async () => { const h = harness({ mutate: (s, n) => { if (n === phase) s.target[key] = value; } }), r = await h.run(); assert.equal(r.status, 'blocked'); assert.equal(r.counts.inputAttempts, 0); assert.equal(r.counts.imageAttempts, 0); assert.ok(!h.calls.includes('mouse')); assert.equal(r.counts.domAttempts, phase); }); // 不重讀找成功、不點其他入口。
-            for (const [key, value] of [['locationValid', false], ['buildLabel', 'wrong-build'], ['canvasVisible', false], ['campTitle', '其他營地'], ['overlayVisible', false], ['hudVisible', true], ['tutorialVisible', true]]) for (const phase of [1, 2]) test(`A/B第${phase}次公開前提${key}失效`, async () => { const h = harness({ mutate: (s, n) => { if (n === phase) s[key] = value; } }), r = await h.run(); assert.equal(r.counts.inputAttempts, 0); assert.equal(r.counts.imageAttempts, 0); }); // 不能以raw pointer繞過既有UI狀態。
-            for (const key of ['width', 'height', 'dpr']) test(`viewport ${key}改變拒絕`, async () => { const h = harness({ mutate: s => { s.viewport[key] += 1; } }), r = await h.run(); assert.equal(r.counts.inputAttempts, 0); }); // 不resize補救。
-            for (const key of ['left', 'top', 'right', 'bottom', 'width', 'height']) test(`rect ${key}非有限數拒絕`, () => { const s = entry(); s.target.rect[key] = Infinity; assert.equal(validEntry(s), false); }); // 不修NaN或Infinity位置。
-            test('中心不是同次rect中心拒絕', () => { const s = entry(); s.target.center.x += 1; assert.equal(validEntry(s), false); }); // 不用歷史PNG坐標。
-            test('部分rect在viewport外拒絕', () => { const s = entry(); s.target.rect.left = -1; assert.equal(validEntry(s), false); }); // 不scroll或clamp。
-            test('rect移動大於半像素不追蹤', async () => { const h = harness({ mutate: (s, n) => { if (n === 2) { s.target.rect.left++; s.target.rect.right++; s.target.center.x++; } } }), r = await h.run(); assert.equal(r.firstFailure.code, 'target-moved'); assert.equal(r.counts.inputAttempts, 0); assert.equal(r.counts.domAttempts, 2); }); // 不補第三次讀取。
-            test('半像素邊界只用B新中心', async () => { const h = harness({ centerX: 212.5, mutate: (s, n) => { if (n === 2) { s.target.rect.left += 0.5; s.target.rect.right += 0.5; s.target.center.x += 0.5; } } }), r = await h.run(); assert.equal(r.actions[0].point.x, 212.5); assert.equal(r.status, 'evidence-collected-pending-image-review'); }); // 容差不表示可追蹤移動按鈕。
-            test('A四秒能力容許1968ms而B依然快才可輸入', async () => { const h = harness({ aCost: 1968, bCost: 415 }), r = await h.run(); assert.equal(r.status, 'evidence-collected-pending-image-review'); assert.equal(r.actions[0].observationAgeMs, 415); }); // run13耗時只作mock參數，不回填根因。
-            test('B在1.5秒內但超1秒fresh仍零輸入', async () => { const h = harness({ bCost: 1001 }), r = await h.run(); assert.equal(r.firstFailure.code, 'stale-target-observation'); assert.equal(r.counts.inputAttempts, 0); assert.ok(!h.calls.includes('png')); }); // DOM上限不是新鮮度放寬。
-            test('B恰1000ms邊界可送一次', async () => { const h = harness({ bCost: 1000 }), r = await h.run(); assert.equal(r.actions[0].observationAgeMs, 1000); assert.equal(r.counts.inputAttempts, 1); }); // 明確含等號邊界。
-            test('實際mouse前同步延遲跨fresh界零輸入', async () => { const h = harness({ bCost: 400, invokeDelay: 601 }), r = await h.run(); assert.equal(r.firstFailure.code, 'stale-target-observation'); assert.ok(!h.calls.includes('mouse')); }); // adapter最後guard才可標attempted。
-            test('bounded排程延遲跨fresh界零輸入', async () => { const h = harness({ bCost: 400, scheduleAt: { 4: 601 } }), r = await h.run(); assert.equal(r.counts.inputAttempts, 0); assert.equal(r.firstFailure.code, 'stale-target-observation'); }); // 不能提前檢完後排程晚click。
-            for (const [option, stage] of [['readyCost', 'wait-camp'], ['aCost', 'observe-entry-a'], ['bCost', 'observe-entry-b'], ['clickCost', 'single-native-mouse-click'], ['pngCost', 'final-snapshot'], ['finalCost', 'observe-after']]) test(`${stage}絕對期限晚回不續正常流程`, async () => { const value = { readyCost: 4000, aCost: 4000, bCost: 1500, clickCost: 5000, pngCost: 8000, finalCost: 1500 }[option], h = harness({ [option]: value }), r = await h.run(); assert.equal(r.status, 'blocked'); assert.equal(r.firstFailure.stage, stage); assert.equal(r.firstFailure.code, 'operation-deadline'); }); // 內層mock即使resolve也不得洗成成功。
-            test('父餘額少於24秒零page動作', async () => { const h = harness(), r = await h.run({ deadlineMs: 23999 }); assert.equal(r.firstFailure.code, 'insufficient-whole-plan-budget'); assert.deepEqual(h.calls, []); }); // 不借父cleanup預留。
-            test('實際mouse前留足14.5秒餘額可單次輸入', async () => { const h = harness({ readyCost: 3999, aCost: 3999, bCost: 999, invokeDelay: 1 }), r = await h.run({ deadlineMs: 24000 }); assert.equal(r.counts.inputAttempts, 1); assert.ok(r.elapsedMs < 24000); }); // 合法最壞準備仍留足收尾。
-            test('實際mouse前不足14.5秒餘額優先零輸入', async () => { const h = harness({ readyCost: 3999, aCost: 3999, bCost: 999, invokeDelay: 600 }), r = await h.run({ deadlineMs: 24000 }); assert.equal(r.counts.inputAttempts, 0); assert.equal(r.firstFailure.code, 'insufficient-input-observation-reserve'); assert.ok(!h.calls.includes('mouse')); }); // 即使另有fresh失效也不得借收尾時間。
-            test('主期限受父截止更早者限制', async () => { const h = harness({ scheduleAt: { 4: 16000 } }), r = await h.run({ deadlineMs: 24000 }); assert.equal(r.counts.inputAttempts, 0); assert.equal(r.firstFailure.code, 'operation-deadline'); }); // 排程逾期不偷送輸入。
-            for (const option of ['clickTimeout', 'clickReject']) test(`${option}只有預定圖DOM但ack與effect永遠未知`, async () => { const h = harness({ [option]: true }), r = await h.run(); assert.equal(r.status, 'blocked'); assert.equal(r.actions[0].effect, 'unknown'); assert.equal(r.diagnostic.firstTrialVisibleFieldsMatch, true); assert.equal(r.visibleTransition, 'not-established'); assert.equal(r.screenshot.role, 'diagnostic-after-unknown-input'); assert.equal(h.calls.filter(x => x === 'mouse').length, 1); assert.equal(r.firstFailure.stage, 'single-native-mouse-click'); assert.equal(r.lastStage, 'observe-after'); }); // 見試煉1也不追認未知click成功。
-            test('晚到click resolve不能改封存report或續輸入', async () => { const h = harness({ lateClick: true }), r = await h.run(), saved = JSON.stringify(r); h.resolveLate(); await Promise.resolve(); assert.equal(JSON.stringify(r), saved); assert.equal(r.actions[0].ack, 'pending'); assert.equal(h.calls.filter(x => x === 'mouse').length, 1); }); // Promise競速不是底層取消，未知不補up。
-            test('未知click後PNG失敗不發末DOM且第一失敗不覆寫', async () => { const h = harness({ clickTimeout: true, pngFail: true }), r = await h.run(); assert.equal(r.firstFailure.stage, 'single-native-mouse-click'); assert.equal(r.lastStage, 'final-snapshot'); assert.equal(r.faults.length, 2); assert.equal(r.counts.domAttempts, 2); assert.equal(r.screenshot, undefined); }); // 不拿舊圖替代、不重截。
-            test('正常click後PNG失敗亦不續DOM', async () => { const h = harness({ pngFail: true }), r = await h.run(); assert.equal(r.counts.domAttempts, 2); assert.equal(r.firstFailure.stage, 'final-snapshot'); assert.equal(r.counts.imageAttempts, 1); }); // 單圖正常與診斷槽互斥。
-            test('click後fatal連只讀圖也不真正呼叫', async () => { const h = harness({ fatalClick: true, clickTimeout: true }), r = await h.run(); assert.ok(!h.calls.includes('png')); assert.equal(r.firstFailure.stage, 'single-native-mouse-click'); assert.equal(r.actions[0].effect, 'unknown'); }); // permanent health不能被診斷例外放過。
-            test('PNG回後fatal不續DOM也不留metadata', async () => { const h = harness({ fatalPNG: true }), r = await h.run(); assert.equal(r.counts.domAttempts, 2); assert.equal(r.screenshot, undefined); }); // 薄shared API後健康檢查仍優先。
-            test('錯URL完全不發page操作', async () => { const h = harness({ badURL: true }), r = await h.run(); assert.deepEqual(h.calls, []); assert.equal(r.firstFailure.code, 'target-url-mismatch'); }); // 不讀登入頁內容。
-            for (const [key, value] of [['file', 'other.png'], ['bytes', 2097153], ['bytes', 0], ['sha256', 'private-data']]) test(`非法PNG ${key}不保留不續DOM`, async () => { const h = harness({ png: { [key]: value } }), r = await h.run(); assert.equal(r.firstFailure.code, 'invalid-png-metadata'); assert.equal(r.screenshot, undefined); assert.equal(r.counts.domAttempts, 2); }); // 不放寬2MiB或身份。
-            for (const [key, value] of [['canvasFocused', false], ['tutorialStep', '試煉 2 / 5'], ['tutorialText', '不同文字'], ['chapter', '其他章'], ['roomName', '其他房'], ['buildLabel', 'wrong']]) test(`末態${key}不符不簽窄通過`, async () => { const h = harness({ mutate: (s, n) => { if (n === 3) s[key] = value; } }), r = await h.run(); assert.equal(r.status, 'blocked'); assert.equal(r.firstFailure.code, 'tutorial-visible-feedback-mismatch'); assert.equal(r.counts.inputAttempts, 1); }); // 不強制focus、不做第二個動作補過。
-            test('失敗分類只允許有限name/code且不記私密訊息', async () => { const h = harness({ clickReject: true }), r = await h.run(); assert.equal(JSON.stringify(r).includes('private-click-message'), false); assert.equal(failureDetails(Object.assign(new Error('x'), { code: 'operation-deadline' })).code, 'operation-deadline'); assert.equal(failureDetails(Object.assign(new Error('secret'), { name: 'Secret', code: 'secret' })).name, 'other'); }); // firstFailure保留分類不洩原文。
-            test('firstFailure保留首步budget與時間且lastStage分開', async () => { const h = harness({ clickTimeout: true }), r = await h.run(); assert.equal(r.stage, 'single-native-mouse-click'); assert.equal(r.firstFailure.stepBudgetMs, 5000); assert.equal(r.firstFailure.stepStartedMs, 80); assert.equal(r.firstFailure.stepElapsedMs, 20); assert.equal(r.lastStage, 'observe-after'); }); // 時間只是觀測，不當根因。
-            test('最大有用分步路徑小於24秒且保留30秒自身', async () => { const h = harness({ readyCost: 3999, aCost: 3999, bCost: 1000, clickCost: 4999, pngCost: 7999, finalCost: 1499 }), r = await h.run(); assert.equal(r.status, 'evidence-collected-pending-image-review'); assert.equal(r.elapsedMs, 23495); assert.equal(LIMITS.requiredMs, 24000); assert.equal(LIMITS.scenarioMs, 30000); }); // B真正可點最多1秒，所以有用路徑更窄。
-            test('adapter原生mouse只有left單次delay0且guard先行', async () => { const calls = [], page = { url: () => TARGET.url, mouse: { click: async (x, y, options) => calls.push({ x, y, options }) } }, io = createPointerAdapter(page, { healthy: () => calls.push('health'), bounded: fn => fn(), snapshot: async () => png() }); await io.click({ x: 212, y: 526 }, () => calls.push('fresh')); assert.ok(calls.indexOf('fresh') < calls.findIndex(v => typeof v === 'object')); assert.deepEqual(calls.find(v => typeof v === 'object'), { x: 212, y: 526, options: { button: 'left', clickCount: 1, delay: 0 } }); }); // 無force、DOMclick、timeout偽參數或拆開down/up。
-            test('最後guard失敗時mouse API完全不被呼叫', async () => { let calls = 0; const io = createPointerAdapter({ url: () => TARGET.url, mouse: { click: async () => { calls++; } } }, { healthy: () => {}, bounded: fn => fn(), snapshot: async () => png() }); await assert.rejects(() => io.click({ x: 212, y: 526 }, () => { throw new PointerFault('stale-target-observation'); })); assert.equal(calls, 0); }); // attempted標記只屬真正送出之前。
-            function fakeNode(text = '', options = {}) { const rect = options.rect ?? { left: 100, top: 500, right: 324, bottom: 552, width: 224, height: 52 }; return { innerText: text, tagName: 'BUTTON', parentElement: options.parent ?? null, hidden: !!options.hidden, disabled: !!options.disabled, inert: !!options.inert, style: { display: 'block', visibility: 'visible', opacity: '1', pointerEvents: 'auto', overflowX: 'visible', overflowY: 'visible', ...options.style }, getClientRects() { return this.hidden ? [] : [rect]; }, getBoundingClientRect: () => rect, getAttribute: name => name === 'aria-disabled' && options.ariaDisabled ? 'true' : null, hasAttribute: name => name === 'inert' && !!options.inert, matches: selector => selector === ':disabled' && !!options.pseudoDisabled, contains(other) { return other === this; } }; } // 假DOM只提供正式callback所需唯讀能力。
-            function domHarness(options = {}) { const nodes = { '#build-label': fakeNode(`${TARGET.version} · ${TARGET.build} · 本機存檔`), '#world': fakeNode(), '#overlay .camp-panel h1': fakeNode('餘燼之冠'), '#overlay': fakeNode(), '#hud': fakeNode('', { hidden: true }), '#tutorial': fakeNode('', { hidden: true }), [SELECTORS.start]: fakeNode('開始 · 學習守誓', options.node) }, queries = []; const globals = { location: { href: options.offTarget ? 'https://invalid.example/' : TARGET.url }, innerWidth: 1920, innerHeight: 1080, devicePixelRatio: 1, getComputedStyle: node => node.style, document: { activeElement: null, querySelector: selector => { queries.push(selector); return nodes[selector] ?? null; }, querySelectorAll: selector => options.duplicate ? [nodes[selector], nodes[selector]] : [nodes[selector]], elementFromPoint: () => options.blocked ? fakeNode('other') : nodes[SELECTORS.start] } }; return { queries, run: () => vm.runInNewContext(`(${visibleCrownStart.toString()})(${JSON.stringify({ target: TARGET, selectors: SELECTORS, phase: 'entry' })})`, globals) }; } // VM不連網、不執行遊戲handler。
-            test('正式DOM callback輸出當次完整rect及centerHit', () => { const h = domHarness(), s = h.run(); assert.equal(validEntry(s), true); assert.equal(s.target.center.x, 212); assert.ok(!h.queries.includes('body')); }); // 以真正callback核可見幾何，不造圖。
-            test('錯址DOM callback不讀任何文字', () => { const h = domHarness({ offTarget: true }); assert.equal(h.run().locationValid, false); assert.deepEqual(h.queries, []); }); // root gate在瀏覽器內再核一次。
-            for (const node of [{ hidden: true }, { disabled: true }, { pseudoDisabled: true }, { inert: true }, { ariaDisabled: true }, { style: { pointerEvents: 'none' } }, { style: { opacity: '0' } }, { style: { visibility: 'hidden' } }, { parent: fakeNode('', { inert: true }) }, { parent: fakeNode('', { ariaDisabled: true }) }, { parent: fakeNode('', { style: { pointerEvents: 'none' } }) }, { parent: fakeNode('', { rect: { left: 101, top: 500, right: 324, bottom: 552, width: 223, height: 52 }, style: { overflowX: 'hidden' } }) }]) test(`正式DOM拒絕disabled/inert/pointer/clip變體${JSON.stringify(node).slice(0, 60)}`, () => { assert.equal(validEntry(domHarness({ node }).run()), false); }); // 祖先限制不能被raw pointer略過。
-            test('同次hit-test被別元素遮擋拒絕', () => { assert.equal(validEntry(domHarness({ blocked: true }).run()), false); }); // 不點遮罩背後控制。
-            test('全DOM重複selector拒絕', () => { assert.equal(validEntry(domHarness({ duplicate: true }).run()), false); }); // 不悄悄用第一個match。
-            test('無鍵盤/force/DOM事件/scroll/遊戲診斷或storage實作', async () => { const source = await readFile(new URL('../scripts/scenario-crown.mjs', import.meta.url), 'utf8'); assert.doesNotMatch(source, /page\.(?:keyboard|goto|reload)|\.mouse\.(?:up|down)|force\s*:|dispatchEvent\(|scrollIntoView\(|localStorage|hollowCrownDiagnostics/); }); // 靜態禁區檢查不當作遠端證據。
-          QA_SOURCE_17: | # 固定原文 tests/native.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from 'node:test'; // 全部純mock，不執行dpkg、sysctl、版本命令或browser。
-            import assert from 'node:assert/strict'; // 原生來源閘門每個必要檢查都有反例。
-            import { createHash } from 'node:crypto'; // 合成profile字串只測checksum契約，不會寫到系統。
-            import { inspectNative, createNativeIO, parsePackage, expectedDigest, canonicalProfile, nativeVersion, NATIVE, COMMANDS, PATHS, pathAccepted, imageProvenance, IMAGE, hashOnce, HASH_LIMIT_MS } from '../scripts/native.mjs'; // 測正式原生查核而非平行假實作。
-            import { classifyAllowed } from '../scripts/diagnostics.mjs'; // 保留run02已證固定分類。
-            import { inspectGate } from '../scripts/gate.mjs'; // 不能讓環境覆寫默默改sandbox或輸出原錯誤。
-            const profile = 'abi <abi/4.0>,\ninclude <tunables/global>\nprofile chrome /opt/google/chrome/chrome flags=(unconfined) {\nuserns,\ninclude if exists <local/chrome>\n}\n'; // 記憶體合成原生格式，不建立或載入profile。
-            const metadata = `google-chrome-stable\n${NATIVE.packageVersion}\namd64\ninstall ok installed\nChrome Linux Team <chromium-dev@chromium.org>\n`; // 只測已知套件metadata格式。
-            const normalPath = { status: 'read', canonical: true, nonSymlink: true, rootOwned: true, typeMatches: true, executable: true, groupWritable: false, worldWritable: false }; // 受控合成子條件，不是實際runner檔案證據。
-            function fixture(failure = '', mutate = {}) { // 純記憶體mock，所有opt模擬官方777，其餘受保護。
-              const calls = []; const call = (key, value) => { calls.push(key); return failure === key ? false : value; }; // 所有獨立唯讀前提可繼續收集，但version絕不越過失敗。
-              const io = { image: imageProvenance, kernel: async () => call('kernel', { apparmorEnabled: { value: true }, apparmorRestrictUnprivilegedUserns: { value: 1 }, unprivilegedUsernsClone: { value: 1 }, maxUserNamespaces: { value: 63838 } }), command: async key => call(key, ({ package: metadata, binaryOwner: `google-chrome-stable: ${NATIVE.binary}`, profileOwner: `apparmor: ${NATIVE.profile}`, profileSums: ` ${NATIVE.profile} ${createHash('md5').update(profile).digest('hex')}\n`, version: `Google Chrome ${NATIVE.version}\n` })[key]), path: async spec => call(spec.key, { ...normalPath, groupWritable: !!spec.opt, worldWritable: !!spec.opt, ...mutate[spec.key] }), read: async path => call(path, path === NATIVE.profile ? profile : `${'a'.repeat(32)}  opt/google/chrome/chrome\n`), hash: async () => call('binary-hash', { digest: 'a'.repeat(32), observation: { status: 'complete', fullyRead: true, bytesProcessed: 1, elapsedMs: 1, abortSignaled: false, abortReasonName: null } }), noLocalRules: async () => call('local', true), absent: async path => call(path, true) }; // 沒有真實系統讀取或launch方法。
-              return { io, calls }; // 回傳記憶體呼叫次序供反駁。
-            } // 合成fixture結束。
-            test('官方opt可寫不再誤擋且保留觀測', async () => { const mock = fixture(); const report = await inspectNative(mock.io); assert.equal(report.status, 'ready'); assert.equal(report.paths.opt.worldWritable, true); assert.equal(report.paths.binary.groupWritable, true); assert.equal(mock.calls.filter(x => x === 'version').length, 1); assert.equal(report.effectiveProfileAudited, false); }); // 可寫不是安全邊界，來源與checksum仍必須成立。
-            for (const key of [...PATHS.map(x => x.key), 'kernel', 'package', 'binaryOwner', 'profileOwner', NATIVE.sums, NATIVE.profile, 'binary-hash', 'profileSums', 'local', '/etc/apparmor.d/disable/chrome', '/etc/apparmor.d/force-complain/chrome', 'version']) test(`不可信${key}絕不越過版本閘門`, async () => { const mock = fixture(key); const report = await inspectNative(mock.io); assert.equal(report.status, 'blocked'); if (key !== 'version') assert.ok(!mock.calls.includes('version')); }); // 唯讀可繼續收集，不代表可執行不可信binary。
-            for (const [key, field, value] of [['binary', 'canonical', false], ['opt', 'canonical', false], ['optGoogle', 'nonSymlink', false], ['binary', 'typeMatches', false], ['binary', 'executable', false], ['profile', 'worldWritable', true], ['dpkgStatus', 'groupWritable', true], ['binarySums', 'rootOwned', false]]) test(`${key}的${field}不可信仍阻擋`, async () => { const mock = fixture('', { [key]: { [field]: value } }); const report = await inspectNative(mock.io); assert.equal(report.status, 'blocked'); assert.equal(report.paths[key][field], value); assert.ok(!mock.calls.includes('version')); if (['dpkgStatus', 'binarySums', 'binary', 'opt', 'optGoogle'].includes(key)) assert.ok(!mock.calls.includes('binary-hash')); }); // 真正來源與型態缺口不能因opt修訂而放行。
-            test('所有固定路徑一次收集且指出多重缺口', async () => { const mock = fixture('', { opt: { nonSymlink: false }, profile: { worldWritable: true } }); const report = await inspectNative(mock.io); assert.equal(Object.keys(report.paths).length, PATHS.length); assert.ok(report.blockedChecks.includes('optPath')); assert.ok(report.blockedChecks.includes('profilePath')); assert.ok(!mock.calls.includes('version')); }); // 不再因第一個父路徑false浪費下一輪才能知道其餘缺口。
-            test('受保護dpkg不符不信任metadata或hash', async () => { const mock = fixture('', { dpkg: { worldWritable: true } }); const report = await inspectNative(mock.io); assert.ok(!mock.calls.includes('package')); assert.ok(!mock.calls.includes('binary-hash')); assert.ok(report.skippedChecks.includes('officialPackageMetadata')); }); // 不用不可信資料庫自行證明binary可信。
-            test('套件版本架構來源缺一不可', () => { for (const old of [NATIVE.packageVersion, 'amd64', 'install ok installed', 'Chrome Linux Team', 'google-chrome-stable']) assert.equal(parsePackage(metadata.replace(old, 'unknown')), false); }); // 名稱相似或已升版都不能默認通過。
-            test('checksum只認精確檔且不可重複', () => { const line = `${'a'.repeat(32)}  opt/google/chrome/chrome`; assert.equal(expectedDigest(line, 'binary'), 'a'.repeat(32)); assert.equal(expectedDigest(line + '\n' + line, 'binary'), null); assert.equal(expectedDigest(line + '-other', 'binary'), null); assert.equal(expectedDigest('secret', 'profile'), null); }); // metadata異常不猜測。
-            test('profile只認原生固定結構', () => { assert.equal(canonicalProfile(profile), true); for (const text of [profile.replace('/opt/google/chrome/chrome', '/tmp/chrome'), profile.replace('userns,', ''), profile.replace('userns,', 'userns, capability,'), 'token=secret']) assert.equal(canonicalProfile(text), false); }); // 不允許動態安全規則或任意路徑。
-            test('版本stdout不可帶任意內容', () => { assert.equal(nativeVersion(`Google Chrome ${NATIVE.version}\n`), true); assert.equal(nativeVersion(`Google Chrome ${NATIVE.version} secret`), false); assert.equal(nativeVersion('Chromium ' + NATIVE.version), false); }); // 不把第三方binary當原生官方Chrome。
-            test('唯讀命令不安裝也不搬檔', () => { assert.deepEqual(Object.keys(COMMANDS), ['package', 'binaryOwner', 'profileOwner', 'profileSums', 'version']); assert.deepEqual(COMMANDS.version, [NATIVE.binary, ['--version']]); }); // 版本查詢不是第二個browser session。
-            test('sandbox與一般權限失敗不得混同', () => { assert.equal(classifyAllowed(new Error('No usable sandbox!')).code, 'sandbox-failure-reported'); assert.equal(classifyAllowed({ code: 'EPERM', message: 'secret' }).code, 'permission-denied-reported'); assert.ok(!JSON.stringify(classifyAllowed(new Error('secret'))).includes('secret')); }); // 未知原因仍標未知，不用猜測填空。
-            test('診斷或原probe確認不可啟動新模式', () => { assert.ok(inspectGate({ QA_MODE: 'launch-diagnostic', QA_CONFIRM_LAUNCH_DIAGNOSIS: 'true' }).length); assert.ok(inspectGate({ QA_MODE: 'probe', QA_CONFIRM_PUBLIC_PROBE: 'true' }).length); }); // 原生Chrome是另一次明示確認，不自動fallback。
-            test('截止後唯讀介面不再發命令或讀檔', async () => { const io = createNativeIO(() => { throw new Error('closed'); }); for (const action of [() => io.read(NATIVE.profile), () => io.path({ path: NATIVE.binary, type: 'file' }), () => io.command('version'), () => io.hash(NATIVE.binary), () => io.absent('/etc/apparmor.d/disable/chrome'), () => io.noLocalRules()]) await assert.rejects(action, /closed/); }); // 先在記憶體停止閘門拒絕，未執行真實read、dpkg、版本或browser。
-            test('opt的uid與mode皆是觀測而非自設來源門檻', async () => { const mock = fixture('', Object.fromEntries(PATHS.filter(x => x.opt).map(x => [x.key, { rootOwned: false, groupWritable: true, worldWritable: true }]))); const report = await inspectNative(mock.io); assert.equal(report.status, 'ready'); assert.equal(report.paths.binary.rootOwned, false); assert.equal(report.checks.packageBinaryChecksum, true); }); // 可信官方新VM與受保護checksum建立內容身份，不宣稱防同VM換檔競態。
-            test('來源驗收保持待root核官方header而非假觀測', async () => { const mock = fixture(); const report = await inspectNative(mock.io); assert.equal(report.status, 'ready'); assert.equal(report.image.status, 'pending-parent-verification'); assert.equal(report.image.actual, null); assert.equal(report.image.requiredImage, 'ubuntu-24.04'); assert.equal(report.image.requiredVersion, IMAGE.version); }); // ready僅指實際套件前提；不能省略外部image與PNG人工驗收。
-            test('傳入預期env也不能冒充image實測', () => { const value = imageProvenance({ ImageOS: IMAGE.os, ImageVersion: IMAGE.version }); assert.equal(value.status, 'pending-parent-verification'); assert.equal(value.actual, null); }); // 純資料契約不讀env、不接受自行聲稱verified。
-            function abortFailure() { const error = new Error('private-path-must-not-leak'); error.name = 'AbortError'; error.code = 'ABORT_ERR'; error.cause = { name: 'TimeoutError', message: 'secret' }; return error; } // 合成有限取消訊號，不是真實I/O或browser。
-            test('metadata讀取取消保留read階段且不hash', async () => { const mock = fixture(); const read = mock.io.read; mock.io.read = async path => { if (path === NATIVE.sums) throw abortFailure(); return read(path); }; const report = await inspectNative(mock.io); assert.equal(report.binaryIntegrity.metadataRead.status, 'rejected'); assert.equal(report.binaryIntegrity.hash.status, 'not-run'); assert.equal(report.errors.find(x => x.check === 'packageBinaryChecksum').stage, 'binary-metadata-read'); assert.equal(report.errors[0].errorCode, 'ABORT_ERR'); assert.equal(report.errors[0].causeName, 'TimeoutError'); assert.ok(!mock.calls.includes('binary-hash')); assert.ok(!mock.calls.includes('version')); assert.ok(!JSON.stringify(report).includes('private-path')); }); // read-timeout不再與hash錯誤混同。
-            test('真正完整digest不符明確mismatch且不執行', async () => { const mock = fixture(); mock.io.hash = async () => ({ digest: 'b'.repeat(32), observation: { status: 'complete', fullyRead: true, bytesProcessed: 10, elapsedMs: 1, abortSignaled: false } }); const report = await inspectNative(mock.io); assert.equal(report.binaryIntegrity.comparison, 'mismatch'); assert.equal(report.binaryIntegrity.hash.fullyRead, true); assert.ok(!report.errors.some(x => x.check === 'packageBinaryChecksum')); assert.ok(!mock.calls.includes('version')); }); // 比較不符與I/O例外是不同結論。
-            test('完整stream只讀一次且hash符合', async () => { let opens = 0; let time = 0; const signal = new AbortController().signal; const result = await hashOnce(() => { opens++; return (async function* () { yield Buffer.from('hello'); time += 3; yield Buffer.from(' world'); time += 2; })(); }, signal, () => {}, () => time); assert.equal(opens, 1); assert.equal(result.digest, createHash('md5').update('hello world').digest('hex')); assert.equal(result.observation.status, 'complete'); assert.equal(result.observation.bytesProcessed, 11); assert.equal(result.observation.elapsedMs, 5); assert.equal(result.observation.fullyRead, true); assert.equal(result.observation.abortSignaled, false); }); // 真正正式hash邏輯只用記憶體合成bytes，不碰系統binary。
-            test('hash逾時保留取消原因時間與已處理bytes且不重讀', async () => { let opens = 0; let time = 0; const controller = new AbortController(); const result = await hashOnce(() => { opens++; return (async function* () { yield Buffer.alloc(7); time = HASH_LIMIT_MS; controller.abort({ name: 'TimeoutError' }); throw abortFailure(); })(); }, controller.signal, () => {}, () => time); assert.equal(opens, 1); assert.equal(result.digest, null); assert.equal(result.observation.stage, 'read-update'); assert.equal(result.observation.bytesProcessed, 7); assert.equal(result.observation.elapsedMs, HASH_LIMIT_MS); assert.equal(result.observation.fullyRead, false); assert.equal(result.observation.abortSignaled, true); assert.equal(result.observation.abortReasonName, 'TimeoutError'); assert.equal(result.observation.error.name, 'AbortError'); assert.equal(result.observation.error.errorCode, 'ABORT_ERR'); assert.ok(!JSON.stringify(result).includes('secret')); }); // 不靠總耗時猜根因，而直接保留本次signal與有限錯誤。
-            test('hash取消不比較部分digest也不執行version', async () => { const mock = fixture(); mock.io.hash = async () => ({ digest: null, observation: { status: 'failed', stage: 'read-update', fullyRead: false, bytesProcessed: 7, elapsedMs: HASH_LIMIT_MS, abortSignaled: true, abortReasonName: 'TimeoutError', error: classifyAllowed(abortFailure()) } }); const report = await inspectNative(mock.io); assert.equal(report.binaryIntegrity.comparison, 'not-run'); assert.equal(report.binaryIntegrity.hash.bytesProcessed, 7); assert.equal(report.errors.find(x => x.check === 'packageBinaryChecksum').stage, 'binary-hash'); assert.ok(!mock.calls.includes('version')); }); // 不把部分hash當完整性通過或自動再讀。
-            test('開stream失敗保留有限code而無原文', async () => { const result = await hashOnce(() => { const error = new Error('secret-path'); error.code = 'EIO'; throw error; }, new AbortController().signal, () => {}); assert.equal(result.observation.stage, 'open-stream'); assert.equal(result.observation.bytesProcessed, 0); assert.equal(result.observation.error.errorCode, 'EIO'); assert.ok(!JSON.stringify(result).includes('secret-path')); }); // 其他I/O失敗不會因新增Abort分類而消失。
-            test('未知錯誤name與code不能成為輸出通道', () => { const result = classifyAllowed({ name: 'secret-name', code: 'secret-code', cause: { name: 'secret-cause' }, message: 'secret-message' }); assert.equal(result.name, 'other'); assert.equal(result.errorCode, null); assert.equal(result.causeName, null); assert.ok(!JSON.stringify(result).includes('secret')); }); // 僅白名單error欄位，禁止任意字串。
-          QA_SOURCE_18: | # 固定原文 tests/public.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from "node:test"; // 純Node測試，不啟動瀏覽器、不連GitHub或遊戲。
-            import assert from "node:assert/strict"; // 任何傳輸不完整都必須反駁通過。
-            import { createHash } from "node:crypto"; // 合成資料的SHA校驗，不產生假遊戲證據。
-            import { inspectGate } from "../scripts/gate.mjs"; // 測正式公開repo閘門。
-            import { encodeTransfer, decodeTransfers, identity, TRANSFER } from "../scripts/log-transfer.mjs"; // 編解碼使用同一份正式程式。
-            const allowed = { GITHUB_ACTIONS: "true", RUNNER_ENVIRONMENT: "github-hosted", RUNNER_OS: "Linux", GITHUB_REPOSITORY: "KYStr/stteak-games", GITHUB_REPOSITORY_OWNER: "KYStr", GITHUB_ACTOR: "KYStr", QA_REPOSITORY_PRIVATE: "false", GITHUB_REF: "refs/heads/main", GITHUB_WORKFLOW_REF: "KYStr/stteak-games/.github/workflows/orbit-capability.yml@refs/heads/main", GITHUB_EVENT_NAME: "workflow_dispatch", GITHUB_RUN_ATTEMPT: "1", QA_CONFIRM_NATIVE_CHROME: "true", GITHUB_SHA: "a".repeat(40), GITHUB_WORKFLOW_SHA: "a".repeat(40), GITHUB_RUN_ID: "12345", QA_MODE: "native-chrome" }; // 合成身份不代表真實run。
-            test("固定公開主分支首次手動派發可通過閘門", () => assert.deepEqual(inspectGate(allowed), [])); // 只測授權前提，不宣稱browser可用。
-            for (const key of Object.keys(allowed)) test(`缺少${key}必須阻擋`, () => assert.ok(inspectGate({ ...allowed, [key]: "" }).length)); // 每項身份、分支、公開性與確認都不可省略。
-            for (const [key, value] of [["QA_REPOSITORY_PRIVATE", "true"], ["GITHUB_RUN_ATTEMPT", "2"], ["GITHUB_REF", "refs/heads/other"], ["GITHUB_REPOSITORY", "Someone/stteak-games"], ["GITHUB_ACTOR", "Someone"], ["QA_MODE", "long"]]) test(`${key}錯值阻擋`, () => assert.ok(inspectGate({ ...allowed, [key]: value }).length)); // 私有、重跑、fork、非owner與長測不能走同一入口。
-            const expected = identity(allowed); // 回收端假定此身份來自獨立讀回，不從stream猜。
-            const hash = value => createHash("sha256").update(value).digest("hex"); // 只核合成測試資料完整性。
-            function sample(bytes = 9000) { // 合成PNG格式簽名字節，不是實際畫面，不落地成png檔。
-              const png = Buffer.alloc(bytes, 37); Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(png); // 檔頭只能測傳輸簽名，不能當有效圖片或遊戲證據。
-              const report = Buffer.from(JSON.stringify({ outcome: "evidence-collected-pending-review", screenshots: [{ file: "boot.png", bytes: png.length, sha256: hash(png) }] })); // 假報告僅存在測試記憶體內。
-              const lines = [...encodeTransfer("report", report, expected), ...encodeTransfer("png", png, expected)]; return { png, report, lines }; // 每個stream都帶同一合成run身份。
-            } // 無API請求、沒有真截圖。
-            test("有時間戳及一般log時可精確回收原bytes", () => { const data = sample(); const log = ["setup output", ...data.lines.map(line => "2026-10-27T08:00:00.1234567Z " + line), "normal footer"].join("\r\n"); const result = decodeTransfers(log, expected); assert.deepEqual(result.outputs.png.bytes, data.png); assert.deepEqual(result.outputs.report.bytes, data.report); }); // 接受官方rawlog時間前綴，不依靠UI文字截取。
-            test("二MiB上界可完整往返且每行小於四千三百字元", () => { const data = sample(TRANSFER.pngLimit); assert.ok(data.lines.slice(1).every(line => line.length < 4300)); assert.deepEqual(decodeTransfers(data.lines.join("\n"), expected).outputs.png.bytes, data.png); }); // 最大合法圖只測合成記憶體資料，不消耗runner或artifact額度。
-            test("過大PNG與報告一律拒絕", () => { assert.throws(() => encodeTransfer("png", Buffer.alloc(TRANSFER.pngLimit + 1), expected)); assert.throws(() => encodeTransfer("report", Buffer.alloc(TRANSFER.reportLimit + 1), expected)); }); // 不偷偷多圖分輪或改畫質。
-            test("blocked無PNG可回收且不冒稱有圖", () => { const bytes = Buffer.from(JSON.stringify({ outcome: "blocked", faults: ["webgl-unavailable"], screenshots: [] })); const result = decodeTransfers(encodeTransfer("report", bytes, expected).join("\n"), expected); assert.equal(result.report.outcome, "blocked"); assert.equal(result.outputs.png, undefined); }); // 能力失敗即停，不硬拿遊戲圖。
-            test("缺一塊拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 2/")); data.lines.splice(index, 1); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不因首尾存在就接受中間缺圖資料。
-            test("重複塊拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); data.lines.splice(index, 0, data.lines[index]); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不自動去重掩蓋來源問題。
-            test("亂序拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); [data.lines[index], data.lines[index + 1]] = [data.lines[index + 1], data.lines[index]]; assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不靠重新排序掩蓋log回收不完整。
-            test("末尾截斷拒絕", () => { const data = sample(); data.lines.pop(); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 必須看見完整結尾與精確SHA。
-            test("GitHub秘密遮罩或UI省略字元拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); data.lines[index] = data.lines[index].slice(0, -3) + "***"; assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 無法回復時回報傳輸blocked，不再測遊戲。
-            test("合法base64字元被改仍以SHA拒絕", () => { const data = sample(); const index = data.lines.findIndex(line => line.startsWith("QA_CHUNK_V1 png 1/")); data.lines[index] = data.lines[index].slice(0, -1) + (data.lines[index].endsWith("A") ? "B" : "A"); assert.throws(() => decodeTransfers(data.lines.join("\n"), expected)); }); // 不是只看base64可解碼就接受。
-            test("錯run或錯commit拒絕", () => { const data = sample(); assert.throws(() => decodeTransfers(data.lines.join("\n"), { ...expected, runId: "999" })); assert.throws(() => decodeTransfers(data.lines.join("\n"), { ...expected, commit: "b".repeat(40) })); }); // 防止舊圖或別的執行混入。
-            test("重複完整stream拒絕", () => { const data = sample(); assert.throws(() => decodeTransfers([...data.lines, ...data.lines].join("\n"), expected)); }); // 不接受合併多個run的日誌。
-            test("只有圖或成功報告缺圖拒絕", () => { const data = sample(); assert.throws(() => decodeTransfers(encodeTransfer("png", data.png, expected).join("\n"), expected)); assert.throws(() => decodeTransfers(encodeTransfer("report", data.report, expected).join("\n"), expected)); }); // 綠燈、圖片與報告不能彼此替代。
-            test("只有shell回顯標記不算真stream", () => assert.throws(() => decodeTransfers("console.log(\"QA_TRANSFER_V1 ...\")", expected))); // 行內程式文字不當執行證據。
-            test("PNG簽名錯誤拒絕", () => { const data = sample(); data.png[0] = 1; const report = Buffer.from(JSON.stringify({ outcome: "evidence-collected-pending-review", screenshots: [{ file: "boot.png", bytes: data.png.length, sha256: hash(data.png) }] })); assert.throws(() => decodeTransfers([...encodeTransfer("report", report, expected), ...encodeTransfer("png", data.png, expected)].join("\n"), expected)); }); // 任意二進位資料不能冒稱原始PNG。
-            test("超過log上限拒絕", () => assert.throws(() => decodeTransfers("x".repeat(TRANSFER.logLimit + 1), expected))); // 本地回收本身也有資源上限。
-            test("未承諾的image env不當成啟動必要條件", () => { assert.deepEqual(inspectGate(allowed), []); assert.deepEqual(inspectGate({ ...allowed, ImageOS: "unknown", ImageVersion: "unknown" }), []); }); // image真實身份由root綁定當輪官方header核，不假填期望值。
-          QA_SOURCE_19: | # 固定原文 tests/integration.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from 'node:test'; // 所有接線驗證只用Node記憶體，不啟browser、不裝套件或字型。
-            import assert from 'node:assert/strict'; // 接線與凍結身分任一不符即失敗，不自動修復。
-            import { readFile } from 'node:fs/promises'; // 只讀本候選公開payload，不讀使用者電腦或其他候選。
-            import { createHash } from 'node:crypto'; // 用原字節SHA核凍結模組與基礎信任面。
-            import { createScenarioHealth, unexpectedMainNavigation } from '../scripts/scenario-health.mjs'; // 測正式薄包裝而非抄另一版健康判斷。
-            import { createSnapshotLease } from '../scripts/snapshot-lease.mjs'; // 外層bounded實際timer與正式token交互一起做純mock。
-            import { selectedScenario } from '../scripts/select-scenario.mjs'; // 固定白名單入口亦須拒絕別遊戲。
-            import { runScenario, TARGET, LIMITS as CROWN_LIMITS } from '../scripts/scenario-crown.mjs'; // 新場景只有正常營地到試煉1的單pointer，不動遊戲來源。
-            import { executeProbe, Fault, LIMITS } from '../scripts/core.mjs'; // 核心生命週期與九十秒界不變，僅核准截圖預算八秒。
-            const hash = bytes => createHash('sha256').update(bytes).digest('hex'); // 僅本地檔案與mock bytes，不當真實遊戲畫面證明。
-            const probe = await readFile(new URL('../scripts/probe.mjs', import.meta.url), 'utf8'); // 不import真正入口，避免載入Playwright或執行閘門CLI。
-            function healthFixture(options = {}) { // 可在同一wrapper生命週期改時間、URL與fatal來測永久停止。
-              let time = options.time ?? 0, url = TARGET.url, fatal = null, checks = 0; // 全為合成記憶體，不代表真頁面狀態。
-              const page = { url: () => url }; const healthy = () => { checks += 1; if (fatal) throw new Fault(fatal); }; const latch = code => { fatal ||= code; }; // 同正式入口的first-fatal永久鎖，不因返回網址清除。
-              const make = () => createScenarioHealth({ healthy, page, target: TARGET, workDeadline: options.deadline ?? 80000, latch, now: () => time }); // 時間基準與絕對截止顯式傳入。
-              return { page, healthy, latch, make, setTime: value => { time = value; }, setUrl: value => { url = value; }, fatal: () => fatal, now: () => time, checks: () => checks }; // 不暴露任何遊戲內部函式或storage通道。
-            } // fixture從不自行導航。
-            test('白名單只有Crown且拒絕Orbit與任意路徑', () => { assert.equal(selectedScenario('crown-camp-first-trial-pointer').runScenario, runScenario); assert.equal(selectedScenario('crown-camp-first-trial-pointer').TARGET, TARGET); for (const id of ['orbit-map-log-return', 'crown-tutorial-first-movement', '', undefined, '../private', TARGET.url, '__proto__']) assert.throws(() => selectedScenario(id)); }); // 不能借此workflow跑另一款或任意URL。
-            test('核准PNG八秒全鏈及單圖二MiB與30秒場景與36秒入口一致', async () => { assert.equal(LIMITS.screenshotMs, 8000); assert.equal(CROWN_LIMITS.snapshotMs, 8000); assert.equal(CROWN_LIMITS.firstReadMs, 4000); assert.equal(CROWN_LIMITS.readMs, 1500); assert.equal(CROWN_LIMITS.scenarioMs, 30000); assert.equal(CROWN_LIMITS.requiredMs, 24000); assert.equal(CROWN_LIMITS.freshnessMs, 1000); assert.equal(CROWN_LIMITS.readyMs + CROWN_LIMITS.firstReadMs + CROWN_LIMITS.readMs + CROWN_LIMITS.clickMs + CROWN_LIMITS.snapshotMs + CROWN_LIMITS.readMs, 24000); assert.equal(LIMITS.totalMs, 90000); assert.equal(LIMITS.closeMs, 5000); assert.equal(LIMITS.pngBytes, 2097152); const lease = await readFile(new URL('../scripts/snapshot-lease.mjs', import.meta.url), 'utf8'); assert.match(lease, /deadline: now\(\) \+ LIMITS\.screenshotMs/); assert.match(lease, /timeout: LIMITS\.screenshotMs/); assert.match(lease, /update\(png\)\.digest\('hex'\)/); }); // outer、lease絕對expiry、API同用八秒，沒有省略hash或大小限制。
-            test('保有完整三十六秒才可進Crown且邊界等號可用', () => { const accepted = healthFixture({ time: 44000 }); accepted.make()(); const denied = healthFixture({ time: 44001 }); assert.throws(() => denied.make(), /probe-deadline/); assert.equal(denied.fatal(), 'probe-deadline'); }); // 不是進入後才發現借用了關閉時間。
-            test('不合法絕對截止永久阻擋', () => { for (const deadline of [NaN, Infinity, -1]) { const mock = healthFixture({ deadline }); assert.throws(() => mock.make(), /probe-deadline/); assert.equal(mock.fatal(), 'probe-deadline'); } }); // 缺失或任意時基不會默認多給時間。
-            test('同步錯址即永久鎖即使返回正式頁仍阻擋', () => { const mock = healthFixture(); const guard = mock.make(); guard(); mock.setUrl(TARGET.url + '#unexpected'); assert.throws(guard, /unexpected-navigation/); mock.setUrl(TARGET.url); assert.throws(guard, /unexpected-navigation/); assert.equal(mock.fatal(), 'unexpected-navigation'); }); // 不依賴延後才到的framenavigated事件。
-            test('共享八十秒deadline同步阻擋且不可倒退洗掉', () => { const mock = healthFixture(); const guard = mock.make(); mock.setTime(79999); guard(); mock.setTime(80000); assert.throws(guard, /probe-deadline/); mock.setTime(0); assert.throws(guard, /probe-deadline/); }); // 不借用原watchdog後五秒cleanup或TERM等待。
-            test('正式goto前只允about:blank，goto後blank返回root仍永久fatal', () => { const mock = healthFixture(); const guard = mock.make(); const event = (url, started) => { if (unexpectedMainNavigation(url, TARGET.url, started)) mock.latch('unexpected-navigation'); }; event('about:blank', false); guard(); assert.equal(mock.fatal(), null); event('about:blank', true); event(TARGET.url, true); assert.throws(guard, /unexpected-navigation/); assert.equal(mock.fatal(), 'unexpected-navigation'); assert.equal(unexpectedMainNavigation('https://example.test/login', TARGET.url, false), true); }); // 不依賴API剛好在blank期間取樣才能發現瞬時導航。
-            test('正式navigation事件使用frame.url即使page.url已回root仍鎖', () => { const callback = probe.match(/page\.on\('framenavigated', (frame => \{[^\n]+\})\);/)?.[1]; assert.ok(callback); let eventUrl = 'about:blank'; const frame = { url: () => eventUrl }; const page = { mainFrame: () => frame, url: () => TARGET.url }; const events = { unexpectedNavigation: 0 }; const make = new Function('page', 'TARGET', 'events', 'unexpectedMainNavigation', `let fatal = null, targetNavigationStarted = false; const handler = ${callback}; return { handler, start: () => { targetNavigationStarted = true; }, fatal: () => fatal };`); const model = make(page, TARGET, events, unexpectedMainNavigation); model.handler(frame); assert.equal(model.fatal(), null); model.start(); model.handler(frame); eventUrl = TARGET.url; model.handler(frame); assert.equal(model.fatal(), 'unexpected-navigation'); assert.equal(events.unexpectedNavigation, 1); }); // 直接測入口事件原文，不用較弱page.url取樣模型替代。
-            function boundedFromProbe(lease) { // 直接擷取正式bounded本文，注入假timer而不重寫timeout邏輯。
-              const start = probe.indexOf('async function bounded(action, milliseconds) {'); const end = probe.indexOf('\nconst healthy =', start); assert.ok(start > 0 && end > start); let timer, cleared = 0; // 不啟任何真實計時或browser程序。
-              const make = new Function('snapshotLease', 'Fault', 'setTimeout', 'clearTimeout', probe.slice(start, end) + '\nreturn bounded;'); const bounded = make(lease, Fault, callback => { timer = callback; return 1; }, id => { assert.equal(id, 1); cleared += 1; }); // 只編譯本包已審固定程式碼，無外部輸入與網路。
-              return { bounded, expire: () => timer(), cleared: () => cleared }; // 由測試明確觸發本次deadline，避免等待五秒成本。
-            } // 一個fixture只代表一個有界操作。
-            test('正式bounded timer在截圖inFlight時失效token且封存後late PNG不落盤', async () => { let fatal = null, resolveShot, capture; const writes = []; const lease = createSnapshotLease({ page: () => ({ screenshot: () => new Promise(resolve => { resolveShot = resolve; }) }), healthy: () => { if (fatal) throw new Fault(fatal); }, latch: code => { fatal ||= code; }, now: () => 0 }); const model = boundedFromProbe(lease); const waiting = model.bounded(() => { capture = lease.capture(); return capture; }, 8000); await Promise.resolve(); assert.equal(lease.inFlight(), true); model.expire(); await assert.rejects(waiting, /operation-deadline/); assert.equal(fatal, 'operation-deadline'); await lease.persistForReport({ outcome: 'blocked', screenshots: [] }, async (...args) => writes.push(args)); resolveShot(Buffer.from('late-mock-not-png')); await assert.rejects(capture, /operation-deadline/); assert.equal(writes.length, 0); assert.equal(lease.inFlight(), false); assert.equal(model.cleared(), 1); }); // 測到真timer callback而不只手動呼叫invalidate方法。
-            test('正式bounded普通輸入timeout沒有shot活躍時不設fatal', async () => { let fatal = null; const lease = createSnapshotLease({ page: () => ({}), healthy: () => {}, latch: code => { fatal ||= code; }, now: () => 0 }); const model = boundedFromProbe(lease); const waiting = model.bounded(() => new Promise(() => {}), 5000); await Promise.resolve(); model.expire(); await assert.rejects(waiting, /operation-deadline/); assert.equal(fatal, null); assert.equal(model.cleared(), 1); }); // click/press未知仍保留已核單次只讀診斷，不擴大永久fatal政策。
-            for (const code of ['pageerror-observed', 'page-crash-observed', 'unexpected-navigation', 'already-closed']) { // 原healthy的既有永久鎖全部仍是前提。
-              test(`原${code}不得被同步URL薄包裝放寬`, () => { const mock = healthFixture(); const guard = mock.make(); mock.latch(code); assert.throws(guard, new RegExp(code)); assert.equal(mock.fatal(), code); }); // URL正確也不能洗掉頁面異常。
-            } // 不創造新browser作為fallback。
-            function coreFixture(options = {}) { // 整體執行序僅模擬原生檢查與page，不啟真正browser。
-              const calls = []; let url = 'about:blank'; const action = async (name, value) => { calls.push(name); return value; }; const screenshot = { file: 'boot.png', bytes: 0, sha256: 'mock-not-an-image' }; // 這是假metadata，沒有檔案與視覺通過意義。
-              const adapter = { target: TARGET, bounded: async action => action(), inspectNative: () => action('native', { status: 'ready' }), launch: () => action('launch'), preparePage: () => action('page'), capability: () => { assert.equal(url, 'about:blank'); return action('webgl2', { status: 'available', api: 'webgl2' }); }, navigate: async () => { url = options.badUrl ? 'https://example.test/login' : TARGET.url; return action('goto', options.http ?? 200); }, url: () => url, runScenario: () => { assert.equal(url, TARGET.url); return action('scenario', { status: options.blocked ? 'blocked' : 'evidence-collected-pending-image-review', screenshot }); }, close: () => action('close', { status: 'close-acknowledged', processInventoryVerified: false }) }; // 原核心實際控制goto、HTTP與finally順序。
-              return { calls, adapter }; // 不使用另一個自造driver替代正式executeProbe。
-            } // 正式新context設定另做原碼接線斷言。
-            test('核心必須先唯一goto及HTTP200才執行Crown且finally關閉', async () => { const mock = coreFixture(); const report = await executeProbe(mock.adapter); assert.deepEqual(mock.calls, ['native', 'launch', 'page', 'webgl2', 'goto', 'scenario', 'close']); assert.equal(report.target.url, TARGET.url); assert.equal(report.screenshots.length, 1); assert.equal(report.outcome, 'evidence-collected-pending-review'); }); // about:blank能力不誤用scenario URL guard。
-            test('HTTP非200或錯址均不得建立scenario健康薄包裝', async () => { for (const options of [{ http: 403 }, { badUrl: true }]) { const mock = coreFixture(options); const report = await executeProbe(mock.adapter); assert.equal(report.outcome, 'blocked'); assert.ok(!mock.calls.includes('scenario')); assert.equal(mock.calls.at(-1), 'close'); } }); // 閘門沒過沒有新gameplay或scenario取證。
-            test('Crown blocked有末圖仍須close且不被核心洗成成功', async () => { const mock = coreFixture({ blocked: true }); const report = await executeProbe(mock.adapter); assert.equal(report.outcome, 'blocked'); assert.equal(report.screenshots.length, 1); assert.equal(mock.calls.at(-1), 'close'); }); // 保留窄診斷圖不等於產品通過。
-            test('入口明確接同步guard、共享截止與原生context設定', () => { assert.match(probe, /const processStarted = performance\.now\(\); const workDeadline = processStarted \+ 80000/); assert.match(probe, /runScenario: \(\) => \{ scenarioHealthy = createScenarioHealth\(\{ healthy, page, target: TARGET, workDeadline, latch: code => \{ fatal \|\|= code; \} \}\); scenarioHealthy\(\); return scenario\.runScenario\(\{ page, healthy: scenarioHealthy, bounded, snapshot: \(\) => adapter\.screenshot\(\) \}\)/); assert.match(probe, /viewport: \{ width: 1920, height: 1080 \}, deviceScaleFactor: 1/); assert.match(probe, /channel: 'chrome', headless: true, chromiumSandbox: true/); assert.match(probe, /\}, 80000\)/); assert.doesNotMatch(probe, /args\s*:|executablePath\s*:/); }); // 靜態接線斷言補上單元mock不會真正執行的入口，無自訂browser flags。
-            test('入口導航事件有phase旗標且snapshot自身期限前後核', () => { assert.match(probe, /targetNavigationStarted = false/); assert.match(probe, /navigate: async \(\) => \{ healthy\(\); targetNavigationStarted = true; const response = await page\.goto/); assert.match(probe, /unexpectedMainNavigation\(frame\.url\(\), TARGET\.url, targetNavigationStarted\)/); assert.match(probe, /if \(snapshotLease\?\.inFlight\(\)\) snapshotLease\.invalidateActive\(\)/); assert.match(probe, /screenshot: \(\) => snapshotLease\.capture\(\)/); assert.match(probe, /const report = await executeProbe\(adapter\); await snapshotLease\.persistForReport\(report, writeFile\)/); assert.doesNotMatch(probe, /writeFile\('artifacts\/boot\.png'/); }); // 精確確認正式入口不是只在測試helper內加限制。
-            test('新場景與核准八秒core精確SHA及其餘b091凍結信任面一致', async () => { const expected = { 'scripts/probe.mjs': 'ba5910266140974a312ac520e327d17f27f4bf0e51854f6697073c75a74f2212', 'scripts/scenario-health.mjs': '4c1678c04a9b78c13bdf09169300ff49b0b79804145b43ae52c712f9da8013a6', 'scripts/snapshot-lease.mjs': '515f3092518205a0b28587d757c88310d1b5cd64ebe5313e611934b5e8d0781e', 'scripts/scenario-crown.mjs': '04da27242e1ade538a5c9fbbc75c4b4da5ae09cc450b690fc9236d9ae8342a59', 'scripts/core.mjs': '16d969a207970a501dd9e68b7dc3f00fe65196d7ff7e7f959eb1c0e490e7b79b', 'scripts/native.mjs': 'd888c91cd59f57a34503498da3cc23dfe3a80c6a1e3b1c785c921a898e94653c', 'scripts/diagnostics.mjs': '0d1f2988ccca9523488d0a8f12ac929071c61f6ba3b218db92eb66b0d5c8f763', 'scripts/gate.mjs': '4665e5f2a404ea8bd90ee52df6979e9129523c7eae89d4ba2b0b0f104251cbaa', 'scripts/log-transfer.mjs': 'a8d65f1da2d0a556b1d352e17570b337357dda7348b2b3d6b6bb2dbb2dd6736d', 'scripts/emit-evidence.mjs': 'a865fda7646a03b4c6258cea7efdabb54bbcb197e66cb2ed5200c7038b389b20', 'scripts/check.mjs': 'eb5321c3e295bb0d50a639bd671374a180e21c55e2817e68b27aa36537b4ea54', 'package.json': 'f0ac519f2f9ff827e77abea1847960536d335a632ff0d622d9ec730e8c704331', 'package-lock.json': 'ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849', 'tests/core.test.mjs': '7840eedf50b46d2dde7845e6fab41018d13ad8983ece462783b124b4e0fdef23', 'tests/native.test.mjs': '6128047028c9b7dbd583fe6fdeededc59e814b80c30ef9188c56d38526ba78f1', 'tests/public.test.mjs': 'ca01a8f31baec18f6490b352fff28f50dadf72f1017862b776424ac5f843f595' }; for (const [path, expectedSha] of Object.entries(expected)) assert.equal(hash(await readFile(new URL('../' + path, import.meta.url))), expectedSha, path); }); // 基礎byte不符不能用通過的mock掩蓋安全面改動。
-          QA_SOURCE_20: | # 固定原文 tests/snapshot-lease.test.mjs；程式逐行中文註解，JSON與LICENSE保留合法原格式。
-            import test from 'node:test'; // 只做固定helper純記憶體測試，不開browser、不連網、不產PNG。
-            import assert from 'node:assert/strict'; // 任何未知或晚圖不得被mock洗成可接受證據。
-            import { createHash } from 'node:crypto'; // 只核合成bytes與metadata一致，合成bytes不是圖片。
-            import { createSnapshotLease } from '../scripts/snapshot-lease.mjs'; // 測唯一正式helper，四款可原文複用。
-            import { Fault, LIMITS } from '../scripts/core.mjs'; // 共用既有八秒／二MiB與錯誤代碼，不新設資源框架。
-            function fixture(options = {}) { // 一次fixture只有一個假page、一張合成Buffer及一個lease。
-              let time = 0, fatal = null, closed = false, url = 'public-root', resolvePending, rejectPending; const calls = [], writes = []; const bytes = Buffer.from('mock-bytes-not-a-png'); // 不生成可混淆的假遊戲圖片或磁碟檔。
-              const healthy = () => { if (closed || fatal) throw new Fault(fatal || 'already-closed'); if (url !== 'public-root') { fatal = 'unexpected-navigation'; throw new Fault(fatal); } }; const latch = code => { fatal ||= code; }; // 模擬原永久健康與同步目標契約。
-              const page = { screenshot: async args => { calls.push(args); if (options.pending) return new Promise((resolve, reject) => { resolvePending = resolve; rejectPending = reject; }); if (options.expire) time = 8000; if (options.redirect) url = 'login'; if (options.fatal) fatal = options.fatal; if (options.reject) throw new Error('screenshot-rejected'); return options.large ? Buffer.alloc(LIMITS.pngBytes + 1) : bytes; } }; // 唯一假API可注入逾時、轉址與例外。
-              const lease = createSnapshotLease({ page: () => page, healthy, latch, now: () => time }); const writeFile = async (file, value) => { writes.push({ file, value }); if (options.writeReject) throw new Error('host-write-rejected'); }; // host保存也只是記憶體帳本，沒有檔案副作用。
-              return { lease, calls, writes, bytes, writeFile, setTime: value => { time = value; }, close: () => { closed = true; }, redirect: () => { url = 'login'; }, restore: () => { url = 'public-root'; }, fatal: () => fatal, resolve: () => resolvePending?.(bytes), reject: () => rejectPending?.(new Error('late-rejected')) }; // 控制晚回順序而不使用真實睡眠或browser。
-            } // 每次獨立token，沒有重用或重試入口。
-            const reportWith = (metadata, outcome = 'evidence-collected-pending-review') => ({ outcome, screenshots: [metadata] }); // 合法blocked診斷報告也可列唯一已確認原圖。
-            test('capture只記憶體且原API八秒不寫檔', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); assert.deepEqual(mock.calls, [{ type: 'png', fullPage: false, timeout: 8000 }]); assert.equal(mock.writes.length, 0); assert.deepEqual(metadata, { file: 'boot.png', bytes: mock.bytes.length, sha256: createHash('sha256').update(mock.bytes).digest('hex') }); assert.equal(mock.lease.inFlight(), false); }); // metadata需hash完仍在自身絕對expiry內。
-            test('正常close後report精確列圖才host保存原Buffer', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); mock.close(); await mock.lease.persistForReport(reportWith(metadata), mock.writeFile); assert.equal(mock.writes.length, 1); assert.equal(mock.writes[0].file, 'artifacts/boot.png'); assert.equal(mock.writes[0].value, mock.bytes); assert.equal(mock.calls.length, 1); }); // host保存不再healthy或browserAPI，不被closed誤擋。
-            test('合法blocked診斷圖已ack且report列圖可保存', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); mock.close(); await mock.lease.persistForReport(reportWith(metadata, 'blocked'), mock.writeFile); assert.equal(mock.writes.length, 1); }); // blocked不等於沒有合法只讀證據，但不升格產品成功。
-            test('report未列圖就丟棄候選且不落盤', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); await mock.lease.persistForReport({ outcome: 'blocked', screenshots: [] }, mock.writeFile); assert.equal(mock.writes.length, 0); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /artifact-size-limit/); }); // outer timeout不能由晚到metadata補圖。
-            test('report未列圖封存時pending token失效且晚回不能產生metadata', async () => { const mock = fixture({ pending: true }); const pending = mock.lease.capture(); await mock.lease.persistForReport({ outcome: 'blocked', screenshots: [] }, mock.writeFile); assert.equal(mock.lease.inFlight(), false); mock.resolve(); await assert.rejects(pending, /operation-deadline/); assert.equal(mock.writes.length, 0); assert.equal(mock.calls.length, 1); }); // helper自身即保證無圖封存後不復活，不能只靠browserclose擋晚回。
-            test('從未capture的無圖封存也禁止後續啟動截圖', async () => { const mock = fixture(); await mock.lease.persistForReport({ outcome: 'blocked', screenshots: [] }, mock.writeFile); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); assert.equal(mock.calls.length, 0); assert.equal(mock.writes.length, 0); }); // late action closure不得在封存後才取得新圖片槽。
-            test('外層bounded先逾時使活躍token失效且晚PNG不保存', async () => { const mock = fixture({ pending: true }); const pending = mock.lease.capture(); assert.equal(mock.lease.inFlight(), true); mock.setTime(7990); mock.lease.invalidateActive(); assert.equal(mock.fatal(), 'operation-deadline'); mock.resolve(); await assert.rejects(pending, /operation-deadline/); await mock.lease.persistForReport({ outcome: 'blocked', screenshots: [] }, mock.writeFile); assert.equal(mock.writes.length, 0); assert.equal(mock.lease.inFlight(), false); }); // 封住外層計時稍早於內層八秒的幾毫秒窗口。
-            test('沒有截圖活躍時bounded逾時不改其他輸入診斷政策', () => { const mock = fixture(); mock.lease.invalidateActive(); assert.equal(mock.fatal(), null); assert.equal(mock.lease.inFlight(), false); }); // click或press未知仍可依原scenario規劃只讀收尾。
-            test('自身八秒expiry即使外層未失效仍拒晚圖及metadata', async () => { const mock = fixture({ expire: true }); await assert.rejects(mock.lease.capture(), /operation-deadline/); assert.equal(mock.writes.length, 0); assert.equal(mock.fatal(), 'operation-deadline'); await mock.lease.persistForReport({ screenshots: [] }, mock.writeFile); assert.equal(mock.writes.length, 0); }); // 不借用共享80秒工作截止延長snapshot。
-            test('活躍截圖未ack時即使report猜metadata亦不得保存', async () => { const mock = fixture({ pending: true }); const pending = mock.lease.capture(); const guessed = { file: 'boot.png', bytes: mock.bytes.length, sha256: createHash('sha256').update(mock.bytes).digest('hex') }; await assert.rejects(mock.lease.persistForReport(reportWith(guessed), mock.writeFile), /artifact-size-limit/); mock.lease.invalidateActive(); mock.resolve(); await assert.rejects(pending, /operation-deadline/); assert.equal(mock.writes.length, 0); }); // token有效且完整ack不可被SHA吻合替代。
-            for (const key of ['file', 'bytes', 'sha256']) { // report三個身分欄位每項都必須精確一致。
-              test(`report ${key}不符不寫原圖`, async () => { const mock = fixture(); const metadata = await mock.lease.capture(); await assert.rejects(mock.lease.persistForReport(reportWith({ ...metadata, [key]: key === 'bytes' ? 999 : 'mismatch' }), mock.writeFile), /artifact-size-limit/); assert.equal(mock.writes.length, 0); }); // 不容另一圖、另一檔名或假hash混入本輪。
-            } // 固定boot.png不可被任意路徑替換。
-            test('report列多圖或無candidate不保存', async () => { const mock = fixture(); await assert.rejects(mock.lease.persistForReport({ screenshots: [{ file: 'boot.png' }] }, mock.writeFile), /artifact-size-limit/); const metadata = await mock.lease.capture(); await assert.rejects(mock.lease.persistForReport({ screenshots: [metadata, metadata] }, mock.writeFile), /artifact-size-limit/); assert.equal(mock.writes.length, 0); }); // 唯一槽位不能從report擴成多圖。
-            test('原Buffer內容若意外改動即使舊metadata相符也拒寫', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); mock.bytes[0] ^= 1; await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /artifact-size-limit/); assert.equal(mock.writes.length, 0); }); // 保存前再核原bytes SHA，沒有默認信任可變Buffer。
-            test('截圖前錯址不呼叫API且回root仍保持fatal', async () => { const mock = fixture(); mock.redirect(); await assert.rejects(mock.lease.capture(), /unexpected-navigation/); mock.restore(); await assert.rejects(mock.lease.capture(), /unexpected-navigation/); assert.equal(mock.calls.length, 0); }); // 不為了diagnostic讀登入頁。
-            for (const [name, options, code] of [['轉址', { redirect: true }, 'unexpected-navigation'], ['pageerror', { fatal: 'pageerror-observed' }, 'pageerror-observed'], ['crash', { fatal: 'page-crash-observed' }, 'page-crash-observed']]) { // screenshot bytes回來後仍必須過原健康與目標gate。
-              test(`截圖後${name}不保留可寫metadata`, async () => { const mock = fixture(options); await assert.rejects(mock.lease.capture(), new RegExp(code)); await mock.lease.persistForReport({ screenshots: [] }, mock.writeFile); assert.equal(mock.calls.length, 1); assert.equal(mock.writes.length, 0); }); // 不依賴事後傳輸器才發現錯頁。
-            } // page事件與同步gate皆不會被本helper清除。
-            test('截圖拒絕用掉唯一槽且不重截', async () => { const mock = fixture({ reject: true }); await assert.rejects(mock.lease.capture(), /screenshot-rejected/); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); assert.equal(mock.calls.length, 1); assert.equal(mock.writes.length, 0); }); // 正常與診斷不能各分一個圖片槽。
-            test('超過二MiB拒絕不壓縮、不寫、不重截', async () => { const mock = fixture({ large: true }); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); assert.equal(mock.calls.length, 1); assert.equal(mock.writes.length, 0); }); // 小於限制才可沿原transport傳輸。
-            test('host寫入失敗也不第二次落盤', async () => { const mock = fixture({ writeReject: true }); const metadata = await mock.lease.capture(); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /host-write-rejected/); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /artifact-size-limit/); assert.equal(mock.writes.length, 1); }); // 純host失敗不重啟browser補證據。
-            test('已保存原圖不能再次保存或再次capture', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); await mock.lease.persistForReport(reportWith(metadata), mock.writeFile); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /artifact-size-limit/); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); assert.equal(mock.writes.length, 1); assert.equal(mock.calls.length, 1); }); // 成功後亦不能形成隱藏第二輪。
-          QA_FILE_INDEX: | # JSON逐欄：path相對檔名、env來源變數、bytes位元組長度、sha256內容校驗；不是執行指令。
-            [{"path":"package.json","env":"QA_SOURCE_0","bytes":392,"sha256":"f0ac519f2f9ff827e77abea1847960536d335a632ff0d622d9ec730e8c704331"},{"path":"package-lock.json","env":"QA_SOURCE_1","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"path":"LICENSE","env":"QA_SOURCE_2","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"scripts/core.mjs","env":"QA_SOURCE_3","bytes":9319,"sha256":"16d969a207970a501dd9e68b7dc3f00fe65196d7ff7e7f959eb1c0e490e7b79b"},{"path":"scripts/select-scenario.mjs","env":"QA_SOURCE_4","bytes":789,"sha256":"1678aec0ce5f8bf2a8791e73eaed6915039bd41820890229b3e69f70c70f40cc"},{"path":"scripts/scenario-crown.mjs","env":"QA_SOURCE_5","bytes":17732,"sha256":"04da27242e1ade538a5c9fbbc75c4b4da5ae09cc450b690fc9236d9ae8342a59"},{"path":"scripts/scenario-health.mjs","env":"QA_SOURCE_6","bytes":1417,"sha256":"4c1678c04a9b78c13bdf09169300ff49b0b79804145b43ae52c712f9da8013a6"},{"path":"scripts/snapshot-lease.mjs","env":"QA_SOURCE_7","bytes":4185,"sha256":"515f3092518205a0b28587d757c88310d1b5cd64ebe5313e611934b5e8d0781e"},{"path":"scripts/diagnostics.mjs","env":"QA_SOURCE_8","bytes":4635,"sha256":"0d1f2988ccca9523488d0a8f12ac929071c61f6ba3b218db92eb66b0d5c8f763"},{"path":"scripts/native.mjs","env":"QA_SOURCE_9","bytes":17168,"sha256":"d888c91cd59f57a34503498da3cc23dfe3a80c6a1e3b1c785c921a898e94653c"},{"path":"scripts/gate.mjs","env":"QA_SOURCE_10","bytes":2934,"sha256":"4665e5f2a404ea8bd90ee52df6979e9129523c7eae89d4ba2b0b0f104251cbaa"},{"path":"scripts/probe.mjs","env":"QA_SOURCE_11","bytes":13903,"sha256":"ba5910266140974a312ac520e327d17f27f4bf0e51854f6697073c75a74f2212"},{"path":"scripts/log-transfer.mjs","env":"QA_SOURCE_12","bytes":7615,"sha256":"a8d65f1da2d0a556b1d352e17570b337357dda7348b2b3d6b6bb2dbb2dd6736d"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_13","bytes":1987,"sha256":"a865fda7646a03b4c6258cea7efdabb54bbcb197e66cb2ed5200c7038b389b20"},{"path":"scripts/check.mjs","env":"QA_SOURCE_14","bytes":2689,"sha256":"eb5321c3e295bb0d50a639bd671374a180e21c55e2817e68b27aa36537b4ea54"},{"path":"tests/core.test.mjs","env":"QA_SOURCE_15","bytes":11669,"sha256":"7840eedf50b46d2dde7845e6fab41018d13ad8983ece462783b124b4e0fdef23"},{"path":"tests/crown.test.mjs","env":"QA_SOURCE_16","bytes":20815,"sha256":"c702fc489f750d81b6c6d0283ea7255776a51aeffbbf83ac6126f1234e6428d1"},{"path":"tests/native.test.mjs","env":"QA_SOURCE_17","bytes":15041,"sha256":"6128047028c9b7dbd583fe6fdeededc59e814b80c30ef9188c56d38526ba78f1"},{"path":"tests/public.test.mjs","env":"QA_SOURCE_18","bytes":8123,"sha256":"ca01a8f31baec18f6490b352fff28f50dadf72f1017862b776424ac5f843f595"},{"path":"tests/integration.test.mjs","env":"QA_SOURCE_19","bytes":16013,"sha256":"8ed6ae019b1d427e0d574450ed60cbb79761ef3f95f9a8309232e048f3e71102"},{"path":"tests/snapshot-lease.test.mjs","env":"QA_SOURCE_20","bytes":11396,"sha256":"77a3ee2df466c98b9bb56b6996a64109d88c969d959fd309b5fb0c1456aa82e5"}]
-        run: | # 下列shell與JavaScript每行均有中文解釋；只做逐byte校驗及臨時檔生成。
-          node --input-type=module -e ' // 使用固定Node與標準模組，不執行外部下載程式。
-          import { mkdir, writeFile, readFile } from "node:fs/promises"; // 檔案只寫本工作目錄。
-          import { createHash } from "node:crypto"; // 每個原文字節都核SHA256。
-          import { dirname } from "node:path"; // 僅為固定相對檔名建立目錄。
-          const entries = JSON.parse(process.env.QA_FILE_INDEX); // JSON欄位path/env/bytes/sha256分別是檔名、來源變數、長度與校驗值。
-          for (const entry of entries) { // 僅走內嵌固定清單，不讀repo或其他檔案。
-            if (!/^(?:scripts|tests)\/[a-z.-]+\.mjs$|^package(?:-lock)?\.json$|^LICENSE$/.test(entry.path)) throw new Error("invalid-payload-path"); // 不接受絕對路徑或路徑穿越。
-            const bytes = Buffer.from(process.env[entry.env], "utf8"); // 保留YAML literal的原始文字與最後換行，不trim、不重排JSON。
-            if (bytes.length !== entry.bytes || createHash("sha256").update(bytes).digest("hex") !== entry.sha256) throw new Error("payload-integrity"); // 貼上、編碼或換行錯誤立即阻擋，不能下載救援副本。
-            await mkdir(dirname(entry.path), { recursive: true }); await writeFile(entry.path, bytes, { flag: "wx" }); // 工作區應為乾淨新runner，拒絕覆蓋未知檔。
-            if (!(await readFile(entry.path)).equals(bytes)) throw new Error("payload-readback"); // 再從實際檔案逐byte讀回，才允許後續測試。
-            console.log(JSON.stringify({ payloadFile: entry.path, bytes: entry.bytes, sha256: entry.sha256 })); // 僅輸出公開測試碼身份，不輸出秘密。
-          } // 全部固定payload已核對。
-          ' # 結束單引號shell參數，沒有here-doc未註解分隔行。
-      - name: Cheap gates and pure mocks first # 先便宜否證，不通過就不下載套件或browser。
-        run: node scripts/gate.mjs && node scripts/select-scenario.mjs && npm run check && npm test # 全部語法／mock只用記憶體，不連網或建立真PNG。
-      - name: Install exact official test dependency # 僅公開npmregistry的兩個鎖版套件。
-        run: npm ci --ignore-scripts --no-audit --no-fund # 不執行依賴安裝script，不配置登入token。
-      - name: Install only official Ubuntu CJK font # 僅字型與fontconfig既有快取觸發，不裝browser或改任何安全設定。
-        timeout-minutes: 2 # 此步驟最多兩分鐘；失敗不進browser。
-        run: | # 所有來源只在本job臨時清單，保持原生系統apt安全驗證。
-          FONT_ROOT="$RUNNER_TEMP/qa-official-font" # 固定本job臨時目錄，不修改/etc/apt來源。
-          mkdir -p "$FONT_ROOT/lists/partial" # 僅建立本次Ubuntu套件索引暫存。
-          printf '%s\n' 'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble main' > "$FONT_ROOT/source.list" # 只信Ubuntu既有archive keyring與官方noble/main，不加入第三方來源。
-          APT_SCOPE=(-o "Dir::Etc::sourcelist=$FONT_ROOT/source.list" -o 'Dir::Etc::sourceparts=-' -o "Dir::State::lists=$FONT_ROOT/lists" -o 'Dir::Cache::pkgcache=' -o 'Dir::Cache::srcpkgcache=' -o 'Acquire::Retries=0' -o 'Acquire::http::Timeout=20' -o 'Acquire::https::Timeout=20') # 命令局部來源與零重試，不削弱套件簽章或TLS。
-          timeout --signal=TERM --kill-after=3s 45s sudo apt-get "${APT_SCOPE[@]}" update # 一次官方索引更新，逾時即停，不對所有runner第三方repo更新。
-          timeout --signal=TERM --kill-after=3s 60s sudo apt-get "${APT_SCOPE[@]}" install -y --no-install-recommends --no-install-suggests --no-upgrade --no-remove 'fonts-noto-cjk=1:20230817+repack1-3' # 只安裝固定無Depends字型包，不升級既有套件、不裝extra字重。
-          test "$(dpkg-query -W -f='${Version}' fonts-noto-cjk)" = '1:20230817+repack1-3' # 安裝後核實際版本，缺失或不同即停止。
-          fc-match -f '%{family}\n' ':lang=zh-tw' # 只印非敏感字族供回查；最終仍須原PNG確認中文不是tofu。
-      - name: One sandbox WebGL2 and reviewed scenario # 能力不足即blocked，不使用危險旗標或重開browser。
-        id: capability # 供結果回讀識別，不觸發下游長測。
-        run: timeout --signal=TERM --kill-after=5s 85s node scripts/probe.mjs # 同一程序群組八十五秒TERM、再五秒KILL，上界九十秒。
-      - name: Emit only bounded public evidence to raw log # 不使用upload-artifact、不使用cache，日誌只含本輪公開圖及短報告。
-        if: ${{ !cancelled() && steps.capability.outcome != 'skipped' && steps.capability.outcome != '' }} # 只有probe真的開始才輸出；前置安裝失敗不補造結果。
-        run: node scripts/emit-evidence.mjs # 逐塊等待stdout寫完；缺圖／缺報告／SHA不符即失敗，不再開browser。
+        required: true # owner須明示同意。
+permissions: {} # 無checkout、GitHub內容寫入或token可選scope。
+concurrency: # 共用原單一QA群組，不能與browser測試並行。
+  group: stteak-single-public-capability # 最多一個工作負載在跑。
+  cancel-in-progress: false # 不取消既有證據來搶runner。
+jobs: # 只有一個標準runner工作。
+  metadata: # 沒有其他gameplay job或followup。
+    if: ${{ github.repository == 'KYStr/stteak-games' && github.repository_owner == 'KYStr' && github.actor == 'KYStr' && !github.event.repository.private && github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && github.run_attempt == 1 && inputs.confirm_metadata_only }} # 與原已核固定repo/owner/public/main/manual/attempt1一致。
+    runs-on: ubuntu-24.04 # 不改OS或self-hosted，只觀測新官方標準image。
+    timeout-minutes: 2 # 整job有限；Python診斷本身另有20秒硬界。
+    env: # 不映射secret、token或私人QA。
+      QA_PRIVATE: ${{ github.event.repository.private }} # 從官方事件取得真實公開性。
+      QA_CONFIRM_METADATA_ONLY: ${{ inputs.confirm_metadata_only }} # 布林確認在腳本內再核。
+    steps: # 不checkout、不setup-node、不npm、不apt、不安裝browser／font。
+      - name: One bounded read only package metadata probe # 唯一命令，沒有網路或Chrome執行。
+        env: # 固定公開診斷原文，沒有外部路徑或自由輸入。
+          QA_SOURCE: | # 原Python逐行中文註解，literal保留精確bytes。
+            import hashlib, json, os, re, selectors, stat, subprocess, sys, time # 僅系統Python標準庫，沒有安裝、網路或browser套件。
+            BINARY = '/opt/google/chrome/chrome' # 只作固定owner查詢與stat目標，絕不執行這個binary。
+            COMMANDS = {'package': ['/usr/bin/dpkg-query', '--admindir=/var/lib/dpkg', '-W', '-f=${Package}\n${Version}\n${Architecture}\n${Status}\n${Maintainer}\n${Source}\n${Homepage}\n', 'google-chrome-stable'], 'owner': ['/usr/bin/dpkg-query', '--admindir=/var/lib/dpkg', '-S', BINARY]} # 固定argv，無shell、--version、apt或其他套件。
+            PATHS = [('etc', '/etc', 'directory'), ('usr', '/usr', 'directory'), ('usrBin', '/usr/bin', 'directory'), ('queryExecutable', '/usr/bin/dpkg-query', 'executable'), ('var', '/var', 'directory'), ('varLib', '/var/lib', 'directory'), ('database', '/var/lib/dpkg', 'directory'), ('info', '/var/lib/dpkg/info', 'directory'), ('status', '/var/lib/dpkg/status', 'file'), ('packageList', '/var/lib/dpkg/info/google-chrome-stable.list', 'file')] # 受保護來源未核實就不查metadata，不讀任意路徑。
+            VERSION = re.compile(r'[1-9][0-9]{1,2}\.[0-9]{1,3}\.[0-9]{1,6}\.[0-9]{1,6}-[0-9]{1,3}\Z') # 僅有界四段數字版及數字Debian revision，觀測不是放行清單。
+            class Rejected(Exception): # 只允許本程式定義的有限診斷代碼。
+                pass # 不把任意外部例外訊息帶進公開報告。
+            def inspect_path(path, kind): # 固定路徑只讀stat與realpath，不chmod/chown或跟任意使用者路徑。
+                value = os.lstat(path); mode = value.st_mode # lstat才能區分symlink本身，不以stat掩蓋連結。
+                return {'read': True, 'canonical': os.path.realpath(path) == path, 'nonSymlink': not stat.S_ISLNK(mode), 'rootOwned': value.st_uid == 0, 'typeMatches': stat.S_ISDIR(mode) if kind == 'directory' else stat.S_ISREG(mode), 'groupWritable': bool(mode & stat.S_IWGRP), 'worldWritable': bool(mode & stat.S_IWOTH), 'executable': bool(mode & 0o111)} # 只輸出有限布林，不回任意uid/mode/路徑。
+            def trusted(value, kind): # 維持受保護資料與dpkg工具的來源門檻，不以metadata自證安全。
+                return all(value.get(k) is True for k in ['read', 'canonical', 'nonSymlink', 'rootOwned', 'typeMatches']) and value.get('groupWritable') is False and value.get('worldWritable') is False and (kind != 'executable' or value.get('executable') is True) # 可寫、symlink、錯型態或錯owner一律不查套件。
+            def query(key, deadline): # 只執行兩個固定唯讀dpkg查詢，不建立shell或Chrome程序。
+                if key not in COMMANDS: raise Rejected('unknown-query') # 未列命令拒絕，不接受任意argv。
+                limit = min(deadline, time.monotonic() + 3.0); output = bytearray(); process = None; selector = None # 單指令三秒，仍裁整體內部十七秒收尾界。
+                try: # stdout限制採流式讀取，不能先無界capture再檢長度。
+                    process = subprocess.Popen(COMMANDS[key], stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env={'PATH': '/usr/bin:/bin', 'LANG': 'C', 'LC_ALL': 'C'}, cwd='/', shell=False) # 最小環境、固定工作目錄、不繼承token／dpkg環境覆寫。
+                    selector = selectors.DefaultSelector(); selector.register(process.stdout, selectors.EVENT_READ) # 只等待此唯讀子程序的stdout。
+                    while True: # 不是重試命令，僅收同一stdout到EOF或界線。
+                        remaining = limit - time.monotonic() # 每次讀取重新核單調截止，不能靠零碎輸出延長。
+                        if remaining <= 0: raise Rejected('query-timeout') # 逾時只終止這個已建立子程序，不另開替代。
+                        if not selector.select(remaining): raise Rejected('query-timeout') # 沒輸出也不能無限等待。
+                        chunk = os.read(process.stdout.fileno(), 4097 - len(output)) # 一次只讀到上限加一，記憶體不隨外部輸出增長。
+                        if not chunk: break # 真EOF才結束讀取，不用poll猜資料完整。
+                        output.extend(chunk) # 只暫存有界metadata，不寫原文到log或磁碟。
+                        if len(output) > 4096: raise Rejected('query-output-limit') # 任意大量輸出立即fail-closed。
+                    remaining = limit - time.monotonic() # EOF後等待退出也包含於原三秒。
+                    if remaining <= 0: raise Rejected('query-timeout') # 不借整體餘額替單命令延長。
+                    if process.wait(timeout=remaining) != 0: raise Rejected('query-rejected') # 非零退出不當成沒有套件或合法資料。
+                    return bytes(output).decode('utf-8', errors='strict') # 非UTF-8只回固定失敗，不替換成可能誤判字串。
+                except subprocess.TimeoutExpired: raise Rejected('query-timeout') # 系統wait逾時保留相同固定類別。
+                except UnicodeDecodeError: raise Rejected('query-invalid-encoding') # 解析失敗不輸出原始bytes。
+                except Rejected: raise # 已知固定類別才原樣保留。
+                except Exception: raise Rejected('query-unavailable') # 其他系統例外不列message或stack。
+                finally: # 關閉只屬本診斷的子程序及管線。
+                    if selector is not None: selector.close() # 不遺留本次selector。
+                    if process is not None: # 未成功建立子程序不呼叫清理API。
+                        if process.poll() is None: # 只在仍未退出時終止，絕不掃系統程序。
+                            process.kill() # 此固定dpkg查詢不應留下子程序，未確認不得繼續查詢。
+                            try: process.wait(timeout=0.5) # 有界收尾，外層19秒TERM加1秒KILL仍是總硬界。
+                            except subprocess.TimeoutExpired: pass # 不把未ack終止冒稱已完整清理。
+                        if process.stdout is not None: process.stdout.close() # metadata管線不存檔。
+            def parse_package(text): # 只對固定dpkg輸出形狀解碼，不回傳任意原文字段。
+                lines = text.splitlines() # Source空欄保留在中間，結尾newline不算額外欄。
+                if len(lines) != 7: raise Rejected('metadata-shape-unrecognized') # 缺欄或多欄都不猜資料。
+                package, version, architecture, status, maintainer, source, homepage = lines # 僅這七個預定欄位，沒有其他套件資料。
+                source_status = 'not-recorded' if source == '' else 'known-literal' if source in ['google-chrome-stable', 'google-chrome'] else 'unrecognized' # Source只是套件自述，不代表下載來源已驗證。
+                return {'packageMatches': package == 'google-chrome-stable', 'versionStatus': 'observed-format-valid' if VERSION.fullmatch(version) else 'unrecognized', 'packageVersion': version if VERSION.fullmatch(version) else None, 'architectureMatches': architecture == 'amd64', 'installedMatches': status == 'install ok installed', 'maintainerMatches': maintainer == 'Chrome Linux Team <chromium-dev@chromium.org>', 'sourceStatus': source_status, 'sourcePackage': source if source_status == 'known-literal' else None, 'homepageMatches': homepage in ['https://www.google.com/chrome/', 'https://www.google.com/chrome'], 'downloadSourceVerified': False} # 數字版本只是觀測；任何欄相符也不授權browser。
+            def identity(env): # 公開run身份與授權門檻先核，禁止任意repo／重跑／非owner。
+                expected = {'GITHUB_REPOSITORY': 'KYStr/stteak-games', 'GITHUB_REPOSITORY_OWNER': 'KYStr', 'GITHUB_ACTOR': 'KYStr', 'GITHUB_REF': 'refs/heads/main', 'GITHUB_EVENT_NAME': 'workflow_dispatch', 'GITHUB_RUN_ATTEMPT': '1', 'QA_PRIVATE': 'false', 'QA_CONFIRM_METADATA_ONLY': 'true'} # 不讀使用者secret或整個環境。
+                if any(env.get(key) != value for key, value in expected.items()): raise Rejected('identity-gate') # false或缺值就停止，不推論授權。
+                if not re.fullmatch(r'[0-9]{1,20}', env.get('GITHUB_RUN_ID', '')) or not re.fullmatch(r'[a-f0-9]{40}', env.get('GITHUB_SHA', '')) or env.get('GITHUB_WORKFLOW_SHA') != env.get('GITHUB_SHA'): raise Rejected('identity-format') # 固定run/commit格式與同workflow commit，防混輪證據。
+                return {'repository': expected['GITHUB_REPOSITORY'], 'runId': env['GITHUB_RUN_ID'], 'commit': env['GITHUB_SHA'], 'workflowCommit': env['GITHUB_WORKFLOW_SHA'], 'attempt': 1} # 只回必要公開身份。
+            def collect(env, path_reader=inspect_path, query_reader=query, now=time.monotonic): # 可用純mock驗證，不安裝或啟動browser。
+                started = now(); deadline = started + 17.0 # 腳本內留收尾餘額，外層整個Python最多20秒。
+                report = {'schemaVersion': 1, 'scope': 'readonly-package-identity-only', 'outcome': 'blocked', 'launchAuthorized': False, 'browserExecuted': False, 'gameVisited': False, 'binaryVersionExecuted': False, 'binaryChecksumVerified': False, 'sandboxConfigurationModified': False, 'image': {'status': 'requires-parent-official-header-binding', 'actual': None, 'missingSubjectTagResolved': False}, 'paths': {}, 'package': None, 'ownerMatches': None, 'errors': []} # 不把套件觀測或未知image當成安全放行。
+                try: # 任一前提不可信即停，但仍可封存固定有限資訊。
+                    report['provenance'] = identity(env) # 授權與身份先核，才接觸系統metadata。
+                    for key, path, kind in PATHS: # 唯讀檢查固定受保護來源，收齊已允許的有限路徑。
+                        if now() >= deadline: raise Rejected('diagnostic-deadline') # 全局界優先於下一讀取。
+                        try: value = path_reader(path, kind) # 不讀檔內容，不exec驗證binary。
+                        except Exception: value = {'read': False} # 任意原始系統錯誤不公開。
+                        report['paths'][key] = value # 固定path key，不存實際可疑路徑文字。
+                    if not all(trusted(report['paths'][key], kind) for key, _, kind in PATHS): raise Rejected('protected-source-untrusted') # 不為過gate跳過owner、mode或canonical。
+                    if now() >= deadline: raise Rejected('diagnostic-deadline') # 可信路徑也不能越過整體界。
+                    report['package'] = parse_package(query_reader('package', deadline)) # 固定套件查詢一次，不迴圈找其他版本。
+                    if now() >= deadline: raise Rejected('diagnostic-deadline') # metadata晚到不能再查下一步。
+                    report['ownerMatches'] = query_reader('owner', deadline).strip() == 'google-chrome-stable: ' + BINARY # 只比對固定binary owner，不輸出任意回覆。
+                    if now() >= deadline: raise Rejected('diagnostic-deadline') # 結果也不能晚到洗成功。
+                    report['outcome'] = 'metadata-observed-not-authorized' # 只是讀取完成，永遠沒有browser allowlist更新或launch。
+                except Rejected as error: report['errors'].append(str(error)) # 本類別只由固定本地代碼建立，不接任意外部message。
+                except Exception: report['errors'].append('unexpected-read-failure') # 最後防線也不列任意字串或stack。
+                report['elapsedMs'] = max(0, round((now() - started) * 1000)); return report # 單調耗時不是效能測試或CPU分數。
+            def encoded_report(report): # 可讀單行JSON附獨立SHA/bytes供root由完整raw log核對。
+                body = json.dumps(report, ensure_ascii=True, separators=(',', ':'), sort_keys=True).encode('ascii') # 固定有限欄位，沒有HTML、HAR、keys或圖片。
+                if len(body) > 4096: raise Rejected('report-size-limit') # 超出4KiB不輸出部分或任意截斷報告。
+                return body, hashlib.sha256(body).hexdigest() # 雜湊只核完整有限JSON，不hash原始外部錯誤。
+            if __name__ == '__main__': # 只有正式workflow呼叫才讀runner；import供純mock不產副作用。
+                if sys.platform != 'linux' or os.uname().machine != 'x86_64' or os.geteuid() == 0: result = {'schemaVersion': 1, 'outcome': 'blocked', 'errors': ['nonroot-linux-x64-required'], 'browserExecuted': False, 'launchAuthorized': False} # 固定OS／非root，不切換環境救援。
+                else: result = collect(os.environ) # 僅讀被identity白名單選取的公開變數。
+                try: body, digest = encoded_report(result) # 必須完整編碼與大小核對才輸出。
+                except Rejected: body, digest = encoded_report({'schemaVersion': 1, 'outcome': 'blocked', 'errors': ['report-size-limit'], 'browserExecuted': False, 'launchAuthorized': False}) # 報告過大只留固定小錯誤，不能洩漏原內容。
+                print('QA_METADATA_V1 ' + body.decode('ascii'), flush=True) # 一份最大4KiB JSON，root只讀原始job log。
+                print('QA_METADATA_SHA256 ' + str(len(body)) + ' ' + digest, flush=True) # 第二行提供固定長度與SHA，不用artifact配額。
+                sys.exit(0 if result.get('outcome') == 'metadata-observed-not-authorized' else 2) # 綠燈僅代表觀測完成，絕不等於可啟動browser。
+        run: | # Python包含來源驗證與執行的整體最多19秒TERM再1秒KILL。
+          timeout --signal=TERM --kill-after=1s 19s /usr/bin/python3 -c ' # 僅已存在系統Python，不安裝替代工具。
+          import hashlib, os # 標準庫核固定內嵌來源身份。
+          source = os.environ["QA_SOURCE"].encode("utf-8") # 不讀其他環境值或外部來源碼。
+          assert len(source) == 12677 and hashlib.sha256(source).hexdigest() == "9698b8596953c1ea5aec051f9e89affe4ac108e39e0af1ffc174ffe1604bf2f9", "payload-integrity" # 不符就不執行、不下載救援副本。
+          exec(compile(source, "reviewed-metadata.py", "exec"), {"__name__": "__main__"}) # 只執行已逐byte核過的固定公開診斷，不接受其他程式。
+          ' # 結束固定shell字串，任何失敗不重試。
