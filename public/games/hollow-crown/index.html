@@ -10,7 +10,10 @@
     <button id="pause-button" class="quiet compact" aria-label="暫停遊戲">Ⅱ <span>暫停</span></button>
   </header>
   <div id="boss-hud" hidden><span id="boss-name"></span><div class="meter boss"><i id="boss-fill"></i></div><small id="boss-move"></small></div>
-  <div id="tutorial" class="tutorial" hidden></div>
+  <div id="tutorial" class="tutorial" hidden> <!-- 教學卡維持既有版位，提示列高度固定。 -->
+    <div id="tutorial-copy"></div> <!-- 原公開試煉正文仍由原HUD更新。 -->
+    <p id="warning-cue" role="status" aria-live="polite" aria-atomic="true"><span id="warning-cue-shape" class="warning-cue-shape cue-none" aria-hidden="true"></span><span id="warning-cue-text">觀察場上動作</span></p> <!-- 文字與ARIA同義，形狀不依賴紅色。 -->
+  </div> <!-- 中性列也占相同行高，不透過顯示閃動暗示時間。 -->
   <aside id="loadout" hidden></aside>
   <div id="combat-tip" hidden>WASD 移動 <b>·</b> 左鍵刺擊／長按蓄力 <b>·</b> 右鍵格擋 <b>·</b> Space 閃避</div>
   <div id="touch-controls" hidden>

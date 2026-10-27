@@ -1,4 +1,5 @@
 import { SceneView } from './scene.js';
+import { WarningCueUI } from './warning-cue-ui.js'; // 一般玩家的公開提示文字與形狀。
 import { createRun, step, chooseReward, enterRoom, checkpoint, restoreRun, startTutorial, chooseStory } from './rules.js';
 import { ROOMS, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, STORIES, DIFFICULTIES, ENEMIES } from './content.js';
 import { SaveStore, settleRun } from './storage.js';
@@ -6,7 +7,7 @@ import { Controls } from './input.js';
 import { Soundscape } from './audio.js';
 import { getGameBridge } from './bridge.js';
 
-const BUILD='hollow-crown-cloud-rebuild-20261027-01', VERSION='1.0.0-rc.9-rebuild.1'; // 雲端checkpoint損壞降級候選由既有stamp機制固定版本。
+const BUILD='hollow-crown-warning-cue-20261027-02', VERSION='1.0.0-rc.10-cue.2'; // 公開扇形提示獨立新候選；舊rc9證據與runtime不回填。
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let store;try{store=new SaveStore();}catch{store=new SaveStore({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});}
 const profile=store.load();
@@ -18,7 +19,9 @@ let config={seed:Math.floor(Date.now()%2147483647),route:'ash',startTalent:'flee
 const camp={phase:'camp',room:ROOMS[0],player:{x:0,z:1,angle:Math.PI*.15,hp:100,maxHp:100,action:'idle',skin:profile.selectedSkin},enemies:[],effects:[],projectiles:[],time:0,settings:profile.settings};
 const timing={frames:[],started:performance.now(),loaded:null};
 const sound=new Soundscape(profile.settings,toast);
-let view,controls;
+let view,controls; // 原遊戲控制保持不變。
+const warningCueUI=new WarningCueUI(document,window); // 僅一般可見DOM，沒有新window診斷接口。
+function clearWarningCue(){warningCueUI.clear();view?.warningCue.invalidate();} // 同步清舊語義及receipt，恢復等下一幀。
 const bridge=getGameBridge(command=>{
   if(command==='host:start'){if(!run){if(profile.checkpoint)resumeSave();else begin(!profile.tutorialDone);}else if(paused)resume();}
   if(command==='host:pause')pause();
@@ -26,9 +29,9 @@ const bridge=getGameBridge(command=>{
   if(command==='host:restart')begin(false);
 });
 
-function toast(message){$('toast').textContent=message;$('toast').hidden=false;toastUntil=performance.now()+3300;}
+function toast(message){clearWarningCue();$('toast').textContent=message;$('toast').hidden=false;toastUntil=performance.now()+3300;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 function persist(){store.save(profile);notice();}
-function notice(){const text=[store.notice,assetNotice].filter(Boolean).join(' ');$('save-notice').textContent=text;$('save-notice').hidden=!text;}
+function notice(){clearWarningCue();const text=[store.notice,assetNotice].filter(Boolean).join(' ');$('save-notice').textContent=text;$('save-notice').hidden=!text;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 function safeCheckpoint(){
   if(!run||run.tutorial||run.phase==='result')return;
   try{profile.checkpoint={run:checkpoint(run),runId,config:{...config},credited:{...credited}};persist();}catch{toast('這一刻無法建立存檔。房間入口存檔仍保留。');}
@@ -43,7 +46,7 @@ function unlockProgress(){
 }
 function panelHeader(kicker,title,close='camp'){return `<div class="panel-header"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><button data-action="${close}" class="quiet compact">返回</button></div>`;}
 function option(items,value){return items.map(t=>`<option value="${esc(t.id)}" ${t.id===value?'selected':''}>${esc(t.name)}</option>`).join('');}
-function setOverlay(name,{focus=true}={}){
+function setOverlay(name,{focus=true}={}){clearWarningCue(); // overlay改動之前先清舊警示。
   overlay=name;flushInput();$('overlay').className=name==='camp'?'camp':'';
   $('overlay').innerHTML=renderPanel(name);
   if(name&&focus)requestAnimationFrame(()=>{const el=$('overlay').querySelector('[autofocus],button.primary,button,input,select');el?.focus({preventScroll:true});});
@@ -98,7 +101,7 @@ function resumeSave(){
   } // 壞wrapper與壞run同走下方既有保留解鎖及設定的安全恢復。
   catch{profile.checkpoint=null;persist();run=null;setOverlay('camp');toast('房間存檔版本不相容或損壞；解鎖與設定已保留，請開始新旅途。');}
 }
-function pause(show=true){
+function pause(show=true){clearWarningCue(); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
   if(!run||run.phase==='result')return;paused=true;flushInput();sound.pause();bridge.state('paused');if(show)setOverlay('pause');
 }
 function resume(){
@@ -117,11 +120,11 @@ function syncPhase(){
     persist();setOverlay('result');sound.setTheme('camp');bridge.state('paused');
   }
 }
-function updateVisibility(){const playing=!!run&&run.phase!=='result';$('hud').hidden=!playing;$('loadout').hidden=!playing;$('combat-tip').hidden=!playing||!!overlay;$('touch-controls').hidden=!playing||!!overlay||!touchActive;$('tutorial').hidden=!run?.tutorial||!!overlay||run.phase==='result';if(overlay)$('boss-hud').hidden=true;}
+function updateVisibility(){clearWarningCue();const playing=!!run&&run.phase!=='result';$('hud').hidden=!playing;$('loadout').hidden=!playing;$('combat-tip').hidden=!playing||!!overlay;$('touch-controls').hidden=!playing||!!overlay||!touchActive;$('tutorial').hidden=!run?.tutorial||!!overlay||run.phase==='result';if(overlay)$('boss-hud').hidden=true;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 function updateHud(){if(!run)return;const p=run.player;$('hp-text').textContent=`${Math.ceil(p.hp)} / ${p.maxHp}`;$('hp-fill').style.width=`${100*Math.max(0,p.hp)/p.maxHp}%`;$('energy-fill').style.width=`${100*p.energy/p.maxEnergy}%`;$('energy-text').textContent=Math.floor(p.energy);$('room-name').textContent=run.room.name;$('chapter').textContent=run.tutorial?'守誓者的試煉':run.roomIndex>=4?'最後一道誓言':`第 ${Number(run.roomIndex)+1} 房 / 4`;
   const alive=run.enemies.filter(e=>e.hp>0);$('room-status').textContent=run.tutorial?'跟隨下方引導，失誤可繼續練習':`${alive.length} 位敵人 · ${formatTime(run.time)} · ${profile.settings.autoAim?'自動鎖定':'手動瞄準'}`;
   const list=(run.talents||p.talents||[]).join(',');if($('loadout').dataset.ids!==list){$('loadout').dataset.ids=list;$('loadout').innerHTML=list.split(',').filter(Boolean).map(id=>`<span class="chip">${esc(TALENTS.find(t=>t.id===id)?.name||id)}</span>`).join('');}
-  if(run.tutorial){$('tutorial').innerHTML=`<strong>試煉 ${Number(run.tutorial.step)+1} / 5</strong>　${esc(run.tutorial.text)}<small>J／左鍵刺擊 · K／右鍵格擋 · Space 閃避 · Esc 設定練習窗口</small>`;}
+  if(run.tutorial){$('tutorial-copy').innerHTML=`<strong>試煉 ${Number(run.tutorial.step)+1} / 5</strong>　${esc(run.tutorial.text)}<small>J／左鍵刺擊 · K／右鍵格擋 · Space 閃避 · Esc 設定練習窗口</small>`;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
   const boss=alive.find(e=>ENEMIES[e.type]?.boss);$('boss-hud').hidden=!boss||!!overlay;if(boss){$('boss-name').textContent=`${ENEMIES[boss.type]?.name} · 第 ${boss.phase||1} 階段`;$('boss-fill').style.width=`${boss.hp/boss.maxHp*100}%`;$('boss-move').textContent=boss.state==='telegraph'?`⚠ ${boss.attack?.name||'即將出招'} — 讓出危險區`:boss.state==='recover'?'破綻 · 現在刺擊':'讀取他的動作';}
 }
 
@@ -154,12 +157,12 @@ $('overlay').addEventListener('change',e=>{
 });
 $('overlay').addEventListener('input',e=>{const key=e.target.dataset.setting;if(!['music','effects'].includes(key))return;profile.settings[key]=Number(e.target.value);sound.update(profile.settings);e.target.parentElement.querySelector('span').textContent=`${Math.round(profile.settings[key]*100)}%`;});
 $('pause-button').onclick=()=>pause();
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(run&&run.phase!=='result')pause();else sound.pause();}});
-window.addEventListener('blur',()=>{if(run&&run.phase!=='result'&&!paused)pause();});
+document.addEventListener('visibilitychange',()=>{clearWarningCue();if(document.hidden){if(run&&run.phase!=='result')pause();else sound.pause();}}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+window.addEventListener('blur',()=>{clearWarningCue();if(run&&run.phase!=='result'&&!paused)pause();}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 window.addEventListener('keydown',e=>{if(e.key!=='Tab'||!overlay)return;const focusables=[...$('overlay').querySelectorAll('button:not(:disabled),input,select')];if(!focusables.length)return;const first=focusables[0],last=focusables.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
 window.addEventListener('resize',()=>{view?.resize();updateVisibility();});
 window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&!touchActive){touchActive=true;updateVisibility();}});
-window.addEventListener('pagehide',()=>{if(disposed)return;disposed=true;controls?.dispose();sound.dispose();view?.dispose();bridge.dispose();});
+window.addEventListener('pagehide',()=>{clearWarningCue();warningCueUI.dispose();if(disposed)return;disposed=true;controls?.dispose();sound.dispose();view?.dispose();bridge.dispose();}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 $('world').addEventListener('webglcontextlost',e=>{e.preventDefault();pause();toast('圖形裝置暫時中斷。請重新載入頁面，將恢復房間入口。');});
 let frame=0,last=performance.now(),hudTime=0;
@@ -169,10 +172,11 @@ function tick(now){if(disposed)return;frame=requestAnimationFrame(tick);const ra
     for(const event of run.events?.splice(0)||[]){sound.cue(event.type,event.material==='armor'||event.material==='shield'?'metal':event.material);if(event.type==='parry')toast('精準反擊');if(event.type==='hurt')toast(`受到 ${sourceName(event.source)} 的攻擊`);if(event.type==='ui'&&event.text&&!event.source&&event.cue!=='tutorial')toast(event.text);}
     syncPhase();
   }
-  camp.time+=dt;view.render(run||camp,paused?0:dt);if(now-hudTime>90){updateHud();hudTime=now;}if(now>toastUntil)$('toast').hidden=true;
+  camp.time+=dt;if(now-hudTime>90){updateHud();hudTime=now;}if(now>toastUntil)$('toast').hidden=true; // 先完成原HUD與toast，再量本幀遮罩；simulation時序不變。
+  const cueEnabled=!!run?.tutorial&&!paused&&!overlay&&!document.hidden&&!disposed;const cue=view.render(run||camp,paused?0:dt,cueEnabled);warningCueUI.present(cue,cueEnabled); // 同幀main render後公布，沒有額外輸入或延時計時。
 }
 try{
-  view=new SceneView($('world'),{quality:profile.settings.quality,onAssetError:()=>{assetNotice='石材貼圖載入失敗，已使用基礎材質繼續。可於設定重新載入頁面，存檔保留。';notice();}});view.setQuality(profile.settings.quality);
+  view=new SceneView($('world'),{quality:profile.settings.quality,onCueClear:()=>warningCueUI.clear(),onAssetError:()=>{assetNotice='石材貼圖載入失敗，已使用基礎材質繼續。可於設定重新載入頁面，存檔保留。';notice();}});view.setQuality(profile.settings.quality); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
   controls=new Controls($('world'),view,{pause:()=>paused?resume():pause(),gesture:()=>sound.unlock(),enabled:()=>!!run&&!paused&&!overlay&&['combat','tutorial'].includes(run.phase)});
   setOverlay('camp');notice();$('build-label').textContent=`${VERSION} · ${BUILD} · 本機存檔`;
   timing.loaded=performance.now()-timing.started;bridge.loaded();frame=requestAnimationFrame(tick);
