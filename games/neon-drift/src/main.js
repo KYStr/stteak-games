@@ -10,7 +10,7 @@ import { createFrameProfiler,FRAME_PHASE } from './profiler.js';
 import { createFrameHistory } from './frame-history.js';
 import { createNotifications } from './notifications.js';
 
-const BUILD='neon-drift-rebuild-0012',VERSION='1.0.10'; // 雲端重建的新候選身分，不冒稱遺失0012原hash。
+const BUILD='neon-drift-readability-0013',VERSION='1.0.11'; // 獨立HUD可讀性候選身分，不沿0012既有證據或分數。
 const $=s=>document.querySelector(s);
 const fmt=t=>`${String(Math.floor(Math.max(0,t)/60)).padStart(2,'0')}:${(Math.max(0,t)%60).toFixed(2).padStart(5,'0')}`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -164,7 +164,7 @@ function drawMap(){
     const xs=pts.map(p=>p.x),zs=pts.map(p=>p.z);cache.x0=Math.min(...xs);cache.z0=Math.min(...zs);cache.scale=Math.min(145/(Math.max(...xs)-cache.x0),115/(Math.max(...zs)-cache.z0));
     const route=cache.routeContext;route.lineWidth=3;route.strokeStyle='#5d7687';route.beginPath();
     pts.forEach((p,i)=>{if(i%8!==0)return;const x=17+(p.x-cache.x0)*cache.scale,y=17+(p.z-cache.z0)*cache.scale;if(i===0)route.moveTo(x,y);else route.lineTo(x,y);});route.closePath();route.stroke();
-    const legend=cache.legendContext;legend.fillStyle='#a7bec9';legend.font='9px sans-serif';legend.fillText('■ 下一點  ● 你',12,143);
+    // 圖例改為相鄰DOM文字，避免canvas縮字；透明legend層與其餘地圖繪製契約保留。
   }
   const ctx=cache.context,xy=p=>[17+(p.x-cache.x0)*cache.scale,17+(p.z-cache.z0)*cache.scale];
   ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(cache.route,0,0);
