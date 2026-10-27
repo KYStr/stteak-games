@@ -10,3 +10,22 @@
 @media(max-height:480px){#garage{top:50px;padding-top:18px}}
 @media(max-height:480px){#tutorial-hint{padding:4px 12px}}
 #modal-notice{position:sticky;top:0;z-index:1;padding:12px 16px;background:#233d41;color:#eef7f6;border:1px solid #9ad9c9;border-radius:4px}
+/* 0013：只改善角落資訊的可讀性；不改Pause backdrop、控制項或世界畫面。 */
+#hud .race-top{gap:12px;align-items:flex-start} /* 左右資訊塊保原位置，預留分隔且不互相拉成整條遮罩。 */
+#hud .race-top>div{min-width:0;max-width:calc((100% - 12px)/2);padding:8px 10px;background:#0c1821f2;border:1px solid #a5c3cf33;border-radius:4px;text-shadow:none} /* 小面板提供穩定暗底，保留夜藍風格，不新增blur或混色效果。 */
+#hud #hud-title,#hud #sector,#hud #reason{font-size:.8125rem;font-weight:600;line-height:1.4;letter-spacing:.04em;overflow-wrap:anywhere} /* 主要小字預設13px，可自然換行，不以ellipsis或裁切隱藏內容。 */
+#hud #timer-label,#hud #combo,#hud .speed>span{font-size:.75rem;font-weight:600;line-height:1.4;letter-spacing:.06em} /* 輔助小字預設12px，不隨畫布縮小。 */
+#hud #timer-label,#hud #sector,#hud #reason{color:#d1e2e6} /* 文字對比留餘裕，不只靠黑色陰影穿過明亮起跑架。 */
+#hud #timer{white-space:nowrap} /* 原計時數字與格式不改，只禁止時間被拆成兩行。 */
+#hud .drift-panel{min-width:0;flex:0 1 auto;padding:8px 10px;background:#0c1821f2;border:1px solid #a5c3cf33;border-radius:4px;text-shadow:none} /* 漂移說明保留在原左下；長字可收縮換行，不佔整個HUD寬。 */
+#hud .speed>span{display:inline-block;margin-left:6px;padding:2px 4px;background:#0c1821f2;border-radius:3px;text-shadow:none} /* 只襯底速度單位，大型速度數字保原輕量視覺。 */
+#hud .minimap-panel{margin:0 0 0 auto;width:160px;flex:0 0 auto;background:#0c1821f2;border-radius:3px;pointer-events:none} /* 顯式重設figure預設margin，延續原右下160px位置與非互動契約。 */
+#hud #minimap{display:block;margin:0;pointer-events:none} /* 寬高仍沿原canvas各尺寸規則，沒有放大、裁切或改內部投影。 */
+#hud .minimap-legend{display:grid;grid-template-columns:1fr auto;gap:4px 8px;margin:0;padding:6px 8px;color:#d1e2e6;font-size:.75rem;font-weight:600;line-height:1.4;letter-spacing:0;border:1px solid #a5c3cf33;border-bottom:0;border-radius:3px 3px 0 0;pointer-events:none} /* 圖例在canvas上方，保原地圖底部錨點；文字獨立比例，無固定高度或溢位隱藏。 */
+#hud .minimap-legend>span{display:flex;align-items:center;gap:5px;min-width:0;overflow-wrap:anywhere} /* 形狀與文字並列，窄版保完整內容而不縮字。 */
+#hud .legend-mark{display:inline-block;width:7px;height:7px;flex:0 0 7px;background:#ffd77e} /* 金方塊對應原下一檢查點，不依賴顏色作唯一區分。 */
+#hud .legend-mark.car{background:#b5ffd9;border-radius:50%} /* 薄荷圓點對應原車輛marker，沒有新遊戲狀態。 */
+.touch #hud .minimap-panel{width:115px} /* 觸控桌面沿原115px小地圖寬，不侵入踏板區。 */
+.touch #hud .minimap-legend{grid-template-columns:1fr} /* 窄圖例分兩列，保字級而非塞成極小canvas字。 */
+@media(max-width:700px){#hud #hud-title,#hud #sector,#hud #reason{font-size:.75rem}#hud .race-top>div{padding:6px 8px}#hud .drift-panel{flex:1 1 0;padding:6px}#hud .race-bottom{gap:10px}#hud .speed>span{display:block;width:fit-content;margin:4px 0 0}#hud .minimap-panel{width:96px}#hud .minimap-legend{grid-template-columns:1fr;padding:5px 6px}.touch #hud .minimap-panel{width:90px}} /* 手機保12px下限，單位換行以留文字空間；canvas96/90寬沿既有分支。 */
+@media(max-height:480px){.touch #hud .minimap-panel{display:none}} /* 原觸控短橫螢幕已隱藏地圖，整組圖例同隱藏，不擠佔原控制區。 */
