@@ -1,0 +1,2784 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.2",
+  "gameId": "tidebound",
+  "assetCount": 33,
+  "coordinateSystem": {
+    "unit": "metre",
+    "up": "+Y",
+    "forward": "-Z"
+  },
+  "palette": {
+    "water": "#187f8d",
+    "deep": "#145b70",
+    "foam": "#c9f2df",
+    "cream": "#fff0ce",
+    "sand": "#e6c998",
+    "coral": "#ef806d",
+    "dark": "#254f59",
+    "wood": "#986c4e",
+    "leaf": "#3e8c77",
+    "leafLight": "#77b991",
+    "brass": "#e6b95d",
+    "stone": "#a7b8ae"
+  },
+  "runtimePolicy": "Procedural runtime geometry uses these exact sources, bundled locally with Three.js. GLBs and separate colliders are retained as reusable interchange exports. No runtime dependency is external or under evidence/.",
+  "assets": [
+    {
+      "id": "tidebound.vessel.steady",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/vessel-steady.glb",
+        "models/vessel-steady.collider.json"
+      ],
+      "sha256": {
+        "models/vessel-steady.glb": "47abcbc214b8275ce7d00d35127ab6a2c4dcf9e48bdac7d41c0dfa3ab267148c",
+        "models/vessel-steady.collider.json": "6e428e8bf8520bb76cb25b42a1544145c7c851c6b302364633fceb030bb91ad5"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          7.7063,
+          13.7769,
+          12.3
+        ],
+        "bounds": {
+          "min": [
+            -2.7535080909729004,
+            -1.4500000476837158,
+            -6.800000190734863
+          ],
+          "max": [
+            4.952762126922607,
+            12.32690601348877,
+            5.5
+          ]
+        },
+        "triangles": 760,
+        "vertices": 1402,
+        "meshes": 28,
+        "collision": "models/vessel-steady.collider.json",
+        "materialSlots": [
+          "deep-teal-enamel",
+          "warm-linen",
+          "coral-enamel",
+          "oiled-timber",
+          "warm-sand"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 77853,
+        "glbBytes": 77560,
+        "colliderBytes": 293,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "vessel",
+          "steady"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.vessel.swift",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/vessel-swift.glb",
+        "models/vessel-swift.collider.json"
+      ],
+      "sha256": {
+        "models/vessel-swift.glb": "1b3f0b2212209db7ca9fe6ee64066dc576989dd99a46efa77463a9402d62f79e",
+        "models/vessel-swift.collider.json": "0e8e4970540da73258ccdefbbc229c4bb730909bc9a5cb18e3fcf2f29e6753de"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          10.5068,
+          13.7769,
+          12.3
+        ],
+        "bounds": {
+          "min": [
+            -4.453417778015137,
+            -1.4500000476837158,
+            -6.800000190734863
+          ],
+          "max": [
+            6.053375720977783,
+            12.32690601348877,
+            5.5
+          ]
+        },
+        "triangles": 760,
+        "vertices": 1402,
+        "meshes": 28,
+        "collision": "models/vessel-swift.collider.json",
+        "materialSlots": [
+          "deep-teal-enamel",
+          "warm-linen",
+          "coral-enamel",
+          "oiled-timber",
+          "warm-sand"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 77856,
+        "glbBytes": 77564,
+        "colliderBytes": 292,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "vessel",
+          "swift"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.vessel.cargo",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/vessel-cargo.glb",
+        "models/vessel-cargo.collider.json"
+      ],
+      "sha256": {
+        "models/vessel-cargo.glb": "a2a3d6ff4dfcb07461279b490afd39c786d0fba5f65d4ddc0b9bf35c5198bf93",
+        "models/vessel-cargo.collider.json": "da2346ec2444e850a5043098502e5c0a936a7992a996630494cfa77da9e77cea"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          7.6,
+          13.7769,
+          12.3
+        ],
+        "bounds": {
+          "min": [
+            -3.799999952316284,
+            -1.4500000476837158,
+            -6.800000190734863
+          ],
+          "max": [
+            3.799999952316284,
+            12.32690601348877,
+            5.5
+          ]
+        },
+        "triangles": 708,
+        "vertices": 1182,
+        "meshes": 32,
+        "collision": "models/vessel-cargo.collider.json",
+        "materialSlots": [
+          "deep-teal-enamel",
+          "warm-linen",
+          "coral-enamel",
+          "oiled-timber",
+          "warm-sand"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 75192,
+        "glbBytes": 74900,
+        "colliderBytes": 292,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "vessel",
+          "cargo"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.harbor",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-harbor.glb",
+        "models/island-harbor.collider.json"
+      ],
+      "sha256": {
+        "models/island-harbor.glb": "4422d313730417053611e63e9e95895022ac52cc8f49462b135cc27c6663d57e",
+        "models/island-harbor.collider.json": "150ce40ab4e128d3aa89919d15e39b73bc589f5d5a9d87476e8ba61c375049e6"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          44.8578,
+          9.8,
+          44.2478
+        ],
+        "bounds": {
+          "min": [
+            -23.485370635986328,
+            -3.9,
+            -19.973308563232422
+          ],
+          "max": [
+            21.372425079345703,
+            5.9000000059604645,
+            24.274478912353516
+          ]
+        },
+        "triangles": 192,
+        "vertices": 304,
+        "meshes": 4,
+        "collision": "models/island-harbor.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "harbor-earth"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 16142,
+        "glbBytes": 15868,
+        "colliderBytes": 274,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "harbor"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.coral",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-coral.glb",
+        "models/island-coral.collider.json"
+      ],
+      "sha256": {
+        "models/island-coral.glb": "475846b31aa105769d7bf0a025164e719d52ebfca847981cb1842a752f3f2de2",
+        "models/island-coral.collider.json": "5be08c6c582cab841398069aadd4d986a5d8d2ffa448fa30b95006772fd7600e"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          42.4779,
+          9.8,
+          43.1163
+        ],
+        "bounds": {
+          "min": [
+            -19.15089225769043,
+            -3.9,
+            -22.704967498779297
+          ],
+          "max": [
+            23.326984405517578,
+            5.9000000059604645,
+            20.41136932373047
+          ]
+        },
+        "triangles": 192,
+        "vertices": 304,
+        "meshes": 4,
+        "collision": "models/island-coral.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "coral-earth"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 16141,
+        "glbBytes": 15868,
+        "colliderBytes": 273,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "coral"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.gull",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-gull.glb",
+        "models/island-gull.collider.json"
+      ],
+      "sha256": {
+        "models/island-gull.glb": "f2b5dafcdef861515f9362d8ab95b7ad6d45f2bb9f00adcbd3ceaced8696a973",
+        "models/island-gull.collider.json": "030d7c76beded27eafb74bf803a84594506397cc161a26d7195f9a872ad3f5bc"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          40.708,
+          14.25,
+          40.708
+        ],
+        "bounds": {
+          "min": [
+            -19.832521438598633,
+            -3.9,
+            -19.443979263305664
+          ],
+          "max": [
+            20.875444412231445,
+            10.349999994039536,
+            21.263986587524414
+          ]
+        },
+        "triangles": 288,
+        "vertices": 456,
+        "meshes": 6,
+        "collision": "models/island-gull.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "gull-earth",
+          "chalk-stone"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 23780,
+        "glbBytes": 23508,
+        "colliderBytes": 272,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "gull"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.mangrove",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-mangrove.glb",
+        "models/island-mangrove.collider.json"
+      ],
+      "sha256": {
+        "models/island-mangrove.glb": "42f8f21972d9b5ff797276ddfe1b9940d8c0105481ce07289e74c855e5229dd1",
+        "models/island-mangrove.collider.json": "e59aba30e741a3c334aec8bdf89149aafadcbd21f61636eabac404213e2b3ad8"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          44.2478,
+          9.8,
+          44.2478
+        ],
+        "bounds": {
+          "min": [
+            -21.04167938232422,
+            -3.9,
+            -21.659889221191406
+          ],
+          "max": [
+            23.20610809326172,
+            5.9000000059604645,
+            22.587900161743164
+          ]
+        },
+        "triangles": 192,
+        "vertices": 304,
+        "meshes": 4,
+        "collision": "models/island-mangrove.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "mangrove-earth"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 16152,
+        "glbBytes": 15876,
+        "colliderBytes": 276,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "mangrove"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.ruin",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-ruin.glb",
+        "models/island-ruin.collider.json"
+      ],
+      "sha256": {
+        "models/island-ruin.glb": "86b12cdabcd67ef719f96fa34600a71ee2c71e16c84766f2b64c0cbb8620f67e",
+        "models/island-ruin.collider.json": "6bed84f828bb4a1fc53499b8c3d5bb11b35e3dc133ba22a84a9190f0ac0f44f6"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          42.5933,
+          17.3,
+          42.4779
+        ],
+        "bounds": {
+          "min": [
+            -20.71211051940918,
+            -3.9,
+            -23.049665451049805
+          ],
+          "max": [
+            21.881174087524414,
+            13.400000011920929,
+            19.428211212158203
+          ]
+        },
+        "triangles": 420,
+        "vertices": 700,
+        "meshes": 15,
+        "collision": "models/island-ruin.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "ruin-earth",
+          "warm-linen",
+          "chalk-stone"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 41312,
+        "glbBytes": 41040,
+        "colliderBytes": 272,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "ruin"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.reef",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-reef.glb",
+        "models/island-reef.collider.json"
+      ],
+      "sha256": {
+        "models/island-reef.glb": "48a4ce8f6b0a0eadba19bd826c5db660ea044631128c693d456e6ba821e7a543",
+        "models/island-reef.collider.json": "15d4991520143d41db2d8b4d5702e447eceba844b73f9662ab1efd5047e419e6"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          28.6591,
+          13.7829,
+          28.3186
+        ],
+        "bounds": {
+          "min": [
+            -14.930978775024414,
+            -3.9,
+            -12.80813217163086
+          ],
+          "max": [
+            13.728078842163086,
+            9.882929730415345,
+            15.510451316833496
+          ]
+        },
+        "triangles": 384,
+        "vertices": 868,
+        "meshes": 14,
+        "collision": "models/island-reef.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "reef-earth",
+          "coral-enamel",
+          "sea-glass"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 44492,
+        "glbBytes": 44220,
+        "colliderBytes": 272,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "reef"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.island.lighthouse",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/island-lighthouse.glb",
+        "models/island-lighthouse.collider.json"
+      ],
+      "sha256": {
+        "models/island-lighthouse.glb": "f65989db80898ee941137e88c49cfc3a6fee539e7879cbfdaafc782c3fde1819",
+        "models/island-lighthouse.collider.json": "88a83983f98cfa6acfcf8b9a5df0103be91ed635a2c8839ce814e988aa67f521"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          39.3896,
+          14.25,
+          38.9381
+        ],
+        "bounds": {
+          "min": [
+            -20.501754760742188,
+            -3.9,
+            -17.619842529296875
+          ],
+          "max": [
+            18.88786506652832,
+            10.349999994039536,
+            21.31821060180664
+          ]
+        },
+        "triangles": 288,
+        "vertices": 456,
+        "meshes": 6,
+        "collision": "models/island-lighthouse.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt",
+          "lighthouse-earth",
+          "chalk-stone"
+        ],
+        "lod": [
+          {
+            "distance": 230,
+            "quality": "low",
+            "policy": "land retained; detail group culled"
+          },
+          {
+            "distance": 420,
+            "quality": "high",
+            "policy": "land retained; detail group culled"
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 23798,
+        "glbBytes": 23520,
+        "colliderBytes": 278,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "island",
+          "lighthouse"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.foxfish",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-foxfish.glb",
+        "models/discovery-foxfish.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-foxfish.glb": "eee932b83795855a0eea402f8ed1a5ff47c466e546249754d8e8a496947b4a26",
+        "models/discovery-foxfish.collider.json": "359f9683f883a2b47e7d0fa6ec1363c00b60276b64ab274db800c2531824d918"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          1.5588,
+          1.84,
+          4.755
+        ],
+        "bounds": {
+          "min": [
+            -0.7794228792190552,
+            -0.9199999809265137,
+            -1.9549999594688414
+          ],
+          "max": [
+            0.7794228792190552,
+            0.9199999809265137,
+            2.800000011920929
+          ]
+        },
+        "triangles": 270,
+        "vertices": 783,
+        "meshes": 6,
+        "collision": "models/discovery-foxfish.collider.json",
+        "materialSlots": [
+          "coral-enamel",
+          "aged-brass",
+          "deep-teal-enamel",
+          "warm-linen"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 32019,
+        "glbBytes": 31764,
+        "colliderBytes": 255,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "foxfish"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.tern",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-tern.glb",
+        "models/discovery-tern.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-tern.glb": "ec9cc799fb45af5b486541a7ccbf8fb8ff7669c7e888ef66bb57a4ed9194471a",
+        "models/discovery-tern.collider.json": "ca825605f75f9abc2d7f00c95d46953f90b378f92d18065ed2c27a361df0330d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          6.1855,
+          1.2631,
+          3.05
+        ],
+        "bounds": {
+          "min": [
+            -3.092738545598608,
+            -0.6,
+            -1.75
+          ],
+          "max": [
+            3.092738545598608,
+            0.6630506062425574,
+            1.3
+          ]
+        },
+        "triangles": 130,
+        "vertices": 383,
+        "meshes": 4,
+        "collision": "models/discovery-tern.collider.json",
+        "materialSlots": [
+          "warm-linen",
+          "coral-enamel"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 17080,
+        "glbBytes": 16828,
+        "colliderBytes": 252,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "tern"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.turtle",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-turtle.glb",
+        "models/discovery-turtle.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-turtle.glb": "c87d3f1ac69adf720ef8febed77de69b8af5e625e6d3eb06bb649b674e3acc3b",
+        "models/discovery-turtle.collider.json": "0a053581b81b90596414180201d5ba04f02fbdeadfe31f0e29aad64f7c9f68a0"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4.8496,
+          1.8,
+          4.72
+        ],
+        "bounds": {
+          "min": [
+            -2.4248080889493226,
+            -0.599999976158142,
+            -2.649999976158142
+          ],
+          "max": [
+            2.4248080889493226,
+            1.1999999761581421,
+            2.0699999451637265
+          ]
+        },
+        "triangles": 240,
+        "vertices": 720,
+        "meshes": 6,
+        "collision": "models/discovery-turtle.collider.json",
+        "materialSlots": [
+          "mangrove-leaf",
+          "palm-leaf-tip"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 29750,
+        "glbBytes": 29496,
+        "colliderBytes": 254,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "turtle"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.nautilus",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-nautilus.glb",
+        "models/discovery-nautilus.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-nautilus.glb": "cd94b4ed3451c75be242eb3140b067632f530e10121efef4a82efa256378a1a1",
+        "models/discovery-nautilus.collider.json": "0572de0468888bbb831c64fd083dfa4ce6f1b7b2d7f619cf644e3d66136b1971"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4.2931,
+          2.8772,
+          1.5737
+        ],
+        "bounds": {
+          "min": [
+            -2.144749389259928,
+            -1.915716942551766,
+            -0.7868520021438599
+          ],
+          "max": [
+            2.14830192079148,
+            0.9614349708766349,
+            0.7868520021438599
+          ]
+        },
+        "triangles": 320,
+        "vertices": 800,
+        "meshes": 15,
+        "collision": "models/discovery-nautilus.collider.json",
+        "materialSlots": [
+          "warm-linen",
+          "warm-sand",
+          "coral-enamel"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 43328,
+        "glbBytes": 43072,
+        "colliderBytes": 256,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "nautilus"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.fan-coral",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-fan-coral.glb",
+        "models/discovery-fan-coral.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-fan-coral.glb": "73ef816bd5fb65bc3c72d1b7b81415bfbf6263822881775575d1364fda804fc8",
+        "models/discovery-fan-coral.collider.json": "8ffe63849c3a030e78974cdc83109810b6c3383229e7f0a1bd8897d401fabc0a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          6.6573,
+          4.2068,
+          0.8336
+        ],
+        "bounds": {
+          "min": [
+            -3.3266958436738974,
+            -0.11916591604249249,
+            -0.3911797556180916
+          ],
+          "max": [
+            3.3305926743454712,
+            4.08764751480943,
+            0.4424208791881832
+          ]
+        },
+        "triangles": 768,
+        "vertices": 1280,
+        "meshes": 32,
+        "collision": "models/discovery-fan-coral.collider.json",
+        "materialSlots": [
+          "coral-enamel"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 86333,
+        "glbBytes": 86076,
+        "colliderBytes": 257,
+        "maxSimultaneousInstances": 18
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "fan-coral"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.mangrove-root",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-mangrove-root.glb",
+        "models/discovery-mangrove-root.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-mangrove-root.glb": "0aa85b53cc9125c8cd6e2e811d1b007a6ad7d9127de858355401b15b8d4d41ca",
+        "models/discovery-mangrove-root.collider.json": "8db3bcd6e7db54bcd235edb1fecdef12c422aa85856e969cc3aab74f86fe139d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          7,
+          10.7262,
+          7
+        ],
+        "bounds": {
+          "min": [
+            -2.4,
+            -0.4512429859486302,
+            -3.5
+          ],
+          "max": [
+            4.6,
+            10.275,
+            3.5
+          ]
+        },
+        "triangles": 224,
+        "vertices": 480,
+        "meshes": 7,
+        "collision": "models/discovery-mangrove-root.collider.json",
+        "materialSlots": [
+          "oiled-timber",
+          "mangrove-leaf"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 25217,
+        "glbBytes": 24956,
+        "colliderBytes": 261,
+        "maxSimultaneousInstances": 18
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "mangrove-root"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.seagrass",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-seagrass.glb",
+        "models/discovery-seagrass.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-seagrass.glb": "5de963dcf05a53af181dfc1a9372c6cddeb6871c1a9cd2f8e56324b62fa18721",
+        "models/discovery-seagrass.collider.json": "960743478d95ba5bc1215999ff799cea81917cb0265eb82ab4c35cd8c3ea7d57"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4.2343,
+          4.3989,
+          2.9886
+        ],
+        "bounds": {
+          "min": [
+            -2.1175825972019315,
+            -0.799467407047413,
+            -1.448562998409801
+          ],
+          "max": [
+            2.1167417830334094,
+            3.599467407047413,
+            1.5400000005960464
+          ]
+        },
+        "triangles": 144,
+        "vertices": 264,
+        "meshes": 12,
+        "collision": "models/discovery-seagrass.collider.json",
+        "materialSlots": [
+          "palm-leaf-tip"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 23324,
+        "glbBytes": 23068,
+        "colliderBytes": 256,
+        "maxSimultaneousInstances": 18
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "seagrass"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.glass-coral",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-glass-coral.glb",
+        "models/discovery-glass-coral.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-glass-coral.glb": "2d60b248b5190e724f486ae4a9c2660d8f3b1db0830932845b9a72ca1fb7c3a1",
+        "models/discovery-glass-coral.collider.json": "fb219dc061a11f58a00b28a675f9a9a09bf0abbfd466ea9280ebc90510623f4f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4.3734,
+          5.3914,
+          4.6017
+        ],
+        "bounds": {
+          "min": [
+            -2.2141684571021756,
+            -1.245718193054199,
+            -2.2870818930043493
+          ],
+          "max": [
+            2.159256158986363,
+            4.145718193054199,
+            2.314643752574921
+          ]
+        },
+        "triangles": 140,
+        "vertices": 420,
+        "meshes": 7,
+        "collision": "models/discovery-glass-coral.collider.json",
+        "materialSlots": [
+          "sea-glass"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 21131,
+        "glbBytes": 20872,
+        "colliderBytes": 259,
+        "maxSimultaneousInstances": 18
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "glass-coral"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.star-tablet",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-star-tablet.glb",
+        "models/discovery-star-tablet.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-star-tablet.glb": "2a19f67eddbcd950c5b10d7aca6a4688cb279d163aba6639bc3fcc6767bfead5",
+        "models/discovery-star-tablet.collider.json": "c082c8a30f4fbe4a1cc6f3243fb3a4b14c3bf8d2ed34704674ad16a3b554c542"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          3.6,
+          4.5,
+          1.4
+        ],
+        "bounds": {
+          "min": [
+            -1.7999999523162842,
+            -0.04999999999999982,
+            -0.699999988079071
+          ],
+          "max": [
+            1.7999999523162842,
+            4.45,
+            0.699999988079071
+          ]
+        },
+        "triangles": 164,
+        "vertices": 468,
+        "meshes": 9,
+        "collision": "models/discovery-star-tablet.collider.json",
+        "materialSlots": [
+          "chalk-stone",
+          "aged-brass",
+          "warm-linen"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 25031,
+        "glbBytes": 24772,
+        "colliderBytes": 259,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "star-tablet"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.tide-clock",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-tide-clock.glb",
+        "models/discovery-tide-clock.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-tide-clock.glb": "cc2fe4e6e5af9f2a5c9c72bc5e8d8a2244b9ae7f4a71b5b53b8b33df65b27e66",
+        "models/discovery-tide-clock.collider.json": "87311f4f21e792678aad1f49bfbf6bb3263a40eaa784ed41d5610d0941775c22"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4.7,
+          4.7,
+          0.8031
+        ],
+        "bounds": {
+          "min": [
+            -2.3499999046325684,
+            -0.34999990463256836,
+            -0.5000000014901161
+          ],
+          "max": [
+            2.3499999046325684,
+            4.349999904632568,
+            0.30310890078544617
+          ]
+        },
+        "triangles": 348,
+        "vertices": 411,
+        "meshes": 11,
+        "collision": "models/discovery-tide-clock.collider.json",
+        "materialSlots": [
+          "aged-brass",
+          "deep-teal-enamel",
+          "warm-linen"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 27238,
+        "glbBytes": 26980,
+        "colliderBytes": 258,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "tide-clock"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.beacon-lens",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-beacon-lens.glb",
+        "models/discovery-beacon-lens.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-beacon-lens.glb": "89ed23c0eb86451c0ace216a69a01a032bcad97798dc0cc3569f481e353b2a20",
+        "models/discovery-beacon-lens.collider.json": "8423cb4250f16877c37cf46ae1431a14dfdd9150673779dc42d1fd472ed10bd3"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4.56,
+          4.78,
+          3.8
+        ],
+        "bounds": {
+          "min": [
+            -2.2799999713897705,
+            5.960464455334602e-9,
+            -1.899999976158142
+          ],
+          "max": [
+            2.2799999713897705,
+            4.7799999713897705,
+            1.899999976158142
+          ]
+        },
+        "triangles": 304,
+        "vertices": 411,
+        "meshes": 3,
+        "collision": "models/discovery-beacon-lens.collider.json",
+        "materialSlots": [
+          "chalk-stone",
+          "sea-glass",
+          "aged-brass"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 18407,
+        "glbBytes": 18148,
+        "colliderBytes": 259,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "beacon-lens"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.discovery.keepers-vault",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/discovery-keepers-vault.glb",
+        "models/discovery-keepers-vault.collider.json"
+      ],
+      "sha256": {
+        "models/discovery-keepers-vault.glb": "cf129305ab5ac62a926e41aa0ba6b57ce0a13f3195408be791886eba8d4f421c",
+        "models/discovery-keepers-vault.collider.json": "0cc02de9d21b626f490c5160b6dfad8049d043e4541d4c12770ce5aa119c9967"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          4,
+          2.1,
+          2.575
+        ],
+        "bounds": {
+          "min": [
+            -2,
+            0,
+            -1.3250000029802322
+          ],
+          "max": [
+            2,
+            2.1000000059604647,
+            1.25
+          ]
+        },
+        "triangles": 48,
+        "vertices": 96,
+        "meshes": 4,
+        "collision": "models/discovery-keepers-vault.collider.json",
+        "materialSlots": [
+          "oiled-timber",
+          "coral-enamel",
+          "aged-brass",
+          "warm-linen"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 8477,
+        "glbBytes": 8216,
+        "colliderBytes": 261,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "discovery",
+          "keepers-vault"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.flora.palm",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/coastal-palm.glb",
+        "models/coastal-palm.collider.json"
+      ],
+      "sha256": {
+        "models/coastal-palm.glb": "80dfe774e76108cb14fb6be321da28180c36ded0d802a90acc6526ae44596c7e",
+        "models/coastal-palm.collider.json": "610a9c6850a776b8c8a016f0e6bb5725a4f6c9c99fc28bef98f51728f2afe218"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          7.6102,
+          10.8774,
+          7.4194
+        ],
+        "bounds": {
+          "min": [
+            -2.7050831294584907,
+            -0.037749814857447106,
+            -3.823052717363361
+          ],
+          "max": [
+            4.905083129458491,
+            10.83965442127696,
+            3.596310784799132
+          ]
+        },
+        "triangles": 280,
+        "vertices": 808,
+        "meshes": 11,
+        "collision": "models/coastal-palm.collider.json",
+        "materialSlots": [
+          "oiled-timber",
+          "palm-leaf-tip",
+          "mangrove-leaf"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 38292,
+        "glbBytes": 38020,
+        "colliderBytes": 272,
+        "maxSimultaneousInstances": 16
+      },
+      "reuse": {
+        "tags": [
+          "flora",
+          "palm"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.flora.mangrove",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/mangrove-tree.glb",
+        "models/mangrove-tree.collider.json"
+      ],
+      "sha256": {
+        "models/mangrove-tree.glb": "84917085c0b5be0fe88dfdd3d9682440eed24491fb08f970eacb3a66d5075902",
+        "models/mangrove-tree.collider.json": "88ec9c3ad28cf9f44b03d06a8dd754ab47cf3fa3ff89b318e02be41e9331f38e"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          7,
+          10.7262,
+          7
+        ],
+        "bounds": {
+          "min": [
+            -2.4,
+            -0.4512429859486302,
+            -3.5
+          ],
+          "max": [
+            4.6,
+            10.275,
+            3.5
+          ]
+        },
+        "triangles": 224,
+        "vertices": 480,
+        "meshes": 7,
+        "collision": "models/mangrove-tree.collider.json",
+        "materialSlots": [
+          "oiled-timber",
+          "mangrove-leaf"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 25052,
+        "glbBytes": 24776,
+        "colliderBytes": 276,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "flora",
+          "mangrove"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.structure.harbor",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/harbor-kit.glb",
+        "models/harbor-kit.collider.json"
+      ],
+      "sha256": {
+        "models/harbor-kit.glb": "c6275d727a608136401aea9ddd2145ac5846bdefb90a735f97df7676e1c31c06",
+        "models/harbor-kit.collider.json": "5ef2af752b0ec286520891004c8b993d39a0f698e8e1899838a72e8e3917f795"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          30.9907,
+          11,
+          19.3953
+        ],
+        "bounds": {
+          "min": [
+            -15.495332150317234,
+            4.5,
+            -9.899999976158142
+          ],
+          "max": [
+            15.495332150317234,
+            15.5,
+            9.495332150317234
+          ]
+        },
+        "triangles": 312,
+        "vertices": 673,
+        "meshes": 22,
+        "collision": "models/harbor-kit.collider.json",
+        "materialSlots": [
+          "warm-linen",
+          "coral-enamel",
+          "deep-teal-enamel",
+          "oiled-timber",
+          "warm-sand"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 46193,
+        "glbBytes": 45904,
+        "colliderBytes": 289,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "structure",
+          "harbor"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.structure.pier",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/timber-jetty.glb",
+        "models/timber-jetty.collider.json"
+      ],
+      "sha256": {
+        "models/timber-jetty.glb": "78b7f17e71317b15a1a83706990f3fa4ebc73a0f356af40b9cb93fdacbfe8109",
+        "models/timber-jetty.collider.json": "41587a8af084e21a6bebf970e781d35bc2286a69c669f2275868eb750cbca214"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          5.82,
+          5.8,
+          12.82
+        ],
+        "bounds": {
+          "min": [
+            -2.9100000143051146,
+            -2.100000095367432,
+            -0.5600000023841858
+          ],
+          "max": [
+            2.9100000143051146,
+            3.7000000953674315,
+            12.260000002384187
+          ]
+        },
+        "triangles": 568,
+        "vertices": 740,
+        "meshes": 20,
+        "collision": "models/timber-jetty.collider.json",
+        "materialSlots": [
+          "oiled-timber",
+          "deep-teal-enamel",
+          "warm-sand"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 47820,
+        "glbBytes": 47428,
+        "colliderBytes": 392,
+        "maxSimultaneousInstances": 7
+      },
+      "reuse": {
+        "tags": [
+          "structure",
+          "pier"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.structure.lighthouse",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/lighthouse-unlit.glb",
+        "models/lighthouse-unlit.collider.json"
+      ],
+      "sha256": {
+        "models/lighthouse-unlit.glb": "26047dfbd3d13d89ae27354beb3c63899a193b75e5b7991c870449fd3129adc2",
+        "models/lighthouse-unlit.collider.json": "0af801122e30069a5022222f5aa2c675cf2a9e45f2450e7caf1caea3f1982133"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          12,
+          29.6,
+          12
+        ],
+        "bounds": {
+          "min": [
+            -6,
+            -2.384185793236071e-8,
+            -6
+          ],
+          "max": [
+            6,
+            29.600000023841858,
+            6
+          ]
+        },
+        "triangles": 564,
+        "vertices": 1043,
+        "meshes": 17,
+        "collision": "models/lighthouse-unlit.collider.json",
+        "materialSlots": [
+          "chalk-stone",
+          "warm-linen",
+          "coral-enamel",
+          "deep-teal-enamel",
+          "sea-glass"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 54771,
+        "glbBytes": 54492,
+        "colliderBytes": 279,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "structure",
+          "lighthouse"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.structure.lighthouse-restored",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/lighthouse-restored.glb",
+        "models/lighthouse-restored.collider.json"
+      ],
+      "sha256": {
+        "models/lighthouse-restored.glb": "cd8cb4ba9bfc45709c99cc9821af3ca61f8a753dfe4c3dc0b8a7080f8cea5adb",
+        "models/lighthouse-restored.collider.json": "5d778d31f8fe2bfc6c7722303cbf896f82522392527bc34f77ac9e7268be751f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          12,
+          29.6,
+          12
+        ],
+        "bounds": {
+          "min": [
+            -6,
+            -2.384185793236071e-8,
+            -6
+          ],
+          "max": [
+            6,
+            29.600000023841858,
+            6
+          ]
+        },
+        "triangles": 564,
+        "vertices": 1043,
+        "meshes": 17,
+        "collision": "models/lighthouse-restored.collider.json",
+        "materialSlots": [
+          "chalk-stone",
+          "warm-linen",
+          "coral-enamel",
+          "deep-teal-enamel",
+          "beacon-light"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 54948,
+        "glbBytes": 54660,
+        "colliderBytes": 288,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "structure",
+          "lighthouse-restored"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.environment.reef",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/tidal-reef.glb",
+        "models/tidal-reef.collider.json"
+      ],
+      "sha256": {
+        "models/tidal-reef.glb": "2b5589255d7f97bc02d9380fc0fa0067ca995357d0d6657fff4f7cd9ef13db32",
+        "models/tidal-reef.collider.json": "9986ad2905e234d0bc5e3113573ad9cd8ea7ff131486db7b07ce6dc1bed32829"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          6.6964,
+          3.3931,
+          8.3658
+        ],
+        "bounds": {
+          "min": [
+            -3.086493720475625,
+            -2.504010868376496,
+            -4.518319348630025
+          ],
+          "max": [
+            3.6099068571176898,
+            0.8891228140252587,
+            3.847460059901528
+          ]
+        },
+        "triangles": 140,
+        "vertices": 420,
+        "meshes": 7,
+        "collision": "models/tidal-reef.collider.json",
+        "materialSlots": [
+          "warm-sand",
+          "submerged-basalt"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 21416,
+        "glbBytes": 21004,
+        "colliderBytes": 412,
+        "maxSimultaneousInstances": 2
+      },
+      "reuse": {
+        "tags": [
+          "environment",
+          "reef"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.character.voyager",
+      "version": "1.0.0",
+      "kind": "rigged-model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/tide-voyager.glb",
+        "models/tide-voyager.collider.json"
+      ],
+      "sha256": {
+        "models/tide-voyager.glb": "a555b40bb40786c46c3477d0cc92753152f7cfbcdf91dee14d3f39d244001ebb",
+        "models/tide-voyager.collider.json": "22a5a315dd8fbbfad72bffc4e6cc878d036f36bf3968df16df6e7256ce039123"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          1.28,
+          2.91,
+          0.8
+        ],
+        "bounds": {
+          "min": [
+            -0.6399999856948853,
+            -0.029999999329447746,
+            -0.4099999964237213
+          ],
+          "max": [
+            0.6399999856948853,
+            2.880000114440918,
+            0.38999998569488525
+          ]
+        },
+        "triangles": 168,
+        "vertices": 336,
+        "meshes": 1,
+        "collision": "models/tide-voyager.collider.json",
+        "materialSlots": [
+          "voyager-woven-uniform"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": {
+          "bones": [
+            "Hips",
+            "Spine",
+            "Head",
+            "LeftArm",
+            "RightArm",
+            "LeftLeg",
+            "RightLeg"
+          ],
+          "bindPose": "standing with arms down",
+          "weighting": "rigid one-bone low-poly skin",
+          "rootMotion": false,
+          "retarget": "match listed bone names and metre bind offsets"
+        },
+        "animations": [
+          {
+            "name": "DockIdle",
+            "duration": 3,
+            "loop": true,
+            "events": []
+          },
+          {
+            "name": "Swim",
+            "duration": 1.6,
+            "loop": true,
+            "events": []
+          },
+          {
+            "name": "DockWave",
+            "duration": 1.8,
+            "loop": true,
+            "events": []
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 31685,
+        "glbBytes": 31404,
+        "colliderBytes": 281,
+        "maxSimultaneousInstances": 4
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "voyager"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.effect.current",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/current-arrow.glb",
+        "models/current-arrow.collider.json"
+      ],
+      "sha256": {
+        "models/current-arrow.glb": "4cd74373cdff590cc6d71776dea1afa42f7f2f29866a6fd7411d03b8281ea93d",
+        "models/current-arrow.collider.json": "eb5744aa6fab9d105dc01cd4bd83c0ec6fe4760943791d3ee10e467d99e96f5c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          2.8644,
+          0.16,
+          4.0985
+        ],
+        "bounds": {
+          "min": [
+            -1.4321868050318045,
+            -0.07999999821186066,
+            -1.9484731336500856
+          ],
+          "max": [
+            1.4321868050318045,
+            0.07999999821186066,
+            2.1500000238418577
+          ]
+        },
+        "triangles": 36,
+        "vertices": 72,
+        "meshes": 3,
+        "collision": "models/current-arrow.collider.json",
+        "materialSlots": [
+          "sea-glass"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 6392,
+        "glbBytes": 5996,
+        "colliderBytes": 396,
+        "maxSimultaneousInstances": 14
+      },
+      "reuse": {
+        "tags": [
+          "effect",
+          "current"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.effect.whirlpool",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/tidal-whirlpool.glb",
+        "models/tidal-whirlpool.collider.json"
+      ],
+      "sha256": {
+        "models/tidal-whirlpool.glb": "0f9e3777df227d90efa80083d3e2c9c43d36251070ae6fd85b5ff54086e8dbd5",
+        "models/tidal-whirlpool.collider.json": "ac689aa22a7911a6954fa82dd99eb1f644082639777a2c387334bbb9dcd266c1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          38.8458,
+          0.5154,
+          38.8468
+        ],
+        "bounds": {
+          "min": [
+            -19.43524894272219,
+            -0.38227469682693554,
+            -19.434729791604326
+          ],
+          "max": [
+            19.410532396739708,
+            0.13314791023731334,
+            19.412089082293
+          ]
+        },
+        "triangles": 1440,
+        "vertices": 888,
+        "meshes": 4,
+        "collision": "models/tidal-whirlpool.collider.json",
+        "materialSlots": [
+          "warm-linen",
+          "sea-glass"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 42807,
+        "glbBytes": 42392,
+        "colliderBytes": 415,
+        "maxSimultaneousInstances": 2
+      },
+      "reuse": {
+        "tags": [
+          "effect",
+          "whirlpool"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "tidebound.navigation.survey-buoy",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/tidebound-models.js",
+      "runtime": [
+        "models/survey-buoy.glb",
+        "models/survey-buoy.collider.json"
+      ],
+      "sha256": {
+        "models/survey-buoy.glb": "4fc1380ab62ce5814e0312c7c1bcf75c9ea9f24a0d72300560c107fd76eb47d7",
+        "models/survey-buoy.collider.json": "3321bc4b2c0b8d0bc807fc0848779ac23e7d86eaa05683f640a85f743acd4df0"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Tidebound Maker / world-art agent",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter",
+        "promptRecord": "generation/art-direction.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry and materials; project license applies. Three.js software is MIT licensed."
+      },
+      "spec": {
+        "unit": "metre",
+        "up": "+Y",
+        "forward": "-Z",
+        "pivot": "local origin; boat waterline, islands sea level, props ground centre",
+        "dimensions": [
+          3.2,
+          4.8231,
+          3.2
+        ],
+        "bounds": {
+          "min": [
+            -1.600000023841858,
+            -0.09999999403953552,
+            -1.600000023841858
+          ],
+          "max": [
+            1.600000023841858,
+            4.723053157329559,
+            1.600000023841858
+          ]
+        },
+        "triangles": 116,
+        "vertices": 224,
+        "meshes": 5,
+        "collision": "models/survey-buoy.collider.json",
+        "materialSlots": [
+          "coral-enamel",
+          "deep-teal-enamel",
+          "aged-brass",
+          "warm-linen",
+          "sea-glass"
+        ],
+        "lod": [],
+        "textureColorSpace": {
+          "baseColor": "linear material factors exported as glTF PBR; no raster texture dependency"
+        },
+        "uv": "primitive-generated UV0 on all component geometry",
+        "skeleton": null,
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 14284,
+        "glbBytes": 13932,
+        "colliderBytes": 352,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "navigation",
+          "survey-buoy"
+        ],
+        "compatibleWith": [
+          "tidebound-coastal-kit-v1"
+        ],
+        "runtimeInstantiation": "The live renderer invokes the same authored constructors from its bundled models.js. GLB is a reproducible interchange derivative, not a separately fetched dependency."
+      },
+      "dependencies": [],
+      "derivatives": []
+    }
+  ]
+}

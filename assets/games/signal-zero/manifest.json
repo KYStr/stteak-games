@@ -1,0 +1,2563 @@
+{
+  "schemaVersion": 1,
+  "gameId": "signal-zero",
+  "version": "1.1.0",
+  "createdAt": "2026-10-25",
+  "coordinateContract": {
+    "unit": "meter",
+    "up": "+Y",
+    "forward": "+X",
+    "runnerHeight": 1.65,
+    "moduleGrid": 0.1
+  },
+  "runtimeStrategy": "The game uses the identical source module games/signal-zero/src/models.js, copied into its fingerprinted runtime as models.js. GLB files are reusable derivative exports, not downloaded by normal gameplay. No runtime code depends on evidence/.",
+  "assets": [
+    {
+      "id": "signal-zero.audio.jump",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Jump accepted",
+        "dispatch": "jump",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -26.894,
+        "rmsDBFS": -43.92,
+        "referenceMaster": {
+          "path": "sources/audio/jump.wav",
+          "sha256": "3345e924e7f4bd348ea96371d224b75fb86798f1ada0ba65450818e3e2f585a3",
+          "bytes": 18566
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 18566,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/jump.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.land",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Landing contact",
+        "dispatch": "land",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -28.851,
+        "rmsDBFS": -44.456,
+        "referenceMaster": {
+          "path": "sources/audio/land.wav",
+          "sha256": "cfae20ce12aafff76252e4538d435bb87cd47d9fe17ba1d1eb5002d54564b590",
+          "bytes": 11510
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 11510,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/land.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.step",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Footstep",
+        "dispatch": "step",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -45.652,
+        "rmsDBFS": -60.159,
+        "referenceMaster": {
+          "path": "sources/audio/step.wav",
+          "sha256": "5fcbbba727d87c35dc2902229954fd809f960782d7d7c324743f15313c115ec5",
+          "bytes": 7542
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 7542,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/step.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.hack",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Hacking action",
+        "dispatch": "hack",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -28.457,
+        "rmsDBFS": -43.994,
+        "referenceMaster": {
+          "path": "sources/audio/hack.wav",
+          "sha256": "da7f5e709b9608e511385cac28bbf9260aa4eae0ccb81c2c3641c11c42553af9",
+          "bytes": 15038
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 15038,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/hack.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.objective",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Objective completed",
+        "dispatch": "objective",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -24.905,
+        "rmsDBFS": -39.721,
+        "referenceMaster": {
+          "path": "sources/audio/objective.wav",
+          "sha256": "e4bf76902d85a0fdc933515eaa5bbda9309b9773624383c6e367746c6a24582e",
+          "bytes": 39734
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 39734,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/objective.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.packet",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Optional data collected",
+        "dispatch": "packet",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -26.913,
+        "rmsDBFS": -43.349,
+        "referenceMaster": {
+          "path": "sources/audio/packet.wav",
+          "sha256": "23f50c8b997ff1f380edc7dd2be8dddeac6dbb1dfc6734eced97a5bd371cb134",
+          "bytes": 35324
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 35324,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/packet.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.checkpoint",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Checkpoint entered",
+        "dispatch": "checkpoint",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -26.82,
+        "rmsDBFS": -41.53,
+        "referenceMaster": {
+          "path": "sources/audio/checkpoint.wav",
+          "sha256": "41541270bb1f45bc5ad2365ab76e8749f44c8a4329ef625a68ecf4469c337ebe",
+          "bytes": 39734
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 39734,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/checkpoint.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.tool",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Tool used successfully",
+        "dispatch": "tool",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -27.355,
+        "rmsDBFS": -44.919,
+        "referenceMaster": {
+          "path": "sources/audio/tool.wav",
+          "sha256": "b4f8472b44fcc06186af0a980ce40d5253bb56000f677ebf02dc2e8e4e9b390e",
+          "bytes": 27386
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 27386,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/tool.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.tool-fail",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Invalid or unavailable tool",
+        "dispatch": "toolFail",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -30.691,
+        "rmsDBFS": -44.207,
+        "referenceMaster": {
+          "path": "sources/audio/tool-fail.wav",
+          "sha256": "05086d5c072e776c98967f5538bc6286d0b7a95ae24d9b3d99290c0e7c895cf5",
+          "bytes": 15038
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 15038,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/tool-fail.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.alert",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Detection warning",
+        "dispatch": "alert",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -28.53,
+        "rmsDBFS": -44.824,
+        "referenceMaster": {
+          "path": "sources/audio/alert.wav",
+          "sha256": "c3e98f30f70ac82d0e44f2459750996b3373c69df8a41044c58ed928fed1a21d",
+          "bytes": 35324
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 35324,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/alert.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.caught",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Caught/failure",
+        "dispatch": "caught",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -25.484,
+        "rmsDBFS": -42.82,
+        "referenceMaster": {
+          "path": "sources/audio/caught.wav",
+          "sha256": "c6d1ea2841438e25a9286c795486dafc1d034c03a0a5b7c7b2e1c0e5d7757e7a",
+          "bytes": 57374
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 57374,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/caught.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.complete",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Level complete",
+        "dispatch": "complete",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -24.847,
+        "rmsDBFS": -39.512,
+        "referenceMaster": {
+          "path": "sources/audio/complete.wav",
+          "sha256": "2b67d1284de87607ac429e556ab1ec00d43c2855c4bf25a2e29928339f13a2d2",
+          "bytes": 66194
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 66194,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/complete.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.click",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "Interface interaction",
+        "dispatch": "click",
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": null,
+        "peakDBFS": -31.12,
+        "rmsDBFS": -46.906,
+        "referenceMaster": {
+          "path": "sources/audio/click.wav",
+          "sha256": "3d62fe6a911cb1d90dec908be33e1be1568735d18dc5e2bb8df1805585a69c0d",
+          "bytes": 9746
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 9746,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "sfx"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/click.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.music-stealth",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "64-step stealth score",
+        "dispatch": null,
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": {
+          "steps": 64,
+          "stepSeconds": 0.33,
+          "startSample": 0,
+          "endSample": 931392,
+          "durationSeconds": 21.12,
+          "construction": "Middle cycle rendered with preceding/following note tails; first scheduler wait omitted"
+        },
+        "peakDBFS": -31.334,
+        "rmsDBFS": -49.795,
+        "referenceMaster": {
+          "path": "sources/audio/music-stealth.wav",
+          "sha256": "c57f33dda354023f0788d3c959c2f7704a69b91f5afa0e949fc65ba1704af1c5",
+          "bytes": 1862828
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 1862828,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "music"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/music-stealth.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.audio.music-search",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio/audio.js",
+      "sourceSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "runtimeRoot": "public/games/signal-zero",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Web Audio API OfflineAudioContext / Microsoft Edge",
+        "promptRecord": "generation/audio-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored oscillator events and score; reusable in this project and its derivatives."
+      },
+      "spec": {
+        "purpose": "64-step score with search pulse layer",
+        "dispatch": null,
+        "sampleRate": 44100,
+        "channels": 1,
+        "referenceFormat": "PCM 16-bit WAV",
+        "runtimeFormat": "Real-time Web Audio oscillators; device-native AudioContext sample rate",
+        "voicesMaximum": 12,
+        "masterGain": 0.55,
+        "referenceSettings": {
+          "sfx": 0.7,
+          "music": 0.45
+        },
+        "loop": {
+          "steps": 64,
+          "stepSeconds": 0.33,
+          "startSample": 0,
+          "endSample": 931392,
+          "durationSeconds": 21.12,
+          "construction": "Middle cycle rendered with preceding/following note tails; first scheduler wait omitted"
+        },
+        "peakDBFS": -30.856,
+        "rmsDBFS": -49.721,
+        "referenceMaster": {
+          "path": "sources/audio/music-search.wav",
+          "sha256": "870ee8dc28274f403d399acd94bcecb3b137c3406f09a5ef54cad19f031a1285",
+          "bytes": 1862828
+        },
+        "transport": "Single active transport; voices disconnected on end, stopped and AudioContext suspended on pause; no WAV requests at runtime."
+      },
+      "budget": {
+        "runtimeBytes": 2538,
+        "runtimeBytesSharedAcrossAudioEntries": true,
+        "referenceBytes": 1862828,
+        "maxSimultaneousVoices": 12
+      },
+      "reuse": {
+        "tags": [
+          "procedural",
+          "synth",
+          "music"
+        ],
+        "compatibleWith": [
+          "signal-zero-audio-v1"
+        ]
+      },
+      "dependencies": [
+        "Web Audio API"
+      ],
+      "derivatives": [
+        "sources/audio/music-search.wav"
+      ]
+    },
+    {
+      "id": "signal-zero.character.runner",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/runner.glb"
+      ],
+      "sha256": {
+        "models/runner.glb": "9a99559b61c5af282b6529ba3b80bb0b13e9dcc49c2df9e9578a284382b8b003"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          0.38,
+          1.6463,
+          0.56
+        ],
+        "bounds": {
+          "min": [
+            -0.215,
+            -0.002,
+            -0.28
+          ],
+          "max": [
+            0.165,
+            1.6443,
+            0.28
+          ]
+        },
+        "triangles": 1584,
+        "drawCalls": 6,
+        "bones": 21,
+        "collision": "data/colliders.json#models/runner",
+        "materialSlots": [
+          "sz-runner-fabric",
+          "sz-rubber",
+          "sz-mint",
+          "sz-runner-armor",
+          "sz-runner-edge",
+          "sz-pink"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 1584,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true,
+            "rootMotion": false,
+            "events": [
+              {
+                "time": 0.16,
+                "event": "footstep-l"
+              },
+              {
+                "time": 0.48,
+                "event": "footstep-r"
+              }
+            ]
+          },
+          {
+            "name": "jump",
+            "duration": 0.5,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "fall",
+            "duration": 0.8,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "crouch",
+            "duration": 1.2,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "ladder",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "climb",
+            "duration": 0.7,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "hack",
+            "duration": 0.9,
+            "loop": true,
+            "rootMotion": false,
+            "events": [
+              {
+                "time": 0.45,
+                "event": "tap"
+              }
+            ]
+          },
+          {
+            "name": "caught",
+            "duration": 0.9,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 191024,
+        "maxSimultaneousInstances": 1,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/runner.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.security.guard",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/guard.glb"
+      ],
+      "sha256": {
+        "models/guard.glb": "69aaa878af76b8d8c77c3e349a4016e4a24c09f8e0e8fa8fcef78cd786573843"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          0.38,
+          1.6463,
+          0.56
+        ],
+        "bounds": {
+          "min": [
+            -0.215,
+            -0.002,
+            -0.28
+          ],
+          "max": [
+            0.165,
+            1.6443,
+            0.28
+          ]
+        },
+        "triangles": 1620,
+        "drawCalls": 5,
+        "bones": 21,
+        "collision": "data/colliders.json#models/guard",
+        "materialSlots": [
+          "sz-armor",
+          "sz-rubber",
+          "sz-amber",
+          "sz-fabric",
+          "sz-edge"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 1620,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true,
+            "rootMotion": false,
+            "events": [
+              {
+                "time": 0.16,
+                "event": "footstep-l"
+              },
+              {
+                "time": 0.48,
+                "event": "footstep-r"
+              }
+            ]
+          },
+          {
+            "name": "jump",
+            "duration": 0.5,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "fall",
+            "duration": 0.8,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "crouch",
+            "duration": 1.2,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "ladder",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "climb",
+            "duration": 0.7,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "hack",
+            "duration": 0.9,
+            "loop": true,
+            "rootMotion": false,
+            "events": [
+              {
+                "time": 0.45,
+                "event": "tap"
+              }
+            ]
+          },
+          {
+            "name": "caught",
+            "duration": 0.9,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "patrol",
+            "duration": 1.0667,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "notice",
+            "duration": 2.8235,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "search",
+            "duration": 1.7778,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "chase",
+            "duration": 0.5424,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 225620,
+        "maxSimultaneousInstances": 9,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "security",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/guard.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.security.camera",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/camera.glb"
+      ],
+      "sha256": {
+        "models/camera.glb": "7d2d606c591e21fdc328fc8b552d77a667e25e3fe052fb7d50af48eefef043af"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "wall-mount",
+        "dimensions": [
+          0.7115,
+          0.45,
+          0.3
+        ],
+        "bounds": {
+          "min": [
+            -0.355,
+            -0.225,
+            -0.15
+          ],
+          "max": [
+            0.3565,
+            0.225,
+            0.15
+          ]
+        },
+        "triangles": 244,
+        "drawCalls": 7,
+        "bones": 0,
+        "collision": "data/colliders.json#models/camera",
+        "materialSlots": [
+          "sz-armor",
+          "sz-edge",
+          "sz-rubber",
+          "sz-security-indicator"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 244,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": [
+          {
+            "name": "idle",
+            "duration": 2,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "alert",
+            "duration": 0.5,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "disabled",
+            "duration": 2,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 25948,
+        "maxSimultaneousInstances": 7,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "security",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/camera.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.security.drone",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/drone.glb"
+      ],
+      "sha256": {
+        "models/drone.glb": "d7ec9a5b974834e3891c7e9278655ed8da47c41a9c2d9a49070b2a8f814b9b78"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "center",
+        "dimensions": [
+          0.68,
+          0.254,
+          0.92
+        ],
+        "bounds": {
+          "min": [
+            -0.34,
+            -0.13,
+            -0.46
+          ],
+          "max": [
+            0.34,
+            0.124,
+            0.46
+          ]
+        },
+        "triangles": 1048,
+        "drawCalls": 9,
+        "bones": 0,
+        "collision": "data/colliders.json#models/drone",
+        "materialSlots": [
+          "sz-edge",
+          "sz-armor",
+          "sz-rubber",
+          "sz-security-indicator",
+          "sz-pink"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 1048,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": [
+          {
+            "name": "idle",
+            "duration": 2,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "alert",
+            "duration": 0.5,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "disabled",
+            "duration": 2,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 57708,
+        "maxSimultaneousInstances": 4,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "security",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/drone.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.security.laser",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/laser.glb"
+      ],
+      "sha256": {
+        "models/laser.glb": "e679babfe5437910cb1418c23d278f63c0853d01cdf1f40f2fdf2bcf3e5cbd8f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          0.29,
+          0.7425,
+          0.31
+        ],
+        "bounds": {
+          "min": [
+            -0.145,
+            0,
+            -0.155
+          ],
+          "max": [
+            0.145,
+            0.7425,
+            0.155
+          ]
+        },
+        "triangles": 120,
+        "drawCalls": 5,
+        "bones": 0,
+        "collision": "data/colliders.json#models/laser",
+        "materialSlots": [
+          "sz-armor",
+          "sz-rubber",
+          "sz-security-indicator",
+          "sz-edge"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 120,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": [
+          {
+            "name": "idle",
+            "duration": 2,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "alert",
+            "duration": 0.5,
+            "loop": true,
+            "rootMotion": false,
+            "events": []
+          },
+          {
+            "name": "disabled",
+            "duration": 2,
+            "loop": false,
+            "rootMotion": false,
+            "events": []
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 16164,
+        "maxSimultaneousInstances": 9,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "security",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/laser.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.prop.terminal",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/terminal.glb"
+      ],
+      "sha256": {
+        "models/terminal.glb": "86e1f3c35a12a7caff832e211308fe07f5ff9e0d501de769abd5ec96613326d0"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          0.72,
+          1.3875,
+          0.735
+        ],
+        "bounds": {
+          "min": [
+            -0.36,
+            0,
+            -0.3
+          ],
+          "max": [
+            0.36,
+            1.3875,
+            0.435
+          ]
+        },
+        "triangles": 216,
+        "drawCalls": 5,
+        "bones": 0,
+        "collision": "data/colliders.json#models/terminal",
+        "materialSlots": [
+          "sz-rubber",
+          "sz-armor",
+          "sz-screen",
+          "sz-mint",
+          "sz-edge"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 216,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 21968,
+        "maxSimultaneousInstances": 4,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "prop",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/terminal.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.prop.exit",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/exit.glb"
+      ],
+      "sha256": {
+        "models/exit.glb": "215fdf90ac6f4784d1c1d55af212fe36c417b960f74e1824a9f2d5e079c093cf"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          2.15,
+          2.6,
+          0.48
+        ],
+        "bounds": {
+          "min": [
+            -1.075,
+            0,
+            -0.24
+          ],
+          "max": [
+            1.075,
+            2.6,
+            0.24
+          ]
+        },
+        "triangles": 132,
+        "drawCalls": 4,
+        "bones": 0,
+        "collision": "data/colliders.json#models/exit",
+        "materialSlots": [
+          "sz-armor",
+          "sz-mint",
+          "sz-edge",
+          "sz-pink"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 132,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 14740,
+        "maxSimultaneousInstances": 1,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "prop",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/exit.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.prop.packet",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/packet.glb"
+      ],
+      "sha256": {
+        "models/packet.glb": "22575fa6b1b6ffb799bb8b44bec268368e363fc3d4978b0d61d2199317bd07a0"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "center",
+        "dimensions": [
+          0.31,
+          0.4375,
+          0.14
+        ],
+        "bounds": {
+          "min": [
+            -0.155,
+            -0.2175,
+            -0.07
+          ],
+          "max": [
+            0.155,
+            0.22,
+            0.07
+          ]
+        },
+        "triangles": 144,
+        "drawCalls": 6,
+        "bones": 0,
+        "collision": "data/colliders.json#models/packet",
+        "materialSlots": [
+          "sz-screen",
+          "sz-armor",
+          "sz-mint",
+          "sz-pink",
+          "sz-edge",
+          "sz-rubber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 144,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 18164,
+        "maxSimultaneousInstances": 1,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "prop",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/packet.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.prop.cover",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/cover.glb"
+      ],
+      "sha256": {
+        "models/cover.glb": "e4dbcf7b6c03d38b9878b4a306c57c7e2837950155589a9b419ee655f9a01bce"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          2.1,
+          1.4,
+          0.905
+        ],
+        "bounds": {
+          "min": [
+            -1.05,
+            0,
+            -0.44
+          ],
+          "max": [
+            1.05,
+            1.4,
+            0.465
+          ]
+        },
+        "triangles": 300,
+        "drawCalls": 4,
+        "bones": 0,
+        "collision": "data/colliders.json#models/cover",
+        "materialSlots": [
+          "sz-armor",
+          "sz-edge",
+          "sz-rubber",
+          "sz-mint"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 300,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 25344,
+        "maxSimultaneousInstances": 47,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "prop",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/cover.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.prop.ladder",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/ladder.glb"
+      ],
+      "sha256": {
+        "models/ladder.glb": "8158ff8bd22d3fcadd7e3996da4edc8ff6221327afcfcedda190a4c181b871d2"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          0.74,
+          3,
+          0.26
+        ],
+        "bounds": {
+          "min": [
+            -0.37,
+            0,
+            -0.2
+          ],
+          "max": [
+            0.37,
+            3,
+            0.06
+          ]
+        },
+        "triangles": 360,
+        "drawCalls": 3,
+        "bones": 0,
+        "collision": "data/colliders.json#models/ladder",
+        "materialSlots": [
+          "sz-edge",
+          "sz-armor",
+          "sz-mint"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 360,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 26524,
+        "maxSimultaneousInstances": 20,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "prop",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/ladder.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.prop.platform",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/platform.glb"
+      ],
+      "sha256": {
+        "models/platform.glb": "0ce3e832d520102dcae7d084ee5a5b2d9161cf32b1238f4e6fd92ad90171072e"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "top-center",
+        "dimensions": [
+          4,
+          0.357,
+          1.4475
+        ],
+        "bounds": {
+          "min": [
+            -2,
+            -0.35,
+            -0.7
+          ],
+          "max": [
+            2,
+            0.007,
+            0.7475
+          ]
+        },
+        "triangles": 96,
+        "drawCalls": 5,
+        "bones": 0,
+        "collision": "data/colliders.json#models/platform",
+        "materialSlots": [
+          "sz-armor",
+          "sz-edge",
+          "sz-rubber",
+          "sz-mint",
+          "sz-pink"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 96,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 13420,
+        "maxSimultaneousInstances": 36,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "prop",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/platform.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.environment.city",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/city.glb"
+      ],
+      "sha256": {
+        "models/city.glb": "e823a1d6c48cb8654281165703723a7300fa55800e3ce78ad87bd02cf77ec548"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          7.8,
+          7.68,
+          2.8345
+        ],
+        "bounds": {
+          "min": [
+            -3.9,
+            0,
+            -1.4
+          ],
+          "max": [
+            3.9,
+            7.68,
+            1.4345
+          ]
+        },
+        "triangles": 3236,
+        "drawCalls": 4,
+        "bones": 0,
+        "collision": "data/colliders.json#models/city",
+        "materialSlots": [
+          "sz-armor",
+          "sz-rubber",
+          "sz-edge",
+          "sz-amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 3236,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 127820,
+        "maxSimultaneousInstances": 4,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "environment",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/city.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.environment.archive",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/archive.glb"
+      ],
+      "sha256": {
+        "models/archive.glb": "dc7b2733942fc761a27c0cacc56cc0da6a2b8e620f5f865b21d69eb4dcc586f3"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          7.8,
+          7.8,
+          2.8345
+        ],
+        "bounds": {
+          "min": [
+            -3.9,
+            0,
+            -1.4
+          ],
+          "max": [
+            3.9,
+            7.8,
+            1.4345
+          ]
+        },
+        "triangles": 1416,
+        "drawCalls": 7,
+        "bones": 0,
+        "collision": "data/colliders.json#models/archive",
+        "materialSlots": [
+          "sz-armor",
+          "sz-rubber",
+          "sz-mint",
+          "sz-edge",
+          "sz-archive-glass",
+          "sz-screen",
+          "sz-pink"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 1416,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 108684,
+        "maxSimultaneousInstances": 4,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "environment",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/archive.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.environment.core",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/procedural-models.js",
+      "sourceSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "runtime": [
+        "models/core.glb"
+      ],
+      "sha256": {
+        "models/core.glb": "6cf66523b2fb9697cc043e8a9583fd5832ff50412a4e73c05b399d5e0c9d0b66"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 + project procedural asset recipe",
+        "promptRecord": "generation/model-brief.md",
+        "referenceSources": [],
+        "rights": "Original project-authored geometry, rig, materials and animation. Reuse within and derivative from this project is permitted. Three.js code is MIT; see runtime vendor/THREE-LICENSE.txt."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "pivot": "base-center",
+        "dimensions": [
+          7.8,
+          7.785,
+          2.8345
+        ],
+        "bounds": {
+          "min": [
+            -3.9,
+            0,
+            -1.4
+          ],
+          "max": [
+            3.9,
+            7.785,
+            1.4345
+          ]
+        },
+        "triangles": 1660,
+        "drawCalls": 5,
+        "bones": 0,
+        "collision": "data/colliders.json#models/core",
+        "materialSlots": [
+          "sz-armor",
+          "sz-rubber",
+          "sz-pink",
+          "sz-edge",
+          "sz-screen"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 1660,
+            "policy": "Single low-polygon geometry LOD; reduce scene density/shadows/DPR externally. No sprite substitution."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Primitive UVs retained; all current PBR materials are untextured scalar materials.",
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 81532,
+        "maxSimultaneousInstances": 4,
+        "instanceBudgetScope": "Maximum resident instances in one authored full chapter, not visible-only. Platform count conservatively includes ground boxes; one regional environment type is present per chapter."
+      },
+      "reuse": {
+        "tags": [
+          "environment",
+          "industrial",
+          "mint-magenta",
+          "modular"
+        ],
+        "compatibleWith": [
+          "signal-zero-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": [
+        "models/core.glb"
+      ]
+    },
+    {
+      "id": "signal-zero.data.colliders",
+      "version": "1.0.0",
+      "kind": "collision-data",
+      "source": "sources/colliders.json",
+      "runtime": [
+        "data/colliders.json"
+      ],
+      "sha256": {
+        "data/colliders.json": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Signal Zero asset maker",
+        "createdAt": "2026-10-25",
+        "rights": "Original project-authored independent collision data."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+X",
+        "shapes": [
+          "box",
+          "capsule-y",
+          "sphere",
+          "compound"
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 5332
+      },
+      "dependencies": [],
+      "derivatives": []
+    }
+  ]
+}

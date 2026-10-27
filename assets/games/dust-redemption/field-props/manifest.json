@@ -1,0 +1,612 @@
+{
+  "schemaVersion": 1,
+  "id": "dust-redemption.field-props",
+  "version": "1.0.0",
+  "stage": "integrated",
+  "source": "games/dust-redemption/field-props.js",
+  "sourceSha256": "ef45eda0d893b147de737b75b05da8538408953393820bb338f069046bc3d1a4",
+  "sourceBytes": 22780,
+  "runtime": [
+    "public/games/dust-redemption/field-props.js"
+  ],
+  "dependencies": [
+    {
+      "name": "three",
+      "version": "0.180.0",
+      "providedBy": "Caller passes the existing pinned THREE namespace"
+    }
+  ],
+  "provenance": {
+    "method": "original-procedural",
+    "creator": "Dust & Redemption asset maker",
+    "createdAt": "2026-10-25",
+    "referenceSources": [],
+    "rights": "Original project geometry, palette and mechanical designs; editable and reusable with this project. No external images, fonts or commercial symbols."
+  },
+  "assets": [
+    {
+      "assetId": "dust-redemption.field-prop.water-valve",
+      "version": "1.0.0",
+      "kind": "water-valve",
+      "unit": "meter",
+      "up": "+Y",
+      "forward": "+Z",
+      "pivot": "base-center",
+      "dimensions": [
+        0.76,
+        1.24,
+        0.7375
+      ],
+      "dynamicParts": {
+        "wheel": {
+          "node": "field-water-valve-wheel",
+          "property": "rotation.z",
+          "range": [
+            0,
+            12.566370614359172
+          ],
+          "initial": 0,
+          "loop": false,
+          "purpose": "Turn through two revolutions to open the supply valve."
+        },
+        "gauge-needle": {
+          "node": "field-water-valve-gauge-needle",
+          "property": "rotation.z",
+          "range": [
+            -0.9,
+            0.9
+          ],
+          "initial": -0.9,
+          "loop": false,
+          "purpose": "Visible supply-pressure feedback; not a hidden gameplay value."
+        }
+      },
+      "interactionPoints": [
+        {
+          "id": "wheel",
+          "position": [
+            0,
+            0.96,
+            0.42125
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "rotate"
+        }
+      ],
+      "collision": {
+        "movementProxies": [
+          {
+            "shape": "box",
+            "center": [
+              0,
+              0.6,
+              0.08125
+            ],
+            "size": [
+              0.76,
+              1.2,
+              0.9
+            ]
+          }
+        ],
+        "shotOcclusion": "render-mesh",
+        "animatedGeometryRequiresWorldMatrixUpdate": true
+      },
+      "materialSlots": [
+        "frontier-painted-wood",
+        "frontier-forged-metal"
+      ],
+      "textureRightsIndex": {
+        "id": "dust-redemption.original-vertex-palette-v1",
+        "textures": [],
+        "method": "Original procedural geometry and vertex colour; no external images, fonts or symbols.",
+        "rights": "Original project asset; reusable and editable with this project."
+      },
+      "budget": {
+        "drawCalls": 4,
+        "triangles": 736,
+        "textureBytes": 0
+      },
+      "lifecycle": "Caller owns geometry and materials; no shared texture allocation. Dispose unique geometry/material once after removing the root."
+    },
+    {
+      "assetId": "dust-redemption.field-prop.telegraph",
+      "version": "1.0.0",
+      "kind": "telegraph",
+      "unit": "meter",
+      "up": "+Y",
+      "forward": "+Z",
+      "pivot": "base-center",
+      "dimensions": [
+        1.05,
+        1.0975,
+        0.85201
+      ],
+      "dynamicParts": {
+        "lever": {
+          "node": "field-telegraph-lever",
+          "property": "rotation.x",
+          "range": [
+            0,
+            0.22
+          ],
+          "initial": 0,
+          "loop": false,
+          "purpose": "Press and release a physical telegraph key."
+        }
+      },
+      "interactionPoints": [
+        {
+          "id": "key",
+          "position": [
+            -0.18,
+            1.08,
+            0.36101
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "press-release"
+        }
+      ],
+      "collision": {
+        "movementProxies": [
+          {
+            "shape": "box",
+            "center": [
+              0,
+              0.5,
+              -0.01899
+            ],
+            "size": [
+              1.05,
+              1,
+              0.64
+            ]
+          }
+        ],
+        "shotOcclusion": "render-mesh",
+        "animatedGeometryRequiresWorldMatrixUpdate": true
+      },
+      "materialSlots": [
+        "frontier-painted-wood",
+        "frontier-forged-metal",
+        "frontier-cloth-paper"
+      ],
+      "textureRightsIndex": {
+        "id": "dust-redemption.original-vertex-palette-v1",
+        "textures": [],
+        "method": "Original procedural geometry and vertex colour; no external images, fonts or symbols.",
+        "rights": "Original project asset; reusable and editable with this project."
+      },
+      "budget": {
+        "drawCalls": 4,
+        "triangles": 700,
+        "textureBytes": 0
+      },
+      "lifecycle": "Caller owns geometry and materials; no shared texture allocation. Dispose unique geometry/material once after removing the root."
+    },
+    {
+      "assetId": "dust-redemption.field-prop.medicine",
+      "version": "1.0.0",
+      "kind": "medicine",
+      "unit": "meter",
+      "up": "+Y",
+      "forward": "+Z",
+      "pivot": "base-center",
+      "dimensions": [
+        1.02,
+        0.8325,
+        0.788
+      ],
+      "dynamicParts": {
+        "lid": {
+          "node": "field-medicine-lid",
+          "property": "rotation.x",
+          "range": [
+            0,
+            -1.35
+          ],
+          "initial": 0,
+          "loop": false,
+          "purpose": "Open the cargo lid after verifying its seal."
+        },
+        "seal": {
+          "node": "field-medicine-seal",
+          "property": "visible",
+          "range": [
+            true,
+            false
+          ],
+          "initial": true,
+          "loop": false,
+          "purpose": "The intact seal disappears only when the accepted interaction opens it."
+        }
+      },
+      "interactionPoints": [
+        {
+          "id": "seal",
+          "position": [
+            0,
+            0.58,
+            0.406
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "inspect-seal"
+        },
+        {
+          "id": "lid",
+          "position": [
+            0,
+            0.8,
+            0.316
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "open"
+        }
+      ],
+      "collision": {
+        "movementProxies": [
+          {
+            "shape": "box",
+            "center": [
+              0,
+              0.4,
+              -0.024
+            ],
+            "size": [
+              1.02,
+              0.8,
+              0.76
+            ]
+          }
+        ],
+        "shotOcclusion": "render-mesh",
+        "animatedGeometryRequiresWorldMatrixUpdate": true
+      },
+      "materialSlots": [
+        "frontier-painted-wood",
+        "frontier-forged-metal",
+        "frontier-cloth-paper"
+      ],
+      "textureRightsIndex": {
+        "id": "dust-redemption.original-vertex-palette-v1",
+        "textures": [],
+        "method": "Original procedural geometry and vertex colour; no external images, fonts or symbols.",
+        "rights": "Original project asset; reusable and editable with this project."
+      },
+      "budget": {
+        "drawCalls": 5,
+        "triangles": 840,
+        "textureBytes": 0
+      },
+      "lifecycle": "Caller owns geometry and materials; no shared texture allocation. Dispose unique geometry/material once after removing the root."
+    },
+    {
+      "assetId": "dust-redemption.field-prop.ledger",
+      "version": "1.0.0",
+      "kind": "ledger",
+      "unit": "meter",
+      "up": "+Y",
+      "forward": "+Z",
+      "pivot": "base-center",
+      "dimensions": [
+        0.92,
+        0.825,
+        0.7025
+      ],
+      "dynamicParts": {
+        "drawer": {
+          "node": "field-ledger-drawer",
+          "property": "position.z",
+          "range": [
+            -0.001249989271163949,
+            0.3187500107288361
+          ],
+          "initial": -0.001249989271163949,
+          "loop": false,
+          "purpose": "Pull out the document drawer to compare stored accounts."
+        },
+        "book-cover": {
+          "node": "field-ledger-book-cover",
+          "property": "rotation.z",
+          "range": [
+            0,
+            1.65
+          ],
+          "initial": 0,
+          "loop": false,
+          "purpose": "Open the ledger cover; document text remains localisable UI."
+        }
+      },
+      "interactionPoints": [
+        {
+          "id": "drawer",
+          "position": [
+            0,
+            0.25,
+            0.37875
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "pull"
+        },
+        {
+          "id": "ledger",
+          "position": [
+            0.03,
+            0.82,
+            0.21875
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "read-open"
+        }
+      ],
+      "collision": {
+        "movementProxies": [
+          {
+            "shape": "box",
+            "center": [
+              0,
+              0.42,
+              -0.02125
+            ],
+            "size": [
+              0.92,
+              0.84,
+              0.72
+            ]
+          }
+        ],
+        "shotOcclusion": "render-mesh",
+        "animatedGeometryRequiresWorldMatrixUpdate": true
+      },
+      "materialSlots": [
+        "frontier-painted-wood",
+        "frontier-forged-metal",
+        "frontier-cloth-paper"
+      ],
+      "textureRightsIndex": {
+        "id": "dust-redemption.original-vertex-palette-v1",
+        "textures": [],
+        "method": "Original procedural geometry and vertex colour; no external images, fonts or symbols.",
+        "rights": "Original project asset; reusable and editable with this project."
+      },
+      "budget": {
+        "drawCalls": 5,
+        "triangles": 348,
+        "textureBytes": 0
+      },
+      "lifecycle": "Caller owns geometry and materials; no shared texture allocation. Dispose unique geometry/material once after removing the root."
+    },
+    {
+      "assetId": "dust-redemption.field-prop.signal",
+      "version": "1.0.0",
+      "kind": "signal",
+      "unit": "meter",
+      "up": "+Y",
+      "forward": "+Z",
+      "pivot": "base-center",
+      "dimensions": [
+        1.065,
+        2.24,
+        0.6075
+      ],
+      "dynamicParts": {
+        "knife-switch": {
+          "node": "field-signal-knife-switch",
+          "property": "rotation.x",
+          "range": [
+            0,
+            1.15
+          ],
+          "initial": 0,
+          "loop": false,
+          "purpose": "Pull the knife switch away from its upper contact to cut the signal."
+        },
+        "indicator": {
+          "node": "field-signal-indicator",
+          "property": "material.emissiveIntensity",
+          "range": [
+            0.65,
+            0
+          ],
+          "initial": 0.65,
+          "loop": false,
+          "purpose": "Visible powered/cut state; no extra dynamic light."
+        },
+        "semaphore": {
+          "node": "field-signal-semaphore",
+          "property": "rotation.z",
+          "range": [
+            0,
+            -0.85
+          ],
+          "initial": 0,
+          "loop": false,
+          "purpose": "Mechanical fallback status visible when the lamp is cut."
+        }
+      },
+      "interactionPoints": [
+        {
+          "id": "switch",
+          "position": [
+            0.0125,
+            0.84,
+            0.34625
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "disconnect"
+        }
+      ],
+      "collision": {
+        "movementProxies": [
+          {
+            "shape": "box",
+            "center": [
+              0.0125,
+              1.12,
+              -0.02375
+            ],
+            "size": [
+              1.02,
+              2.24,
+              0.56
+            ]
+          }
+        ],
+        "shotOcclusion": "render-mesh",
+        "animatedGeometryRequiresWorldMatrixUpdate": true
+      },
+      "materialSlots": [
+        "frontier-painted-wood",
+        "frontier-forged-metal",
+        "frontier-amber-lamp"
+      ],
+      "textureRightsIndex": {
+        "id": "dust-redemption.original-vertex-palette-v1",
+        "textures": [],
+        "method": "Original procedural geometry and vertex colour; no external images, fonts or symbols.",
+        "rights": "Original project asset; reusable and editable with this project."
+      },
+      "budget": {
+        "drawCalls": 5,
+        "triangles": 692,
+        "textureBytes": 0
+      },
+      "lifecycle": "Caller owns geometry and materials; no shared texture allocation. Dispose unique geometry/material once after removing the root."
+    },
+    {
+      "assetId": "dust-redemption.field-prop.evacuation",
+      "version": "1.0.0",
+      "kind": "evacuation",
+      "unit": "meter",
+      "up": "+Y",
+      "forward": "+Z",
+      "pivot": "base-center",
+      "dimensions": [
+        1.46,
+        1.562,
+        2.55
+      ],
+      "dynamicParts": {
+        "left-wheel": {
+          "node": "field-evacuation-left-wheel",
+          "property": "rotation.x",
+          "range": [
+            0,
+            6.283185307179586
+          ],
+          "initial": 0,
+          "loop": true,
+          "purpose": "Rotate by travelled distance / 0.39 metre wheel radius."
+        },
+        "right-wheel": {
+          "node": "field-evacuation-right-wheel",
+          "property": "rotation.x",
+          "range": [
+            0,
+            6.283185307179586
+          ],
+          "initial": 0,
+          "loop": true,
+          "purpose": "Rotate by travelled distance / 0.39 metre wheel radius."
+        },
+        "lantern": {
+          "node": "field-evacuation-lantern",
+          "property": "material.emissiveIntensity",
+          "range": [
+            0.3,
+            0.9
+          ],
+          "initial": 0.65,
+          "loop": false,
+          "purpose": "Route-ready feedback without a costly extra light."
+        }
+      },
+      "interactionPoints": [
+        {
+          "id": "handles",
+          "position": [
+            0,
+            0.85,
+            -1.195
+          ],
+          "facing": [
+            0,
+            0,
+            1
+          ],
+          "action": "escort-pull"
+        }
+      ],
+      "collision": {
+        "movementProxies": [
+          {
+            "shape": "box",
+            "center": [
+              0,
+              0.7,
+              0.225
+            ],
+            "size": [
+              1.46,
+              1.4,
+              2.9
+            ]
+          }
+        ],
+        "shotOcclusion": "render-mesh",
+        "animatedGeometryRequiresWorldMatrixUpdate": true
+      },
+      "materialSlots": [
+        "frontier-painted-wood",
+        "frontier-forged-metal",
+        "frontier-cloth-paper",
+        "frontier-amber-lamp"
+      ],
+      "textureRightsIndex": {
+        "id": "dust-redemption.original-vertex-palette-v1",
+        "textures": [],
+        "method": "Original procedural geometry and vertex colour; no external images, fonts or symbols.",
+        "rights": "Original project asset; reusable and editable with this project."
+      },
+      "budget": {
+        "drawCalls": 7,
+        "triangles": 1392,
+        "textureBytes": 0
+      },
+      "lifecycle": "Caller owns geometry and materials; no shared texture allocation. Dispose unique geometry/material once after removing the root."
+    }
+  ],
+  "limitations": [
+    "Built into the fingerprinted runtime; asset verification does not replace gameplay acceptance.",
+    "Per-object draws exclude scene shadows and postprocessing.",
+    "Interaction rules, timing, rewards and accessible text remain owned by the game."
+  ]
+}

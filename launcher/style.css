@@ -1,0 +1,17 @@
+:root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; background: #121418; color: #f5f4ed; } /* 使用系統字型，沒有 Google Fonts 或字型下載。 */
+* { box-sizing: border-box; } /* 讓格線寬度包含邊框與內距。 */
+body { margin: 0; } /* 移除瀏覽器預設邊距。 */
+main { max-width: 1120px; margin: 0 auto; padding: 64px 28px 40px; } /* 保留舒適閱讀寬度與手機安全邊界。 */
+.eyebrow { color: #bff471; font-weight: 750; letter-spacing: .16em; font-size: .8rem; } /* 小標提供清楚但不喧賓奪主的識別。 */
+h1 { margin: 26px 0; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.12; letter-spacing: -.04em; } /* 標題依螢幕寬度縮放。 */
+.intro { color: #c4c7cb; font-size: 1.1rem; line-height: 1.7; max-width: 680px; } /* 內文維持足夠對比與行距。 */
+.notice { margin: 30px 0; padding: 18px 22px; border-left: 3px solid #e8b36a; background: #23231f; color: #e9d5b9; line-height: 1.7; } /* 明顯揭露尚未完成整體驗收。 */
+.games { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 32px 0; } /* 桌面使用兩欄，避免八款入口過度擁擠。 */
+.games a { display: grid; grid-template-columns: 34px 1fr; gap: 7px 14px; padding: 24px; color: inherit; text-decoration: none; border: 1px solid #34383f; border-radius: 12px; background: #1b1e24; } /* 卡片全區可點且保留原生連結語意。 */
+.games a:hover { background: #252b31; border-color: #bff471; } /* 滑鼠懸停只改變顏色，不造成版面位移。 */
+.games a:focus-visible { outline: 3px solid #bff471; outline-offset: 4px; } /* 鍵盤焦點保持清楚可見。 */
+.games span { grid-row: span 2; color: #8b929b; font-size: .85rem; padding-top: 2px; } /* 編號不干擾遊戲名稱閱讀。 */
+.games strong { font-size: 1.12rem; } /* 遊戲名稱是卡片主要內容。 */
+.games small { color: #bff471; } /* 操作提示維持可讀對比。 */
+footer { color: #a6adb7; font-size: .82rem; line-height: 1.8; border-top: 1px solid #34383f; padding-top: 22px; } /* 授權範圍持續可見。 */
+@media (max-width: 600px) { .games { grid-template-columns: 1fr; } main { padding: 36px 20px; } } /* 小螢幕改用單欄，不縮小可點選區域。 */

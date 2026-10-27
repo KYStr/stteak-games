@@ -1,0 +1,1569 @@
+{
+  "schemaVersion": 1,
+  "id": "dust-redemption.frontier-kit",
+  "version": "1.0.1",
+  "source": "recipes/build-frontier-kit.mjs",
+  "sourceDependencies": [
+    "sources/palette.json"
+  ],
+  "runtime": [
+    "models/frontier-kit.glb",
+    "data/colliders.json",
+    "data/rig.json",
+    "textures/wood-grain.png",
+    "textures/cloth-grain.png",
+    "textures/stone-grain.png"
+  ],
+  "sha256": {
+    "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f",
+    "data/colliders.json": "21d06ffcecd0c28d04ebeec11be5dce3274101eb71d1ee410330b7674c0b2324",
+    "data/rig.json": "ec0622185ffa81df65a3ab927efb0cfa629d4407435dacbcfe86c5c335c51e25",
+    "textures/wood-grain.png": "6bf8bfc1de3e46f08e9cb241c1cbdbe9cc5ce1aa0f9d6f8057aff32fcdf6d2f1",
+    "textures/cloth-grain.png": "c66aea461ba84f57408d2b641bd6b30a5e3850ddf3994bee69bee513aa7db91f",
+    "textures/stone-grain.png": "734fb16f62f58987eac7aa3a42c174c1abde36fd2cfa62563ddd8f3cccc25604"
+  },
+  "bytes": {
+    "models/frontier-kit.glb": 2352012,
+    "data/colliders.json": 9259,
+    "data/rig.json": 5081,
+    "textures/wood-grain.png": 13263,
+    "textures/cloth-grain.png": 335,
+    "textures/stone-grain.png": 14261
+  },
+  "provenance": {
+    "method": "original-procedural",
+    "creator": "Dust & Redemption asset maker",
+    "createdAt": "2026-10-25",
+    "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+    "promptRecord": "generation/production-record.md",
+    "referenceSources": [],
+    "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+  },
+  "spec": {
+    "unit": "meter",
+    "up": "+Y",
+    "forward": "+Z",
+    "pivot": "base-center",
+    "rig": "frontier-humanoid-v1",
+    "collision": "data/colliders.json (separate simplified colliders)",
+    "materialSlots": [
+      "woven-cloth",
+      "skin-leather",
+      "forged-metal",
+      "weathered-wood",
+      "sandstone"
+    ],
+    "textureColorSpace": {
+      "baseColor": "sRGB"
+    },
+    "textures": {
+      "width": 128,
+      "height": 128,
+      "channels": "RGBA8",
+      "repeat": true,
+      "purpose": "Original neutral base-color modulation; hue is vertex color; no baked shadows or text."
+    },
+    "lod": [
+      {
+        "level": 0,
+        "policy": "Low-poly runtime assets. Repeated environment templates can be instanced. Far distant scenery may be omitted; no billboard substitutions."
+      }
+    ],
+    "poseTargets": {
+      "standingBodyMax": 1.85,
+      "standingMuzzle": 1.35,
+      "coverBodyMax": 0.95,
+      "coverMuzzle": 0.55,
+      "peekMuzzle": 1.65,
+      "feetGroundTolerance": 0.015,
+      "boneScale": [
+        1,
+        1,
+        1
+      ],
+      "standingStance": "slightly bent knees; fixed bone lengths",
+      "coverStance": "deep squat with forward spine and tucked head; flat planted feet",
+      "peekStance": "standing with raised aiming arms"
+    },
+    "weaponAttachments": {
+      "revolver": {
+        "node": "weapon-revolver",
+        "schemaVersion": 1,
+        "socketSemantic": "weaponSocket",
+        "position": [
+          0,
+          -0.17,
+          -0.065
+        ],
+        "rotation": [
+          1.5707963267948966,
+          0,
+          0
+        ],
+        "muzzle": "weapon-revolver__muzzle",
+        "muzzlePosition": [
+          0,
+          0.19787222526967527,
+          0.2261040559411049
+        ]
+      },
+      "rifle": {
+        "node": "weapon-rifle",
+        "schemaVersion": 1,
+        "socketSemantic": "weaponSocket",
+        "position": [
+          0,
+          -0.16,
+          -0.011480535697191957
+        ],
+        "rotation": [
+          1.5707963267948966,
+          0,
+          0
+        ],
+        "muzzle": "weapon-rifle__muzzle",
+        "muzzlePosition": [
+          0,
+          0.14435276096686722,
+          0.5521383023262024
+        ]
+      }
+    }
+  },
+  "budget": {
+    "runtimeBytes": 2394211,
+    "decodedTextureBytes": 196608,
+    "maxSimultaneousCharacters": 10,
+    "skinnedDrawCallsPerCharacter": 3,
+    "assetTriangles": 8100
+  },
+  "assets": [
+    {
+      "id": "dust-redemption.hero",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "hero",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 640,
+        "collision": "data/colliders.json#assets/hero",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "poncho",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.enemy-guard",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "enemy-guard",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 648,
+        "collision": "data/colliders.json#assets/enemy-guard",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "badge",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.enemy-flanker",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "enemy-flanker",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 652,
+        "collision": "data/colliders.json#assets/enemy-flanker",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "scarf",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.enemy-shotgun",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "enemy-shotgun",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 700,
+        "collision": "data/colliders.json#assets/enemy-shotgun",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "bandolier",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.enemy-sniper",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "enemy-sniper",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 708,
+        "collision": "data/colliders.json#assets/enemy-sniper",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "hood",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.npc-mara",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "npc-mara",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 648,
+        "collision": "data/colliders.json#assets/npc-mara",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "badge",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.npc-elias",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "npc-elias",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 640,
+        "collision": "data/colliders.json#assets/npc-elias",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "apron",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.npc-june",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "npc-june",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 652,
+        "collision": "data/colliders.json#assets/npc-june",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "scarf",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.npc-sol",
+      "version": "1.0.1",
+      "kind": "skinned-model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "npc-sol",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.75,
+          1.975,
+          0.56
+        ],
+        "triangles": 700,
+        "collision": "data/colliders.json#assets/npc-sol",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 10
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "bandolier",
+          "humanoid"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.crate-low",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "crate-low",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.585,
+          0.935,
+          1.205
+        ],
+        "triangles": 180,
+        "collision": "data/colliders.json#assets/crate-low",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "cover",
+          "crate",
+          "wood"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.crate-high",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "crate-high",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.285,
+          1.685,
+          1.205
+        ],
+        "triangles": 180,
+        "collision": "data/colliders.json#assets/crate-high",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "cover",
+          "crate",
+          "wood"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.barrel",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "barrel",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.73,
+          0.9475,
+          0.73
+        ],
+        "triangles": 240,
+        "collision": "data/colliders.json#assets/barrel",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "cover",
+          "barrel"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.rock-low",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "rock-low",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.6,
+          0.85,
+          1.82
+        ],
+        "triangles": 80,
+        "collision": "data/colliders.json#assets/rock-low",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "cover",
+          "rock",
+          "canyon"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.rock-high",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "rock-high",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          3.2,
+          2.25,
+          2.24
+        ],
+        "triangles": 80,
+        "collision": "data/colliders.json#assets/rock-high",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "cover",
+          "rock",
+          "canyon"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.wall-wood",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "wall-wood",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.1,
+          1.85,
+          0.295
+        ],
+        "triangles": 120,
+        "collision": "data/colliders.json#assets/wall-wood",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "wall",
+          "station",
+          "mine"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.rail-segment",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "rail-segment",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.9,
+          0.24,
+          4
+        ],
+        "triangles": 96,
+        "collision": "data/colliders.json#assets/rail-segment",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "station",
+          "rail",
+          "modular-4m"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.station-canopy",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "station-canopy",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          4.6,
+          3.1782,
+          2.806
+        ],
+        "triangles": 96,
+        "collision": "data/colliders.json#assets/station-canopy",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "station",
+          "shelter",
+          "modular"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.mine-arch",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "mine-arch",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.85,
+          2.975,
+          0.585
+        ],
+        "triangles": 72,
+        "collision": "data/colliders.json#assets/mine-arch",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "mine",
+          "entrance",
+          "modular"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.water-tower",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "water-tower",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.5,
+          5.305,
+          2.5
+        ],
+        "triangles": 264,
+        "collision": "data/colliders.json#assets/water-tower",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "town",
+          "station",
+          "landmark"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.weapon-revolver",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "weapon-revolver",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.14,
+          0.2729,
+          0.4522
+        ],
+        "triangles": 68,
+        "collision": "data/colliders.json#assets/weapon-revolver",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "weapon",
+          "revolver"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.weapon-rifle",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "weapon-rifle",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.07,
+          0.2194,
+          1.1043
+        ],
+        "triangles": 80,
+        "collision": "data/colliders.json#assets/weapon-rifle",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "weapon",
+          "rifle"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.horse",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "horse",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.72,
+          2.26,
+          2.1669
+        ],
+        "triangles": 472,
+        "collision": "data/colliders.json#assets/horse",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "horse",
+          "travel"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "dust-redemption.saloon-front",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "recipes/build-frontier-kit.mjs",
+      "runtime": [
+        "models/frontier-kit.glb"
+      ],
+      "node": "saloon-front",
+      "sha256": {
+        "models/frontier-kit.glb": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Dust & Redemption asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js + Three.js 0.180.0 GLTFExporter; original geometry / PNG recipe",
+        "promptRecord": "generation/production-record.md",
+        "referenceSources": [],
+        "rights": "Original project assets; source and generated assets may be reused and modified with this project. Three.js engine MIT license is tracked in the game dependency lockfile."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          4.4,
+          3.9,
+          1.15
+        ],
+        "triangles": 84,
+        "collision": "data/colliders.json#assets/saloon-front",
+        "materialSlots": [
+          "woven-cloth",
+          "skin-leather",
+          "forged-metal",
+          "weathered-wood",
+          "sandstone"
+        ],
+        "lod": []
+      },
+      "budget": {
+        "runtimeBytes": 2352012,
+        "sharedContainer": true,
+        "maxSimultaneousInstances": 24
+      },
+      "reuse": {
+        "tags": [
+          "town",
+          "saloon",
+          "facade-with-volume"
+        ],
+        "compatibleWith": [
+          "frontier-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "dust-redemption.frontier-kit"
+      ],
+      "derivatives": []
+    }
+  ],
+  "validation": {
+    "recipe": "recipes/verify-frontier-poses.mjs",
+    "evidence": "generation/pose-verification.json",
+    "contract": "Real GLTFLoader + CPU skinning of every vertex; named weapon muzzle nodes; no character scaling."
+  }
+}

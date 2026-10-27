@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#193b38"><link rel="icon" href="data:,"><title>苔蘚與月光 · Moss & Moon</title><link rel="stylesheet" href="./style.css"><link rel="modulepreload" href="./main.js"><link rel="modulepreload" href="./world.js"><link rel="modulepreload" href="./models.js"><link rel="modulepreload" href="./vendor/three.module.js"><link rel="modulepreload" href="./vendor/three.core.js"></head>
+<body>
+<main id="game" aria-label="苔蘚與月光三維庭園">
+ <canvas id="world" tabindex="0" aria-label="三維庭園。WASD 移動，E 互動，Q R 轉鏡。也可用選格面板操作。"></canvas>
+ <div id="labels" aria-hidden="true"></div>
+ <header class="hud"><div class="brand"><span class="eyebrow">MOSS & MOON</span><h1>苔蘚與月光</h1><div id="day">第 1 日 · 新月</div></div><div class="resources"><span id="coins">◈ 24</span><span id="rating">萌芽庭園</span><button data-open="settings" aria-label="設定與暫停">Ⅱ</button></div></header>
+ <aside class="goal"><span class="eyebrow">一點點，把世界養大</span><p id="goal"></p><button data-open="journal">翻開庭園手帳 <span>↗</span></button></aside>
+ <nav class="world-nav" aria-label="目的地"><button data-region="garden" class="active">⌂ 庭園</button><button data-open="map">♧ 散步採集</button><button data-open="quests">♡ 鄰居</button><button data-open="shop">◈ 小舖</button></nav>
+ <div id="context" class="context" aria-live="polite"></div>
+ <div id="toast" class="toast" role="status"></div>
+ <div class="view-tools"><button data-camera="-1" aria-label="向左旋轉相機 Q">↶</button><button data-camera="1" aria-label="向右旋轉相機 R">↷</button><button data-zoom="-1" aria-label="拉近">＋</button><button data-zoom="1" aria-label="拉遠">−</button></div>
+ <nav class="dock" aria-label="庭園工具"><button data-tool="plant" class="active"><span>♧</span>種植 <kbd>1</kbd></button><button data-tool="water"><span>♒</span>澆水 <kbd>2</kbd></button><button data-tool="harvest"><span>✂</span>收成 <kbd>3</kbd></button><button data-tool="decorate"><span>⌑</span>佈置 <kbd>4</kbd></button><i></i><button data-open="bag"><span>▱</span>背包</button><button data-open="craft"><span>⚒</span>手作</button><button data-open="sleep"><span>☾</span>睡覺</button></nav>
+ <div id="seedbar" class="seedbar"></div>
+ <div class="touch-pad" aria-label="移動控制"><button data-move="up" aria-label="往前移動">↑</button><button data-move="left" aria-label="往左移動">←</button><button data-move="down" aria-label="往後移動">↓</button><button data-move="right" aria-label="往右移動">→</button><button id="interact" aria-label="互動">E</button></div>
+ <footer class="caption"><span id="region-label">月光庭園</span><span id="save-status">在這裡，時間由你決定。</span><button data-open="help">操作說明 ?</button></footer>
+ <section id="welcome" class="veil"><div class="welcome-sheet"><span class="eyebrow">一座屬於你的月光庭園</span><h2>慢慢生長，<br>好好生活。</h2><p>種下一小片綠意，聽鄰居說說心事。<br>等月亮走過四個模樣，為大家點亮一場慶典。</p><button id="start" class="primary">走進庭園 <span>→</span></button><button id="switch-slot">存檔 1 · 切換庭園</button><small>沒有倒數，沒有枯萎。準備好了，再讓今天結束。</small><small id="build-label"></small></div></section>
+ <dialog id="panel"><header><div><span class="eyebrow" id="panel-kicker">庭園手帳</span><h2 id="panel-title"></h2></div><button id="close-panel" aria-label="關閉面板">×</button></header><div id="panel-body"></div></dialog>
+ <div id="fatal" hidden role="alert"><h2>庭園載入中斷</h2><p>請檢查連線後重試。本機保存的庭園不會因此清除。</p><button onclick="location.reload()">重新載入庭園</button></div>
+</main><script type="module" src="./main.js" onerror="document.getElementById('fatal').hidden=false"></script>
+</body></html>
+

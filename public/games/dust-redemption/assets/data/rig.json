@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "id": "frontier-humanoid-v1",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "base-center",
+  "rootMotion": false,
+  "clone": "SkeletonUtils.clone(template)",
+  "bindPose": "Standing, arms down, facing +Z; root at ground center.",
+  "hierarchy": {
+    "root": [
+      "hips"
+    ],
+    "hips": [
+      "spine",
+      "leftThigh",
+      "rightThigh"
+    ],
+    "spine": [
+      "head",
+      "leftArm",
+      "rightArm"
+    ],
+    "leftArm": [
+      "leftForearm"
+    ],
+    "leftForearm": [
+      "leftHand"
+    ],
+    "rightArm": [
+      "rightForearm"
+    ],
+    "rightForearm": [
+      "rightHand"
+    ],
+    "rightHand": [
+      "weaponSocket"
+    ],
+    "leftThigh": [
+      "leftShin"
+    ],
+    "leftShin": [
+      "leftFoot"
+    ],
+    "rightThigh": [
+      "rightShin"
+    ],
+    "rightShin": [
+      "rightFoot"
+    ]
+  },
+  "states": [
+    {
+      "name": "idle",
+      "duration": 2.4,
+      "loop": true,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "walk",
+      "duration": 0.68,
+      "loop": true,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "aim-revolver",
+      "duration": 0.3,
+      "loop": true,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "aim-rifle",
+      "duration": 0.3,
+      "loop": true,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "cover",
+      "duration": 0.4,
+      "loop": true,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "peek",
+      "duration": 0.35,
+      "loop": true,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "reload",
+      "duration": 1.8,
+      "loop": false,
+      "events": [
+        {
+          "time": 1.3,
+          "event": "reload-visual"
+        }
+      ],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "hurt",
+      "duration": 0.4,
+      "loop": false,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    },
+    {
+      "name": "down",
+      "duration": 0.75,
+      "loop": false,
+      "events": [],
+      "gameplay": "Game rules own hit, ammo and damage timing."
+    }
+  ],
+  "crossfadeSeconds": 0.12,
+  "retarget": "Match semantic bone suffix after __; named clips are per template. No skeleton scale retargeting.",
+  "templates": [
+    {
+      "name": "hero",
+      "clipPrefix": "hero:",
+      "socket": "hero__weaponSocket"
+    },
+    {
+      "name": "enemy-guard",
+      "clipPrefix": "enemy-guard:",
+      "socket": "enemy-guard__weaponSocket"
+    },
+    {
+      "name": "enemy-flanker",
+      "clipPrefix": "enemy-flanker:",
+      "socket": "enemy-flanker__weaponSocket"
+    },
+    {
+      "name": "enemy-shotgun",
+      "clipPrefix": "enemy-shotgun:",
+      "socket": "enemy-shotgun__weaponSocket"
+    },
+    {
+      "name": "enemy-sniper",
+      "clipPrefix": "enemy-sniper:",
+      "socket": "enemy-sniper__weaponSocket"
+    },
+    {
+      "name": "npc-mara",
+      "clipPrefix": "npc-mara:",
+      "socket": "npc-mara__weaponSocket"
+    },
+    {
+      "name": "npc-elias",
+      "clipPrefix": "npc-elias:",
+      "socket": "npc-elias__weaponSocket"
+    },
+    {
+      "name": "npc-june",
+      "clipPrefix": "npc-june:",
+      "socket": "npc-june__weaponSocket"
+    },
+    {
+      "name": "npc-sol",
+      "clipPrefix": "npc-sol:",
+      "socket": "npc-sol__weaponSocket"
+    }
+  ],
+  "poseTargets": {
+    "standingBodyMax": 1.85,
+    "standingMuzzle": 1.35,
+    "coverBodyMax": 0.95,
+    "coverMuzzle": 0.55,
+    "peekMuzzle": 1.65,
+    "feetGroundTolerance": 0.015,
+    "boneScale": [
+      1,
+      1,
+      1
+    ],
+    "standingStance": "slightly bent knees; fixed bone lengths",
+    "coverStance": "deep squat with forward spine and tucked head; flat planted feet",
+    "peekStance": "standing with raised aiming arms"
+  },
+  "weaponAttachments": {
+    "revolver": {
+      "node": "weapon-revolver",
+      "schemaVersion": 1,
+      "socketSemantic": "weaponSocket",
+      "position": [
+        0,
+        -0.17,
+        -0.065
+      ],
+      "rotation": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "muzzle": "weapon-revolver__muzzle",
+      "muzzlePosition": [
+        0,
+        0.19787222526967527,
+        0.2261040559411049
+      ]
+    },
+    "rifle": {
+      "node": "weapon-rifle",
+      "schemaVersion": 1,
+      "socketSemantic": "weaponSocket",
+      "position": [
+        0,
+        -0.16,
+        -0.011480535697191957
+      ],
+      "rotation": [
+        1.5707963267948966,
+        0,
+        0
+      ],
+      "muzzle": "weapon-rifle__muzzle",
+      "muzzlePosition": [
+        0,
+        0.14435276096686722,
+        0.5521383023262024
+      ]
+    }
+  },
+  "poseVerification": "assets/games/dust-redemption/generation/pose-verification.json"
+}

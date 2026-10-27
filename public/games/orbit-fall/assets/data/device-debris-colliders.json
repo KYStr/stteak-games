@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit-fall.device-debris.collision",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "base-center",
+  "collider": {
+    "shape": "box",
+    "halfExtents": [
+      0.8615,
+      0.756,
+      0.6859
+    ],
+    "position": [
+      0.0577,
+      0.5702,
+      0
+    ],
+    "sensor": false,
+    "use": "Reference simplified collider. Gameplay applies its explicit puzzle interaction and hazard rules."
+  },
+  "sockets": []
+}

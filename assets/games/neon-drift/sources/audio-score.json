@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "name": "After Hours / 104",
+  "creator": "Neon Drift Maker",
+  "method": "original-procedural",
+  "bpm": 104,
+  "sampleRate": 22050,
+  "channels": 1,
+  "notes": [
+    55,
+    55,
+    82.4069,
+    65.4064,
+    55,
+    73.4162,
+    82.4069,
+    65.4064
+  ],
+  "rights": "Original project composition and synthesis. No third-party samples.",
+  "engine": "Real-time saw oscillator through low-pass filter, 38 + speed*3.1 Hz; load follows throttle and speed.",
+  "tire": "Deterministic seeded white noise through 1300Hz bandpass, gain follows clean drift.",
+  "recipe": "games/neon-drift/tools/generate-audio.mjs"
+}

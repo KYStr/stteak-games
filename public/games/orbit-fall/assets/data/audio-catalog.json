@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "orbit-fall.audio.ambient-loop",
+      "runtime": [
+        "assets/audio/ambient-loop.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 24,
+        "loop": true,
+        "loopPoints": [
+          0,
+          576000
+        ],
+        "peakDbFS": -7.53501446322833,
+        "rmsDbFS": -17.434029139486555,
+        "loopBoundaryDifference": 0,
+        "use": "Quiet four-chord station ambience, 24-second seamless loop"
+      },
+      "budget": {
+        "runtimeBytes": 1152044,
+        "decodedBytes": 2304000,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.thruster-loop",
+      "runtime": [
+        "assets/audio/thruster-loop.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 2,
+        "loop": true,
+        "loopPoints": [
+          0,
+          48000
+        ],
+        "peakDbFS": -6.37517544663302,
+        "rmsDbFS": -18.124912886930996,
+        "loopBoundaryDifference": 0,
+        "use": "Low-pass pneumatic thrust loop"
+      },
+      "budget": {
+        "runtimeBytes": 96044,
+        "decodedBytes": 192000,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.brake",
+      "runtime": [
+        "assets/audio/brake.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.42,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -16.83460066625568,
+        "loopBoundaryDifference": null,
+        "use": "Descending pneumatic braking impulse"
+      },
+      "budget": {
+        "runtimeBytes": 20204,
+        "decodedBytes": 40320,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.magnet",
+      "runtime": [
+        "assets/audio/magnet.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.3,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -14.45005128357087,
+        "loopBoundaryDifference": null,
+        "use": "Magnetic boot lock, paired low clicks"
+      },
+      "budget": {
+        "runtimeBytes": 14444,
+        "decodedBytes": 28800,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.tether",
+      "runtime": [
+        "assets/audio/tether.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.48,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -13.578986250827391,
+        "loopBoundaryDifference": null,
+        "use": "Traction beam startup, soft upward overtone"
+      },
+      "budget": {
+        "runtimeBytes": 23084,
+        "decodedBytes": 46080,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.interact",
+      "runtime": [
+        "assets/audio/interact.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.16,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -11.692896537843387,
+        "loopBoundaryDifference": null,
+        "use": "Nearby panel accepted"
+      },
+      "budget": {
+        "runtimeBytes": 7724,
+        "decodedBytes": 15360,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.power",
+      "runtime": [
+        "assets/audio/power.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 1.15,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -14.636796873892399,
+        "loopBoundaryDifference": null,
+        "use": "Power path restored, ascending three-note confirmation"
+      },
+      "budget": {
+        "runtimeBytes": 55244,
+        "decodedBytes": 110400,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.signal",
+      "runtime": [
+        "assets/audio/signal.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.75,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -13.781269954013917,
+        "loopBoundaryDifference": null,
+        "use": "Optional signal found, radio onset and two notes"
+      },
+      "budget": {
+        "runtimeBytes": 36044,
+        "decodedBytes": 72000,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.low-oxygen",
+      "runtime": [
+        "assets/audio/low-oxygen.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.8,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -14.298057442852999,
+        "loopBoundaryDifference": null,
+        "use": "Low register two-beat oxygen notification, runtime limited to once per 8 seconds"
+      },
+      "budget": {
+        "runtimeBytes": 38444,
+        "decodedBytes": 76800,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.damage",
+      "runtime": [
+        "assets/audio/damage.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.45,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -13.910375965832635,
+        "loopBoundaryDifference": null,
+        "use": "Muted suit impact and falling pressure"
+      },
+      "budget": {
+        "runtimeBytes": 21644,
+        "decodedBytes": 43200,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.fail",
+      "runtime": [
+        "assets/audio/fail.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 1.3,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -11.818569870090709,
+        "loopBoundaryDifference": null,
+        "use": "Loss cue, low descending interval"
+      },
+      "budget": {
+        "runtimeBytes": 62444,
+        "decodedBytes": 124800,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.success",
+      "runtime": [
+        "assets/audio/success.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 1.7,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -15.629898017376489,
+        "loopBoundaryDifference": null,
+        "use": "Deck repair complete, resolving original chord"
+      },
+      "budget": {
+        "runtimeBytes": 81644,
+        "decodedBytes": 163200,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.ending",
+      "runtime": [
+        "assets/audio/ending.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 3.4,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -15.584327763402255,
+        "loopBoundaryDifference": null,
+        "use": "Journey completion, calm layered arpeggio"
+      },
+      "budget": {
+        "runtimeBytes": 163244,
+        "decodedBytes": 326400,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.door",
+      "runtime": [
+        "assets/audio/door.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.75,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -17.075117429887044,
+        "loopBoundaryDifference": null,
+        "use": "Pressure seal and sliding motor"
+      },
+      "budget": {
+        "runtimeBytes": 36044,
+        "decodedBytes": 72000,
+        "maxSimultaneousVoices": 16
+      }
+    },
+    {
+      "id": "orbit-fall.audio.click",
+      "runtime": [
+        "assets/audio/click.wav"
+      ],
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.08,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -11.404903601856214,
+        "loopBoundaryDifference": null,
+        "use": "Interface confirmation"
+      },
+      "budget": {
+        "runtimeBytes": 3884,
+        "decodedBytes": 7680,
+        "maxSimultaneousVoices": 16
+      }
+    }
+  ]
+}

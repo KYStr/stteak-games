@@ -1,0 +1,909 @@
+{
+  "schema": 1,
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "assets": {
+    "moss-and-moon.plant-moss-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-moss-0.glb"
+    },
+    "moss-and-moon.plant-moss-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-moss-1.glb"
+    },
+    "moss-and-moon.plant-moss-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-moss-2.glb"
+    },
+    "moss-and-moon.plant-moss-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-moss-3.glb"
+    },
+    "moss-and-moon.plant-moonflower-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-moonflower-0.glb"
+    },
+    "moss-and-moon.plant-moonflower-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-moonflower-1.glb"
+    },
+    "moss-and-moon.plant-moonflower-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-moonflower-2.glb"
+    },
+    "moss-and-moon.plant-moonflower-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-moonflower-3.glb"
+    },
+    "moss-and-moon.plant-fern-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-fern-0.glb"
+    },
+    "moss-and-moon.plant-fern-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-fern-1.glb"
+    },
+    "moss-and-moon.plant-fern-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-fern-2.glb"
+    },
+    "moss-and-moon.plant-fern-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-fern-3.glb"
+    },
+    "moss-and-moon.plant-bluebell-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-bluebell-0.glb"
+    },
+    "moss-and-moon.plant-bluebell-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-bluebell-1.glb"
+    },
+    "moss-and-moon.plant-bluebell-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-bluebell-2.glb"
+    },
+    "moss-and-moon.plant-bluebell-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-bluebell-3.glb"
+    },
+    "moss-and-moon.plant-pumpkin-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-pumpkin-0.glb"
+    },
+    "moss-and-moon.plant-pumpkin-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-pumpkin-1.glb"
+    },
+    "moss-and-moon.plant-pumpkin-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-pumpkin-2.glb"
+    },
+    "moss-and-moon.plant-pumpkin-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-pumpkin-3.glb"
+    },
+    "moss-and-moon.plant-starcap-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-starcap-0.glb"
+    },
+    "moss-and-moon.plant-starcap-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-starcap-1.glb"
+    },
+    "moss-and-moon.plant-starcap-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-starcap-2.glb"
+    },
+    "moss-and-moon.plant-starcap-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-starcap-3.glb"
+    },
+    "moss-and-moon.plant-lavender-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-lavender-0.glb"
+    },
+    "moss-and-moon.plant-lavender-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-lavender-1.glb"
+    },
+    "moss-and-moon.plant-lavender-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-lavender-2.glb"
+    },
+    "moss-and-moon.plant-lavender-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-lavender-3.glb"
+    },
+    "moss-and-moon.plant-lotus-0": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.13,
+      "center": [
+        0,
+        0.065,
+        0
+      ],
+      "visualFile": "assets/models/plant-lotus-0.glb"
+    },
+    "moss-and-moon.plant-lotus-1": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.28,
+      "center": [
+        0,
+        0.14,
+        0
+      ],
+      "visualFile": "assets/models/plant-lotus-1.glb"
+    },
+    "moss-and-moon.plant-lotus-2": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/plant-lotus-2.glb"
+    },
+    "moss-and-moon.plant-lotus-3": {
+      "type": "cylinder",
+      "radius": 0.3,
+      "height": 0.72,
+      "center": [
+        0,
+        0.36,
+        0
+      ],
+      "visualFile": "assets/models/plant-lotus-3.glb"
+    },
+    "moss-and-moon.decoration-planter": {
+      "type": "box",
+      "size": [
+        0.7,
+        0.65,
+        0.65
+      ],
+      "center": [
+        0,
+        0.325,
+        0
+      ],
+      "visualFile": "assets/models/decoration-planter.glb"
+    },
+    "moss-and-moon.decoration-lantern": {
+      "type": "box",
+      "size": [
+        0.32,
+        1.2,
+        0.32
+      ],
+      "center": [
+        0,
+        0.6,
+        0
+      ],
+      "visualFile": "assets/models/decoration-lantern.glb"
+    },
+    "moss-and-moon.decoration-bench": {
+      "type": "box",
+      "size": [
+        0.85,
+        0.65,
+        0.5
+      ],
+      "center": [
+        0,
+        0.325,
+        0
+      ],
+      "visualFile": "assets/models/decoration-bench.glb"
+    },
+    "moss-and-moon.decoration-arch": {
+      "type": "box",
+      "size": [
+        0.88,
+        1.7,
+        0.3
+      ],
+      "center": [
+        0,
+        0.85,
+        0
+      ],
+      "visualFile": "assets/models/decoration-arch.glb"
+    },
+    "moss-and-moon.decoration-birdbath": {
+      "type": "box",
+      "size": [
+        0.65,
+        0.8,
+        0.65
+      ],
+      "center": [
+        0,
+        0.4,
+        0
+      ],
+      "visualFile": "assets/models/decoration-birdbath.glb"
+    },
+    "moss-and-moon.decoration-windchime": {
+      "type": "box",
+      "size": [
+        0.65,
+        1.5,
+        0.35
+      ],
+      "center": [
+        0,
+        0.75,
+        0
+      ],
+      "visualFile": "assets/models/decoration-windchime.glb"
+    },
+    "moss-and-moon.decoration-pond": {
+      "type": "box",
+      "size": [
+        0.8,
+        0.18,
+        0.8
+      ],
+      "center": [
+        0,
+        0.09,
+        0
+      ],
+      "visualFile": "assets/models/decoration-pond.glb"
+    },
+    "moss-and-moon.decoration-stones": {
+      "type": "box",
+      "size": [
+        0.7,
+        0.12,
+        0.7
+      ],
+      "center": [
+        0,
+        0.06,
+        0
+      ],
+      "visualFile": "assets/models/decoration-stones.glb"
+    },
+    "moss-and-moon.decoration-fence": {
+      "type": "box",
+      "size": [
+        0.85,
+        0.6,
+        0.18
+      ],
+      "center": [
+        0,
+        0.3,
+        0
+      ],
+      "visualFile": "assets/models/decoration-fence.glb"
+    },
+    "moss-and-moon.decoration-table": {
+      "type": "box",
+      "size": [
+        0.8,
+        0.6,
+        0.65
+      ],
+      "center": [
+        0,
+        0.3,
+        0
+      ],
+      "visualFile": "assets/models/decoration-table.glb"
+    },
+    "moss-and-moon.decoration-moonstand": {
+      "type": "box",
+      "size": [
+        0.5,
+        1.3,
+        0.5
+      ],
+      "center": [
+        0,
+        0.65,
+        0
+      ],
+      "visualFile": "assets/models/decoration-moonstand.glb"
+    },
+    "moss-and-moon.decoration-garland": {
+      "type": "box",
+      "size": [
+        0.88,
+        1.2,
+        0.25
+      ],
+      "center": [
+        0,
+        0.6,
+        0
+      ],
+      "visualFile": "assets/models/decoration-garland.glb"
+    },
+    "moss-and-moon.discovery-dew": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.38,
+      "center": [
+        0,
+        0.19,
+        0
+      ],
+      "visualFile": "assets/models/discovery-dew.glb"
+    },
+    "moss-and-moon.discovery-snail": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.7,
+      "center": [
+        0,
+        0.35,
+        0
+      ],
+      "visualFile": "assets/models/discovery-snail.glb"
+    },
+    "moss-and-moon.discovery-seedwing": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.4,
+      "center": [
+        0,
+        0.2,
+        0
+      ],
+      "visualFile": "assets/models/discovery-seedwing.glb"
+    },
+    "moss-and-moon.discovery-leafprint": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.38,
+      "center": [
+        0,
+        0.19,
+        0
+      ],
+      "visualFile": "assets/models/discovery-leafprint.glb"
+    },
+    "moss-and-moon.discovery-shellspiral": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.55,
+      "center": [
+        0,
+        0.275,
+        0
+      ],
+      "visualFile": "assets/models/discovery-shellspiral.glb"
+    },
+    "moss-and-moon.discovery-waterbeetle": {
+      "type": "cylinder",
+      "radius": 0.49,
+      "height": 0.43,
+      "center": [
+        0,
+        0.215,
+        0
+      ],
+      "visualFile": "assets/models/discovery-waterbeetle.glb"
+    },
+    "moss-and-moon.discovery-roundstone": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.44,
+      "center": [
+        0,
+        0.22,
+        0
+      ],
+      "visualFile": "assets/models/discovery-roundstone.glb"
+    },
+    "moss-and-moon.discovery-reed": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.95,
+      "center": [
+        0,
+        0.475,
+        0
+      ],
+      "visualFile": "assets/models/discovery-reed.glb"
+    },
+    "moss-and-moon.discovery-mica": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.48,
+      "center": [
+        0,
+        0.24,
+        0
+      ],
+      "visualFile": "assets/models/discovery-mica.glb"
+    },
+    "moss-and-moon.discovery-moth": {
+      "type": "cylinder",
+      "radius": 0.49,
+      "height": 0.48,
+      "center": [
+        0,
+        0.24,
+        0
+      ],
+      "visualFile": "assets/models/discovery-moth.glb"
+    },
+    "moss-and-moon.discovery-quartz": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.88,
+      "center": [
+        0,
+        0.44,
+        0
+      ],
+      "visualFile": "assets/models/discovery-quartz.glb"
+    },
+    "moss-and-moon.discovery-lichen": {
+      "type": "cylinder",
+      "radius": 0.43,
+      "height": 0.38,
+      "center": [
+        0,
+        0.19,
+        0
+      ],
+      "visualFile": "assets/models/discovery-lichen.glb"
+    },
+    "moss-and-moon.gardener": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/gardener.glb"
+    },
+    "moss-and-moon.resident-1": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/resident-1.glb"
+    },
+    "moss-and-moon.resident-2": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/resident-2.glb"
+    },
+    "moss-and-moon.resident-3": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/resident-3.glb"
+    },
+    "moss-and-moon.resident-4": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/resident-4.glb"
+    },
+    "moss-and-moon.resident-5": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/resident-5.glb"
+    },
+    "moss-and-moon.resident-6": {
+      "type": "cylinder",
+      "radius": 0.23,
+      "height": 1.45,
+      "center": [
+        0,
+        0.725,
+        0
+      ],
+      "visualFile": "assets/models/resident-6.glb"
+    },
+    "moss-and-moon.terrain-forest": {
+      "type": "terrain",
+      "size": [
+        2,
+        0.5,
+        2
+      ],
+      "walkable": true,
+      "gridSnap": 2,
+      "visualFile": "assets/models/terrain-forest.glb"
+    },
+    "moss-and-moon.terrain-brook": {
+      "type": "terrain",
+      "size": [
+        2,
+        0.5,
+        2
+      ],
+      "walkable": true,
+      "gridSnap": 2,
+      "visualFile": "assets/models/terrain-brook.glb"
+    },
+    "moss-and-moon.terrain-hill": {
+      "type": "terrain",
+      "size": [
+        2,
+        0.5,
+        2
+      ],
+      "walkable": true,
+      "gridSnap": 2,
+      "visualFile": "assets/models/terrain-hill.glb"
+    },
+    "moss-and-moon.tool-watering-can": {
+      "type": "box",
+      "size": [
+        0.4,
+        0.7,
+        0.3
+      ],
+      "center": [
+        0,
+        0.35,
+        0
+      ],
+      "visualFile": "assets/models/tool-watering-can.glb"
+    },
+    "moss-and-moon.tool-trowel": {
+      "type": "box",
+      "size": [
+        0.4,
+        0.7,
+        0.3
+      ],
+      "center": [
+        0,
+        0.35,
+        0
+      ],
+      "visualFile": "assets/models/tool-trowel.glb"
+    },
+    "moss-and-moon.tool-basket": {
+      "type": "box",
+      "size": [
+        0.4,
+        0.7,
+        0.3
+      ],
+      "center": [
+        0,
+        0.35,
+        0
+      ],
+      "visualFile": "assets/models/tool-basket.glb"
+    },
+    "moss-and-moon.tool-hoe": {
+      "type": "box",
+      "size": [
+        0.4,
+        0.7,
+        0.3
+      ],
+      "center": [
+        0,
+        0.35,
+        0
+      ],
+      "visualFile": "assets/models/tool-hoe.glb"
+    },
+    "moss-and-moon.tool-seed-pouch": {
+      "type": "box",
+      "size": [
+        0.4,
+        0.7,
+        0.3
+      ],
+      "center": [
+        0,
+        0.35,
+        0
+      ],
+      "visualFile": "assets/models/tool-seed-pouch.glb"
+    },
+    "moss-and-moon.tree-oak": {
+      "type": "cylinder",
+      "radius": 0.22,
+      "height": 2.7,
+      "center": [
+        0,
+        1.35,
+        0
+      ],
+      "visualFile": "assets/models/tree-oak.glb"
+    },
+    "moss-and-moon.tree-willow": {
+      "type": "cylinder",
+      "radius": 0.22,
+      "height": 2.7,
+      "center": [
+        0,
+        1.35,
+        0
+      ],
+      "visualFile": "assets/models/tree-willow.glb"
+    },
+    "moss-and-moon.tree-pine": {
+      "type": "cylinder",
+      "radius": 0.22,
+      "height": 2.7,
+      "center": [
+        0,
+        1.35,
+        0
+      ],
+      "visualFile": "assets/models/tree-pine.glb"
+    },
+    "moss-and-moon.tree-birch": {
+      "type": "cylinder",
+      "radius": 0.22,
+      "height": 2.7,
+      "center": [
+        0,
+        1.35,
+        0
+      ],
+      "visualFile": "assets/models/tree-birch.glb"
+    },
+    "moss-and-moon.moon-cottage": {
+      "type": "box",
+      "size": [
+        2.7,
+        2.6,
+        2.4
+      ],
+      "center": [
+        0,
+        1.3,
+        0
+      ],
+      "visualFile": "assets/models/moon-cottage.glb"
+    },
+    "moss-and-moon.moss-rock": {
+      "type": "cylinder",
+      "radius": 0.4,
+      "height": 0.5,
+      "center": [
+        0,
+        0.25,
+        0
+      ],
+      "visualFile": "assets/models/moss-rock.glb"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.discovery.seagrass",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "sphere",
+      "radius": 2.5,
+      "center": [
+        0,
+        1,
+        0
+      ]
+    }
+  ]
+}

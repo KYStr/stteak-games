@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit-fall.device-memory.collision",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "base-center",
+  "collider": {
+    "shape": "box",
+    "halfExtents": [
+      0.775,
+      1.66,
+      0.575
+    ],
+    "position": [
+      0,
+      1.655,
+      0
+    ],
+    "sensor": true,
+    "use": "Reference simplified collider. Gameplay applies its explicit puzzle interaction and hazard rules."
+  },
+  "sockets": []
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit-fall.device-arc.collision",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "base-center",
+  "collider": {
+    "shape": "box",
+    "halfExtents": [
+      1.245,
+      0.9316,
+      0.345
+    ],
+    "position": [
+      0,
+      0.9316,
+      0
+    ],
+    "sensor": true,
+    "use": "Reference simplified collider. Gameplay applies its explicit puzzle interaction and hazard rules."
+  },
+  "sockets": []
+}

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-27",
+  "releaseType": "development-source-release",
+  "overallGameQualityAcceptance": {
+    "passed": 0,
+    "total": 8
+  },
+  "checks": {
+    "officialPackageBuilds": {
+      "passed": 8,
+      "total": 8
+    },
+    "portableSourceTests": {
+      "passed": 546,
+      "failed": 0,
+      "scope": "Selected portable tests only; not original full QA or real-device/browser acceptance."
+    },
+    "assetRebuild": {
+      "modelRecipes": "All eight original recipe sets executed successfully; regenerated model runtime bytes match retained baseline.",
+      "audioRecipes": "Seven games rebuilt successfully. Signal Zero retained original synthesized WAVs; regeneration blocked by cloud browser local-socket restriction.",
+      "signalAudioChange": "Recipe portability only: default Playwright Chromium instead of hard-coded Microsoft Edge, optional explicit STTEAK_CHROMIUM_PATH. No newly rendered Signal audio claimed."
+    },
+    "browserUi": "Not executed in this cloud audit; local browser process was blocked by sandbox. No GUI, listening, performance or real-device pass claimed.",
+    "publicReleaseContractTests": {
+      "passed": 13,
+      "failed": 0,
+      "scope": "Runtime identity, truthful development metadata, notice retention and static launcher/privacy contract."
+    }
+  },
+  "runtimeHashAlgorithm": "SHA256 of compact JSON array of {path,bytes,sha256}, relative paths sorted lexicographically; evidence directory excluded.",
+  "games": [
+    {
+      "game": "aetherwake",
+      "distributionId": "aetherwake-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "d65a3bf80dbced62032f244151617c6fcba6ecc0312d2ca891a20ccff6d73f57",
+      "runtimeFiles": 60,
+      "baselineRuntimeHash": "a044c186aaaf45c67eb9ab4827d02989ccfcd57118a6c3823bd6eedd7584b345",
+      "baselineBuildId": "aetherwake-0008",
+      "baselineByteIdentical": false,
+      "changedFiles": [
+        "game.js",
+        "style.css"
+      ],
+      "note": "New development source-build identity; frozen 0008 acceptance is not inherited."
+    },
+    {
+      "game": "dust-redemption",
+      "distributionId": "dust-redemption-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "c9250a688abacf4f9bb4619e2a439ca49ff24fd3574793aa4ef0672798d1f6f6",
+      "runtimeFiles": 61,
+      "baselineRuntimeHash": "c9250a688abacf4f9bb4619e2a439ca49ff24fd3574793aa4ef0672798d1f6f6",
+      "baselineBuildId": "dust-redemption-development-0020",
+      "baselineByteIdentical": true,
+      "changedFiles": [],
+      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+    },
+    {
+      "game": "hollow-crown",
+      "distributionId": "hollow-crown-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "ff772ba80cb9819e4cbc1b6da932d35f4afe4f8e3e7002946815d54163d687a5",
+      "runtimeFiles": 53,
+      "baselineRuntimeHash": "ff772ba80cb9819e4cbc1b6da932d35f4afe4f8e3e7002946815d54163d687a5",
+      "baselineBuildId": "hollow-crown-cloud-rebuild-20261027-01",
+      "baselineByteIdentical": true,
+      "changedFiles": [],
+      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+    },
+    {
+      "game": "moss-and-moon",
+      "distributionId": "moss-and-moon-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "f64877d96d8f3bb4bdb2b2477f20dd8a53a7b964e23e7f1e439840b778b1b4ad",
+      "runtimeFiles": 102,
+      "baselineRuntimeHash": "f64877d96d8f3bb4bdb2b2477f20dd8a53a7b964e23e7f1e439840b778b1b4ad",
+      "baselineBuildId": "moss-and-moon-rebuild-0019-cloud-1",
+      "baselineByteIdentical": true,
+      "changedFiles": [],
+      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+    },
+    {
+      "game": "neon-drift",
+      "distributionId": "neon-drift-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "b04507ddbf27248777110f6f40ce74d36f253c6d4eaec523e9c9d85e8812e9da",
+      "runtimeFiles": 18,
+      "baselineRuntimeHash": "b04507ddbf27248777110f6f40ce74d36f253c6d4eaec523e9c9d85e8812e9da",
+      "baselineBuildId": "neon-drift-rebuild-0012",
+      "baselineByteIdentical": true,
+      "changedFiles": [],
+      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+    },
+    {
+      "game": "orbit-fall",
+      "distributionId": "orbit-fall-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "9f81de47ff047ce94d9ff49fec14a0ef574f8efc25f64c88db3ba0cfabfa0cf3",
+      "runtimeFiles": 80,
+      "baselineRuntimeHash": "313575493db1f9ec915fe408e712ffe4530b3cdbfe9991e5ef0d1dfb8a461f3a",
+      "baselineBuildId": "orbit-fall-0014",
+      "baselineByteIdentical": false,
+      "changedFiles": [
+        "vendor/rapier.mjs"
+      ],
+      "note": "Prominent Rapier notice header only; new distribution byte identity, unchanged engine patch payload and WASM."
+    },
+    {
+      "game": "signal-zero",
+      "distributionId": "signal-zero-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "3113acb4d51a4df261ee70ec02e3cfe0421a9573f27187330b6b139e973cd361",
+      "runtimeFiles": 33,
+      "baselineRuntimeHash": "3113acb4d51a4df261ee70ec02e3cfe0421a9573f27187330b6b139e973cd361",
+      "baselineBuildId": "signal-zero-0011",
+      "baselineByteIdentical": true,
+      "changedFiles": [],
+      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+    },
+    {
+      "game": "tidebound",
+      "distributionId": "tidebound-public-source-20261027",
+      "stage": "development",
+      "independentlyAccepted": false,
+      "runtimeHash": "5421ff2910dd45bbd94f4819d4fdf51b425de32377a2abc4e7efdeaaeafcbd1a",
+      "runtimeFiles": 78,
+      "baselineRuntimeHash": "5421ff2910dd45bbd94f4819d4fdf51b425de32377a2abc4e7efdeaaeafcbd1a",
+      "baselineBuildId": "tidebound-0012",
+      "baselineByteIdentical": true,
+      "changedFiles": [],
+      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+    }
+  ]
+}

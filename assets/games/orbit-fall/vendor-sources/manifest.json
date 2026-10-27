@@ -1,0 +1,18 @@
+{
+  "upstreamPackage": "@dimforge/rapier3d-compat",
+  "upstreamVersion": "0.19.0",
+  "upstreamSourceSha256": "1ade6875c663c1398f490d4fa67837386b2d7e0aad45fe54e9b7af52b8198a49",
+  "patchedRuntimeSha256": "79187dfd61b8f1b04b730992c2d8f1c0014265f5afee0d64021c32f06cba4f97",
+  "wasmSha256": "c8cf07035996629dbf6156c82fec836ddc1c6cff78cf6afde726c30585da2bfd",
+  "wasmBytes": 1555075,
+  "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+  "exactCallOffset": 141650,
+  "exactCallBytes": 2073471,
+  "exactCallSha256": "d61d9336557eac94e7af9d8ea166133f7f2ff949f9736617f142e0867f1ea490",
+  "patchId": "compat-0.19.0-init-object-1",
+  "change": "Wrap the same internal ArrayBuffer in the existing module_or_path object; public init() and WASM unchanged",
+  "originalSourceRetained": true,
+  "originalWasmRetained": true,
+  "publicDistributionNotice": "Prominent notice header added for public distribution; raw patched payload identity above remains unchanged.",
+  "publicDistributionSha256": "ccee73334f11be7070c8ae7db7f224f651e36afaed942caa21e7b1765eb850ec"
+}

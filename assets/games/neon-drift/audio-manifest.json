@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "gameId": "neon-drift",
+  "version": "1.0.0",
+  "assets": [
+    {
+      "id": "neon-drift.audio.music",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio-score.json",
+      "recipe": "games/neon-drift/tools/generate-audio.mjs",
+      "runtime": [
+        "audio/music.wav"
+      ],
+      "sha256": {
+        "audio/music.wav": "1b8454184a57685f9eff4720aad9f26d92583038b49ddf2508fc7fee452c19f6"
+      },
+      "provenance": {
+        "creator": "Neon Drift Maker",
+        "method": "original-procedural",
+        "createdAt": "2026-10-25",
+        "rights": "Original project composition and synthesis. No third-party samples.",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "encoding": "PCM signed 16-bit WAV",
+        "duration": 18.46154195011338,
+        "loop": true,
+        "loopStart": 0,
+        "loopEnd": 18.46154195011338,
+        "gain": 0.3
+      },
+      "budget": {
+        "runtimeBytes": 814198,
+        "maxSimultaneousVoices": 1
+      }
+    },
+    {
+      "id": "neon-drift.audio.click",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio-score.json",
+      "recipe": "games/neon-drift/tools/generate-audio.mjs",
+      "runtime": [
+        "audio/click.wav"
+      ],
+      "sha256": {
+        "audio/click.wav": "1a7d2ccdf0c78008d27024a647019653fce6b3f5e1e5f433f84c8e7f752cf8e3"
+      },
+      "provenance": {
+        "creator": "Neon Drift Maker",
+        "method": "original-procedural",
+        "createdAt": "2026-10-25",
+        "rights": "Original project composition and synthesis. No third-party samples.",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "encoding": "PCM signed 16-bit WAV",
+        "duration": 0.09002267573696145,
+        "loop": false,
+        "loopStart": 0,
+        "loopEnd": 0.09002267573696145,
+        "gain": 0.65
+      },
+      "budget": {
+        "runtimeBytes": 4014,
+        "maxSimultaneousVoices": 4
+      }
+    },
+    {
+      "id": "neon-drift.audio.impact",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio-score.json",
+      "recipe": "games/neon-drift/tools/generate-audio.mjs",
+      "runtime": [
+        "audio/impact.wav"
+      ],
+      "sha256": {
+        "audio/impact.wav": "d6ddf32baf73bb9020756d3f27b1bdfcef5c80caae492c6dbdf3a6a96c93541b"
+      },
+      "provenance": {
+        "creator": "Neon Drift Maker",
+        "method": "original-procedural",
+        "createdAt": "2026-10-25",
+        "rights": "Original project composition and synthesis. No third-party samples.",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "encoding": "PCM signed 16-bit WAV",
+        "duration": 0.24,
+        "loop": false,
+        "loopStart": 0,
+        "loopEnd": 0.24,
+        "gain": 0.65
+      },
+      "budget": {
+        "runtimeBytes": 10628,
+        "maxSimultaneousVoices": 4
+      }
+    },
+    {
+      "id": "neon-drift.audio.success",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/audio-score.json",
+      "recipe": "games/neon-drift/tools/generate-audio.mjs",
+      "runtime": [
+        "audio/success.wav"
+      ],
+      "sha256": {
+        "audio/success.wav": "52d177250059ea3f8a689aa8226ddac9607499089fead724ddd66db7b783c37b"
+      },
+      "provenance": {
+        "creator": "Neon Drift Maker",
+        "method": "original-procedural",
+        "createdAt": "2026-10-25",
+        "rights": "Original project composition and synthesis. No third-party samples.",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "encoding": "PCM signed 16-bit WAV",
+        "duration": 1.4,
+        "loop": false,
+        "loopStart": 0,
+        "loopEnd": 1.4,
+        "gain": 0.65
+      },
+      "budget": {
+        "runtimeBytes": 61784,
+        "maxSimultaneousVoices": 4
+      }
+    }
+  ]
+}

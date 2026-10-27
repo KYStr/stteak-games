@@ -1,0 +1,2 @@
+# Runtime fingerprints are byte exact on Windows and Linux.
+* -text

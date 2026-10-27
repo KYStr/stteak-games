@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111514"><title>餘燼之冠 · Hollow Crown</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23111b17' d='M0 0h32v32H0z'/%3E%3Cpath fill='%23e7dfc7' d='m5 9 6 6 5-11 5 11 6-6-3 16H8z'/%3E%3C/svg%3E"><link rel="stylesheet" href="./style.css"></head>
+<body>
+  <canvas id="world" aria-label="餘燼之冠三維戰鬥場地" tabindex="0"></canvas>
+  <div id="vignette" aria-hidden="true"></div>
+  <header id="hud" hidden>
+    <div class="vitals"><div class="tiny">守誓者 <span id="hp-text">100 / 100</span></div><div class="meter health"><i id="hp-fill"></i></div><div class="meter energy"><i id="energy-fill"></i></div><div class="tiny subdued">精力 <span id="energy-text">100</span></div></div>
+    <div class="room-label"><span id="chapter" class="eyebrow">第一道誓言</span><strong id="room-name">誓約庭</strong><span id="room-status">讀招・讓位・刺擊</span></div>
+    <button id="pause-button" class="quiet compact" aria-label="暫停遊戲">Ⅱ <span>暫停</span></button>
+  </header>
+  <div id="boss-hud" hidden><span id="boss-name"></span><div class="meter boss"><i id="boss-fill"></i></div><small id="boss-move"></small></div>
+  <div id="tutorial" class="tutorial" hidden></div>
+  <aside id="loadout" hidden></aside>
+  <div id="combat-tip" hidden>WASD 移動 <b>·</b> 左鍵刺擊／長按蓄力 <b>·</b> 右鍵格擋 <b>·</b> Space 閃避</div>
+  <div id="touch-controls" hidden>
+    <div id="move-stick" class="stick" aria-label="移動搖桿"><span>移動</span><i></i></div>
+    <div class="touch-right"><div id="aim-stick" class="stick aim-stick" aria-label="瞄準搖桿"><span>瞄準</span><i></i></div><div class="actions"><button id="guard" aria-label="按住格擋">◇<small>格擋</small></button><button id="attack" aria-label="刺擊；長按蓄力">†<small>刺擊</small></button><button id="evade" aria-label="閃避">↗<small>閃避</small></button></div></div>
+  </div>
+  <main id="overlay" aria-live="polite"><div class="panel loading"><p class="eyebrow">HOLLOW CROWN</p><h1>餘燼之冠</h1><p>正在點亮無王之座…</p></div></main>
+  <div id="toast" role="status" hidden></div>
+  <div id="save-notice" role="status" hidden></div>
+  <footer id="build-label">1.0 候選製作中 · 本機存檔</footer>
+  <script type="module" src="./boot.js"></script>
+</body></html>

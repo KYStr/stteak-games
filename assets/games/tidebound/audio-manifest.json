@@ -1,0 +1,253 @@
+[
+  {
+    "id": "tidebound.audio.waves",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/waves.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/waves.wav"
+    ],
+    "sha256": {
+      "assets/audio/waves.wav": "d75247c121c43889bae1309fb89726a63f0635c108465a18cfb8653c315dc644"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 8,
+      "loop": true,
+      "loopPoints": [
+        0,
+        176400
+      ],
+      "peakDbFS": -15.12
+    },
+    "budget": {
+      "runtimeBytes": 352844,
+      "maxSimultaneousInstances": 1
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.music",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/music.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/music.wav"
+    ],
+    "sha256": {
+      "assets/audio/music.wav": "ac2cac108a5df5330836c31a158487c4271eee1cfc55fa63f5969698b1e56c78"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 16,
+      "loop": true,
+      "loopPoints": [
+        0,
+        352800
+      ],
+      "peakDbFS": -15.46
+    },
+    "budget": {
+      "runtimeBytes": 705644,
+      "maxSimultaneousInstances": 1
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.sail",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/sail.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/sail.wav"
+    ],
+    "sha256": {
+      "assets/audio/sail.wav": "f9d142fa39c9843a199742eb695e175d5c218581cac7373ca12ca90cf342b4c8"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 0.7,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -12.84
+    },
+    "budget": {
+      "runtimeBytes": 30912,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.dock",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/dock.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/dock.wav"
+    ],
+    "sha256": {
+      "assets/audio/dock.wav": "8d967ebc6363a49d2b81c7caa7a7871395f91934ff1f2f400920289d5864ff40"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 1.1,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -12.14
+    },
+    "budget": {
+      "runtimeBytes": 48554,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.discovery",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/discovery.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/discovery.wav"
+    ],
+    "sha256": {
+      "assets/audio/discovery.wav": "139ed64498ddeece2b2be2e4b5ec98e387915abb7526a956bfd14862a3ddfa7d"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 1.8,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -11.09
+    },
+    "budget": {
+      "runtimeBytes": 79424,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.danger",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/danger.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/danger.wav"
+    ],
+    "sha256": {
+      "assets/audio/danger.wav": "87449d194ee88d90f1b69d9895c1b8253ec6343bd811c3d323584fd09b0ae92b"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 0.7,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -12.2
+    },
+    "budget": {
+      "runtimeBytes": 30912,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.gull",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/gull.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/gull.wav"
+    ],
+    "sha256": {
+      "assets/audio/gull.wav": "a49aa09d306c5e1404e881e9dc2ad468586a63c23c1293391bfb1e001c435b53"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 1.2,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -20
+    },
+    "budget": {
+      "runtimeBytes": 52964,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  }
+]
