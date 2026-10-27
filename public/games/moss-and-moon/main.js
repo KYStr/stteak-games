@@ -5,7 +5,7 @@ import { createWorld } from './world.js';
 import { createAudio } from './audio.js';
 import { bridge } from './bridge.js';
 
-const BUILD='moss-and-moon-rebuild-0019-cloud-1',VERSION='1.0.17-rebuild.1'; // 由可靠0016原件重新製作的新候選，不冒稱找回0017／0018或沿用其評分。
+const BUILD='moss-and-moon-rebuild-0020-cloud-1',VERSION='1.0.17-rebuild.2'; // 由可靠0016原件重新製作的新候選，不冒稱找回0017／0018或沿用其評分。
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let slot=1,loaded=loadSlot(slot),state=loaded.state||createState(slot),tool='plant',seed=PLANTS[0].id,decor='planter',rotation=0,selected=-1,movingFrom=null,started=false,paused=false,faulted=false,panelName=null,residentFilter=null,toastTimer,world,previousFocus=null;
 const sound=createAudio(message=>notice(message));let connection;
@@ -37,7 +37,7 @@ function tile(i){selected=i;if(state.region!=='garden')return;const cell=state.g
 function interaction(obj){if(obj.kind==='house')openPanel('sleep');else if(obj.kind==='shop')openPanel('shop');else if(obj.kind==='resident'){residentFilter=obj.id;action({type:'talk',id:obj.id});openPanel('quests');}else if(obj.kind==='gather')action({type:'gather',region:obj.region});else if(obj.kind==='discovery'){action({type:'discover',id:obj.id});openPanel('discovery:'+obj.id);}else if(obj.kind==='puzzle')openPanel('puzzle:'+obj.region);else if(obj.kind==='return')travel('garden');}
 function travel(region){if(action({type:'travel',region})){selected=-1;movingFrom=null;closePanel();$('#world').focus();}}
 function start(){if(faulted)return;started=true;paused=false;$('#welcome').hidden=true;world.setEnabled(true);sound.setActive(true);sound.unlock();connection?.state('running');if(loaded.recovered)notice('已從上一份有效快照恢復庭園。');else if(loaded.error)notice(loaded.error,true);else notice(state.day>1||state.stats.planted>0?'歡迎回家。接著照顧庭園，或翻開手帳看看下一步吧。':'歡迎回家。種下兩份絨苔，再澆水吧。');$('#world').focus();}
-function pause(){if(!started||faulted)return;world?.endCelebration();paused=true;world.setEnabled(false);sound.setActive(false);connection?.state('paused');openPanel('settings',true);}
+function pause(){if(!started||faulted)return;world?.endCelebration();const alreadyPaused=paused;paused=true;world.setEnabled(false);sound.setActive(false);connection?.state('paused');if(!alreadyPaused||!$('#panel').open||!panelName)openPanel('settings',true);} // 保留世界、音效及bridge暫停回報；已有命名dialog的重複暫停不重建DOM，首次／無面板仍開設定。
 function resume(){if(faulted)return;if(!started){start();return;}paused=false;closePanel();world.setEnabled(true);sound.setActive(true);connection?.state('running');}
 function openPanel(name,fromPause=false){if(faulted)return;panelName=name;previousFocus=document.activeElement;world?.setEnabled(false);if(!fromPause)sound.effect('click');renderPanel();if(!$('#panel').open)$('#panel').showModal();}
 function closePanel(){revealDialogue();world?.endCelebration();panelName=null;world?.clearPreview();if($('#panel').open)$('#panel').close();if(started&&!paused)world?.setEnabled(true);if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});}
