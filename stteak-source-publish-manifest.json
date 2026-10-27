@@ -1,0 +1,4571 @@
+{
+  "summary": {
+    "files": 758,
+    "bytes": 60390388,
+    "text": {
+      "files": 451,
+      "bytes": 23176118
+    },
+    "binary": {
+      "files": 307,
+      "bytes": 37214270
+    },
+    "largest_file": {
+      "path": "public/games/dust-redemption/assets/models/frontier-kit.glb",
+      "bytes": 2352012,
+      "sha256": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f",
+      "kind": "binary"
+    },
+    "scan_unresolved": 0
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 298,
+      "sha256": "e6eca9f3e90870508b4dbc7641df2eafde15bcef9e51c51c2e4e343461b88eae",
+      "kind": "text"
+    },
+    {
+      "path": "ASSET-LICENSES.md",
+      "bytes": 2110,
+      "sha256": "63c4e52df4f181f96f1106b40ceb93694ba325abac173e0d49a3b4535d13993e",
+      "kind": "text"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1063,
+      "sha256": "4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3",
+      "kind": "text"
+    },
+    {
+      "path": "LICENSE-SCOPE.md",
+      "bytes": 955,
+      "sha256": "a6084d069b9f799c7d14efbf17936ccc23c2948c557801ab40ead011db30a252",
+      "kind": "text"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6324,
+      "sha256": "6ad7adfbeeb8cda776f433af19657075e535d8dbbe842fa7f08ebae34631b302",
+      "kind": "text"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 2770,
+      "sha256": "f2943c56b8aa0fe25086a1ac97bb9faf3bd09ba6420f59d3aca57d5dbcca454a",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/aetherwake/generation/design-record.md",
+      "bytes": 2478,
+      "sha256": "8bb66d40b9410020c9472c9c3cf7984a4d96cecde576505c9ee027d87ec77aad",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/aetherwake/manifest.json",
+      "bytes": 95606,
+      "sha256": "58a9da65c4df891979c75014d4bd0cc388e2a37998640d6a7647c10068494eaf",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/aetherwake/recipes/export-assets.mjs",
+      "bytes": 9978,
+      "sha256": "3a16455d65067754b8925c908ed08f168316ddf943c4c31822cfb42ec2d54c1b",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/audio.js",
+      "bytes": 7387,
+      "sha256": "db6d2e3d16e8ab6d863168c5f657a298026a76ae12ce60874882b4c034626e53",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/cloud-sea-loop.wav",
+      "bytes": 564524,
+      "sha256": "295ee08bc4a31ee25cf95118b7a8ff67f331693cb4ab8c9f973d2769743a26ed",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/energy.wav",
+      "bytes": 14722,
+      "sha256": "0a2307de65282752bab8173536d7b757db31391ac4b6667a1647af9fcd4f4d57",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/finish.wav",
+      "bytes": 46570,
+      "sha256": "88f86dc2bdba87a06fe9c772cabb0c4ae02621c86168af6a827a6c8df1ab4506",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/glide.wav",
+      "bytes": 32150,
+      "sha256": "6714b17eadba470bcbd76971d4e0077a69d5e26f0383dc446cf1b72e0af2877d",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/land.wav",
+      "bytes": 24530,
+      "sha256": "3e682f0d8ae87e6bd312cf7292c05eabfe5159a2e83bf26f6b5addab68df2cb3",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/models.js",
+      "bytes": 25033,
+      "sha256": "b823f90af0891441855f83d9238bd636648ac0a0321e20b9dbb61d57249ba8d7",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/relic.wav",
+      "bytes": 17862,
+      "sha256": "2ccedabbd0c42de048b7a53a06cbd9f4e8475668bcea4bf8bd711685a3a6d6f7",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/stall.wav",
+      "bytes": 22624,
+      "sha256": "60246c60f25ed62cad94b0486bc4acc800603382ac63ac17f3c048e4de000019",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/tailwind.wav",
+      "bytes": 46438,
+      "sha256": "01cda312b5e40b2488e6834e5cb710c7c25e3497de4e4aa3b0c9fe07da253852",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/ui.wav",
+      "bytes": 6660,
+      "sha256": "98ddc559cd2311684f3fcca6e68723ac3bdeaf3e411ba07b027f35d4dff01014",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/unlock.wav",
+      "bytes": 31392,
+      "sha256": "74a77837309b8257afd70b8d4e0521564bab5f3581842e8bae3402f256cdecaf",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/generate.mjs",
+      "bytes": 5796,
+      "sha256": "2195b11a37dcea2c69214055a08a091427fed4ad50de7073161a4d816c623bcc",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/manifest.json",
+      "bytes": 7910,
+      "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/sound-project.json",
+      "bytes": 2268,
+      "sha256": "865fd8bcfd65063ccf2ce75c564ae32515c7e7fb64c9bdcfa9bec03daa1c0769",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/field-props/manifest.json",
+      "bytes": 16699,
+      "sha256": "59cf7e05e90c2ae5e66df0d87f18dc4cbc41fb2b523a2b352c90599b2762f51f",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/generation/production-record.md",
+      "bytes": 2899,
+      "sha256": "3f5acf90bf3b4f039c93faca30d5319c6b31ca0c9e287c6dbef36701cca644fd",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/manifest.json",
+      "bytes": 45709,
+      "sha256": "4d20f1b8e2562f0da0ad91c5d1ad4800c66c32d21fd835dc73b385c623a6664a",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "bytes": 27581,
+      "sha256": "bcd42eaec09cb2cb2640bfadb4dcd54ee5f67029fdd7ab93694dc7fccad39a75",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/dust-redemption/sources/palette.json",
+      "bytes": 1724,
+      "sha256": "b27ae976b5289bbac19eb91a0787a039b0b47189c3bcf022473b4edd968841f3",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/.gitattributes",
+      "bytes": 58,
+      "sha256": "3dfb23ecd019bbef203d72f2e8fccd8159756efc7e9a87fb3e55fb89026606f3",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/audio/generate.mjs",
+      "bytes": 3716,
+      "sha256": "1ffe82a455c61980b1f27ccd73756653da319fb345ab9a2c71c100076dab6816",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/audio-manifest.json",
+      "bytes": 15048,
+      "sha256": "20df179011938d39e546feec72f5e65f79a5218395f9146c5d80cf16d5b6f546",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/generation/brief.md",
+      "bytes": 4929,
+      "sha256": "37ed2eac0e03b51c71ed16cc3a8114555b065cdecf72b2f03ad4e74f5fdda752",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/manifest.json",
+      "bytes": 62382,
+      "sha256": "cd0d1a4c5c7add06cccfd1357247e1eefa63582e807cb695ee2b1e5651a67ee0",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/recipes/export-assets.mjs",
+      "bytes": 9555,
+      "sha256": "fadf786d9216f92c67928ffd6c5ffe22e4986c7954761329d12c792c667679c7",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/recipes/stone-surfaces.mjs",
+      "bytes": 2967,
+      "sha256": "3f7b5b9bd84fe37ac8b2f2f1f83bb2a627cdc41bdf14964e79e0178c5a55f39e",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/sources/README.md",
+      "bytes": 1692,
+      "sha256": "32fff6ecd6fdc8a864c8cc7a271ce1af0c158a1af71198958f60f3b7f8cafad1",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/hollow-crown/sources/kit.mjs",
+      "bytes": 18908,
+      "sha256": "62dc735b6f1f0f3594d8c9381fca92f80c84f3505f6e705c11e8d57a0f8a6f8d",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/audio-manifest.json",
+      "bytes": 19410,
+      "sha256": "77e7c42365d1acd35ee3fb9513ece509569652ebb15be29558d6602ae5df7277",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/generation/original-design.md",
+      "bytes": 2771,
+      "sha256": "5391031af1451e24e84b3c6aaaae741d848e31595ffb59dfde24b561dbaf27f7",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/manifest.json",
+      "bytes": 227323,
+      "sha256": "44f1af8cbb2eb6ff5aacb83618440dbf21ec97743f1275b61a72bebd1dd16720",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/ambient-leaves.wav",
+      "bytes": 128044,
+      "sha256": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/music-loop.wav",
+      "bytes": 705644,
+      "sha256": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/sfx-harvest.wav",
+      "bytes": 14444,
+      "sha256": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/sfx-plant.wav",
+      "bytes": 9004,
+      "sha256": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/sfx-success.wav",
+      "bytes": 38444,
+      "sha256": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/sfx-ui.wav",
+      "bytes": 3244,
+      "sha256": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio/sfx-water.wav",
+      "bytes": 20844,
+      "sha256": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "bytes": 10551,
+      "sha256": "61957b5ed32b60ec0541fb486062bf7425e3759167dbae6f220b731d4d1d91db",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio-notes.md",
+      "bytes": 4880,
+      "sha256": "79bb62d9a9f637358b38570c4dee5aaf16b6306112618765de910721a5cd9627",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "bytes": 37041,
+      "sha256": "04930c909bb8dddbf7975e710a830a6f27045f24b5a86b2a85083e7fc4c26eb2",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/neon-drift/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/neon-drift/audio-manifest.json",
+      "bytes": 4068,
+      "sha256": "1d2b1e7ff505628dafed370baf8a9a0ea86f27dd7215bc44ae36b2f7509a07e6",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/neon-drift/generation/vehicle-kit.md",
+      "bytes": 2128,
+      "sha256": "3650fc87f8c085d857d0e3a3b7089612b6a654df5c6091d4de9573d6e349b7d8",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/neon-drift/manifest.json",
+      "bytes": 19804,
+      "sha256": "67953781e54353affb2c377bb0e7d29b06af26489438de72227c603c60db812d",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/neon-drift/sources/audio-score.json",
+      "bytes": 638,
+      "sha256": "0bcf25bf5b4f585b70b7120df5488f74e6c88a0b2d5e2a018d1b31a715ef92c6",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/neon-drift/sources/models.js",
+      "bytes": 7393,
+      "sha256": "146f8fe5cff7f1976406331b1211068c3d8fe86d75a4cafc3b588b70063d7959",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/.gitattributes",
+      "bytes": 55,
+      "sha256": "69e297b189a9a7b75ee00bddcc477bc66a9b6eaf6c9b67be468ca6dd20122ad3",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/generation/design-record.md",
+      "bytes": 2270,
+      "sha256": "2bb00dbaf35de3dc3ec0fd6ef8e7806ba4d3689ef552ac64221641b3660d1610",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/manifest.json",
+      "bytes": 66612,
+      "sha256": "5f3b94cca9b5e883a6672dc4809ebe52e832f2833e5dece31a8797ece407af7b",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/recipes/build-assets.mjs",
+      "bytes": 9137,
+      "sha256": "96c955e8f132bf6d611f06861fc56cd8054bc2684ea30b682174e85dcc049e0e",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/recipes/build-audio.mjs",
+      "bytes": 3376,
+      "sha256": "5bb6d02f5d3a10c85e4f9abcc6f0251b978af493803c499c4d524e772dea8000",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/audio-source.js",
+      "bytes": 6098,
+      "sha256": "d85916b9d290a8c10b116fca0538fa7e7031b0ee2207d087066978db9024d305",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/models-source.js",
+      "bytes": 20335,
+      "sha256": "47dce984cd7f6c1129d7b1102a97b9492e22b2a6c8419057caccb18071f1c683",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/sound-synthesis.mjs",
+      "bytes": 5123,
+      "sha256": "bbbbd5e3c2acfb1de1354f08cabde4d4729642d3bad660543cc5b18723efa511",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/buffer-geometry-utils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/gltf-loader.js",
+      "bytes": 114739,
+      "sha256": "67ac5551fdafa6e349bd80c8f8e5e39c136d6b2fb1ad647db9abb21dc86f9e4a",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/skeleton-utils.js",
+      "bytes": 11062,
+      "sha256": "0761b1e003917b215d25dd81439d854b36034b5a57ce84c2cfe3b02428d7b253",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/.gitattributes",
+      "bytes": 86,
+      "sha256": "de346929bb74e62a2554dc1c953c390a3891f762e7522d7b51eef552b725f119",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/manifest.json",
+      "bytes": 1086,
+      "sha256": "7c9b8552194568a189230fb96cbac48a6c9397bf868ce5593ef1613ac76cb8cc",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/rapier-0.19.0.mjs",
+      "bytes": 2219371,
+      "sha256": "1ade6875c663c1398f490d4fa67837386b2d7e0aad45fe54e9b7af52b8198a49",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/rapier-0.19.0.wasm",
+      "bytes": 1555075,
+      "sha256": "c8cf07035996629dbf6156c82fec836ddc1c6cff78cf6afde726c30585da2bfd",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/.gitattributes",
+      "bytes": 107,
+      "sha256": "9a89f451a5862a2f6fb2fdcc30675aa291023cbd0e89460e52c95bc94072e698",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/audio-brief.md",
+      "bytes": 2651,
+      "sha256": "4106182f89b7f5a9283b6c68de28a9a86f6ba79e060dcc96a06c0bff1ae99df4",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/landmark-brief.md",
+      "bytes": 2904,
+      "sha256": "3be49cd15bdea97b57ed089a8acba4682a0c5dea1b3770c21eb2da0ea43f5c16",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/model-brief.md",
+      "bytes": 2052,
+      "sha256": "f83c5fca3b45528b7c6434b40c77b4cce28444432de666d8c8d33fbabee01bbf",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/manifest.json",
+      "bytes": 78298,
+      "sha256": "3a01dc8e7144069f3f379a910f349d12d1aa653e9e5b38e118b6b31098e4f5ae",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-assets.mjs",
+      "bytes": 14673,
+      "sha256": "d71fa7cedb472a61f3f3675d613c2e26cb35b3546055978fbb24723fa72d8803",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-audio.mjs",
+      "bytes": 8333,
+      "sha256": "04d3d95756e99e31f16b4329c09cf826fe493dd434ed9f1c7137385d9d048295",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/alert.wav",
+      "bytes": 35324,
+      "sha256": "c3e98f30f70ac82d0e44f2459750996b3373c69df8a41044c58ed928fed1a21d",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/caught.wav",
+      "bytes": 57374,
+      "sha256": "c6d1ea2841438e25a9286c795486dafc1d034c03a0a5b7c7b2e1c0e5d7757e7a",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/checkpoint.wav",
+      "bytes": 39734,
+      "sha256": "41541270bb1f45bc5ad2365ab76e8749f44c8a4329ef625a68ecf4469c337ebe",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/click.wav",
+      "bytes": 9746,
+      "sha256": "3d62fe6a911cb1d90dec908be33e1be1568735d18dc5e2bb8df1805585a69c0d",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/complete.wav",
+      "bytes": 66194,
+      "sha256": "2b67d1284de87607ac429e556ab1ec00d43c2855c4bf25a2e29928339f13a2d2",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/hack.wav",
+      "bytes": 15038,
+      "sha256": "da7f5e709b9608e511385cac28bbf9260aa4eae0ccb81c2c3641c11c42553af9",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/jump.wav",
+      "bytes": 18566,
+      "sha256": "3345e924e7f4bd348ea96371d224b75fb86798f1ada0ba65450818e3e2f585a3",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/land.wav",
+      "bytes": 11510,
+      "sha256": "cfae20ce12aafff76252e4538d435bb87cd47d9fe17ba1d1eb5002d54564b590",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/music-search.wav",
+      "bytes": 1862828,
+      "sha256": "870ee8dc28274f403d399acd94bcecb3b137c3406f09a5ef54cad19f031a1285",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/music-stealth.wav",
+      "bytes": 1862828,
+      "sha256": "c57f33dda354023f0788d3c959c2f7704a69b91f5afa0e949fc65ba1704af1c5",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/objective.wav",
+      "bytes": 39734,
+      "sha256": "e4bf76902d85a0fdc933515eaa5bbda9309b9773624383c6e367746c6a24582e",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/packet.wav",
+      "bytes": 35324,
+      "sha256": "23f50c8b997ff1f380edc7dd2be8dddeac6dbb1dfc6734eced97a5bd371cb134",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/step.wav",
+      "bytes": 7542,
+      "sha256": "5fcbbba727d87c35dc2902229954fd809f960782d7d7c324743f15313c115ec5",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/tool-fail.wav",
+      "bytes": 15038,
+      "sha256": "05086d5c072e776c98967f5538bc6286d0b7a95ae24d9b3d99290c0e7c895cf5",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/tool.wav",
+      "bytes": 27386,
+      "sha256": "b4f8472b44fcc06186af0a980ce40d5253bb56000f677ebf02dc2e8e4e9b390e",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/colliders.json",
+      "bytes": 5332,
+      "sha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/procedural-models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/audio-manifest.json",
+      "bytes": 6477,
+      "sha256": "50aedaf5db4cdb52b612441ab7cf78a1df3339da429e4cd616c2ba2c61aea2ce",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/generation/art-direction.md",
+      "bytes": 890,
+      "sha256": "d0e52b81a363926c52ccfdfcf942b16e0e765c8c3266bb5e49ad59be9ae6a8bd",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/manifest.json",
+      "bytes": 89071,
+      "sha256": "57586369d80a059e7c9557464a557d78022568a75e4f2805853a37d0c2bfc0ac",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/recipes/export-assets.mjs",
+      "bytes": 8270,
+      "sha256": "736b96a382156bc0c8053b6515d9bced36933d6b67129cd24f63e834c1842c0b",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/sources/danger.wav",
+      "bytes": 30912,
+      "sha256": "87449d194ee88d90f1b69d9895c1b8253ec6343bd811c3d323584fd09b0ae92b",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/tidebound/sources/discovery.wav",
+      "bytes": 79424,
+      "sha256": "139ed64498ddeece2b2be2e4b5ec98e387915abb7526a956bfd14862a3ddfa7d",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/tidebound/sources/dock.wav",
+      "bytes": 48554,
+      "sha256": "8d967ebc6363a49d2b81c7caa7a7871395f91934ff1f2f400920289d5864ff40",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/tidebound/sources/gull.wav",
+      "bytes": 52964,
+      "sha256": "a49aa09d306c5e1404e881e9dc2ad468586a63c23c1293391bfb1e001c435b53",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/tidebound/sources/music.wav",
+      "bytes": 705644,
+      "sha256": "ac2cac108a5df5330836c31a158487c4271eee1cfc55fa63f5969698b1e56c78",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/tidebound/sources/sail.wav",
+      "bytes": 30912,
+      "sha256": "f9d142fa39c9843a199742eb695e175d5c218581cac7373ca12ca90cf342b4c8",
+      "kind": "binary"
+    },
+    {
+      "path": "assets/games/tidebound/sources/tidebound-models.js",
+      "bytes": 19542,
+      "sha256": "0a0905a119511eac692eae299e693a07f701471aad0eb0b8740400a126b7b1e4",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/sources/tidebound-scene.js",
+      "bytes": 24908,
+      "sha256": "df22a201c3b05bab2a4be1a0c1633dbe1461e3d619668fadfe2dcc8bd11dadb8",
+      "kind": "text"
+    },
+    {
+      "path": "assets/games/tidebound/sources/waves.wav",
+      "bytes": 352844,
+      "sha256": "d75247c121c43889bae1309fb89726a63f0635c108465a18cfb8653c315dc644",
+      "kind": "binary"
+    },
+    {
+      "path": "games/aetherwake/package-lock.json",
+      "bytes": 16948,
+      "sha256": "4d8271dbebcf614d08c9b5afa95877038cbdd789689e6619f27f8aea383be8fe",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/package.json",
+      "bytes": 422,
+      "sha256": "65b4b403d935b80bb328e8748b46f82f67d53f04be240e73e7a8df6f706838fd",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/scripts/build.mjs",
+      "bytes": 841,
+      "sha256": "0f5d0ddefabb1ce9e7e3fe09b7b26d67d091f5cc92d33cbd96fe4aba0b04ded8",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/scripts/export-assets.mjs",
+      "bytes": 9978,
+      "sha256": "3a16455d65067754b8925c908ed08f168316ddf943c4c31822cfb42ec2d54c1b",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/audio.js",
+      "bytes": 7387,
+      "sha256": "db6d2e3d16e8ab6d863168c5f657a298026a76ae12ce60874882b4c034626e53",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/bridge.js",
+      "bytes": 2169,
+      "sha256": "5bba0107e080d741a9cb9511baf7bc7179e0b2b86a2475068249c8821c58dc10",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/flight-plans.js",
+      "bytes": 19593,
+      "sha256": "db5168e8c1e644ccf7c41a012e30e829ee210637d27a2904d673752fc29005f4",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/index.html",
+      "bytes": 7099,
+      "sha256": "c8031e3b43e505d2273e72d24a2be57f82ca5859a152711ed2e214fbf0077194",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/input.js",
+      "bytes": 5970,
+      "sha256": "827cbae2dab23b5ced2fffb04e3543e4f2c5fc7ff01ada379845802724344201",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/main.js",
+      "bytes": 37889,
+      "sha256": "1a72b7c3b3cc2ac8c3082bfbb19025207dc0979fc71cbb56b62abbe64ffad87e",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/models.js",
+      "bytes": 25033,
+      "sha256": "b823f90af0891441855f83d9238bd636648ac0a0321e20b9dbb61d57249ba8d7",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/scene.js",
+      "bytes": 39261,
+      "sha256": "3ffa8289bb0574301a1df6eb1794803c653819be3f347574b0669e201072b61f",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/simulation.js",
+      "bytes": 28236,
+      "sha256": "fb83cca6e4888270e53b57f254678443debc12ccab562e6fc3b1880e2353a86f",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/storage.js",
+      "bytes": 9348,
+      "sha256": "68217795ca95b208a8828a5bacb4827bf1108c737a1359db870a8e2e5fba572e",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/style.css",
+      "bytes": 25363,
+      "sha256": "4107f5189c468b1d65619e25bd27fba036ed00da99631b6ed078c67292c8b1dd",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/transit.js",
+      "bytes": 3662,
+      "sha256": "1a022864e79ccb023187d876be2cbe73b3b6552312a76dda71d5e2f6eb203bb8",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/version.js",
+      "bytes": 552,
+      "sha256": "685e12470d802315d96646565f3fd3555065bd955be4b35082f70de7d382b500",
+      "kind": "text"
+    },
+    {
+      "path": "games/aetherwake/src/world.js",
+      "bytes": 8721,
+      "sha256": "4e1d67f436e583151ee519fdd3e5aee0f88862492256b489da839ffb587560bb",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/build.mjs",
+      "bytes": 2065,
+      "sha256": "3120190702b5698a1c29ca15eb87dbaac0a141481227a4684c209a929aebafe0",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/cargo-tether.js",
+      "bytes": 831,
+      "sha256": "1a606f0cae0c0269f6a6be9ef987404c918eee3965af018f11cd51ce9d5468df",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/departure-guidance.js",
+      "bytes": 5901,
+      "sha256": "1429402296bc3f4b60e733ede2d3b2af5211e0659b2e31e84d06d983982d7b3f",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/enemy-tactics.js",
+      "bytes": 16304,
+      "sha256": "ad0c997a319ab034310970aa1a5e06cc948e7fe10d172ad1eb7c72988ca88955",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/expansion-content.js",
+      "bytes": 78639,
+      "sha256": "fc4344f5eab4326f0fac6087d2d59c9999c22505ecc0e34246128507f45ebe64",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/field-props.js",
+      "bytes": 22780,
+      "sha256": "ef45eda0d893b147de737b75b05da8538408953393820bb338f069046bc3d1a4",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/field-system.js",
+      "bytes": 86304,
+      "sha256": "a5b55dd4f495075b4e0c465e0bf87f8eb161cc463ee343aa0515fe866ca538cc",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/game.js",
+      "bytes": 129987,
+      "sha256": "8c93a2fe57a1e183a6f1d20a722d5f59148bd3c11ab7b6edaae287d2a572cbc9",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/ledger-flow.js",
+      "bytes": 30217,
+      "sha256": "cd1fc8043cd6b9061da818bc6e5b04d5acc4159c6d5dface7c1fa6c30a4f206e",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/ledger-props.js",
+      "bytes": 24061,
+      "sha256": "4141b773fb7b975da6dfb5b62f7d45cb20d98fe1ef74ed8dc4df2546317f922c",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/ledger-system.js",
+      "bytes": 37140,
+      "sha256": "b47b181badc96b5aa97e3d4fbc8db247d29ae9613ee5683fdedbc6049eca2c82",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/mission-flow-v1.js",
+      "bytes": 24537,
+      "sha256": "0f24bd95b11f02cec48b591cf2e5106ee4bbaf671c5973b7d185e2ca201b56ea",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/mission-flow.js",
+      "bytes": 24830,
+      "sha256": "4f36802e422fc948a1b58a5c0e17f0715349f3cd80220f7c9b6ee682efc762c6",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/mission-props.js",
+      "bytes": 23275,
+      "sha256": "92d502f68b2f0108bc07e261e87a12d93529f11a8cc8a56c4f897719586b9b22",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/mission-system.js",
+      "bytes": 48205,
+      "sha256": "4d70184e60cf2b4f4b2e9e53e2522cbc48568eb68729378f987c05a4b786f5f5",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/night-flow.js",
+      "bytes": 26363,
+      "sha256": "acf7fb1731dc9070fa65c491ee648c9be9f393e4c999195b2efbe372192b9940",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/night-props.js",
+      "bytes": 19078,
+      "sha256": "80726ceddbbf303c5bb81ca33c244adde3dc9d0cce65514a22030f0d3376797e",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/night-system.js",
+      "bytes": 29625,
+      "sha256": "8785c1545404cac63046f934a5585d225647926bc9039653bf8d81bddcf5f5bc",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/package-lock.json",
+      "bytes": 2636,
+      "sha256": "2f56db1b4ad1c8f8d18acb113507b896760b7bd4f36784c694683e22861f2830",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/package.json",
+      "bytes": 353,
+      "sha256": "5371e47b23e08957111bb7205458ea207ed9bfbb332d972208099ce63c66aa86",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/pact-flow.js",
+      "bytes": 28291,
+      "sha256": "ef312c37fdfd8d838a1126abffe4685510807278aa037aeac0b10362aa88a82f",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/pact-props.js",
+      "bytes": 29401,
+      "sha256": "338803fa70ac4217931b2adf64ed0fd7aa0414f80823c33c1aa15c795cc20fde",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/pact-system.js",
+      "bytes": 33050,
+      "sha256": "2635e12c50c7554c93793712dea28797882354ab5a318002581ee4327dda41f0",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/render-batches.js",
+      "bytes": 9956,
+      "sha256": "f15942c8cdafa65aed00c677729ee386f6052aa5270b994a26564289ab5a7ae9",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/signal-flow.js",
+      "bytes": 27884,
+      "sha256": "9cd6ae4f59ff7b02893ee36009038bfc26a8f96577edbbcce860b93b0cda8ca3",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/signal-props.js",
+      "bytes": 30581,
+      "sha256": "56ee663c1689ef2a587787d9e143eae764f33cd98bcc37e98176629563a4789d",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/signal-system.js",
+      "bytes": 37615,
+      "sha256": "9bbcd96067c5b774c2608e96eca1ef8f3176f14cdb0e36a715894695dec56b08",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/water-flow.js",
+      "bytes": 29320,
+      "sha256": "dec290d1602ccb1145ef8eb3fef841d932078039ed27f1ec3757d5b1ec7baf21",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/water-props.js",
+      "bytes": 24786,
+      "sha256": "a2ac8dfe649bf99ef04d09260a1f99571e48f00688dc9732239a48d0efba1d31",
+      "kind": "text"
+    },
+    {
+      "path": "games/dust-redemption/water-system.js",
+      "bytes": 35554,
+      "sha256": "9f55a81076a8df5a8e8d736c57bfb01950bdd1fb5bf3ab46b5b215697107e0d9",
+      "kind": "text"
+    },
+    {
+      "path": "games/hollow-crown/build.mjs",
+      "bytes": 765,
+      "sha256": "b27cb543e9f31a251098f510a975bc6f02a0b6d77ad2528b4dad055e38ee1f2f",
+      "kind": "text"
+    },
+    {
+      "path": "games/hollow-crown/package-lock.json",
+      "bytes": 2586,
+      "sha256": "082d0f9fdb27f1607fbbcc5da0bd96eaa92f40b7f71d9933bb60155ab111aa77",
+      "kind": "text"
+    },
+    {
+      "path": "games/hollow-crown/package.json",
+      "bytes": 313,
+      "sha256": "6f025bbf77d0586c40b0d3fb7b5addd0b8216e2a702b2a7aea53fb0199342694",
+      "kind": "text"
+    },
+    {
+      "path": "games/moss-and-moon/build.mjs",
+      "bytes": 606,
+      "sha256": "cab7bf4a68c4730d35eebd63474af24a0313fd8bbd544a5295c575118e44d330",
+      "kind": "text"
+    },
+    {
+      "path": "games/moss-and-moon/export-assets.mjs",
+      "bytes": 7578,
+      "sha256": "c502f358d66e38957527b38ed9f409e03ffdbc6b1c989a49354eecd353f67788",
+      "kind": "text"
+    },
+    {
+      "path": "games/moss-and-moon/export-audio.mjs",
+      "bytes": 5421,
+      "sha256": "3c8a6e598150c0a927fb2cfe06e968f9dcaae097cc65ba113edc1555fb17273a",
+      "kind": "text"
+    },
+    {
+      "path": "games/moss-and-moon/package-lock.json",
+      "bytes": 2047,
+      "sha256": "60c3569dfc00e3675542f2f864c3a4ea28bac74f959441fbedfce626ab8c2e97",
+      "kind": "text"
+    },
+    {
+      "path": "games/moss-and-moon/package.json",
+      "bytes": 330,
+      "sha256": "cb5cae4e371fd8eafb599687ade604437df3d29593b0e5fa2f691308a248f3af",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/package-lock.json",
+      "bytes": 14260,
+      "sha256": "c437ec3e9d3c2683972fb8ef0e470365aa1575e4a33973516009e45e6a1be12a",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/package.json",
+      "bytes": 388,
+      "sha256": "a845b83048f9766ec5ccaa76ec4b0b139eb5d3f0fcae65690bfc6a19f6a6ea93",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/audio.js",
+      "bytes": 4746,
+      "sha256": "b214715b174c05d95cf4359d9556ce149e796a7232e99bfccb79e4a3bf42b43c",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/bridge.js",
+      "bytes": 1539,
+      "sha256": "dfad3431df7775a67471bd62a0c90dc4854f28bdf08c6cd5d00bf2c21712191e",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/content.js",
+      "bytes": 7905,
+      "sha256": "1e94a18b886ef2eb4b2eba3afa8d4f945b6bbc540c8fd833b3cc1dc71c787d9f",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/frame-history.js",
+      "bytes": 1063,
+      "sha256": "b5d753d5f781e94b0e9268f3b4207e46b096381b1f107302bab7b47d2f4225bb",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/index.html",
+      "bytes": 4167,
+      "sha256": "adf9251955c58a76858e2e52c1cca8f6d738f4dfa4dd026a8245a245fb23a3fe",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/input.js",
+      "bytes": 2169,
+      "sha256": "ae2c98be86a8cd370224f1cba47398748b59ccd57588c836e3086d1c7afa9dd3",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/main.js",
+      "bytes": 39133,
+      "sha256": "a129eb3912eb4367d89b1c2b63c5553a49f7e133b90b995b2a9c91351c2331f8",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/notifications.js",
+      "bytes": 867,
+      "sha256": "e452081760ad1171a70d74ef53467f66f90963c133f870c8971e8ee8a2a87df5",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/physics.js",
+      "bytes": 14929,
+      "sha256": "ddc38b2ab3c3493133b7917d4b2318fcab49c319112a54a92fa3af8aa66225ed",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/presentation.js",
+      "bytes": 1366,
+      "sha256": "9ff791f277e14f01a2d585f185bb7b9565d361d94e0bd85ff7234c24e4cbd238",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/profiler.js",
+      "bytes": 5351,
+      "sha256": "1c4c4bb857ded465216c586f864a97c81ce5fe12f16d5576511f6dc078d92b83",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/renderer.js",
+      "bytes": 36078,
+      "sha256": "8c1845d493278ed310c96f1eafbb7fc68432b13a4d7ec2bbe9173026cb633c71",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/storage.js",
+      "bytes": 9428,
+      "sha256": "6b9b301fa7b7c230197f3449fd94b911896051a4021379c66ba6b12058bd2f0b",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/src/style.css",
+      "bytes": 12233,
+      "sha256": "b35931fc224b164589d60751dc56f9179a7945134651726b764b1758fd109553",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/tools/build.mjs",
+      "bytes": 778,
+      "sha256": "a7b87c9d97106e53781e555109432e3f23b9705af46360c5403b7aa76c6431fd",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/tools/generate-assets.mjs",
+      "bytes": 8092,
+      "sha256": "6043a65aa312063023db412a52f4d08c97663d0fd3df54f1cbed28189f88cbad",
+      "kind": "text"
+    },
+    {
+      "path": "games/neon-drift/tools/generate-audio.mjs",
+      "bytes": 3424,
+      "sha256": "74d0cdc4a85c065e7964d74b9082aaaaa23155c2becf1ac625c7a0303ed4f57a",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/build.mjs",
+      "bytes": 2860,
+      "sha256": "12a3d32cc2fe89ec6ca156808e8bbeb5738796d28c5337ab463b3c67a4338cb3",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/hazards.js",
+      "bytes": 566,
+      "sha256": "d8c1cf57be04b59b5b98aacb77f5971edca0c655040d2fc7014ffb32d45789f7",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/optics.js",
+      "bytes": 5765,
+      "sha256": "974a039f7af83d48b4978786a6b650f34e44934c6dbcda6202f11764590459df",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/package-lock.json",
+      "bytes": 853,
+      "sha256": "bf5c3b6fa63fb4616e3fd266f915f687a994ccf9051b76436194c375323abd42",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/package.json",
+      "bytes": 162,
+      "sha256": "3c6f7c13319f5ff56b1bd6f3b7fe616e83b276b284746206840484f162327878",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "kind": "text"
+    },
+    {
+      "path": "games/orbit-fall/rapier-init-patch.mjs",
+      "bytes": 3166,
+      "sha256": "7fd44003112af167ae02fd901156da71f85f6332bc1dcd9fa712885cb75136eb",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/build.mjs",
+      "bytes": 919,
+      "sha256": "d31819f0fc66ce1249375410b804dd65430d5f270da478103758c23a4f3af1b8",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/package-lock.json",
+      "bytes": 2568,
+      "sha256": "6360f1bd6fcbe1fae3d36b0054ef6705cf46c0b5635de5fc4d67861776d09f17",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/package.json",
+      "bytes": 253,
+      "sha256": "67aae7e9a26ba270644fb8ac115e29671192eebb197cb80666926431ac518a71",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/app.js",
+      "bytes": 24879,
+      "sha256": "50cbaad51c5cd616a22951f112bebdb9dafea1881c4264f8f3ecc9b12b29c829",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/bridge.js",
+      "bytes": 1427,
+      "sha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/build.js",
+      "bytes": 84,
+      "sha256": "4097e8eafef3d220cb851ad2083792e398f6abba855f5eef62539bdf75cd13e5",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/core.js",
+      "bytes": 23905,
+      "sha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/index.html",
+      "bytes": 2750,
+      "sha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/input.js",
+      "bytes": 3092,
+      "sha256": "928eefc8dd4bec8d9176e1a54ec67ae5e8ba19b0d415bd35c9d01608b0ade942",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/levels.js",
+      "bytes": 18783,
+      "sha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/save.js",
+      "bytes": 7389,
+      "sha256": "7070f49298a188a1b785bd647c497c824ef51a856970d9ced3f04aede0e6f142",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/static-stage.js",
+      "bytes": 3852,
+      "sha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/style.css",
+      "bytes": 9368,
+      "sha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4",
+      "kind": "text"
+    },
+    {
+      "path": "games/signal-zero/src/view.js",
+      "bytes": 17345,
+      "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/build.mjs",
+      "bytes": 909,
+      "sha256": "cd8df83869e2d74c1a939b5445abce72ecd906eb13a7f204a1a0f9041b43b50d",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/export-assets.mjs",
+      "bytes": 8270,
+      "sha256": "736b96a382156bc0c8053b6515d9bced36933d6b67129cd24f63e834c1842c0b",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/generate-audio.mjs",
+      "bytes": 3130,
+      "sha256": "df71b10952ffb05a10641876b65f0ab247888836ae38dcb0f450dabcfc8abb59",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/package-lock.json",
+      "bytes": 16407,
+      "sha256": "978366e304759c57e5a9cee71f5f904fc72873e24ea22585273e158c62be6eef",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/package.json",
+      "bytes": 348,
+      "sha256": "20f79408b1630d1721e124b956e641419d128e52882c8c8f6e513dabe694b11f",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/audio.js",
+      "bytes": 2369,
+      "sha256": "b0ff4f591e3f8d3fe7886fc12902b68d9d939f5c544f14f92c91fb15774e0f69",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/index.html",
+      "bytes": 5213,
+      "sha256": "700fe8f65b6d0eee31e49966f599e5ce5fac6e8678c5d44914390946764d7933",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/main.js",
+      "bytes": 41968,
+      "sha256": "2ff89a22fe4e0e78055b5461c1275112ac6de05fadf241124635231a93986e23",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/models.js",
+      "bytes": 19542,
+      "sha256": "0a0905a119511eac692eae299e693a07f701471aad0eb0b8740400a126b7b1e4",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/rules.js",
+      "bytes": 37280,
+      "sha256": "085071254225fd35045b5c1b4dc98d53bae479346e6e91a107738552f5616c8a",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/scene.js",
+      "bytes": 24908,
+      "sha256": "df22a201c3b05bab2a4be1a0c1633dbe1461e3d619668fadfe2dcc8bd11dadb8",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/style.css",
+      "bytes": 19351,
+      "sha256": "d3c166817e69d09b120098bf252203eddc5d43d08b40864832e9387b57665be0",
+      "kind": "text"
+    },
+    {
+      "path": "games/tidebound/src/world.js",
+      "bytes": 28871,
+      "sha256": "4ab3a7218ae750dea04022d49f6d9e051413cdd10106c6923dfc01e31df618fe",
+      "kind": "text"
+    },
+    {
+      "path": "launcher/index.html",
+      "bytes": 3359,
+      "sha256": "93fa94c578885f7c7a4ef335ba7c4f5c203cc1bb5e2fc4a610c6def5adfd4e35",
+      "kind": "text"
+    },
+    {
+      "path": "launcher/style.css",
+      "bytes": 2276,
+      "sha256": "63dc5ddce260e8e6302c45dd99ea5cf24cc9ed9c9543ed234dedea169fbf3536",
+      "kind": "text"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 279,
+      "sha256": "aa5a2ad7312d6281d249956c1de5eed26943740e48db63a0e6fc0b07ee2131f6",
+      "kind": "text"
+    },
+    {
+      "path": "package.json",
+      "bytes": 580,
+      "sha256": "2e28d52d6f596775ffbcc4098da239be9de83fac0adc05d2769bbc699e568368",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/.gitattributes",
+      "bytes": 67,
+      "sha256": "21836c2c546c81bd318ead4ed4f16d431a8d3fb2d6c7b0ba9dd405973af98835",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/cloud-sea-loop.wav",
+      "bytes": 564524,
+      "sha256": "295ee08bc4a31ee25cf95118b7a8ff67f331693cb4ab8c9f973d2769743a26ed",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/energy.wav",
+      "bytes": 14722,
+      "sha256": "0a2307de65282752bab8173536d7b757db31391ac4b6667a1647af9fcd4f4d57",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/finish.wav",
+      "bytes": 46570,
+      "sha256": "88f86dc2bdba87a06fe9c772cabb0c4ae02621c86168af6a827a6c8df1ab4506",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/glide.wav",
+      "bytes": 32150,
+      "sha256": "6714b17eadba470bcbd76971d4e0077a69d5e26f0383dc446cf1b72e0af2877d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/land.wav",
+      "bytes": 24530,
+      "sha256": "3e682f0d8ae87e6bd312cf7292c05eabfe5159a2e83bf26f6b5addab68df2cb3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/relic.wav",
+      "bytes": 17862,
+      "sha256": "2ccedabbd0c42de048b7a53a06cbd9f4e8475668bcea4bf8bd711685a3a6d6f7",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/stall.wav",
+      "bytes": 22624,
+      "sha256": "60246c60f25ed62cad94b0486bc4acc800603382ac63ac17f3c048e4de000019",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/tailwind.wav",
+      "bytes": 46438,
+      "sha256": "01cda312b5e40b2488e6834e5cb710c7c25e3497de4e4aa3b0c9fe07da253852",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/ui.wav",
+      "bytes": 6660,
+      "sha256": "98ddc559cd2311684f3fcca6e68723ac3bdeaf3e411ba07b027f35d4dff01014",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/unlock.wav",
+      "bytes": 31392,
+      "sha256": "74a77837309b8257afd70b8d4e0521564bab5f3581842e8bae3402f256cdecaf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/data/collision.json",
+      "bytes": 8390,
+      "sha256": "30bbeb88c2338141200dda9d972551487c005ef45692ffb2e7173f3c279c76e3",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/data/manifest.json",
+      "bytes": 95606,
+      "sha256": "58a9da65c4df891979c75014d4bd0cc388e2a37998640d6a7647c10068494eaf",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-01.svg",
+      "bytes": 545,
+      "sha256": "79594ba8b75754865db79bbf067069d7862021eedf7feed4813b8e7961cb9709",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-02.svg",
+      "bytes": 516,
+      "sha256": "2bff5dbcf36aba8460dfb41ce161010dc92dfe7d24e35c9c3975a00205434826",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-03.svg",
+      "bytes": 719,
+      "sha256": "2f405da5b0bb253ef71e8194ef04f316d456c7db0f303c4f3f9274e747fdf75a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-04.svg",
+      "bytes": 734,
+      "sha256": "bf4b3728d4524531aee9b68043a19df6816e28e29908518fb86383e039775a36",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-05.svg",
+      "bytes": 545,
+      "sha256": "41a5e7979c0edee6d0aaa29c009199a33b84a24b2cd23cf7a9d38e16dbefc176",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-06.svg",
+      "bytes": 516,
+      "sha256": "c7de53fd0ea6dc1d20a08c369f4146e46fa4abecbdbeae4461767a4183b3481c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-07.svg",
+      "bytes": 719,
+      "sha256": "f8e4fdd658db2cdc71b1ca1eac34ebdc86e569a9f7491a79edb58a208e55dbcf",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-08.svg",
+      "bytes": 734,
+      "sha256": "74ab3b4479226323b8d1500ff95075eed0e6d1bcf9a298d78191a9c463cd487c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-09.svg",
+      "bytes": 545,
+      "sha256": "7324a501467c8ec0d260b7ff46ff99bca88dd46f1e996810510f8e0495cfbd7f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-10.svg",
+      "bytes": 516,
+      "sha256": "bc9fa139fb2b76066a127f7fbc37ba28d1e798d5cf253784399f8188c9cdd2ac",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-11.svg",
+      "bytes": 719,
+      "sha256": "ac09d59c37f67a788db401dc136a1888f28fb6ba8d065f137ffc59deb9ea2ff5",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-12.svg",
+      "bytes": 734,
+      "sha256": "eebd1e89316bdcd93d557972b726533f898b8e344fbd37e8fff54af372238e70",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-1-low.glb",
+      "bytes": 72224,
+      "sha256": "94136d645d000ceaaa58b5e5a685b946cc818fb8ca314f8a9fc29cfaa5d7eef9",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-1.glb",
+      "bytes": 333068,
+      "sha256": "c7b8c9fa1a60a325654ee2be92592cd3feb935eb52a31ea30e810a06fe97840d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-2-low.glb",
+      "bytes": 102024,
+      "sha256": "427983ebae29681819672093796dcad92719ae007315a4a04622bf1530391c98",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-2.glb",
+      "bytes": 361784,
+      "sha256": "b2e05206c4c1d58b87348041bdd419d1b15b27517199d3a85e9a2306e2fe0a0a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-3-low.glb",
+      "bytes": 71084,
+      "sha256": "39fcb8b3bde4ce32cd13aa90eaf576d1570c09c59069cc7571fed9f6bf061191",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-3.glb",
+      "bytes": 322184,
+      "sha256": "1a37b74ee3aa22c15c107bf36f25b69b223d2e7c7ae7a73238beb577acb8bae4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-4-low.glb",
+      "bytes": 155256,
+      "sha256": "deeab58dde489de8695001869b663d1919244b5f63d5cca7a3815b49c6ec8af1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-4.glb",
+      "bytes": 425196,
+      "sha256": "8b54f97d04cc7c67de3613f7a74a357f22db923f4eec402d485ff9688becbbf9",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-5-low.glb",
+      "bytes": 126484,
+      "sha256": "6eb5e4f18de7f55ae1f735690fca12c197079886806dcc68364128c4a959f97b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-5.glb",
+      "bytes": 381940,
+      "sha256": "7ee06c0e94ab8ee2db1596295af58d2c2a1767753a14f05a7935a84f086a2071",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-6-low.glb",
+      "bytes": 141672,
+      "sha256": "889b2642f4ccad1ae1c8a6c0840978b5b045289893b8f19600dbddea1d597277",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-6.glb",
+      "bytes": 457384,
+      "sha256": "b65a75f12ed417750bbdf843337a361b3a188f435594cd7ecc87d5a11648fa43",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/pilot.glb",
+      "bytes": 204772,
+      "sha256": "43ff07b262dd8eb044e2ed866547621734a54490fe1f55c75867c73ccfd26470",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-01.glb",
+      "bytes": 40800,
+      "sha256": "882a1707562afdb81bcde5e8f19e2815ed084382fb643857040425287653da31",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-02.glb",
+      "bytes": 43224,
+      "sha256": "18cbcc27ea725128f6186099f74abc8433c3b1fafe36f6cc3b6d74dfbf65865a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-03.glb",
+      "bytes": 45908,
+      "sha256": "f01390940f757904752bf988483a43d82dff5bbee4dfe54ff654c267f1edb534",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-04.glb",
+      "bytes": 44324,
+      "sha256": "4a18210f2e05215c83e779d14392567d47c36eb4e04afd3b29a6938a8a3f0993",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-05.glb",
+      "bytes": 42076,
+      "sha256": "6556ce94d833151f45b1531d4da075cf15a33e0359f7db0e1c22b742f5223c2d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-06.glb",
+      "bytes": 44756,
+      "sha256": "3d058507e1507af001d6e8b61ba36b809fc89c83f4ebcc045e353545db2c41a8",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-07.glb",
+      "bytes": 59476,
+      "sha256": "f38a0a6ee0cf05f2778af9a24fd3c51a7039be08d272a9888ef8725c700c9c77",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-08.glb",
+      "bytes": 61872,
+      "sha256": "70ca2323040ccb7724b74d636390f9af4b8c0531e9e8dc3d8656923275258c3a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-09.glb",
+      "bytes": 59940,
+      "sha256": "376f68d73e5b7244ccc1a0fd2d22886e1251cf2c6167ac6c0ea1c8161f7e34c7",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-10.glb",
+      "bytes": 58364,
+      "sha256": "e7ca1bf03d0c48f18fb9566872c890856ead72a0a0556ff2fa915c9185759954",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-11.glb",
+      "bytes": 60724,
+      "sha256": "7e2de9bdce00ce159ad5f1b080bad34dc6387fc10ef2d99c40caf01c16158965",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-12.glb",
+      "bytes": 63400,
+      "sha256": "1f59eaf462ac3e84c6d121bdd5bb366c5bd16eb13c20ec3e81d520df12bb6668",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/station-1.glb",
+      "bytes": 115936,
+      "sha256": "df7330ab0d85b8bfdc31e56ceef9b6c02a3cb87318e5ca38cb39f1da9b650ad7",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/station-2.glb",
+      "bytes": 188884,
+      "sha256": "16af2c3880dae59d670a50f2fb018cce4d019cb12047bf9c14e09b10a5233e47",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/station-3.glb",
+      "bytes": 175076,
+      "sha256": "959e993ec19c4a9efc0284fdb597cdb703b36d2ee0edb3a9d5364ca86cc1fd35",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/wind-crosswind.glb",
+      "bytes": 15012,
+      "sha256": "0b8e599d725943487ae24158b62206955fb711ffe82e9f53d4ecf11e256f5a3c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/wind-tailwind.glb",
+      "bytes": 14932,
+      "sha256": "a905b00f6a26347eb456242351c14d139d7b53d9a8ce4fb6a5624074c88c0b5d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/wind-updraft.glb",
+      "bytes": 32588,
+      "sha256": "bf4ee136eb22ae081673e80bdccaf512cef1ca5ab5cd65c58fed36024a30e995",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/aetherwake/game.js",
+      "bytes": 697829,
+      "sha256": "f4ca097f26585369500e0719dfdd5d502495c88ce7c0a129c0ab6fd06bcd82c0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/index.html",
+      "bytes": 7099,
+      "sha256": "c8031e3b43e505d2273e72d24a2be57f82ca5859a152711ed2e214fbf0077194",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/aetherwake/style.css",
+      "bytes": 25363,
+      "sha256": "4107f5189c468b1d65619e25bd27fba036ed00da99631b6ed078c67292c8b1dd",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/.gitattributes",
+      "bytes": 19,
+      "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/enemy.wav",
+      "bytes": 24742,
+      "sha256": "2411fb9d63040cccfa2d083ae9241daa3e7b80ecf4e15dda7e49b267c058760d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/hit.wav",
+      "bytes": 13274,
+      "sha256": "87fcb8420538badf13d528938039affed92d7b8c0d5da0d4c7e523f3d37dd667",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/hurt.wav",
+      "bytes": 33560,
+      "sha256": "df71bcd27ba58cbd3ebc656623acd0434a20716ff4e81c3fa1edbd2b9d4bd454",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/manifest.json",
+      "bytes": 7910,
+      "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/reload.wav",
+      "bytes": 44144,
+      "sha256": "a9b8d786adbf930e28c021f5fd3101c9bff0b25aef5995d086816b05c983c82c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/revolver.wav",
+      "bytes": 33560,
+      "sha256": "cf73989af90bebd8e692ecef6dbbe31cbc890c8ad0bf5ce570d5341972ddf23d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/rifle.wav",
+      "bytes": 26504,
+      "sha256": "6efb2b079b949d27bf33a72f7a0fabd112b5f4a5baf9154d74ddedb92d84499e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/step.wav",
+      "bytes": 15920,
+      "sha256": "4594f305d80dc961d046d172254b36732fdb7af200beddc73baaa5745f03139a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/stone.wav",
+      "bytes": 20330,
+      "sha256": "a6d9328fbf555d9352bf24571757060d731b3cc79c5547ece9bb36795ff32fc3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/success.wav",
+      "bytes": 83834,
+      "sha256": "59914aa0d58d76a33ffafe207518db16b242e59ee646ce8d59d5f840568b3911",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/ui.wav",
+      "bytes": 10628,
+      "sha256": "7d110a84e7473e31c99671fd46a1c581c538a0b44f84260fd370f85911fa5e87",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/warning.wav",
+      "bytes": 38852,
+      "sha256": "1c0986b8cd6aea7ac320f1e09d14f36aa3882bb8678880ccd6f84919b2818dcb",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/data/colliders.json",
+      "bytes": 9259,
+      "sha256": "21d06ffcecd0c28d04ebeec11be5dce3274101eb71d1ee410330b7674c0b2324",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/data/rig.json",
+      "bytes": 5081,
+      "sha256": "ec0622185ffa81df65a3ab927efb0cfa629d4407435dacbcfe86c5c335c51e25",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/models/frontier-kit.glb",
+      "bytes": 2352012,
+      "sha256": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/cloth-grain.png",
+      "bytes": 335,
+      "sha256": "c66aea461ba84f57408d2b641bd6b30a5e3850ddf3994bee69bee513aa7db91f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/stone-grain.png",
+      "bytes": 14261,
+      "sha256": "734fb16f62f58987eac7aa3a42c174c1abde36fd2cfa62563ddd8f3cccc25604",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/wood-grain.png",
+      "bytes": 13263,
+      "sha256": "6bf8bfc1de3e46f08e9cb241c1cbdbe9cc5ce1aa0f9d6f8057aff32fcdf6d2f1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/dust-redemption/audio.js",
+      "bytes": 7485,
+      "sha256": "2d4aa9d1723f84a4f05925a8a9e28a3115ad65ddc737ac7d4c0e9bbca4c4e09f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/bridge.js",
+      "bytes": 1794,
+      "sha256": "99b48741f95fa7e59f9506a281817e8b7e8a8a7cddf95a862bc48a7abecae6ce",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/cargo-tether.js",
+      "bytes": 831,
+      "sha256": "1a606f0cae0c0269f6a6be9ef987404c918eee3965af018f11cd51ce9d5468df",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/content.js",
+      "bytes": 25412,
+      "sha256": "f0e004ec3f45066e389767553b2479823f73b7d907d3e522b7fdf41f815a3dd1",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/departure-guidance.js",
+      "bytes": 5901,
+      "sha256": "1429402296bc3f4b60e733ede2d3b2af5211e0659b2e31e84d06d983982d7b3f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/enemy-tactics.js",
+      "bytes": 16304,
+      "sha256": "ad0c997a319ab034310970aa1a5e06cc948e7fe10d172ad1eb7c72988ca88955",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/expansion-content.js",
+      "bytes": 78639,
+      "sha256": "fc4344f5eab4326f0fac6087d2d59c9999c22505ecc0e34246128507f45ebe64",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/field-props.js",
+      "bytes": 22780,
+      "sha256": "ef45eda0d893b147de737b75b05da8538408953393820bb338f069046bc3d1a4",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/field-system.js",
+      "bytes": 86304,
+      "sha256": "a5b55dd4f495075b4e0c465e0bf87f8eb161cc463ee343aa0515fe866ca538cc",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/game.js",
+      "bytes": 129987,
+      "sha256": "8c93a2fe57a1e183a6f1d20a722d5f59148bd3c11ab7b6edaae287d2a572cbc9",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/index.html",
+      "bytes": 3070,
+      "sha256": "7dbb2c2b5583a906de1bce4084ee0e98a1a693f0b9be826d051d2f58d8915302",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/ledger-flow.js",
+      "bytes": 30217,
+      "sha256": "cd1fc8043cd6b9061da818bc6e5b04d5acc4159c6d5dface7c1fa6c30a4f206e",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/ledger-props.js",
+      "bytes": 24061,
+      "sha256": "4141b773fb7b975da6dfb5b62f7d45cb20d98fe1ef74ed8dc4df2546317f922c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/ledger-system.js",
+      "bytes": 37140,
+      "sha256": "b47b181badc96b5aa97e3d4fbc8db247d29ae9613ee5683fdedbc6049eca2c82",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-flow-v1.js",
+      "bytes": 24537,
+      "sha256": "0f24bd95b11f02cec48b591cf2e5106ee4bbaf671c5973b7d185e2ca201b56ea",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-flow.js",
+      "bytes": 24830,
+      "sha256": "4f36802e422fc948a1b58a5c0e17f0715349f3cd80220f7c9b6ee682efc762c6",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-props.js",
+      "bytes": 23275,
+      "sha256": "92d502f68b2f0108bc07e261e87a12d93529f11a8cc8a56c4f897719586b9b22",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-system.js",
+      "bytes": 48205,
+      "sha256": "4d70184e60cf2b4f4b2e9e53e2522cbc48568eb68729378f987c05a4b786f5f5",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/night-flow.js",
+      "bytes": 26363,
+      "sha256": "acf7fb1731dc9070fa65c491ee648c9be9f393e4c999195b2efbe372192b9940",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/night-props.js",
+      "bytes": 19078,
+      "sha256": "80726ceddbbf303c5bb81ca33c244adde3dc9d0cce65514a22030f0d3376797e",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/night-system.js",
+      "bytes": 29625,
+      "sha256": "8785c1545404cac63046f934a5585d225647926bc9039653bf8d81bddcf5f5bc",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/pact-flow.js",
+      "bytes": 28291,
+      "sha256": "ef312c37fdfd8d838a1126abffe4685510807278aa037aeac0b10362aa88a82f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/pact-props.js",
+      "bytes": 29401,
+      "sha256": "338803fa70ac4217931b2adf64ed0fd7aa0414f80823c33c1aa15c795cc20fde",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/pact-system.js",
+      "bytes": 33050,
+      "sha256": "2635e12c50c7554c93793712dea28797882354ab5a318002581ee4327dda41f0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/physics.js",
+      "bytes": 2550,
+      "sha256": "2260f80ab8eda6387ca948a75084284fc32af0a6b2974fbcdae20a6b2a80e46d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/render-batches.js",
+      "bytes": 9956,
+      "sha256": "f15942c8cdafa65aed00c677729ee386f6052aa5270b994a26564289ab5a7ae9",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/rules.js",
+      "bytes": 34051,
+      "sha256": "97ac178e461c56160b3a51b1b3642771d03a0a3a4064567f5b0bee0aa92bb731",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/signal-flow.js",
+      "bytes": 27884,
+      "sha256": "9cd6ae4f59ff7b02893ee36009038bfc26a8f96577edbbcce860b93b0cda8ca3",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/signal-props.js",
+      "bytes": 30581,
+      "sha256": "56ee663c1689ef2a587787d9e143eae764f33cd98bcc37e98176629563a4789d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/signal-system.js",
+      "bytes": 37186,
+      "sha256": "03ead433ae81ba14642a2eba6e15f2733ba129c850cbb972dd1ce05c4a160b6d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/storage.js",
+      "bytes": 6565,
+      "sha256": "ba57973408cf67c0028b68f91b73cd717b1c5c038f4f22cb93cffb27d87f1b18",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/style.css",
+      "bytes": 15645,
+      "sha256": "ea01047dd07b93736578d9ee59aa2fa1493efb16c1a391e26eb3d0e113c59594",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/BufferGeometryUtils.js",
+      "bytes": 35551,
+      "sha256": "248b3e8420bd3de805ca01845c1b0cc62aa2766f3c56bdcead265e306f8e715c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/GLTFLoader.js",
+      "bytes": 114744,
+      "sha256": "2904f2823e23d5bc1d64512bf4c0d777ac44d728d47c34a9e3d48ce8ef6b761d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/SkeletonUtils.js",
+      "bytes": 11074,
+      "sha256": "98b7b2b72f64f0132669976fd5992436c3bab2d077023c7871db1ecf7e0f279f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/water-flow.js",
+      "bytes": 29320,
+      "sha256": "dec290d1602ccb1145ef8eb3fef841d932078039ed27f1ec3757d5b1ec7baf21",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/water-props.js",
+      "bytes": 24786,
+      "sha256": "a2ac8dfe649bf99ef04d09260a1f99571e48f00688dc9732239a48d0efba1d31",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/water-system.js",
+      "bytes": 35554,
+      "sha256": "9f55a81076a8df5a8e8d736c57bfb01950bdd1fb5bf3ab46b5b215697107e0d9",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/dust-redemption/world.js",
+      "bytes": 25505,
+      "sha256": "cc08fb4f3b2b9dc8d8a7bb6507578dc00d1244d338d6518d59141a2350147f27",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/.gitattributes",
+      "bytes": 72,
+      "sha256": "c882794754ab6adc93a3f11266d728c67c8ed67bd31d513824c1a3a24bbb4db8",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/boss.wav",
+      "bytes": 705644,
+      "sha256": "95a8afbd15afe9b6b9e7ddbe3ed4f827dfaaedf8d01457791f989b9f222f284c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/camp.wav",
+      "bytes": 705644,
+      "sha256": "c72c12780f342d8768372c8e002f99d4e40b621d069eaf092857759ca3306e10",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/charge.wav",
+      "bytes": 28708,
+      "sha256": "c4e582853717124ff41ffe44813917bcfb639d79a48c6919605763be492e413e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/combat.wav",
+      "bytes": 705644,
+      "sha256": "df370f14084fc91f9e883a65ee7acada4b8f723bb54524d2f5383d5602361109",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/death.wav",
+      "bytes": 30912,
+      "sha256": "23252a52c9a3a944c358418792c49f83f07514212e9e6fe9aa1802f97e046e4b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/dodge.wav",
+      "bytes": 8864,
+      "sha256": "1eeebdb304162ec501798347c045d25666de9af6c73bd586fab6874a51bcc799",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/hit.wav",
+      "bytes": 8864,
+      "sha256": "52f7272d92486a69a8c159812d011c4e9114900173ae1f0e6ed1b05f8a1ef085",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/hurt.wav",
+      "bytes": 15478,
+      "sha256": "a978e2708145de20add3b15a149fdb17deb2e0763719d0bc703bd73dbb4f63be",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/light.wav",
+      "bytes": 7100,
+      "sha256": "1d664a2f7c282800ef0618371244b1c55c76d0142e6cce7fa7bf9d559cf5558f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/loss.wav",
+      "bytes": 44144,
+      "sha256": "71766ded4ac67c68e4794b075c899fff93be98445cc8194cb98e73b5fe873d6c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/metal.wav",
+      "bytes": 14156,
+      "sha256": "c58b5063d83a3bf9d910977a1e307e67fffab4dbe5047f84644a5b34d6f19bb1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/parry.wav",
+      "bytes": 19888,
+      "sha256": "3e1c974048f48a29ebc4d21c98ae53b640edfd8aaf65d25eef935d96e3414cf8",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/stone.wav",
+      "bytes": 8864,
+      "sha256": "726b6267ca7e3be368898e96c9ffa3631d889458c58230f3b8de57796d6c2d6c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/ui.wav",
+      "bytes": 4012,
+      "sha256": "ca3f02d712c14f4ffe96a34df94af753cb7099bd9e8462ee927c0d4c45d549b1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/warning.wav",
+      "bytes": 11068,
+      "sha256": "05bd421b322a36c65df393d15d1685872ad2e388967778e41880007390f3b159",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/audio/win.wav",
+      "bytes": 61782,
+      "sha256": "0bdc0a0e2940828a622a039486801397ad65173c49e83a8dbf92f92011e386b2",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/altar.glb",
+      "bytes": 283852,
+      "sha256": "f5e7f76641b5b86e5d0adf110798c7e15f0633f24ca82ca7f9d298a4cc5aa6a4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/arbalest.glb",
+      "bytes": 44284,
+      "sha256": "939bf2a46d37cd950ea56a7b690eb0b8728484b8aebf64a54045d420982883f1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/banner.glb",
+      "bytes": 5892,
+      "sha256": "c47b4ced263ba5410b8ba5c7ba31947d08f15c54b47124fc2c1bdb99b2b17372",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/bellwarden.glb",
+      "bytes": 44436,
+      "sha256": "37bb4e66a0bb4582d639ef3ecb999a3f9976760b3354ec141e9134b3a6510c82",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/brazier.glb",
+      "bytes": 13404,
+      "sha256": "b4373da620c1391fe9fb2d61250b2934d80fad81c94a7f99b786419bf8d37b21",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/candelabrum.glb",
+      "bytes": 10240,
+      "sha256": "ac2480d60f7dadc195b372786052a4230a38ebbfb036dad3a17177a2cf670451",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/cinderbug.glb",
+      "bytes": 46304,
+      "sha256": "c29dfac0f686d37108bd92f963ecff779b4b5c74d38f6d74a1324e3b24c1da2f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/collision-proxies.json",
+      "bytes": 2097,
+      "sha256": "54ec3eccf7919b6aa1743b684bc6cec02fe6ebf4b754d1c55cd69446978ff01d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/crown.glb",
+      "bytes": 44304,
+      "sha256": "4f6f79c1b439386197903c41889c458edeb3b98e06b51de159b2c69b0c9f8f47",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/floor-tile.glb",
+      "bytes": 279188,
+      "sha256": "57d64ea5b25395fc503aaef83b9207598d4a850a85d0dcce12798d55bb2ccc6a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/guardian.glb",
+      "bytes": 42880,
+      "sha256": "f812f67b8b0a8a79499b4aedc6460d784be78c52fcd15fe82307663ac4ca4d3b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/infantry.glb",
+      "bytes": 42148,
+      "sha256": "59ce99d98c6fb9a30fe53f756562df6c6cf45031c5f658aeb7e1e8249d1a09c3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/kit.js",
+      "bytes": 18908,
+      "sha256": "62dc735b6f1f0f3594d8c9381fca92f80c84f3505f6e705c11e8d57a0f8a6f8d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/lancer.glb",
+      "bytes": 42984,
+      "sha256": "c821e2839c993f12ce5bde4c02e079693fc2bf1be979ac53cfb321dba3ba09c5",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/pillar-low.glb",
+      "bytes": 282144,
+      "sha256": "2eabf9070669f13598750e042809f91df3811da2f8641f494b3030858be63075",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/pillar.glb",
+      "bytes": 283564,
+      "sha256": "a0a14d65fd7e47019a756454d1416c5e0e29933d1a6fff9eb44732c9e4a12f31",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/rubble.glb",
+      "bytes": 280772,
+      "sha256": "357b8b308b7b1524b2f0e90d9c26765e32901c291841c601111bc14c766b47f6",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/shieldguard.glb",
+      "bytes": 42908,
+      "sha256": "36d68347c9232021bc39c94f735a32be2e109c42179f8b0a694486ba3d61d597",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/models/wall.glb",
+      "bytes": 280580,
+      "sha256": "ab7bd08805cf8954d9845e360069ae7cd1f6d34e87a41262608c2d51b9f4404a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/textures/ruin-stone-basecolor.png",
+      "bytes": 76203,
+      "sha256": "5bd50be7e08458cdc536007dae4157bc76cf5590259a5d9f122f3878ab817540",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/textures/ruin-stone-normal.png",
+      "bytes": 144979,
+      "sha256": "cca0005e6e6bdd83c2dc8698e76978c95dd0631139b8edad2dd56efd11b9f03f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/assets/textures/ruin-stone-roughness.png",
+      "bytes": 53448,
+      "sha256": "7b45ba6b415406dad996fa590be5fb492550794c6e4d5ee688676fcd6e57ff38",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/hollow-crown/audio.js",
+      "bytes": 3592,
+      "sha256": "e4ac5f9d7fa7fd8edae1256a58c9426f2889a53e0d262b07865a34638b6d512c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/boot.js",
+      "bytes": 1069,
+      "sha256": "312734702dce69a7c2bde808c402ff8440b2edbbcd33a79c8659e4a5a1622aae",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/bridge.js",
+      "bytes": 2803,
+      "sha256": "9eb5da2c48ebc75c9feafe01996a951f6dc9f92a4e43bd5fa32ca2adac29a55d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/content.js",
+      "bytes": 9440,
+      "sha256": "1defd1959a58b0cf5d223c9da338331df89f203452851e9581005c7c55b4fd1f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/index.html",
+      "bytes": 2592,
+      "sha256": "f9d4eaeff43d3e8767a09f0c5206fdb85e8548bae197ffee6e864210397293ec",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/input.js",
+      "bytes": 4880,
+      "sha256": "6750921ab3c997c855d3f1e93b11a3168a18253e83923e54970a65de7c540650",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/main.js",
+      "bytes": 31322,
+      "sha256": "cccea33262aa87aed1ef963bc753c95578e8c5771e8ef7685cf7c8c24133f972",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/rules.js",
+      "bytes": 49655,
+      "sha256": "87e6396bb0a18741066d93b9ce895be5d89678eb6bb8591ef83e01413fbf8d1d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/scene.js",
+      "bytes": 31277,
+      "sha256": "a150e29552134e713868ddcfeb760703104e5ea86a1ece117171290b87fe0bc1",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/storage.js",
+      "bytes": 5066,
+      "sha256": "8532199cfb649e949778efb97fd7023cf4f0d2fddd95eb3287ea09b81ee61c20",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/style.css",
+      "bytes": 12898,
+      "sha256": "82ec4f0c9caed25eaa73f8f08a3e7b4dddf117af6b9e8a5fd09cb7205a1ee04e",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/hollow-crown/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/ambient-leaves.wav",
+      "bytes": 128044,
+      "sha256": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/music-loop.wav",
+      "bytes": 705644,
+      "sha256": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-harvest.wav",
+      "bytes": 14444,
+      "sha256": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-plant.wav",
+      "bytes": 9004,
+      "sha256": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-success.wav",
+      "bytes": 38444,
+      "sha256": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-ui.wav",
+      "bytes": 3244,
+      "sha256": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-water.wav",
+      "bytes": 20844,
+      "sha256": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/asset-manifest.json",
+      "bytes": 227323,
+      "sha256": "44f1af8cbb2eb6ff5aacb83618440dbf21ec97743f1275b61a72bebd1dd16720",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/audio-manifest.json",
+      "bytes": 19410,
+      "sha256": "77e7c42365d1acd35ee3fb9513ece509569652ebb15be29558d6602ae5df7277",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/colliders.json",
+      "bytes": 18232,
+      "sha256": "a9b3b54833daecdeebc66e77a2c35566df2d2406099b3a2194e6f69019595001",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/model-index.json",
+      "bytes": 21990,
+      "sha256": "0ab3fa9db60a40fdcc6b8c89c516e43ced8ff2bbe825c61ef2ced2baf13b8680",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-arch.glb",
+      "bytes": 112588,
+      "sha256": "e9a5b413e5ab4a7ee1fe85a12cb2e8abea07759bb5b5010d67c34017a748f132",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-bench.glb",
+      "bytes": 15956,
+      "sha256": "004721d38646afb0fa77de15be566a34d1c8b7b4bd4d647712f79716cb775ed9",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-birdbath.glb",
+      "bytes": 25488,
+      "sha256": "f064b7d32e5404f28698d7dbcfdc8e401b780ebecc36a69fc475a096e00d5c7f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-fence.glb",
+      "bytes": 15956,
+      "sha256": "1a3112ee1117aa5dab8a85eb9706aa1decf91ee85e7795cc28c6afbf2d2cf52b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-garland.glb",
+      "bytes": 57704,
+      "sha256": "ae63f49ddb2c87d6b40ed1896e3f3902747d5dc562866aeac6cd7cafbb21e6ef",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-lantern.glb",
+      "bytes": 45328,
+      "sha256": "0de95f5a70f3083ef48184483b3bd3d0c4f26a85a2754df7193343c2d1be60b3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-moonstand.glb",
+      "bytes": 40808,
+      "sha256": "9bf33dc67b62a24764f6cad48b7eaa65ceaa1bccb4838110214588ca464f58b3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-planter.glb",
+      "bytes": 95740,
+      "sha256": "c1a8dfc56653587067d3827b5c2505c810ad5057e1dffd87dcfedbf848c00819",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-pond.glb",
+      "bytes": 53468,
+      "sha256": "5f113503bf13de189136e9f999cd038665856a27e119e8c6396a44df6c3b2f8e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-stones.glb",
+      "bytes": 15072,
+      "sha256": "54934452d94cb6a7016d46d44dcb75ae1e993a2bc3c27f538405bb270ffdc232",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-table.glb",
+      "bytes": 30228,
+      "sha256": "e200c65daed16933f7bc8c76cfe56af0f715ec34727d7b4b53c086bef92c614a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-windchime.glb",
+      "bytes": 39736,
+      "sha256": "3653c1e0e82819d194d2a11cdca38e3327f54674d0f3e85d42b7c477d3f97a86",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-dew.glb",
+      "bytes": 265808,
+      "sha256": "e23395097313865aeb83318484638d6244fe2a4cb7bb28e399c5253baa4dd3d3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-leafprint.glb",
+      "bytes": 168660,
+      "sha256": "c0bfeef45a4939b6906abc3beb5f6d1ec9495aa103e9bfbb6d0537813bd59f9a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-lichen.glb",
+      "bytes": 282720,
+      "sha256": "5d0e0de0979ae27d0aef8292ac8cb46a682abdd249f0a17f4e83593538a3643c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-mica.glb",
+      "bytes": 44024,
+      "sha256": "e54b65a9a1c91b85b1d89e8a6a5a99d2bbc36d284697b704fd55b3b75103148d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-moth.glb",
+      "bytes": 303812,
+      "sha256": "fe9c8882f0fbd1d5be71fb99bed8b17bd4e911163276cd8d707ed7c6bc2b6ca3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-quartz.glb",
+      "bytes": 57184,
+      "sha256": "5209cbf85a2dbaa9bd5bb597e2eee2c1b20a3f6b66aeedaf37b49a9df0fbdb16",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-reed.glb",
+      "bytes": 183428,
+      "sha256": "66ecb3913ede8cb06d7f8e8031a83d2fec09cb1d282d175a37454974dd53c085",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-roundstone.glb",
+      "bytes": 39848,
+      "sha256": "ab5570c01fdfbb3d4e2d9da763d29492bc2a458ccf2dfbd1930e9ba0e8990b05",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-seedwing.glb",
+      "bytes": 92620,
+      "sha256": "ecc32372cef9cccc213437ba6db6d1ff858031d58cbb022a437ed5662065f9b6",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-shellspiral.glb",
+      "bytes": 208800,
+      "sha256": "7e4e4409f5b5c0a5a9be687e7c9aa824408b2e778cd0a45c806234b30527b993",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-snail.glb",
+      "bytes": 335516,
+      "sha256": "e7912e48257339fc6c0e810ee196752e15df1bdb9e88a1a8d8a491b0553c7307",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-waterbeetle.glb",
+      "bytes": 223588,
+      "sha256": "9633ff72b3c2b10d9dc558580dbe38e9204cfa47a182ba1af345bf368f6db35a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/gardener.glb",
+      "bytes": 350256,
+      "sha256": "31dd5cb0cba8d7ff357530326e6fff9cce664165baf98a802f5f6fd5a0493b97",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/moon-cottage.glb",
+      "bytes": 69752,
+      "sha256": "7492d4a6d21e8ce3fefce6ea8fd21f0461bccb83ef4fa90b5d710ad0e8264811",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/moss-rock.glb",
+      "bytes": 54388,
+      "sha256": "5db3e78b8f843357cf1ff1da74b4b14fdc6c0befda45f26a9975862d70858396",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-0.glb",
+      "bytes": 10732,
+      "sha256": "3b5c7f0dca2be0a0b2c801718cc3f255fcdabc2de4db1fb53e49cfec67c147cf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-1.glb",
+      "bytes": 18636,
+      "sha256": "5fb5860a25ffea5517d974593bad0d294e7586f58af688a02df1241872d5b68f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-2.glb",
+      "bytes": 31312,
+      "sha256": "00028eaa351157eb31cabddffb17f4a435ee83c8e1e75ecaa3b329475c39e1ac",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-3.glb",
+      "bytes": 67240,
+      "sha256": "70d56fc30c9c77c700e7cad7546361eb69e657730ad9b2784a74912c60fde234",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-0.glb",
+      "bytes": 11776,
+      "sha256": "143eaa663eb3dc282699ee6faf418a1069fc142a7ede9b2eea71907863e4450e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-1.glb",
+      "bytes": 43976,
+      "sha256": "39df7ca5a3babca361a6e79b3212dd1ebb1838233b1c3eae32383b2b21346dc6",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-2.glb",
+      "bytes": 69320,
+      "sha256": "a7888e3486548e76ea40ec383e320c56b5f6141327da065537f472ea2c930c22",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-3.glb",
+      "bytes": 94668,
+      "sha256": "40aa33ae04538d06828db80324f8902eaa79a7fb1de9907807490f407b20b0cf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-0.glb",
+      "bytes": 11788,
+      "sha256": "86806061be9a3dac72533bef03171f00ef70cec3b9165af39fb94536f6eb495b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-1.glb",
+      "bytes": 23936,
+      "sha256": "1fce06a6e808d3643d80a276307c8af2954194652ffb98b6d30b7f1e34cdc15f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-2.glb",
+      "bytes": 52452,
+      "sha256": "c9885ee105a6fc24b687b58227515bc761debb11d7744fd7671ab3c3676b4e95",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-3.glb",
+      "bytes": 107372,
+      "sha256": "3323967611133a0bd8b672f56411b63e1f2e27cdec08f049965ab3b418aaa628",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-0.glb",
+      "bytes": 10720,
+      "sha256": "3a065f118989dd0de61030080eb75ff164c830bc0c8cbab00ca8f12b473790c3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-1.glb",
+      "bytes": 18112,
+      "sha256": "27cc7ccb3a9551a6bd3b80334f5b736f139131a81dc9f2330d747e48f42958b3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-2.glb",
+      "bytes": 20752,
+      "sha256": "e7d9483384584111b62bfe82fb9921491115a4f9ca3ab0fcc051973ef551f13f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-3.glb",
+      "bytes": 57724,
+      "sha256": "6beb16b0d339b089cd21215060542c0781041db9ff0d8dc1a7df5d7bfd9ac119",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-0.glb",
+      "bytes": 10740,
+      "sha256": "84cbfd75d4f5e2db54e5975bdc8aa3eb53fa7f55aa0a442edbd322f880c4cdbc",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-1.glb",
+      "bytes": 14964,
+      "sha256": "64fb96657ea8075373bc43af4b47652ed175892481f17eff511cc02f5d6cf028",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-2.glb",
+      "bytes": 23940,
+      "sha256": "6ff3ab8d796ce4abee140ec41fee34d326dc4a4605ec5cebd4a179988d8c02d4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-3.glb",
+      "bytes": 80444,
+      "sha256": "daf05de7b3c5f981bba2ecc4f81507f887bf2a895a0ef44b80de5094bab2806f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-0.glb",
+      "bytes": 19168,
+      "sha256": "f9bea9931caa99068cf9594784b1694b15eadb45390d961bc9e7a68d92b875dd",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-1.glb",
+      "bytes": 13904,
+      "sha256": "3751cae366037051824c16b94e1dbbcc5e1347945fd341bf145b239d557275a4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-2.glb",
+      "bytes": 32916,
+      "sha256": "2c775eef38e6e1ca7ce2056e5cdfb7e1798537527914cde9cf1b5acc93f43146",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-3.glb",
+      "bytes": 61436,
+      "sha256": "2e4fee65e9c18cb34f16f356e2f5c5010878ed436adf69d5eaae90797b7924af",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-0.glb",
+      "bytes": 10728,
+      "sha256": "4fcd9d35ca7a64d8cc2075820163081f013c0797b1437d6101178b2201b66bba",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-1.glb",
+      "bytes": 13352,
+      "sha256": "081c2be37eaf42cc39bcb52b6f5965b5608a22896647cd8a52712a4c12925eaf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-2.glb",
+      "bytes": 31324,
+      "sha256": "207e1982f80bfa769f4d0e9bbfcb1d7cd655dfa9d6c0d7e5f292eab4f0674ef4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-3.glb",
+      "bytes": 40852,
+      "sha256": "33aa89be3a34ed41bbfcfeedf44233b7abf4cce18e1f97f8772fa65d1c94cf74",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-0.glb",
+      "bytes": 16536,
+      "sha256": "f83e8a780348e768c7197b6547b8b350a148ef848775ee848ebb3375f2801923",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-1.glb",
+      "bytes": 16516,
+      "sha256": "582efa3726c0e0bb5270656c2b5e6a974e168a38aec9de088bd3dc7abb30ac10",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-2.glb",
+      "bytes": 27076,
+      "sha256": "17ff47a512dfbba062027826446c5b0ec22ce3d20ca308bc8fc4188625453322",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-3.glb",
+      "bytes": 90464,
+      "sha256": "6e97e74e4b591ff2d43b914e0638a586605135cbed5f312af29d240b355cdbfe",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-1.glb",
+      "bytes": 329644,
+      "sha256": "0954f8d637b749692244ef36feaf6abc8651d6f27e562bcd342e69c012be711c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-2.glb",
+      "bytes": 440620,
+      "sha256": "83d4ef979670fe92fb95098dffd3ccc499d21b0bf24b51a2c5ce082553485087",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-3.glb",
+      "bytes": 342696,
+      "sha256": "71ba38e0c593025f6b46165294b9405a77aaab1d9125092a6107dbf55ec68fb5",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-4.glb",
+      "bytes": 377788,
+      "sha256": "ebd638041bb8d4dba3915b1a0cd5946c8b74c8a515bd79d3bdac80f314e57ace",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-5.glb",
+      "bytes": 326380,
+      "sha256": "c6679d2668565984900ed314402cdc86277f379ba6feb8c6dfb81623125bbe69",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-6.glb",
+      "bytes": 316588,
+      "sha256": "8ffc939e58d65bc1234befc99c20fa7464c62f83b734dafcc3fd750a7e8c3cc1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-brook.glb",
+      "bytes": 77676,
+      "sha256": "2717d19d434aedd3168c148dcbfee5c3cd9e72412671137723408bee9fc7a3cf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-forest.glb",
+      "bytes": 83492,
+      "sha256": "9d7f184bb4639972af7939025c1d904fe7ab97132932352a7093eb5e67e22c9e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-hill.glb",
+      "bytes": 298908,
+      "sha256": "b62a5762cbb96e98385a6ab45b235a2af0bc861ec0784ee160d751193f20c30d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-basket.glb",
+      "bytes": 40700,
+      "sha256": "e19a9185a59a8e79f95100d66ff17c4eb3416778e551597c3457e0ecb50c97c9",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-hoe.glb",
+      "bytes": 7432,
+      "sha256": "fe1e52d80adabcd101d9b6909c60656119378a5d781cff2158287e1111a62741",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-seed-pouch.glb",
+      "bytes": 27020,
+      "sha256": "9a77a0cedf925078264127439f0279721caceafa0b33faa4c029bb07a7d08659",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-trowel.glb",
+      "bytes": 16444,
+      "sha256": "4cd54c199004139a7f5c30a5a0a0dc630608044e1fe333bf38f1e651cdf31d31",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-watering-can.glb",
+      "bytes": 39684,
+      "sha256": "904dff3c2e3d467d3d389a7a1986a9249a90549c470dbc6f23f9c057a7d2f382",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-birch.glb",
+      "bytes": 109392,
+      "sha256": "20a96108e0dc2f578e0b1f01bd1e108e2abd83b8ddcd4d6f3ee88df4dfd941db",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-oak.glb",
+      "bytes": 109388,
+      "sha256": "9c11d768349bb8699fbe75ceddfe0a799e470be89ca46dfcd291f5f20e6afb99",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-pine.glb",
+      "bytes": 31216,
+      "sha256": "ca3f99b3f9b18ea8cbb8c58a6770574c5e9fb0beddf3348b867f5a008b497840",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-willow.glb",
+      "bytes": 267800,
+      "sha256": "c441282a2c949cd4def77ad1f79426190f8ebd3440f80092a0d789139aa1a1c3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/moss-and-moon/audio.js",
+      "bytes": 6472,
+      "sha256": "da1af1471f9419d9a4de8d660d471d582c2725b1c5d358f79c98ea545b403cb3",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/bridge.js",
+      "bytes": 1614,
+      "sha256": "fa9a3f0b7f11cb2e5916b2cfa4765ee8c66d0fe76cacd63f537340160f9edbb9",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/content.js",
+      "bytes": 11562,
+      "sha256": "8184cb1f8f711d911c091231eaa0a6fcb18673343ecde9ddc5d67d31e84692cc",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/index.html",
+      "bytes": 4200,
+      "sha256": "12ba46c36cbb5c9d331ce43453e9b0058ac1366640741002691bbcffdaa0e51f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/main.js",
+      "bytes": 34256,
+      "sha256": "9e46c319229b41416f028914c526a8137c05a5f21362d22ad11bbadf230a4a42",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/models.js",
+      "bytes": 36993,
+      "sha256": "bec312e56cfade74d120ff60b144a58b967782c6e66ae3067145c75c276f96bd",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/rules.js",
+      "bytes": 22741,
+      "sha256": "55fd3c6bff6d1536394fb52a9866899e6b478e43cce1e6889ffc112c8c66023d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/storage.js",
+      "bytes": 4219,
+      "sha256": "31b60f4d37e69e7f79e5416e33f0ea8d336d4d532896932b20cdd00207675682",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/style.css",
+      "bytes": 12648,
+      "sha256": "7c67097e9f9f4a4c39dfb622b15d08533124192c73be85ccd861dc65e99550f0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/moss-and-moon/world.js",
+      "bytes": 23775,
+      "sha256": "efe774ad5df02cb15c0858cf17b0f5bf579e5d81985607d2e93aebf53a4f074d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/click.wav",
+      "bytes": 4014,
+      "sha256": "1a7d2ccdf0c78008d27024a647019653fce6b3f5e1e5f433f84c8e7f752cf8e3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/impact.wav",
+      "bytes": 10628,
+      "sha256": "d6ddf32baf73bb9020756d3f27b1bdfcef5c80caae492c6dbdf3a6a96c93541b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/music.wav",
+      "bytes": 814198,
+      "sha256": "1b8454184a57685f9eff4720aad9f26d92583038b49ddf2508fc7fee452c19f6",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/success.wav",
+      "bytes": 61784,
+      "sha256": "52d177250059ea3f8a689aa8226ddac9607499089fead724ddd66db7b783c37b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/neon-drift/assets/colliders/comet.json",
+      "bytes": 696,
+      "sha256": "e4e934cdc7ef416d0ccf203904c556e362b4b072d801b8651f0a824716bf9b0f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/colliders/phantom.json",
+      "bytes": 638,
+      "sha256": "fc0778c0e3a401c56e5d87f7afd04ad91a652bb86391be03faedd24d2049b4ca",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/colliders/stinger.json",
+      "bytes": 638,
+      "sha256": "9984d1555965d8ad75eae2670d93655941e5cfb974b80e31438c0b77e82b9bef",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/comet.gltf",
+      "bytes": 129785,
+      "sha256": "0394a54b95585d93b5430c1dddf1148398b1616f783e237c36c622eff6398e9a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/dock-warehouse.gltf",
+      "bytes": 4980,
+      "sha256": "7132ca37cf6b68f7621503fb1fc7469fbbad0b9d94acd50127ae5aef9d993334",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/highway-tower.gltf",
+      "bytes": 4974,
+      "sha256": "17ddc06c685b6655cc269c8b4bb91ef4c193718a9182e820772444ebbdb32545",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/oldtown-shop.gltf",
+      "bytes": 4972,
+      "sha256": "f0108d0e1f0f64ea3e051b02ae6abb40b669b134d5b1ecf674d0baac234a58b0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/phantom.gltf",
+      "bytes": 129696,
+      "sha256": "01329e7e1367d469a72a0e8b0f76373deb8dcd69f20b9bb7f78d29c62b8cc4fe",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/stinger.gltf",
+      "bytes": 129744,
+      "sha256": "096ae2f40c50891cd2ca941ee4b2d6727fe3346f8bf9612fd9fcbda46562b787",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/game.js",
+      "bytes": 828016,
+      "sha256": "fbcc72ee3f3e337538f11fa90258aad09f4cef2b6f7aaa37c6a0fa94effb8a2f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/index.html",
+      "bytes": 4167,
+      "sha256": "adf9251955c58a76858e2e52c1cca8f6d738f4dfa4dd026a8245a245fb23a3fe",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/neon-drift/style.css",
+      "bytes": 12233,
+      "sha256": "b35931fc224b164589d60751dc56f9179a7945134651726b764b1758fd109553",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/.gitattributes",
+      "bytes": 67,
+      "sha256": "2cf6c8dd955913beecb3d0d7cb00dab86e5da2bebcb1cf5b71db72bd0f78dfa0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/ambient-loop.wav",
+      "bytes": 1152044,
+      "sha256": "a046ad9e402fafe33c2d940709018fad0af0c9a11d8f9f6b54351818b988b35f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/brake.wav",
+      "bytes": 20204,
+      "sha256": "6bc75a1569ca8d6aa112f6411151e4d1cf19d204ffc7ae8656648ef4e831c052",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/click.wav",
+      "bytes": 3884,
+      "sha256": "c025930c125637ef5b7aa67f1067183bd34b37db9db45bd8fd06b1fc47eb035c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/damage.wav",
+      "bytes": 21644,
+      "sha256": "65c34968c3e85b7ae5f2586fc6ab1370fac5d93e7b092a39c41b7b9eca0160b9",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/door.wav",
+      "bytes": 36044,
+      "sha256": "2c4ab2b7aaee3fd089a023d84055caad62e5f67a63671b7fa10d70dd601ec99f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/ending.wav",
+      "bytes": 163244,
+      "sha256": "cf446b080993fcf851cd0eac4b73aa39032a91d089638bfa0dc871003a3ad16c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/fail.wav",
+      "bytes": 62444,
+      "sha256": "d7e80837aab53dd75a4758c096d85a63c255588deaf5a5ce7607337202f2b76b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/interact.wav",
+      "bytes": 7724,
+      "sha256": "c53aab4fd616d02f7a815c0d72a52f55fae315c5fb4a6e22ae81a451418791ad",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/low-oxygen.wav",
+      "bytes": 38444,
+      "sha256": "dbaedefef9826f56ab7794be484a2cd0db7727908aacee18e7eae75782b1d6d4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/magnet.wav",
+      "bytes": 14444,
+      "sha256": "ba6876e111e8a84eaa1ba8aeaf5a208021e2e94d609177523c457dcfa39ce86d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/power.wav",
+      "bytes": 55244,
+      "sha256": "2cfc9c866f49812897601c650cac7b8bf8548d923d8a26715ad05fd31ddc16b4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/signal.wav",
+      "bytes": 36044,
+      "sha256": "09fec7da9c1514e723f79044156cdf31f72765a4f7af7440a1bfc44dfcc0dc19",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/success.wav",
+      "bytes": 81644,
+      "sha256": "34b44f9e50e449a76d9eb2f1a9b9655bd57860a7c63eec724df70038692a5a13",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/tether.wav",
+      "bytes": 23084,
+      "sha256": "7ff1fc55ff1b39537d474d362508a4a62975a45723c21ffbc6ea6b52eae9c356",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/thruster-loop.wav",
+      "bytes": 96044,
+      "sha256": "329ae6a950adf73fdf419c0bc8686fa2a5afa5b51115057305fcc46443c247ee",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/astronaut-colliders.json",
+      "bytes": 299,
+      "sha256": "325ee40aba708cb5e3763d49973870dead5747d4075206c2ec0555999890eaf2",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/audio-catalog.json",
+      "bytes": 9503,
+      "sha256": "41ac87c135847e3a4a455158f5b8aa985114dac95f53bd00fcbc88372ba27d8d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-arc-colliders.json",
+      "bytes": 458,
+      "sha256": "c6e7855731fe6765ba9f022dff63d4c869eb76e77174121fc9c2a9c6685844ee",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-beacon-colliders.json",
+      "bytes": 455,
+      "sha256": "0c5751317770262df94fb6167116d1f5af3e3145a4a0beced0bb69b91bba66bf",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-console-colliders.json",
+      "bytes": 462,
+      "sha256": "82d0b439afe488383e8256e21da3ad652ec199cfbb472f047310df1b593115c9",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-crate-colliders.json",
+      "bytes": 365,
+      "sha256": "e8be9898992b4e54a3798ba5513d32770f4af77644789d38178f34f8bcc5607a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-debris-colliders.json",
+      "bytes": 468,
+      "sha256": "ba3fbf88a7c1b65633284429a97ea7e75a2f0e779419c40296bb7fb159cc2fee",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-gate-colliders.json",
+      "bytes": 465,
+      "sha256": "64421039d5adf5de652c2e922be86098e37f33253c6dc639a09a4f8c1252f627",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-leak-colliders.json",
+      "bytes": 452,
+      "sha256": "b1436582e3920be5760b9a1e1ae04a7b9fb9e69f16cba47ca8e84f3df51f2b35",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-magnetic-colliders.json",
+      "bytes": 461,
+      "sha256": "80293d1f1ae5fcd5e210374799265528a9b781e8da3af2f52eb44f3694483e5e",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-memory-colliders.json",
+      "bytes": 458,
+      "sha256": "ad3acedf557232f83c300b9accf97b2d76f2204b40e826554e38528309b0b2c1",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-mirror-colliders.json",
+      "bytes": 511,
+      "sha256": "3bb188f70fdd67889f05cab838ebfaf26419dd6fe63d7b48a0f7d2206c337455",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-oxygen-colliders.json",
+      "bytes": 471,
+      "sha256": "aff8da6682a5a13413b71287141a7779dcbcb052b2a305a4b3ddd39444d7fcc8",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-receiver-colliders.json",
+      "bytes": 506,
+      "sha256": "406bbfe6c2d398988c3255727e411e13fcd0f28c53a6bf2789edf725f4290e36",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-tether-colliders.json",
+      "bytes": 467,
+      "sha256": "9b1a50956063d0988a1b1e920fba2b9029236790dd211945d3286b3869440513",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/model-catalog.json",
+      "bytes": 9838,
+      "sha256": "366f7beeab328c0296f3b9474051e76ce83c08b8fda5177531cc18b5186b1b3b",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-airlock-colliders.json",
+      "bytes": 1661,
+      "sha256": "19c30b7b61b534e47cb36cb2af369b2959904f2bf5e88006a434630b0f5ffb1c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-core-colliders.json",
+      "bytes": 1658,
+      "sha256": "3f24a6d43ca4f21d4ef0f1bce213068953001a3138b53bcbcf4df8789564140c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-habitat-colliders.json",
+      "bytes": 1661,
+      "sha256": "2516b9773614fa9dfda081e4c1cdbe873c20b267d9848e7096e83c149a31a2c4",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-maintenance-colliders.json",
+      "bytes": 1665,
+      "sha256": "648dfd37878a4a9c69fba95907917fd817c3535aff47af60d0e2786a6b585a55",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/astronaut.glb",
+      "bytes": 157484,
+      "sha256": "2f2f86fde7bf971f788275d3cf185e127e814d931eedb6111d248fde99a3dbb5",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-arc.glb",
+      "bytes": 121804,
+      "sha256": "748c951a3e0d4166626bb82c32acae79f1b7114f3ecd176a52b9bc2cc14013f4",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-beacon.glb",
+      "bytes": 24272,
+      "sha256": "668ed82cd34e98f8e79f7fdde48b35013b08b524f0f8b09b73db37ce6607bfb6",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-console.glb",
+      "bytes": 23144,
+      "sha256": "10d463bf1f1d82eccf7a46916c04ca879c7e19e5b5d378f4da122d0567c59d31",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-crate.glb",
+      "bytes": 28196,
+      "sha256": "cd8503a6d764ebe99162c7ff021855d1b2c358510f37836fdda38ab60f8ef799",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-debris.glb",
+      "bytes": 11772,
+      "sha256": "1b78fa65e3190e2e40b9d9dcc3b53477c3274594d278e2b1d8f5aa029fb7a815",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-gate.glb",
+      "bytes": 24332,
+      "sha256": "9c4969d902cb73498a494f62b6a893cce348a8953989853e8fe5dfbc24cdfe12",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-leak.glb",
+      "bytes": 34932,
+      "sha256": "678bb57bcd092a52ebb788ecaa1dee0ebf8a029b5dd24ab42cbfbb0e5321fa8d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-magnetic.glb",
+      "bytes": 14528,
+      "sha256": "5b364ef7a2e4fb5f12235296ff3b286b59bd28df6c540e78e93fbf48b6599c94",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-memory.glb",
+      "bytes": 33464,
+      "sha256": "5ad7cfdc3a4e9f747d277c3255a9b564b242489be62c8bbe326462b41037843c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-mirror.glb",
+      "bytes": 20764,
+      "sha256": "8d23cdee81021d2ef1ea9226a7717600b208b63d72410f28d880e9587db9c03e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-oxygen.glb",
+      "bytes": 79260,
+      "sha256": "009e6e8a428a936e8b9e97262de7a75f53d906c4b1a279830a1e0024c6ad2dbf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-receiver.glb",
+      "bytes": 22896,
+      "sha256": "746a9f74e91ac6b258ee746265db03c9a424894deb3d6739218acdcd689e68e5",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-tether.glb",
+      "bytes": 19104,
+      "sha256": "c867161c4d4a40657ef950a286eaa500e470b7de408eb19b988d619ef7451bba",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-airlock.glb",
+      "bytes": 161112,
+      "sha256": "8513a4bd8604b2333185604eb05190007e53ee06ec75450d1a05f1d123cc3999",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-core.glb",
+      "bytes": 161024,
+      "sha256": "778675cf3a7acb1050e164bd04371bc77142e065ead7473e76525ffdb025fe50",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-habitat.glb",
+      "bytes": 182796,
+      "sha256": "95c45e051ebf3206be6c92f71ae97495ccdbca8047383fefe065dcfbfb94e517",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-maintenance.glb",
+      "bytes": 176624,
+      "sha256": "880ffa219c15f0fb158142275ee157d2ba7cb2d18f42fbea5b90532ea94f9dd9",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/buffer-geometry-utils.js",
+      "bytes": 35562,
+      "sha256": "0054b0332ad40e359acdd2ac2e71ee49f704b91511d33387aeaec5ed855de059",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/gltf-loader.js",
+      "bytes": 114757,
+      "sha256": "f488d85ed2b395eaef2d6abd8a95cc3176a6007e253d5fd7fc2d76b297410467",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/skeleton-utils.js",
+      "bytes": 11085,
+      "sha256": "6f0249a93264157300d4bde7d2da5b655a5922cae786137d19527f1bfc004e3c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/audio.js",
+      "bytes": 6098,
+      "sha256": "d85916b9d290a8c10b116fca0538fa7e7031b0ee2207d087066978db9024d305",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/bootstrap.js",
+      "bytes": 2510,
+      "sha256": "1d738dd4b3cc11cca30c8eddc7bde6340ac12aa69a6f579d9ecf6d74752674d3",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/bridge.js",
+      "bytes": 1370,
+      "sha256": "59d4314f685ce18b11366f4f74c8e669d66b8d753fd90acffe81507d1a60a0d3",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/content.js",
+      "bytes": 10067,
+      "sha256": "add4e4866fa2fd527492fe676b5e6f3a84f5ea82372282854a4cc693d2d427ff",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/hazards.js",
+      "bytes": 566,
+      "sha256": "d8c1cf57be04b59b5b98aacb77f5971edca0c655040d2fc7014ffb32d45789f7",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/index.html",
+      "bytes": 2738,
+      "sha256": "b040d6bca2335052e654f55af2038be2f4698739ded93a9d9047cc57ccd1beec",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/main.js",
+      "bytes": 31485,
+      "sha256": "3ceb468d353dc448d4d63a98f73e44202dabdc25bcd8d56fd042029b16c4eb96",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/marker-layout.js",
+      "bytes": 8026,
+      "sha256": "538445834200463950284b30fe2d3a8d8d4c5eb61face499e12a9200293c2749",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/measurement.js",
+      "bytes": 5245,
+      "sha256": "6bc96c5086ebde80bd6d9989153a8d7a8b8c6f71032706fb6bbb62043d6ee5b5",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/models.js",
+      "bytes": 20335,
+      "sha256": "47dce984cd7f6c1129d7b1102a97b9492e22b2a6c8419057caccb18071f1c683",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/optics.js",
+      "bytes": 5765,
+      "sha256": "974a039f7af83d48b4978786a6b650f34e44934c6dbcda6202f11764590459df",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/physics.js",
+      "bytes": 4590,
+      "sha256": "70be688db92863dbec0712e7a41f969ab4d9bc94d644d0a07279f0a310584c5c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/rules.js",
+      "bytes": 10841,
+      "sha256": "81487bcb26e6d50f685d930a5fc5b1593dff0d3c98497c8ddd3128992f8cae4c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/scene.js",
+      "bytes": 17758,
+      "sha256": "0aa8a74c51b45d71433b2148449e49f80d60cc6fec34848e1cafa19003e54a5c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/settings.js",
+      "bytes": 2663,
+      "sha256": "85c93f038d7785459fb877a7ce5937e859cf11ace87b6e6ec0e5492c1293d4a7",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/storage.js",
+      "bytes": 8937,
+      "sha256": "c89bd73fb76eb816d959f8cdf3422fe3c4da789257c878c07a51543b87fb479b",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/style.css",
+      "bytes": 10632,
+      "sha256": "e961ec270245fc32b4b41ee95889fb339d3a731027d9758420c8d16001ed76f7",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/rapier.mjs",
+      "bytes": 2219774,
+      "sha256": "ccee73334f11be7070c8ae7db7f224f651e36afaed942caa21e7b1765eb850ec",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/app.js",
+      "bytes": 24879,
+      "sha256": "50cbaad51c5cd616a22951f112bebdb9dafea1881c4264f8f3ecc9b12b29c829",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/assets/data/colliders.json",
+      "bytes": 5332,
+      "sha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/archive.glb",
+      "bytes": 108684,
+      "sha256": "dc7b2733942fc761a27c0cacc56cc0da6a2b8e620f5f865b21d69eb4dcc586f3",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/camera.glb",
+      "bytes": 25948,
+      "sha256": "7d2d606c591e21fdc328fc8b552d77a667e25e3fe052fb7d50af48eefef043af",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/city.glb",
+      "bytes": 127820,
+      "sha256": "e823a1d6c48cb8654281165703723a7300fa55800e3ce78ad87bd02cf77ec548",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/core.glb",
+      "bytes": 81532,
+      "sha256": "6cf66523b2fb9697cc043e8a9583fd5832ff50412a4e73c05b399d5e0c9d0b66",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/cover.glb",
+      "bytes": 25344,
+      "sha256": "e4dbcf7b6c03d38b9878b4a306c57c7e2837950155589a9b419ee655f9a01bce",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/drone.glb",
+      "bytes": 57708,
+      "sha256": "d7ec9a5b974834e3891c7e9278655ed8da47c41a9c2d9a49070b2a8f814b9b78",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/exit.glb",
+      "bytes": 14740,
+      "sha256": "215fdf90ac6f4784d1c1d55af212fe36c417b960f74e1824a9f2d5e079c093cf",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/guard.glb",
+      "bytes": 225620,
+      "sha256": "69aaa878af76b8d8c77c3e349a4016e4a24c09f8e0e8fa8fcef78cd786573843",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/ladder.glb",
+      "bytes": 26524,
+      "sha256": "8158ff8bd22d3fcadd7e3996da4edc8ff6221327afcfcedda190a4c181b871d2",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/laser.glb",
+      "bytes": 16164,
+      "sha256": "e679babfe5437910cb1418c23d278f63c0853d01cdf1f40f2fdf2bcf3e5cbd8f",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/packet.glb",
+      "bytes": 18164,
+      "sha256": "22575fa6b1b6ffb799bb8b44bec268368e363fc3d4978b0d61d2199317bd07a0",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/platform.glb",
+      "bytes": 13420,
+      "sha256": "0ce3e832d520102dcae7d084ee5a5b2d9161cf32b1238f4e6fd92ad90171072e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/runner.glb",
+      "bytes": 191024,
+      "sha256": "9a99559b61c5af282b6529ba3b80bb0b13e9dcc49c2df9e9578a284382b8b003",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/terminal.glb",
+      "bytes": 21968,
+      "sha256": "86e1f3c35a12a7caff832e211308fe07f5ff9e0d501de769abd5ec96613326d0",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/signal-zero/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/bridge.js",
+      "bytes": 1427,
+      "sha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/build.js",
+      "bytes": 84,
+      "sha256": "4097e8eafef3d220cb851ad2083792e398f6abba855f5eef62539bdf75cd13e5",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/core.js",
+      "bytes": 23905,
+      "sha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/index.html",
+      "bytes": 2750,
+      "sha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/input.js",
+      "bytes": 3092,
+      "sha256": "928eefc8dd4bec8d9176e1a54ec67ae5e8ba19b0d415bd35c9d01608b0ade942",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/levels.js",
+      "bytes": 18783,
+      "sha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/save.js",
+      "bytes": 7389,
+      "sha256": "7070f49298a188a1b785bd647c497c824ef51a856970d9ced3f04aede0e6f142",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/static-stage.js",
+      "bytes": 3852,
+      "sha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/style.css",
+      "bytes": 9368,
+      "sha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/BufferGeometryUtils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/signal-zero/view.js",
+      "bytes": 17345,
+      "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/.gitattributes",
+      "bytes": 68,
+      "sha256": "eb0096883fadc9d4876335c0712d613624a935ce5bdca3a392bc1458bc2d64e2",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/danger.wav",
+      "bytes": 30912,
+      "sha256": "87449d194ee88d90f1b69d9895c1b8253ec6343bd811c3d323584fd09b0ae92b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/discovery.wav",
+      "bytes": 79424,
+      "sha256": "139ed64498ddeece2b2be2e4b5ec98e387915abb7526a956bfd14862a3ddfa7d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/dock.wav",
+      "bytes": 48554,
+      "sha256": "8d967ebc6363a49d2b81c7caa7a7871395f91934ff1f2f400920289d5864ff40",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/gull.wav",
+      "bytes": 52964,
+      "sha256": "a49aa09d306c5e1404e881e9dc2ad468586a63c23c1293391bfb1e001c435b53",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/music.wav",
+      "bytes": 705644,
+      "sha256": "ac2cac108a5df5330836c31a158487c4271eee1cfc55fa63f5969698b1e56c78",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/sail.wav",
+      "bytes": 30912,
+      "sha256": "f9d142fa39c9843a199742eb695e175d5c218581cac7373ca12ca90cf342b4c8",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/audio/waves.wav",
+      "bytes": 352844,
+      "sha256": "d75247c121c43889bae1309fb89726a63f0635c108465a18cfb8653c315dc644",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/coastal-palm.collider.json",
+      "bytes": 272,
+      "sha256": "610a9c6850a776b8c8a016f0e6bb5725a4f6c9c99fc28bef98f51728f2afe218",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/coastal-palm.glb",
+      "bytes": 38020,
+      "sha256": "80dfe774e76108cb14fb6be321da28180c36ded0d802a90acc6526ae44596c7e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/current-arrow.collider.json",
+      "bytes": 396,
+      "sha256": "eb5744aa6fab9d105dc01cd4bd83c0ec6fe4760943791d3ee10e467d99e96f5c",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/current-arrow.glb",
+      "bytes": 5996,
+      "sha256": "4cd74373cdff590cc6d71776dea1afa42f7f2f29866a6fd7411d03b8281ea93d",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-beacon-lens.collider.json",
+      "bytes": 259,
+      "sha256": "8423cb4250f16877c37cf46ae1431a14dfdd9150673779dc42d1fd472ed10bd3",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-beacon-lens.glb",
+      "bytes": 18148,
+      "sha256": "89ed23c0eb86451c0ace216a69a01a032bcad97798dc0cc3569f481e353b2a20",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-fan-coral.collider.json",
+      "bytes": 257,
+      "sha256": "8ffe63849c3a030e78974cdc83109810b6c3383229e7f0a1bd8897d401fabc0a",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-fan-coral.glb",
+      "bytes": 86076,
+      "sha256": "73ef816bd5fb65bc3c72d1b7b81415bfbf6263822881775575d1364fda804fc8",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-foxfish.collider.json",
+      "bytes": 255,
+      "sha256": "359f9683f883a2b47e7d0fa6ec1363c00b60276b64ab274db800c2531824d918",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-foxfish.glb",
+      "bytes": 31764,
+      "sha256": "eee932b83795855a0eea402f8ed1a5ff47c466e546249754d8e8a496947b4a26",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-glass-coral.collider.json",
+      "bytes": 259,
+      "sha256": "fb219dc061a11f58a00b28a675f9a9a09bf0abbfd466ea9280ebc90510623f4f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-glass-coral.glb",
+      "bytes": 20872,
+      "sha256": "2d60b248b5190e724f486ae4a9c2660d8f3b1db0830932845b9a72ca1fb7c3a1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-keepers-vault.collider.json",
+      "bytes": 261,
+      "sha256": "0cc02de9d21b626f490c5160b6dfad8049d043e4541d4c12770ce5aa119c9967",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-keepers-vault.glb",
+      "bytes": 8216,
+      "sha256": "cf129305ab5ac62a926e41aa0ba6b57ce0a13f3195408be791886eba8d4f421c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-mangrove-root.collider.json",
+      "bytes": 261,
+      "sha256": "8db3bcd6e7db54bcd235edb1fecdef12c422aa85856e969cc3aab74f86fe139d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-mangrove-root.glb",
+      "bytes": 24956,
+      "sha256": "0aa85b53cc9125c8cd6e2e811d1b007a6ad7d9127de858355401b15b8d4d41ca",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-nautilus.collider.json",
+      "bytes": 256,
+      "sha256": "0572de0468888bbb831c64fd083dfa4ce6f1b7b2d7f619cf644e3d66136b1971",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-nautilus.glb",
+      "bytes": 43072,
+      "sha256": "cd94b4ed3451c75be242eb3140b067632f530e10121efef4a82efa256378a1a1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-seagrass.collider.json",
+      "bytes": 256,
+      "sha256": "960743478d95ba5bc1215999ff799cea81917cb0265eb82ab4c35cd8c3ea7d57",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-seagrass.glb",
+      "bytes": 23068,
+      "sha256": "5de963dcf05a53af181dfc1a9372c6cddeb6871c1a9cd2f8e56324b62fa18721",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-star-tablet.collider.json",
+      "bytes": 259,
+      "sha256": "c082c8a30f4fbe4a1cc6f3243fb3a4b14c3bf8d2ed34704674ad16a3b554c542",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-star-tablet.glb",
+      "bytes": 24772,
+      "sha256": "2a19f67eddbcd950c5b10d7aca6a4688cb279d163aba6639bc3fcc6767bfead5",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-tern.collider.json",
+      "bytes": 252,
+      "sha256": "ca825605f75f9abc2d7f00c95d46953f90b378f92d18065ed2c27a361df0330d",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-tern.glb",
+      "bytes": 16828,
+      "sha256": "ec9cc799fb45af5b486541a7ccbf8fb8ff7669c7e888ef66bb57a4ed9194471a",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-tide-clock.collider.json",
+      "bytes": 258,
+      "sha256": "87311f4f21e792678aad1f49bfbf6bb3263a40eaa784ed41d5610d0941775c22",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-tide-clock.glb",
+      "bytes": 26980,
+      "sha256": "cc2fe4e6e5af9f2a5c9c72bc5e8d8a2244b9ae7f4a71b5b53b8b33df65b27e66",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-turtle.collider.json",
+      "bytes": 254,
+      "sha256": "0a053581b81b90596414180201d5ba04f02fbdeadfe31f0e29aad64f7c9f68a0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/discovery-turtle.glb",
+      "bytes": 29496,
+      "sha256": "c87d3f1ac69adf720ef8febed77de69b8af5e625e6d3eb06bb649b674e3acc3b",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/harbor-kit.collider.json",
+      "bytes": 289,
+      "sha256": "5ef2af752b0ec286520891004c8b993d39a0f698e8e1899838a72e8e3917f795",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/harbor-kit.glb",
+      "bytes": 45904,
+      "sha256": "c6275d727a608136401aea9ddd2145ac5846bdefb90a735f97df7676e1c31c06",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-coral.collider.json",
+      "bytes": 273,
+      "sha256": "5be08c6c582cab841398069aadd4d986a5d8d2ffa448fa30b95006772fd7600e",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-coral.glb",
+      "bytes": 15868,
+      "sha256": "475846b31aa105769d7bf0a025164e719d52ebfca847981cb1842a752f3f2de2",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-gull.collider.json",
+      "bytes": 272,
+      "sha256": "030d7c76beded27eafb74bf803a84594506397cc161a26d7195f9a872ad3f5bc",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-gull.glb",
+      "bytes": 23508,
+      "sha256": "f2b5dafcdef861515f9362d8ab95b7ad6d45f2bb9f00adcbd3ceaced8696a973",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-harbor.collider.json",
+      "bytes": 274,
+      "sha256": "150ce40ab4e128d3aa89919d15e39b73bc589f5d5a9d87476e8ba61c375049e6",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-harbor.glb",
+      "bytes": 15868,
+      "sha256": "4422d313730417053611e63e9e95895022ac52cc8f49462b135cc27c6663d57e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-lighthouse.collider.json",
+      "bytes": 278,
+      "sha256": "88a83983f98cfa6acfcf8b9a5df0103be91ed635a2c8839ce814e988aa67f521",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-lighthouse.glb",
+      "bytes": 23520,
+      "sha256": "f65989db80898ee941137e88c49cfc3a6fee539e7879cbfdaafc782c3fde1819",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-mangrove.collider.json",
+      "bytes": 276,
+      "sha256": "e59aba30e741a3c334aec8bdf89149aafadcbd21f61636eabac404213e2b3ad8",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-mangrove.glb",
+      "bytes": 15876,
+      "sha256": "42f8f21972d9b5ff797276ddfe1b9940d8c0105481ce07289e74c855e5229dd1",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-reef.collider.json",
+      "bytes": 272,
+      "sha256": "15d4991520143d41db2d8b4d5702e447eceba844b73f9662ab1efd5047e419e6",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-reef.glb",
+      "bytes": 44220,
+      "sha256": "48a4ce8f6b0a0eadba19bd826c5db660ea044631128c693d456e6ba821e7a543",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-ruin.collider.json",
+      "bytes": 272,
+      "sha256": "6bed84f828bb4a1fc53499b8c3d5bb11b35e3dc133ba22a84a9190f0ac0f44f6",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/island-ruin.glb",
+      "bytes": 41040,
+      "sha256": "86b12cdabcd67ef719f96fa34600a71ee2c71e16c84766f2b64c0cbb8620f67e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/lighthouse-restored.collider.json",
+      "bytes": 288,
+      "sha256": "5d778d31f8fe2bfc6c7722303cbf896f82522392527bc34f77ac9e7268be751f",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/lighthouse-restored.glb",
+      "bytes": 54660,
+      "sha256": "cd8cb4ba9bfc45709c99cc9821af3ca61f8a753dfe4c3dc0b8a7080f8cea5adb",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/lighthouse-unlit.collider.json",
+      "bytes": 279,
+      "sha256": "0af801122e30069a5022222f5aa2c675cf2a9e45f2450e7caf1caea3f1982133",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/lighthouse-unlit.glb",
+      "bytes": 54492,
+      "sha256": "26047dfbd3d13d89ae27354beb3c63899a193b75e5b7991c870449fd3129adc2",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/mangrove-tree.collider.json",
+      "bytes": 276,
+      "sha256": "88ec9c3ad28cf9f44b03d06a8dd754ab47cf3fa3ff89b318e02be41e9331f38e",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/mangrove-tree.glb",
+      "bytes": 24776,
+      "sha256": "84917085c0b5be0fe88dfdd3d9682440eed24491fb08f970eacb3a66d5075902",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/survey-buoy.collider.json",
+      "bytes": 352,
+      "sha256": "3321bc4b2c0b8d0bc807fc0848779ac23e7d86eaa05683f640a85f743acd4df0",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/survey-buoy.glb",
+      "bytes": 13932,
+      "sha256": "4fc1380ab62ce5814e0312c7c1bcf75c9ea9f24a0d72300560c107fd76eb47d7",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/tidal-reef.collider.json",
+      "bytes": 412,
+      "sha256": "9986ad2905e234d0bc5e3113573ad9cd8ea7ff131486db7b07ce6dc1bed32829",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/tidal-reef.glb",
+      "bytes": 21004,
+      "sha256": "2b5589255d7f97bc02d9380fc0fa0067ca995357d0d6657fff4f7cd9ef13db32",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/tidal-whirlpool.collider.json",
+      "bytes": 415,
+      "sha256": "ac689aa22a7911a6954fa82dd99eb1f644082639777a2c387334bbb9dcd266c1",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/tidal-whirlpool.glb",
+      "bytes": 42392,
+      "sha256": "0f9e3777df227d90efa80083d3e2c9c43d36251070ae6fd85b5ff54086e8dbd5",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/tide-voyager.collider.json",
+      "bytes": 281,
+      "sha256": "22a5a315dd8fbbfad72bffc4e6cc878d036f36bf3968df16df6e7256ce039123",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/tide-voyager.glb",
+      "bytes": 31404,
+      "sha256": "a555b40bb40786c46c3477d0cc92753152f7cfbcdf91dee14d3f39d244001ebb",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/timber-jetty.collider.json",
+      "bytes": 392,
+      "sha256": "41587a8af084e21a6bebf970e781d35bc2286a69c669f2275868eb750cbca214",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/timber-jetty.glb",
+      "bytes": 47428,
+      "sha256": "78b7f17e71317b15a1a83706990f3fa4ebc73a0f356af40b9cb93fdacbfe8109",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/vessel-cargo.collider.json",
+      "bytes": 292,
+      "sha256": "da2346ec2444e850a5043098502e5c0a936a7992a996630494cfa77da9e77cea",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/vessel-cargo.glb",
+      "bytes": 74900,
+      "sha256": "a2a3d6ff4dfcb07461279b490afd39c786d0fba5f65d4ddc0b9bf35c5198bf93",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/vessel-steady.collider.json",
+      "bytes": 293,
+      "sha256": "6e428e8bf8520bb76cb25b42a1544145c7c851c6b302364633fceb030bb91ad5",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/vessel-steady.glb",
+      "bytes": 77560,
+      "sha256": "47abcbc214b8275ce7d00d35127ab6a2c4dcf9e48bdac7d41c0dfa3ab267148c",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/vessel-swift.collider.json",
+      "bytes": 292,
+      "sha256": "0e8e4970540da73258ccdefbbc229c4bb730909bc9a5cb18e3fcf2f29e6753de",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/assets/models/vessel-swift.glb",
+      "bytes": 77564,
+      "sha256": "1b3f0b2212209db7ca9fe6ee64066dc576989dd99a46efa77463a9402d62f79e",
+      "kind": "binary"
+    },
+    {
+      "path": "public/games/tidebound/game.js",
+      "bytes": 693029,
+      "sha256": "a18e652d3e34c13187945dce8c7b766afb619be580cacee973e9c34ad189bc77",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/index.html",
+      "bytes": 5213,
+      "sha256": "700fe8f65b6d0eee31e49966f599e5ce5fac6e8678c5d44914390946764d7933",
+      "kind": "text"
+    },
+    {
+      "path": "public/games/tidebound/style.css",
+      "bytes": 19340,
+      "sha256": "ee52a09943286e868147ee375b1962c6e288453cdf61f0a2d526b825155ce294",
+      "kind": "text"
+    },
+    {
+      "path": "release-status.json",
+      "bytes": 6335,
+      "sha256": "0a227a5e99a1358d13f5d7555c0d9744867c3714102349a35d984e8010ed1c44",
+      "kind": "text"
+    },
+    {
+      "path": "scripts/public.mjs",
+      "bytes": 5090,
+      "sha256": "c24c3ee0d4d9b5608e2d8d782d9654854a96b5a970e1e3b0343af2c7e0c10e58",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/aetherwake/bridge.test.js",
+      "bytes": 10273,
+      "sha256": "94f93a51114314c60b2686279825ce4346a56c4d3418a3368f0c174ee39caaa4",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/aetherwake/flight-test-pilot.mjs",
+      "bytes": 6035,
+      "sha256": "404c3865aecccf2291ea70b351aefbcfd97e9cdee35bf26b8a60885921087060",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/aetherwake/rules.test.js",
+      "bytes": 27036,
+      "sha256": "ea02399acae725e8054325fe1d9fcb71ec2f1fac91089284cf8d269c7356ff79",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/aetherwake/save-v3.test.js",
+      "bytes": 15820,
+      "sha256": "e9d10f52a15d547c4b85c76ebf3307c2ed711e20da15ed181c40c03d36f1dda0",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/aetherwake/transit-flight.test.js",
+      "bytes": 11878,
+      "sha256": "2c87681a6dd778d8d5fdb9f40115462c5ca2bd23d74e5653bf42793be97cd1d7",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/aetherwake/transit.test.js",
+      "bytes": 5413,
+      "sha256": "bc5177d0cfd8b8341c157d03a51e13545da2208746af2e300d6ab6453241892c",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/dust-redemption/cargo-tether.test.js",
+      "bytes": 1550,
+      "sha256": "3f7a4f7eb3669fa75fcb0de89cab3232fa540257e8272c4e8de22b0d57b344f5",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/dust-redemption/enemy-tactics.test.js",
+      "bytes": 18096,
+      "sha256": "dff02d16de42cd2f6e7d2c011dae55bfc17445dceacb1f2a19167a218cd0a037",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/dust-redemption/physics.test.js",
+      "bytes": 8316,
+      "sha256": "193cd9b1ed9f73da715cfcee610f37b5ac9ecb1d9d2d6ac3ebb0b9a44d8518cf",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/dust-redemption/rules.test.js",
+      "bytes": 12000,
+      "sha256": "24307e04123a6ed3f5e0912b89a7a97fbcedaf522538aca2b2153ba2be870a62",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/dust-redemption/storage-supplies.test.js",
+      "bytes": 5261,
+      "sha256": "8e368b15cca95d3e42893e659bf4e67c8f813c2c9b2803124e48d313271acaa6",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/hollow-crown/audio.test.js",
+      "bytes": 10032,
+      "sha256": "70b461a5b2db59a9a7bd14868f94e185cd7953309b7283a5a2708f1c3713f6f1",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/hollow-crown/checkpoint-validation.test.js",
+      "bytes": 8467,
+      "sha256": "0944ea49b6c7e77bcf0de9a2a291435f10067be784386b81e6e7cd480259b89d",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/hollow-crown/rules.test.js",
+      "bytes": 33031,
+      "sha256": "a469d0a9b4a2c1b28ff4a3c4af4a4311b23d5223f24aec1ad2bb8be469021200",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/hollow-crown/storage.test.js",
+      "bytes": 5211,
+      "sha256": "2486bec91a5d1729dedf670c832ddb7848f6c9d4d2ba9cf86158be3199838ee4",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/moss-and-moon/audio.test.js",
+      "bytes": 8258,
+      "sha256": "2c1d1e6ce6446e5be253ef40450690e31b6f2ce47a9ea4658967488d29e8ad53",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/moss-and-moon/bridge-session.test.js",
+      "bytes": 5233,
+      "sha256": "f40e7c4ac059d8f9553767f4d93c0895b669b9701e5889d58f691c543cd9486c",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/moss-and-moon/bridge.test.js",
+      "bytes": 2502,
+      "sha256": "b0c5d0146a727e24b9f1198b516b7acc1ca752b5a2fac3a1366d9b06dd789b92",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/moss-and-moon/rules.test.js",
+      "bytes": 14285,
+      "sha256": "260d9d8fa27d8d86cec210c4a3b0797c3cc288662031962426f7b71ce3962a0f",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/moss-and-moon/storage.test.js",
+      "bytes": 4673,
+      "sha256": "9e485a4d3f2f6ebdf0626cc717dd670b6906eb98e37d139f7749b6a86dba1fda",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/neon-drift/bridge.test.js",
+      "bytes": 1905,
+      "sha256": "5ed2808870926e7296277fe155f6b76858c2788b525ebf370a90d2547586215c",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/neon-drift/core.test.js",
+      "bytes": 16195,
+      "sha256": "daa671dafaad9e8826ab01bdacc5a7f880512030e97c0623ebf32a869507bd51",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/neon-drift/driver.js",
+      "bytes": 2053,
+      "sha256": "f4fb3bb565e897b2c8f434a176513792ff7c57315330af5783f26277de1d6517",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/neon-drift/frame-history.test.js",
+      "bytes": 7923,
+      "sha256": "4c622c98d55cfe0ef48c51b3e7aff3986007db127d0e1f6edc6f508fd38d0ead",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/neon-drift/notifications.test.js",
+      "bytes": 5784,
+      "sha256": "839a06f47ebb89efe95b73a4f4adf7a489edf243869675cb232d7fbfff8b0e40",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/neon-drift/storage-recovery.test.js",
+      "bytes": 5593,
+      "sha256": "b93d93071681eb8c9f995715a3587b34af1c132aa2c40e578a106cbcfa973b3d",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/hazards.test.js",
+      "bytes": 732,
+      "sha256": "f1162b4272c6cffc2f65830a5f6da103fda549cf7e1de70e15e2ba2b2c39ce4f",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/measurement.test.js",
+      "bytes": 12356,
+      "sha256": "1b8e5bf75172a594e0df59311b1e8a67bc50c20c4d75926e740ebc825641a1f2",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/optics.test.js",
+      "bytes": 7443,
+      "sha256": "cf17f846c940103f9999a7dcecfa3eb7ddd10dc86a4e88ad77a7c4f5ac1b4721",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/rapier-equivalence-probe.mjs",
+      "bytes": 4253,
+      "sha256": "8e15ee905f4a77e793d9c8f44fecf3ed390ae34bb908c65db857e09a456d47ab",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/rapier-init-patch.test.js",
+      "bytes": 8841,
+      "sha256": "b2e2a5cd8c93e3c1961274f868eb237a6829be2f3e1fe29c122c4a2124edd835",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/rules.test.js",
+      "bytes": 10250,
+      "sha256": "167b7984031d66b608fe75a42bce4253b24d5e21e85f2026c3593eb0e01d3d46",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/settings.test.js",
+      "bytes": 6391,
+      "sha256": "9fc730e777239a35ba672437c5680014f5895506ccdfbfd0fee74c835680c6ac",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/orbit-fall/storage.test.js",
+      "bytes": 6518,
+      "sha256": "27da7fa1043ecd16e01a22f5acd7c97e25cf636a19893d80c50b9083635ed75a",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/signal-zero/core.test.js",
+      "bytes": 24056,
+      "sha256": "3c892045f186a50095078280e856ed900a21c827a600a2a6e465bc3aea687ccf",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/signal-zero/guard-culling.test.js",
+      "bytes": 6959,
+      "sha256": "eef5220afd24d80c65e844868a9a4337b4193319af796b6391b65368bef9e589",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/signal-zero/input.test.js",
+      "bytes": 3383,
+      "sha256": "cb028d0d527f881d2e2b35c23dd468cf7b3f9e71a8928733f2c7172eab5c86eb",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/signal-zero/static-stage.test.js",
+      "bytes": 3366,
+      "sha256": "1ae147a7ac7312037397c83337bba6ee4ac7c639f41687280e06ad7a1a9be494",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/tidebound/assets.test.js",
+      "bytes": 2497,
+      "sha256": "ede7f6d7cf47250d272c11ded5afa2df5c8a8aa286a55753cd8d82eba2cb28ff",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/tidebound/maker-0011-navigation.mjs",
+      "bytes": 16474,
+      "sha256": "4e3328dfb7550fe2bc2b68852dfae2081ca6fa93953ff389cd97a739e0ce286b",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/tidebound/maker-pacing.mjs",
+      "bytes": 5599,
+      "sha256": "0aa408b62623093b9659c89e53b947d6d52b28f1235e2fe2a4cf9332fbf46765",
+      "kind": "text"
+    },
+    {
+      "path": "tests/games/tidebound/rules.test.js",
+      "bytes": 43010,
+      "sha256": "b5e1109d62ab8888ad5e1cc8534699a35e024a4a3a1cd40527c98d040048e23f",
+      "kind": "text"
+    },
+    {
+      "path": "tests/public-release.test.mjs",
+      "bytes": 4075,
+      "sha256": "44a8bee50f38335f8423a1d2a242a69526fc9531b5084a8da5443687a428b313",
+      "kind": "text"
+    }
+  ]
+}
