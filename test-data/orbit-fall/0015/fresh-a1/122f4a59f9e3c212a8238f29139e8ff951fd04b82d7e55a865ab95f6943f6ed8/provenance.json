@@ -1,0 +1,57 @@
+{
+  "provenanceSchema": 1,
+  "status": "limited-fresh-a1-producer-accepted-not-import-tested",
+  "purpose": "artificial-fresh-story-a1-test-save-not-personal-data",
+  "producer": {
+    "repository": "KYStr/stteak-games",
+    "runId": "40577964973",
+    "jobId": "122449362671",
+    "commit": "d236331996584c5fec9b410d9d4a5a67804dde78",
+    "attempt": 1,
+    "workflowSha256": "17705d3d7f66e637e7efb486069ecbe518162b1788867a5902a160da0f262275"
+  },
+  "runtime": {
+    "build": "orbit-fall-0015",
+    "siteVersion": 2,
+    "sourceCommit": "4460a5c5532c8bb8afadf57661702bcc34f00e83",
+    "expectedSourceRuntimeSha256": "24d1cd8b283ca7e6621107191333ac7d8011946c25a233f8ecb79f999cc18c57",
+    "producerRemoteRuntimeBytesVerified": false
+  },
+  "validator": {
+    "id": "orbit0015-fresh-a1-public-v1",
+    "sourceSha256": "71cb0222f2caef7d74dc8331eb8a1d59bf8b121f8328f221d0c43982629ee759",
+    "maxBytes": 4096
+  },
+  "save": {
+    "file": "story-backup.json",
+    "bytes": 808,
+    "sha256": "122f4a59f9e3c212a8238f29139e8ff951fd04b82d7e55a865ab95f6943f6ed8",
+    "gitBlobSha1": "6163abb6f3fce4d6aab1aebe0c9d02f4ecbcffb2",
+    "originalBytesUnmodified": true
+  },
+  "observed": {
+    "browserVersion": "155.0.8059.39",
+    "runnerImage": "ubuntu-24.04",
+    "runnerImageVersion": "20261012.334.1",
+    "strictTransferVerified": true,
+    "completeSchemaVerified": true,
+    "freshA1ProfileVerified": true,
+    "prepublicationPrivacyGateVerified": true,
+    "privateDownloadsRemoved": true,
+    "stagingRemovedBeforeSaveStream": true,
+    "independentResultAccepted": true
+  },
+  "limitations": [
+    "This is an original normal-UI export from one artificial fresh A1 producer run; it is not a consumer or restoration result.",
+    "Only a newly generated artificial story A1 save is in scope; no personal save, account or credential.",
+    "The save must remain the original normal-UI export bytes, without reserialization or generated progress.",
+    "No import, restoration, persistence across reload, later progress or whole-game completion is established by the producer.",
+    "Checksums provide byte identity, not authenticity or a general privacy guarantee for arbitrary saves.",
+    "Software WebGL2 does not establish hardware performance or real-device compatibility.",
+    "The source runtime hash is not a full remote deployed-byte verification. The official runner image header is bound to this run, but a full downloaded-package/GPG supply-chain verification is not established."
+  ],
+  "review": {
+    "result": "limited-fresh-a1-producer-pass",
+    "receiptSha256": "fbb72c6df8eae5c6ecd048e5b7f1207947dda23adf1c28c24e7817f32315d0fa"
+  }
+}
