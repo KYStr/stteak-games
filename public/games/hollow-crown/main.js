@@ -7,7 +7,7 @@ import { Controls } from './input.js';
 import { Soundscape } from './audio.js';
 import { getGameBridge } from './bridge.js';
 
-const BUILD='hollow-crown-warning-cue-20261027-02', VERSION='1.0.0-rc.10-cue.2'; // 公開扇形提示獨立新候選；舊rc9證據與runtime不回填。
+const BUILD='hollow-crown-warning-cue-20261027-03', VERSION='1.0.0-rc.10-cue.3'; // body附屬非繪製根窄相容新候選；舊r2與run61不回填。
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let store;try{store=new SaveStore();}catch{store=new SaveStore({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});}
 const profile=store.load();
