@@ -17,3 +17,5 @@
 @media(max-width:480px){#game:has(#save-status:not([hidden])) .objective{top:192px}}
 
 @media(max-height:500px){#game:has(#save-status:not([hidden])) .hud{top:42px}#game:has(#save-status:not([hidden])) .objective{top:127px;max-width:260px}#game:has(#save-status:not([hidden])) .objective h1{font-size:14px;line-height:1.35;margin:4px 0}#game:has(#save-status:not([hidden])) .objective p{font-size:11px}#game:has(#save-status:not([hidden])) #progress{margin-top:4px;font-size:10px}}
+
+.player-backup{display:grid;gap:12px;min-width:0}.player-backup p{margin:0;overflow-wrap:anywhere}.player-backup input[type=file]{width:100%;max-width:100%;padding:10px;border:1px solid #77939b88;color:inherit;background:#071520}.player-backup button{min-height:44px;white-space:normal}.player-backup [hidden]{display:none!important}.player-backup a{color:#b9e2ee;overflow-wrap:anywhere} /* 故事備份面板沿原視覺，窄螢幕可讀且明示隱藏/44px操作區。 */
