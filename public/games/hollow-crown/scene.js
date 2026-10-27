@@ -40,7 +40,7 @@ export class SceneView {
     // 圖形context切換只清呈現receipt，恢復後必等下一個主render。
     this.onContextLost=e=>{e.preventDefault();this.contextLost=true;this.warningCue.invalidate();options.onCueClear?.();options.onContextLost?.();};this.onContextRestored=()=>{this.contextLost=false;this.warningCue.invalidate();options.onCueClear?.();options.onContextRestored?.();}; // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
     canvas.addEventListener('webglcontextlost',this.onContextLost);canvas.addEventListener('webglcontextrestored',this.onContextRestored);
-    this.resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>this.resize()):null;this.resizeObserver?.observe(canvas);this.resize();this.setQuality(this.quality);
+    this.resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>this.resize()):null;this.resizeObserver?.observe(canvas);this.setQuality(this.quality); // 初次由品質套用帶一次resize，原觀察器仍保留。
   }
   ownGeometry(g){this.extraGeometries.push(g);return g;}
   ownMaterial(m){this.extraMaterials.push(m);return m;}
@@ -206,9 +206,22 @@ export class SceneView {
     try{this.renderer.render(this.scene,this.camera);cue=this.warningCue.finish(cueToken,[...this.actors.values()].map(actor=>actor.health.children[0]));}finally{this.warningCue.invalidate();} // renderer錯誤照原路拋出，只有helper計算降級。
     const renderMs=performance.now()-start;this.frames.push({dt:rawDt*1000,renderMs});if(this.frames.length>7200)this.frames.shift();this.frameCount++;return cue; // 返回只讀呈現候選，非GPU像素證明。
   }
-  resize(){this.warningCue?.invalidate();this.options.onCueClear?.();if(this.disposed)return;const bounds=this.canvas.getBoundingClientRect();const w=Math.max(1,Math.floor(bounds.width||this.canvas.clientWidth||640)),h=Math.max(1,Math.floor(bounds.height||this.canvas.clientHeight||360));this.aspect=w/h;this.renderer.setSize(w,h,false);this.renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,this.quality==='low'?1:1.6));const half=this.aspect<1?8.7/this.aspect:12;this.camera.left=-half*this.aspect;this.camera.right=half*this.aspect;this.camera.top=half;this.camera.bottom=-half;this.camera.updateProjectionMatrix();} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+  resize(){ // 只去除重複畫布尺寸提交，不改原清cue或投影。
+    this.warningCue?.invalidate();this.options.onCueClear?.();if(this.disposed)return; // 原失效與生命週期順序保持。
+    const bounds=this.canvas.getBoundingClientRect();const w=Math.max(1,Math.floor(bounds.width||this.canvas.clientWidth||640)),h=Math.max(1,Math.floor(bounds.height||this.canvas.clientHeight||360));this.aspect=w/h; // 保留原CSS測量、fallback與整數化。
+    const ratio=Math.min(globalThis.devicePixelRatio||1,this.quality==='low'?1:1.6),prior=this.appliedViewport; // 與原品質像素上限完全相同。
+    const changed=!prior||prior.w!==w||prior.h!==h||prior.ratio!==ratio||this.canvas.width!==Math.floor(w*ratio)||this.canvas.height!==Math.floor(h*ratio); // 不只信快取，外部尺寸改動仍需修復。
+    if(changed)this.renderer.setDrawingBufferSize(w,h,ratio); // 固定Three一次更新logicalsize、ratio、canvas與viewport，原兩路亦皆不寫CSSstyle。
+    const half=this.aspect<1?8.7/this.aspect:12;this.camera.left=-half*this.aspect;this.camera.right=half*this.aspect;this.camera.top=half;this.camera.bottom=-half;this.camera.updateProjectionMatrix(); // 即使不提交尺寸也保留原投影更新。
+    if(changed)this.appliedViewport={w,h,ratio}; // 包含投影在內全部成功才記；錯誤照拋，無假成功。
+  } // 下一次合法resize可再嘗試，不保證瀏覽器或GPU已完成繪圖。
   screenToGround(clientX,clientY){const b=this.canvas.getBoundingClientRect();const mouse=new THREE.Vector2((clientX-b.left)/Math.max(1,b.width)*2-1,-(clientY-b.top)/Math.max(1,b.height)*2+1);this.raycaster.setFromCamera(mouse,this.camera);const hit=new THREE.Vector3();if(this.raycaster.ray.intersectPlane(this.ground,hit))return{x:hit.x,z:hit.z};return{x:0,z:0};}
-  setQuality(quality){this.quality=quality==='low'?'low':'high';this.renderer.shadowMap.enabled=this.quality==='high';this.sun.castShadow=this.quality==='high';this.sun.shadow.mapSize.set(this.quality==='high'?1024:512,this.quality==='high'?1024:512);for(const lod of this.colonnades||[]){lod.autoUpdate=this.quality!=='low';lod.levels.forEach((l,i)=>l.object.visible=this.quality==='low'?i===1:i===0);}this.resize();}
+  setQuality(quality){ // 首次與真正品質改變才套既有陰影與LOD。
+    if(this.disposed)return;const next=quality==='low'?'low':'high';if(this.appliedQuality===next)return; // 初次sentinel未設，不會漏套constructor已有的quality。
+    this.appliedQuality=undefined;this.quality=next;this.renderer.shadowMap.enabled=this.quality==='high';this.sun.castShadow=this.quality==='high';this.sun.shadow.mapSize.set(this.quality==='high'?1024:512,this.quality==='high'?1024:512); // 開始轉換先失效舊成功marker，避免半途throw後請求舊品質被誤略；陰影值不變。
+    for(const lod of this.colonnades||[]){lod.autoUpdate=this.quality!=='low';lod.levels.forEach((l,i)=>l.object.visible=this.quality==='low'?i===1:i===0);} // 保原兩級遠景可見性。
+    this.resize();this.appliedQuality=next; // resize與投影全成功才記；throw後只允下次合法setQuality重試，不聲稱render會自動重入。
+  } // 不重建房間、不改畫面動畫或simulation。
   metrics(){
     const percentile=key=>{const values=this.frames.map(f=>f[key]).sort((a,b)=>a-b);return values.length?Number(values[Math.min(values.length-1,Math.floor(values.length*.95))].toFixed(2)):null;};let instances=0;this.scene.traverse(node=>{if(node.isInstancedMesh&&node.visible)instances++;});
     const textureBytes=this.kit.shared.textures.reduce((n,t)=>n+(t.image?.width||0)*(t.image?.height||0)*4*(t.generateMipmaps?4/3:1),0),shadow=this.sun.shadow.map;

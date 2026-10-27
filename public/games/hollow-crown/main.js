@@ -7,7 +7,7 @@ import { Controls } from './input.js';
 import { Soundscape } from './audio.js';
 import { getGameBridge } from './bridge.js';
 
-const BUILD='hollow-crown-warning-cue-20261027-03', VERSION='1.0.0-rc.10-cue.3'; // body附屬非繪製根窄相容新候選；舊r2與run61不回填。
+const BUILD='hollow-crown-render-sizing-20261027-04', VERSION='1.0.0-rc.10-render.4'; // 只消除品質與尺寸重複提交的新候選，不回填run75原因。
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let store;try{store=new SaveStore();}catch{store=new SaveStore({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});}
 const profile=store.load();
@@ -153,7 +153,7 @@ $('overlay').addEventListener('change',e=>{
   if(c){config[c]=c==='seed'?Math.max(1,Math.min(2147483647,Number(el.value)||1)):el.value;updateConfigNote();return;}
   if(!key)return;if(key==='skin'){profile.selectedSkin=el.value;camp.player.skin=el.value;if(run)run.player.skin=el.value;}
   else profile.settings[key]=el.type==='checkbox'?el.checked:['music','effects','practiceWindow'].includes(key)?Number(el.value):el.value;
-  sound.update(profile.settings);view.setQuality(profile.settings.quality);persist();
+  sound.update(profile.settings);if(key==='quality')view.setQuality(profile.settings.quality);persist(); // 非品質設定不重套同值；原音訊與保存順序不變。
 });
 $('overlay').addEventListener('input',e=>{const key=e.target.dataset.setting;if(!['music','effects'].includes(key))return;profile.settings[key]=Number(e.target.value);sound.update(profile.settings);e.target.parentElement.querySelector('span').textContent=`${Math.round(profile.settings[key]*100)}%`;});
 $('pause-button').onclick=()=>pause();
@@ -176,7 +176,7 @@ function tick(now){if(disposed)return;frame=requestAnimationFrame(tick);const ra
   const cueEnabled=!!run?.tutorial&&!paused&&!overlay&&!document.hidden&&!disposed;const cue=view.render(run||camp,paused?0:dt,cueEnabled);warningCueUI.present(cue,cueEnabled); // 同幀main render後公布，沒有額外輸入或延時計時。
 }
 try{
-  view=new SceneView($('world'),{quality:profile.settings.quality,onCueClear:()=>warningCueUI.clear(),onAssetError:()=>{assetNotice='石材貼圖載入失敗，已使用基礎材質繼續。可於設定重新載入頁面，存檔保留。';notice();}});view.setQuality(profile.settings.quality); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+  view=new SceneView($('world'),{quality:profile.settings.quality,onCueClear:()=>warningCueUI.clear(),onAssetError:()=>{assetNotice='石材貼圖載入失敗，已使用基礎材質繼續。可於設定重新載入頁面，存檔保留。';notice();}}); // SceneView自身完成一次初始品質套用，不再立即重複。
   controls=new Controls($('world'),view,{pause:()=>paused?resume():pause(),gesture:()=>sound.unlock(),enabled:()=>!!run&&!paused&&!overlay&&['combat','tutorial'].includes(run.phase)});
   setOverlay('camp');notice();$('build-label').textContent=`${VERSION} · ${BUILD} · 本機存檔`;
   timing.loaded=performance.now()-timing.started;bridge.loaded();frame=requestAnimationFrame(tick);
