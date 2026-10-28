@@ -10,7 +10,7 @@ import { createFrameProfiler,FRAME_PHASE } from './profiler.js';
 import { createFrameHistory } from './frame-history.js';
 import { createNotifications } from './notifications.js';
 
-const BUILD='neon-drift-readability-0014',VERSION='1.0.12'; // 獨立車庫可讀性候選身分，不沿0013既有證據或分數。
+const BUILD='neon-drift-tutorial-progress-0015',VERSION='1.0.13'; // 教學進度提示使用獨立候選身分，不沿用0014的驗收證據或分數。
 const $=s=>document.querySelector(s);
 const fmt=t=>`${String(Math.floor(Math.max(0,t)/60)).padStart(2,'0')}:${(Math.max(0,t)%60).toFixed(2).padStart(5,'0')}`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -80,6 +80,8 @@ function refreshMenu(){
   const r=record();$('#record-label').textContent=r?(mode==='time'?`個人最佳 ${fmt(r.bestTime||0)}`:`個人最佳 ${(r.bestScore||0).toLocaleString()} 分`):'尚無本機紀錄';
   $('#targets').textContent=`金 / 銀 / 銅 ${track().medals[mode].map(v=>mode==='time'?fmt(v):v.toLocaleString()+' 分').join(' · ')}`;
   $('#scene-track').textContent=track().subtitle.split(' / ')[0];
+  const tutorialProgress=save.tutorialComplete===true?'教學進度：已完成（目前進度）':'教學進度：尚未完成'; // 只讀既有正規存檔狀態；目前進度不代表本機寫入一定成功。
+  const progressNode=$('#tutorial-progress');if(progressNode.textContent!==tutorialProgress)progressNode.textContent=tutorialProgress; // 只在狀態文字改變時更新，避免切換車款或賽道重複播報。
 }
 function showPreview(){race=createRace({trackId,carId,mode});renderer.setRace(track(),car(),COLORS.find(c=>c.id===settings.colorId)||COLORS[0],settings.decalId||'none');}
 function menu(){preserveCompletedRun();if(profileActive){profileEndedAt=performance.now();observedRun.end=profileEndedAt;}profileActive=false;phase='menu';input.setEnabled(false);audio.pause();closeModal();$('#garage').hidden=false;$('#scene-label').hidden=false;$('#hud').hidden=true;$('#touch-controls').hidden=true;$('#pause-button').hidden=true;bridge.state('ready');refreshMenu();showPreview();}
