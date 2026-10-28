@@ -1,12 +1,31 @@
 {
   "schemaVersion": 1,
-  "date": "2026-10-27",
+  "date": "2026-10-28",
   "releaseType": "development-source-release",
+  "identityAuditCoverage": {
+    "verifiedSourceCommit": "3ccce575416ed394f6e6ac9ce1bc998c6c34683c",
+    "currentAtVerifiedSourceCommit": [
+      "neon-drift",
+      "signal-zero",
+      "tidebound"
+    ],
+    "historicalRecordsNotReaudited": [
+      "aetherwake",
+      "dust-redemption",
+      "hollow-crown",
+      "moss-and-moon",
+      "orbit-fall"
+    ],
+    "historicalRecordDate": "2026-10-27",
+    "scope": "Only the three listed current identities were verified against the complete runtime file sets at verifiedSourceCommit. The other five game records are preserved historical metadata, not claims about current main; later revisions are not reconciled here. Baseline fields describe historical retained identities. Source/CPU review and byte identity do not establish GUI or whole-game acceptance."
+  },
   "overallGameQualityAcceptance": {
     "passed": 0,
     "total": 8
   },
   "checks": {
+    "auditDate": "2026-10-27",
+    "scope": "Historical initial source-release audit. These aggregate build/test counts were not rerun for the 2026-10-28 source publications below; they are not latest-main GUI or whole-game acceptance.",
     "officialPackageBuilds": {
       "passed": 8,
       "total": 8
@@ -87,16 +106,23 @@
     },
     {
       "game": "neon-drift",
-      "distributionId": "neon-drift-public-source-20261027",
+      "distributionId": "neon-drift-public-source-20261028",
       "stage": "development",
       "independentlyAccepted": false,
-      "runtimeHash": "b04507ddbf27248777110f6f40ce74d36f253c6d4eaec523e9c9d85e8812e9da",
+      "runtimeHash": "d114079dbbc9534732daa215d79eda7f30214e280a37b6e4bdd45d0507d976f2",
       "runtimeFiles": 18,
       "baselineRuntimeHash": "b04507ddbf27248777110f6f40ce74d36f253c6d4eaec523e9c9d85e8812e9da",
       "baselineBuildId": "neon-drift-rebuild-0012",
-      "baselineByteIdentical": true,
-      "changedFiles": [],
-      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+      "baselineByteIdentical": false,
+      "changedFiles": [
+        "game.js",
+        "index.html",
+        "style.css"
+      ],
+      "note": "Tutorial progress display update; narrow source/portable-test review only. No GUI, real-device or whole-game quality acceptance is implied. Baseline fields retain the historical baseline identity; changedFiles lists the runtime paths changed since changedFilesBaseCommit.",
+      "buildId": "neon-drift-tutorial-progress-0015",
+      "sourcePublicationCommit": "bcbc3588d2c48f1f3330545b8e98aa6267885211",
+      "changedFilesBaseCommit": "46cc058e73e65c1cad4f22c1c9803560f00e781d"
     },
     {
       "game": "orbit-fall",
@@ -115,29 +141,40 @@
     },
     {
       "game": "signal-zero",
-      "distributionId": "signal-zero-public-source-20261027",
+      "distributionId": "signal-zero-public-source-20261028",
       "stage": "development",
       "independentlyAccepted": false,
-      "runtimeHash": "3113acb4d51a4df261ee70ec02e3cfe0421a9573f27187330b6b139e973cd361",
+      "runtimeHash": "f99c9242f5b0529faaf1dfa8a36ae5daa2fc4270f0d13dde1549edf79099fc9d",
       "runtimeFiles": 33,
       "baselineRuntimeHash": "3113acb4d51a4df261ee70ec02e3cfe0421a9573f27187330b6b139e973cd361",
       "baselineBuildId": "signal-zero-0011",
-      "baselineByteIdentical": true,
-      "changedFiles": [],
-      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+      "baselineByteIdentical": false,
+      "changedFiles": [
+        "build.js",
+        "input.js"
+      ],
+      "note": "Physical keyboard/touch action ownership update; narrow source/CPU-fixture review only. No browser pointer-capture, real-device or whole-game quality acceptance is implied. Baseline fields retain the historical baseline identity; changedFiles lists the runtime paths changed since changedFilesBaseCommit.",
+      "buildId": "signal-zero-cloud-input-20261028-01",
+      "sourcePublicationCommit": "e6aae6f82529cdf182155b0baeb38c1eb8486d8e",
+      "changedFilesBaseCommit": "46cc058e73e65c1cad4f22c1c9803560f00e781d"
     },
     {
       "game": "tidebound",
-      "distributionId": "tidebound-public-source-20261027",
+      "distributionId": "tidebound-public-source-20261028",
       "stage": "development",
       "independentlyAccepted": false,
-      "runtimeHash": "5421ff2910dd45bbd94f4819d4fdf51b425de32377a2abc4e7efdeaaeafcbd1a",
+      "runtimeHash": "961e77b0b40fe1495e8a3c0d4aaea192d8d7591c07a5d13555bdbec26be9000e",
       "runtimeFiles": 78,
       "baselineRuntimeHash": "5421ff2910dd45bbd94f4819d4fdf51b425de32377a2abc4e7efdeaaeafcbd1a",
       "baselineBuildId": "tidebound-0012",
-      "baselineByteIdentical": true,
-      "changedFiles": [],
-      "note": "Runtime bytes match retained baseline; no gameplay acceptance implied."
+      "baselineByteIdentical": false,
+      "changedFiles": [
+        "game.js"
+      ],
+      "note": "Single-pointer helm ownership/reset update; narrow source/CPU-fixture review only. No browser multi-touch, real-device or whole-game quality acceptance is implied. Baseline fields retain the historical baseline identity; changedFiles lists the runtime paths changed since changedFilesBaseCommit.",
+      "buildId": "tidebound-cloud-helm-20261028-01",
+      "sourcePublicationCommit": "3ccce575416ed394f6e6ac9ce1bc998c6c34683c",
+      "changedFilesBaseCommit": "46cc058e73e65c1cad4f22c1c9803560f00e781d"
     }
   ]
 }
