@@ -65,14 +65,16 @@ npm run bundle
 
 這是獨立公開建置流程，不包含原平台登入預覽、內部交辦文件、私人 evidence 或舊評分 UI。可攜測試是經選取的來源邏輯／存檔／物理／資產測試，**不是整套歷史 QA**。保留的模型測試不等於真實玩家通關或畫面／聲音驗收。
 
-Orbit / Fall 的 Rapier 原始 JS、WASM、Apache 授權與精確 patch 配方均保留。公開 runtime 另外加上顯著修改標示，因此公開檔案的完整 SHA256 與沒有這段標示的歷史 runtime 不同；這不是暗中替換原驗收身分。
+在 2026-10-27 的既有公開基準中，Orbit / Fall 保留 Rapier 原始 JS、WASM、Apache 授權與精確 patch 配方，並另加顯著修改標示，因此當時公開檔案的完整 SHA256 與沒有這段標示的歷史 runtime 不同。這是歷史來源與授權說明，不是目前 Orbit 全部程式差異的稽核結論。
 
 ## 本次公開建置身分與限制
 
-- 六款 runtime（Dust、Hollow Crown、Moss、Neon、Signal、Tide）與保留基準逐位元相符；來源／資產重建不等於遊戲 QA 通過。
-- Aetherwake 使用 `aetherwake-open-source-20261027`、`development` 身分。已恢復 source 的 `game.js`／窄螢幕 toast 樣式與 frozen 0008 不同，未獨立驗收；原正式 Site 的 frozen 0008 沒有被這個 repo 修改。
-- Orbit 的公開 distribution 有新的 runtime hash，差異只有 Rapier 顯著修改標示；遊戲內歷史 engine build label 不等於本公開 distribution 的位元身分。
-- 精確公開身分見 `release-status.json`。沒有把未通過項目填成分數或以開源取代驗收。
+- 本次僅核對 commit `3ccce575416ed394f6e6ac9ce1bc998c6c34683c` 的 Neon、Signal、Tide 三款當前 runtime 身分；不是八款現況的完整稽核。
+- 2026-10-28 已公開 Neon `neon-drift-tutorial-progress-0015` 的教學進度顯示、Signal `signal-zero-cloud-input-20261028-01` 的實體鍵／觸控持有修正，以及 Tide `tidebound-cloud-helm-20261028-01` 的單指舵盤持有修正。三款在上述 commit 的完整 runtime 檔案集合與 GitHub 對應 blob 均已核對；沒有把 source／CPU 審查或發布成功當作 GUI、真機或整款品質驗收。
+- Aether、Dust、Hollow Crown、Moss、Orbit 的五個既有紀錄保留為 2026-10-27 歷史 metadata，本次未重核，也未整併後續修正；不能據此認定它們仍與基準相同、或代表目前 main 的 build／hash。
+- Aetherwake 的既有基準說明（2026-10-27）：公開 source 使用 `aetherwake-open-source-20261027`、`development` 身分，當時 `game.js`／窄螢幕 toast 樣式與 frozen 0008 不同，未獨立驗收；該公開版本沒有修改原正式 Site 的 frozen 0008。此處保留歷史區分，不代表本次重核了目前 Aether 的全部身分。
+- Orbit 的既有基準說明（2026-10-27）：當時公開 distribution 的 Rapier 顯著修改標示產生獨立 runtime hash；歷史 engine build label 不等於該 distribution 的位元身分。這不是目前 Orbit 的完整差異清單，不表示後續版本只有 notice 變動。
+- 本次已核三款的 build、runtime hash、發布 commit 與差異範圍見 `release-status.json`；`identityAuditCoverage` 明列當前已核與未重核的歷史紀錄。`checks` 保留 2026-10-27 初次公開稽核的歷史結果，並非更新後八款總測試的重跑結果。沒有把未通過項目填成分數或以開源取代驗收。
 - Signal Zero 的音訊匯出配方原本固定使用 Microsoft Edge；公開版改為 Playwright Chromium，可用 `STTEAK_CHROMIUM_PATH` 明確指定已安裝的受信任 Chromium。配方需要瀏覽器；一般 `setup` 不下載它。本次雲端因 sandbox 禁止瀏覽器本機 socket，**此音訊配方未重新執行成功**；保留的原合成 WAV 與原授權／雜湊已逐檔核對，並非本次新生成音訊。
 - 如需自行重建 Signal 音訊，可在允許啟動瀏覽器的環境先於 `games/signal-zero` 執行 `npx --no-install playwright install chromium`，再執行表中配方；下載瀏覽器是明確的額外步驟，不會在 `setup` 背景執行。
 
