@@ -42,3 +42,4 @@
 #garage .track-options,#garage .car-options{grid-template-columns:repeat(3,minmax(0,1fr))} /* 保原三卡排列，允列內容縮小換行而不靠最小內容寬擠出視窗。 */
 #garage .segmented{grid-template-columns:repeat(2,minmax(0,1fr))} /* 模式仍兩欄，字大時各自正常換行而非固定高度。 */
 #garage .track-options button{overflow:visible} /* 明確解除原track button的hidden裁切，保SVG與文字自然流，不以未新增clip當作沒裁字的證明。 */
+#garage .tutorial-progress{margin:10px 0 0;color:#c0d0d6;font-size:max(12px,.75rem);line-height:1.5;overflow-wrap:anywhere} /* 0015：進度提示保12px下限與自然換行；不設固定高度、不改焦點或原捲動容器。 */
