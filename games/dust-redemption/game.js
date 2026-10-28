@@ -39,7 +39,7 @@ import {
   fieldPlacementPoints,
 } from "./expansion-content.js";
 
-export const BUILD = "dust-redemption-development-0020";
+export const BUILD = "dust-redemption-cloud-escape-20261028-01";
 const sceneFlowFor = (id) =>
   MISSION_FLOW[id]
     ? MissionSystem
@@ -2746,6 +2746,7 @@ window.addEventListener("keydown", (event) => {
     event.preventDefault();
   if (event.code === "Escape") {
     event.preventDefault();
+    if (event.repeat) return;
     if (mode === "paused") resume();
     else if (mode === "help" || mode === "settings") closeSheet();
     else if (mode === "field") field.handle("field-close", {});
