@@ -1,0 +1,2246 @@
+{
+  "schemaVersion": 1,
+  "gameId": "hollow-crown",
+  "version": "1.0.0",
+  "generatedAt": "2026-10-25",
+  "rebuild": "node assets/games/hollow-crown/recipes/export-assets.mjs",
+  "runtimeModelRoot": "public/games/hollow-crown/",
+  "assetPolicy": "Original procedural mesh assets with reusable GLB exports and deterministic seamless PBR textures; live rendering uses the same source kit. No external fonts, photos or images.",
+  "relatedManifests": [
+    "audio-manifest.json"
+  ],
+  "assets": [
+    {
+      "id": "hollow-crown.character.guardian",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/guardian.glb"
+      ],
+      "sha256": {
+        "assets/models/guardian.glb": "f812f67b8b0a8a79499b4aedc6460d784be78c52fcd15fe82307663ac4ca4d3b"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.2639,
+          1.715,
+          3.4795
+        ],
+        "triangles": 944,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "ivory-enamel",
+          "joint-leather",
+          "old-brass",
+          "blue-tempered-steel",
+          "charcoal-steel",
+          "oxblood-cloth"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.43,
+          "height": 1.75,
+          "center": [
+            0,
+            0.875,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 42880,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "guardian"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.infantry",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/infantry.glb"
+      ],
+      "sha256": {
+        "assets/models/infantry.glb": "59ce99d98c6fb9a30fe53f756562df6c6cf45031c5f658aeb7e1e8249d1a09c3"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.18,
+          1.715,
+          1.6795
+        ],
+        "triangles": 736,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "charcoal-steel",
+          "joint-leather",
+          "living-ember",
+          "blue-tempered-steel",
+          "old-brass",
+          "ivory-enamel",
+          "ivory-cloth"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.48,
+          "height": 1.75,
+          "center": [
+            0,
+            0.875,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 42148,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "infantry"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.lancer",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/lancer.glb"
+      ],
+      "sha256": {
+        "assets/models/lancer.glb": "c821e2839c993f12ce5bde4c02e079693fc2bf1be979ac53cfb321dba3ba09c5"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.18,
+          1.915,
+          3.4795
+        ],
+        "triangles": 808,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "charcoal-steel",
+          "joint-leather",
+          "living-ember",
+          "blue-tempered-steel",
+          "oxblood-cloth",
+          "ivory-enamel",
+          "old-brass",
+          "ivory-cloth"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.48,
+          "height": 1.75,
+          "center": [
+            0,
+            0.875,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 42984,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "lancer"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.arbalest",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/arbalest.glb"
+      ],
+      "sha256": {
+        "assets/models/arbalest.glb": "939bf2a46d37cd950ea56a7b690eb0b8728484b8aebf64a54045d420982883f1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.275,
+          1.715,
+          1.2795
+        ],
+        "triangles": 744,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "charcoal-steel",
+          "joint-leather",
+          "living-ember",
+          "blue-tempered-steel",
+          "old-brass",
+          "ivory-cloth",
+          "ivory-enamel"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.42,
+          "height": 1.75,
+          "center": [
+            0,
+            0.875,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 44284,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "arbalest"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.cinderbug",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/cinderbug.glb"
+      ],
+      "sha256": {
+        "assets/models/cinderbug.glb": "c29dfac0f686d37108bd92f963ecff779b4b5c74d38f6d74a1324e3b24c1da2f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.384,
+          0.5905,
+          0.9929
+        ],
+        "triangles": 590,
+        "bones": 22,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "old-brass",
+          "candle-flame",
+          "living-ember",
+          "charcoal-steel"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.4,
+          "height": 0.8,
+          "center": [
+            0,
+            0.4,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 46304,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "cinderbug"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.shieldguard",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/shieldguard.glb"
+      ],
+      "sha256": {
+        "assets/models/shieldguard.glb": "36d68347c9232021bc39c94f735a32be2e109c42179f8b0a694486ba3d61d597"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.4236,
+          1.715,
+          1.6795
+        ],
+        "triangles": 884,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "blue-tempered-steel",
+          "joint-leather",
+          "living-ember",
+          "charcoal-steel",
+          "old-brass",
+          "ivory-enamel",
+          "ivory-cloth"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.6,
+          "height": 1.75,
+          "center": [
+            0,
+            0.875,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 42908,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "shieldguard"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.crown",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/crown.glb"
+      ],
+      "sha256": {
+        "assets/models/crown.glb": "4f6f79c1b439386197903c41889c458edeb3b98e06b51de159b2c69b0c9f8f47"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.9116,
+          3.3022,
+          6.2978
+        ],
+        "triangles": 884,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "old-brass",
+          "joint-leather",
+          "living-ember",
+          "blue-tempered-steel",
+          "charcoal-steel",
+          "ivory-enamel",
+          "ivory-cloth"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.9,
+          "height": 2.65,
+          "center": [
+            0,
+            1.325,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 44304,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "crown"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.character.bellwarden",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/bellwarden.glb"
+      ],
+      "sha256": {
+        "assets/models/bellwarden.glb": "37bb4e66a0bb4582d639ef3ecb999a3f9976760b3354ec141e9134b3a6510c82"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.9092,
+          4.1588,
+          1.3017
+        ],
+        "triangles": 984,
+        "bones": 16,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "ivory-enamel",
+          "joint-leather",
+          "living-ember",
+          "blue-tempered-steel",
+          "old-brass",
+          "ivory-cloth",
+          "charcoal-steel"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true
+          },
+          {
+            "name": "run",
+            "duration": 0.64,
+            "loop": true
+          },
+          {
+            "name": "light",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "charge",
+            "duration": 0.8,
+            "loop": true
+          },
+          {
+            "name": "block",
+            "duration": 0.5,
+            "loop": true
+          },
+          {
+            "name": "dodge",
+            "duration": 0.36,
+            "loop": false
+          },
+          {
+            "name": "hurt",
+            "duration": 0.3,
+            "loop": false
+          },
+          {
+            "name": "death",
+            "duration": 0.7,
+            "loop": false
+          },
+          {
+            "name": "telegraph",
+            "duration": 0.7,
+            "loop": true
+          },
+          {
+            "name": "attack",
+            "duration": 0.42,
+            "loop": false
+          },
+          {
+            "name": "recover",
+            "duration": 0.55,
+            "loop": false
+          }
+        ],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {
+          "light": [
+            {
+              "time": 0.16,
+              "event": "impact"
+            }
+          ],
+          "charge": [
+            {
+              "time": 0.36,
+              "event": "charge-ready"
+            }
+          ],
+          "attack": [
+            {
+              "time": 0.18,
+              "event": "impact"
+            }
+          ],
+          "dodge": [
+            {
+              "time": 0,
+              "event": "invulnerable-start"
+            },
+            {
+              "time": 0.24,
+              "event": "invulnerable-end"
+            }
+          ]
+        },
+        "collision": {
+          "shape": "vertical-capsule",
+          "radius": 0.86,
+          "height": 2.5,
+          "center": [
+            0,
+            1.25,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 44436,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "bellwarden"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Reusable glTF export of the exact runtime kit geometry and rigid Bone clips. Live game constructs the same asset through assets/models/kit.js to share geometry and material allocations."
+    },
+    {
+      "id": "hollow-crown.environment.pillar",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/pillar.glb"
+      ],
+      "sha256": {
+        "assets/models/pillar.glb": "a0a14d65fd7e47019a756454d1416c5e0e29933d1a6fff9eb44732c9e4a12f31"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.1833,
+          3.02,
+          1.15
+        ],
+        "triangles": 352,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "basalt-stone",
+          "ash-stone"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": {
+          "shape": "box",
+          "size": [
+            1.15,
+            3.02,
+            1.15
+          ],
+          "center": [
+            0,
+            1.51,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 283564,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "pillar"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.altar",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/altar.glb"
+      ],
+      "sha256": {
+        "assets/models/altar.glb": "f5e7f76641b5b86e5d0adf110798c7e15f0633f24ca82ca7f9d298a4cc5aa6a4"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          2.6,
+          1.7,
+          1.65
+        ],
+        "triangles": 102,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "basalt-stone",
+          "ivory-enamel",
+          "old-brass",
+          "ember-glass"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": {
+          "shape": "box",
+          "size": [
+            2.6,
+            1.1,
+            1.65
+          ],
+          "center": [
+            0,
+            0.55,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 283852,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "altar"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.candelabrum",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/candelabrum.glb"
+      ],
+      "sha256": {
+        "assets/models/candelabrum.glb": "ac2480d60f7dadc195b372786052a4230a38ebbfb036dad3a17177a2cf670451"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          0.7,
+          1.53,
+          0.4
+        ],
+        "triangles": 170,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "old-brass",
+          "candle-wax",
+          "candle-flame"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": null
+      },
+      "budget": {
+        "runtimeBytes": 10240,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "candelabrum"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.wall",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/wall.glb"
+      ],
+      "sha256": {
+        "assets/models/wall.glb": "ab7bd08805cf8954d9845e360069ae7cd1f6d34e87a41262608c2d51b9f4404a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          2.1,
+          1.0979,
+          0.6
+        ],
+        "triangles": 196,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "basalt-stone",
+          "ash-stone"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": {
+          "shape": "box",
+          "size": [
+            2,
+            1.1,
+            0.5
+          ],
+          "center": [
+            0,
+            0.55,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 280580,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "wall"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.banner",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/banner.glb"
+      ],
+      "sha256": {
+        "assets/models/banner.glb": "c47b4ced263ba5410b8ba5c7ba31947d08f15c54b47124fc2c1bdb99b2b17372"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.1,
+          3,
+          0.1135
+        ],
+        "triangles": 108,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "old-brass",
+          "oxblood-cloth",
+          "ivory-enamel"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": null
+      },
+      "budget": {
+        "runtimeBytes": 5892,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "banner"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.floor-tile",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/floor-tile.glb"
+      ],
+      "sha256": {
+        "assets/models/floor-tile.glb": "57d64ea5b25395fc503aaef83b9207598d4a850a85d0dcce12798d55bb2ccc6a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.94,
+          0.2,
+          1.94
+        ],
+        "triangles": 28,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "basalt-stone"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": null
+      },
+      "budget": {
+        "runtimeBytes": 279188,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "floor-tile"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.rubble",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/rubble.glb"
+      ],
+      "sha256": {
+        "assets/models/rubble.glb": "357b8b308b7b1524b2f0e90d9c26765e32901c291841c601111bc14c766b47f6"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          0.8374,
+          0.3386,
+          0.8353
+        ],
+        "triangles": 140,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "basalt-stone",
+          "ash-stone"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": null
+      },
+      "budget": {
+        "runtimeBytes": 280772,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "rubble"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.brazier",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/brazier.glb"
+      ],
+      "sha256": {
+        "assets/models/brazier.glb": "b4373da620c1391fe9fb2d61250b2934d80fad81c94a7f99b786419bf8d37b21"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          0.9,
+          1.58,
+          0.9
+        ],
+        "triangles": 638,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "charcoal-steel",
+          "old-brass",
+          "living-ember",
+          "candle-flame"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": null
+      },
+      "budget": {
+        "runtimeBytes": 13404,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "brazier"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": [],
+      "runtimeUse": "Runtime uses the identical parametric source in kit.js; repeated pieces use InstancedMesh."
+    },
+    {
+      "id": "hollow-crown.environment.pillar-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/pillar-low.glb"
+      ],
+      "sha256": {
+        "assets/models/pillar-low.glb": "2eabf9070669f13598750e042809f91df3811da2f8641f494b3030858be63075"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "feet-center",
+        "dimensions": [
+          1.15,
+          3.02,
+          1.15
+        ],
+        "triangles": 108,
+        "bones": 0,
+        "rig": "rigid meshes parented to named THREE.Bone joints",
+        "rootMotion": false,
+        "materialSlots": [
+          "basalt-stone",
+          "ash-stone"
+        ],
+        "materials": "UV-equipped procedural primitives; PBR metallic/roughness; stone slots embed original seamless baseColor/normal/roughness maps",
+        "clips": [],
+        "weaponMount": "root/hips/spine/arm-r/forearm-r/hand-r/weapon-mount",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear",
+          "roughness": "linear"
+        },
+        "lod": [],
+        "animationEvents": {},
+        "collision": {
+          "shape": "box",
+          "size": [
+            1.15,
+            3.02,
+            1.15
+          ],
+          "center": [
+            0,
+            1.51,
+            0
+          ]
+        }
+      },
+      "budget": {
+        "runtimeBytes": 282144,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "model",
+          "pillar-low"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "hollow-crown.data.collision-proxies",
+      "version": "1.0.0",
+      "kind": "data",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/collision-proxies.json"
+      ],
+      "sha256": {
+        "assets/models/collision-proxies.json": "54ec3eccf7919b6aa1743b684bc6cec02fe6ebf4b754d1c55cd69446978ff01d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "schemaVersion": 1,
+        "unit": "meter",
+        "coordinates": "Y up, X/Z ground plane",
+        "separateFromVisualMeshes": true
+      },
+      "budget": {
+        "runtimeBytes": 2097,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "data",
+          "collision-proxies"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "hollow-crown.source.runtime-kit",
+      "version": "1.0.0",
+      "kind": "code",
+      "source": "sources/kit.mjs",
+      "runtime": [
+        "assets/models/kit.js"
+      ],
+      "sha256": {
+        "assets/models/kit.js": "62dc735b6f1f0f3594d8c9381fca92f80c84f3505f6e705c11e8d57a0f8a6f8d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; editable JavaScript primitives",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project geometry, designs, materials and clips; third-party engine Three.js is separately MIT licensed."
+      },
+      "spec": {
+        "language": "JavaScript ES module",
+        "threeVersion": "0.180.0",
+        "publicExports": [
+          "KIT_VERSION",
+          "PALETTE",
+          "ACTOR_IDS",
+          "COLLIDERS",
+          "createKit"
+        ],
+        "dependencies": [
+          "../../vendor/three.module.js (injected by scene.js)"
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 18908,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "code",
+          "runtime-kit"
+        ],
+        "compatibleWith": [
+          "hollow-crown-rig-v1",
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "hollow-crown.material.ruin-stone-basecolor",
+      "version": "1.0.0",
+      "kind": "texture",
+      "source": "recipes/stone-surfaces.mjs",
+      "runtime": [
+        "assets/textures/ruin-stone-basecolor.png"
+      ],
+      "sha256": {
+        "assets/textures/ruin-stone-basecolor.png": "5bd50be7e08458cdc536007dae4157bc76cf5590259a5d9f122f3878ab817540"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Deterministic periodic noise and PNG encoder in Node.js",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project procedural pixels; no source photographs or external textures."
+      },
+      "spec": {
+        "width": 256,
+        "height": 256,
+        "channels": "RGBA",
+        "colorSpace": "sRGB",
+        "seamless": true,
+        "uvScale": "One repeat per standard primitive UV unit; no text or baked lighting",
+        "normalConvention": null
+      },
+      "budget": {
+        "runtimeBytes": 76203,
+        "decodedBytes": 262144,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "stone",
+          "seamless",
+          "PBR"
+        ],
+        "compatibleWith": [
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "hollow-crown.material.ruin-stone-normal",
+      "version": "1.0.0",
+      "kind": "texture",
+      "source": "recipes/stone-surfaces.mjs",
+      "runtime": [
+        "assets/textures/ruin-stone-normal.png"
+      ],
+      "sha256": {
+        "assets/textures/ruin-stone-normal.png": "cca0005e6e6bdd83c2dc8698e76978c95dd0631139b8edad2dd56efd11b9f03f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Deterministic periodic noise and PNG encoder in Node.js",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project procedural pixels; no source photographs or external textures."
+      },
+      "spec": {
+        "width": 256,
+        "height": 256,
+        "channels": "RGBA",
+        "colorSpace": "linear",
+        "seamless": true,
+        "uvScale": "One repeat per standard primitive UV unit; no text or baked lighting",
+        "normalConvention": "OpenGL +Y"
+      },
+      "budget": {
+        "runtimeBytes": 144979,
+        "decodedBytes": 262144,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "stone",
+          "seamless",
+          "PBR"
+        ],
+        "compatibleWith": [
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "hollow-crown.material.ruin-stone-roughness",
+      "version": "1.0.0",
+      "kind": "texture",
+      "source": "recipes/stone-surfaces.mjs",
+      "runtime": [
+        "assets/textures/ruin-stone-roughness.png"
+      ],
+      "sha256": {
+        "assets/textures/ruin-stone-roughness.png": "7b45ba6b415406dad996fa590be5fb492550794c6e4d5ee688676fcd6e57ff38"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker scene-assets assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Deterministic periodic noise and PNG encoder in Node.js",
+        "promptRecord": "generation/brief.md",
+        "referenceSources": [],
+        "rights": "Original project procedural pixels; no source photographs or external textures."
+      },
+      "spec": {
+        "width": 256,
+        "height": 256,
+        "channels": "RGBA",
+        "colorSpace": "linear",
+        "seamless": true,
+        "uvScale": "One repeat per standard primitive UV unit; no text or baked lighting",
+        "normalConvention": null
+      },
+      "budget": {
+        "runtimeBytes": 53448,
+        "decodedBytes": 262144,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "stone",
+          "seamless",
+          "PBR"
+        ],
+        "compatibleWith": [
+          "hollow-crown-ruin-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    }
+  ]
+}

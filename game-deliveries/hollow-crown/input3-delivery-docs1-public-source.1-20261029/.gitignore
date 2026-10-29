@@ -1,0 +1,4 @@
+**/node_modules/
+assets/games/hollow-crown/verification/
+dist/
+*.log

@@ -1,0 +1,12 @@
+{
+  "name": "@stteak/hollow-crown",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test ../../tests/games/hollow-crown/*.test.js"
+  },
+  "dependencies": { "three": "0.180.0" },
+  "devDependencies": { "@playwright/test": "1.56.1" }
+}

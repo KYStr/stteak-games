@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "hollow-crown.audio.camp",
+      "version": "1.0.0",
+      "kind": "music",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/camp.wav"
+      ],
+      "sha256": {
+        "assets/audio/camp.wav": "c72c12780f342d8768372c8e002f99d4e40b621d069eaf092857759ca3306e10"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 16,
+        "loop": true,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 705644,
+        "maxSimultaneousInstances": 1
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.combat",
+      "version": "1.0.0",
+      "kind": "music",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/combat.wav"
+      ],
+      "sha256": {
+        "assets/audio/combat.wav": "df370f14084fc91f9e883a65ee7acada4b8f723bb54524d2f5383d5602361109"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 16,
+        "loop": true,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 705644,
+        "maxSimultaneousInstances": 1
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.boss",
+      "version": "1.0.0",
+      "kind": "music",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/boss.wav"
+      ],
+      "sha256": {
+        "assets/audio/boss.wav": "95a8afbd15afe9b6b9e7ddbe3ed4f827dfaaedf8d01457791f989b9f222f284c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 16,
+        "loop": true,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 705644,
+        "maxSimultaneousInstances": 1
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.light",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/light.wav"
+      ],
+      "sha256": {
+        "assets/audio/light.wav": "1d664a2f7c282800ef0618371244b1c55c76d0142e6cce7fa7bf9d559cf5558f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.16,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 7100,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.charge",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/charge.wav"
+      ],
+      "sha256": {
+        "assets/audio/charge.wav": "c4e582853717124ff41ffe44813917bcfb639d79a48c6919605763be492e413e"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.6499773242630386,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 28708,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.hit",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/hit.wav"
+      ],
+      "sha256": {
+        "assets/audio/hit.wav": "52f7272d92486a69a8c159812d011c4e9114900173ae1f0e6ed1b05f8a1ef085"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.2,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 8864,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.metal",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/metal.wav"
+      ],
+      "sha256": {
+        "assets/audio/metal.wav": "c58b5063d83a3bf9d910977a1e307e67fffab4dbe5047f84644a5b34d6f19bb1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.32,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 14156,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.stone",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/stone.wav"
+      ],
+      "sha256": {
+        "assets/audio/stone.wav": "726b6267ca7e3be368898e96c9ffa3631d889458c58230f3b8de57796d6c2d6c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.2,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 8864,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.hurt",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/hurt.wav"
+      ],
+      "sha256": {
+        "assets/audio/hurt.wav": "a978e2708145de20add3b15a149fdb17deb2e0763719d0bc703bd73dbb4f63be"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.34997732426303857,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 15478,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.parry",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/parry.wav"
+      ],
+      "sha256": {
+        "assets/audio/parry.wav": "3e1c974048f48a29ebc4d21c98ae53b640edfd8aaf65d25eef935d96e3414cf8"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.44997732426303855,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 19888,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.dodge",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/dodge.wav"
+      ],
+      "sha256": {
+        "assets/audio/dodge.wav": "1eeebdb304162ec501798347c045d25666de9af6c73bd586fab6874a51bcc799"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.2,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 8864,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.death",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/death.wav"
+      ],
+      "sha256": {
+        "assets/audio/death.wav": "23252a52c9a3a944c358418792c49f83f07514212e9e6fe9aa1802f97e046e4b"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.6999546485260771,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 30912,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.win",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/win.wav"
+      ],
+      "sha256": {
+        "assets/audio/win.wav": "0bdc0a0e2940828a622a039486801397ad65173c49e83a8dbf92f92011e386b2"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 1.3999546485260772,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 61782,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.loss",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/loss.wav"
+      ],
+      "sha256": {
+        "assets/audio/loss.wav": "71766ded4ac67c68e4794b075c899fff93be98445cc8194cb98e73b5fe873d6c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 1,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 44144,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.ui",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/ui.wav"
+      ],
+      "sha256": {
+        "assets/audio/ui.wav": "ca3f02d712c14f4ffe96a34df94af753cb7099bd9e8462ee927c0d4c45d549b1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.08997732426303855,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 4012,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.warning",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/warning.wav"
+      ],
+      "sha256": {
+        "assets/audio/warning.wav": "05bd421b322a36c65df393d15d1685872ad2e388967778e41880007390f3b159"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.24997732426303854,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 11068,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
+    }
+  ]
+}
