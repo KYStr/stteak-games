@@ -1,10 +1,10 @@
-name: Moss0022 fixed synthetic import and reload # 固定新情境的手動入口與權限，不沿用舊執行批准。
+name: Moss0022 pinned loopback synthetic import and reload # 固定新情境的手動入口與權限，不沿用舊執行批准。
 run-name: Moss0022 synthetic file-input integration by ${{ github.actor }} # 固定新情境的手動入口與權限，不沿用舊執行批准。
 on: # 沒有push、PR、schedule或其他自動觸發。
   workflow_dispatch: # 只有owner手動派發一次。
     inputs: # 不接受自選URL、指令或瀏覽器旗標。
       confirm_native_chrome: # 明示確認公開最小probe，不是持續付費或長測授權。
-        description: 'New scope: fixed synthetic1106-byte JSON import and reload; not OS chooser; process115s, job12min; one run' # 固定新情境的手動入口與權限，不沿用舊執行批准。
+        description: 'Fixed pinned GitHub runtime plus loopback synthetic import; process115s, job12min; one manual run, no retry' # 固定新情境的手動入口與權限，不沿用舊執行批准。
         type: boolean # 用明確布林選項，避免字串歧義。
         default: false # 預設不執行。
         required: true # 必須由owner明確確認。
@@ -12,9 +12,9 @@ on: # 沒有push、PR、schedule或其他自動觸發。
         description: '7 pointer inputs, one fixed Buffer FileChooser.setFiles, one reload, one PNG; no retry or race claim' # 固定新情境的手動入口與權限，不沿用舊執行批准。
         type: choice # GitHub固定選單，runtime仍核白名單。
         required: true # 不依預設推測使用者要測哪款。
-        default: moss0022-synthetic-import-reload # 本包只提供固定day2合成檔正常匯入與同頁reload保存。
+        default: moss0022-loopback-synthetic-import-reload # 本包只提供固定day2合成檔正常匯入與同頁reload保存。
         options: # 後續情境只有逐份審過才可加入。
-          - moss0022-synthetic-import-reload # 7pointer、1固定file、1reload；兩entry A/B，讀回slot1/day2，唯一末圖。
+          - moss0022-loopback-synthetic-import-reload # 7pointer、1固定file、1reload；兩entry A/B，讀回slot1/day2，唯一末圖。
 permissions: {} # 不checkout、不讀寫GitHub內容、不給token任何可選scope。
 concurrency: # 所有分支共用固定群組，沒有矩陣或分片。
   group: stteak-single-public-capability # 最多一個正在執行的probe。
@@ -169,10 +169,10 @@ jobs: # 只有一個標準runner job。
           QA_SOURCE_6: |
             import {fixedPayload,FIXTURE} from './fixed-fixture.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             export const CHOOSER_LIMITS=Object.freeze({totalMs:7000,metadataMs:1000,setFilesMs:3000,events:1,files:1}); // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
-            export const TARGET_URL='https://moss-moon-private-qa.agentkystr.chatgpt.site/'; // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
+            export const TARGET_URL='http://127.0.0.1:43122/'; // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
             // 只讀回傳控制項身份的一個布林；明確不是讀隱藏遊戲狀態或檔案內容。
             export function inputIdentity(element){ // 僅暴露本檔宣告的有限介面與結果，不提供額外瀏覽器或遊戲控制能力。
-             return location.href==='https://moss-moon-private-qa.agentkystr.chatgpt.site/' && element?.ownerDocument===document && element.isConnected===true && element===document.querySelector('#panel-body #import-file') && document.querySelectorAll('#panel-body #import-file').length===1 && element.tagName==='INPUT' && element.type==='file' && element.getAttribute('accept')==='application/json' && element.multiple===false && element.disabled===false && element.getAttribute('webkitdirectory')===null; // 僅暴露本檔宣告的有限介面與結果，不提供額外瀏覽器或遊戲控制能力。
+             return location.href==='http://127.0.0.1:43122/' && element?.ownerDocument===document && element.isConnected===true && element===document.querySelector('#panel-body #import-file') && document.querySelectorAll('#panel-body #import-file').length===1 && element.tagName==='INPUT' && element.type==='file' && element.getAttribute('accept')==='application/json' && element.multiple===false && element.disabled===false && element.getAttribute('webkitdirectory')===null; // 僅暴露本檔宣告的有限介面與結果，不提供額外瀏覽器或遊戲控制能力。
             } // 結束本有界分支並保留既定停止、回報與清理語義。
             export function createChooserLease({page,healthy,latch,now=()=>performance.now(),setTimer=setTimeout,clearTimer=clearTimeout}){ // 使用單調期限限制此非同步步驟；逾時後不能採納晚回覆或延長授權。
              let state='idle',fatal=null,expires=null,chooser=null,seen=0,setFilesAttempts=0,triggerAck=false,selectionAck='not-run',waitResolve=null; // 僅處理一次固定合成檔的提交或未確認結果；停止後不得恢復或重試。
@@ -215,7 +215,7 @@ jobs: # 只有一個標準runner job。
             export class Fault extends Error { constructor(code) { super(code); this.code = code; } } // 只允許自訂固定代碼進報告，不保存外部錯誤中的網址或秘密。
             export function exactTarget(value, target = TARGET) { try { return new URL(value).href === target.url; } catch { return false; } } // 禁止轉址、查詢、片段與其他頁面的資料收集。
             export function validMenu(state) { return !!state?.locationValid && !state.bootVisible && state.overlayVisible && state.versionVisible && state.storyVisible && !state.continueVisible && !state.confirmVisible && state.canvasVisible; } // 僅判斷啟動畫面前提，不把選單當可遊玩通過。
-            const fixedCodes = new Set(['probe-deadline', 'operation-deadline', 'native-chrome-unverified', 'webgl2-unavailable', 'entry-url-mismatch', 'entry-http-not-200', 'boot-visible-prerequisite-mismatch', 'cleanup-incomplete', 'cleanup-still-connected', 'already-closed', 'late-browser-launch', 'pageerror-observed', 'page-crash-observed', 'unexpected-navigation', 'screenshot-url-mismatch', 'artifact-size-limit', 'scenario-blocked', 'navigation-unconfirmed', 'private-file-unconfirmed']); // 自訂錯誤也僅允許固定類別。
+            const fixedCodes = new Set(['probe-deadline', 'operation-deadline', 'native-chrome-unverified', 'webgl2-unavailable', 'entry-url-mismatch', 'entry-http-not-200', 'boot-visible-prerequisite-mismatch', 'cleanup-incomplete', 'cleanup-still-connected', 'already-closed', 'late-browser-launch', 'pageerror-observed', 'page-crash-observed', 'unexpected-navigation', 'screenshot-url-mismatch', 'artifact-size-limit', 'scenario-blocked', 'navigation-unconfirmed', 'private-file-unconfirmed', 'loopback-unavailable']); // 自訂錯誤也僅允許固定類別。
             export function classifyError(error) { return error instanceof Fault && fixedCodes.has(error.code) ? error.code : classifyAllowed(error).code; } // 未知異常只留種類，不能猜測產品根因。
             export async function executeProbe(adapter, now = () => performance.now(), { deadlineMs } = {}) { // 注入介面方便純記憶體測試，不需要啟動瀏覽器。
               const target = adapter.target || TARGET; // 可選目標只由正式入口固定白名單模組提供，不能由URL輸入覆寫。
@@ -311,6 +311,50 @@ jobs: # 只有一個標準runner job。
             } // 無圖的blocked輪不輸出假圖。
             for (const lines of streams) for (const line of lines) await new Promise((resolve, reject) => process.stdout.write(line + "\n", error => error ? reject(error) : resolve())); // 尊重stdout背壓，逐行送完再結束，避免exit截斷尾端。
           QA_SOURCE_10: |
+            import {get} from 'node:https'; // 唯一新外網能力是固定GitHub raw commit的匿名GET，不啟瀏覽器。
+            import {createHash} from 'node:crypto'; // 下載壓縮bytes與逐檔驗證皆須固定SHA。
+            import {mkdir,lstat,writeFile,readFile} from 'node:fs/promises'; // 只寫本輪新建的固定專用目錄，拒既存目錄及檔案。
+            import {pathToFileURL} from 'node:url'; // 只在明確CLI入口執行下載，不在離線import測試時連網。
+            import {SOURCE,PACKAGE_PATH,validSource} from './runtime-source.mjs'; // 固定commit未填時必須先停，不能接受環境URL。
+            import {inspectGate} from './gate.mjs'; // 同原公開repo、owner與明示確認gate先於新外網能力。
+            import {privatePrivacyProblems} from './private-privacy.mjs'; // 原環境隱私與debug限制不放寬。
+            const digest=bytes=>createHash('sha256').update(bytes).digest('hex'); // 只處理公開runtime包，不讀遊戲保存內容。
+            export async function acquireRuntime(io,{source=SOURCE,deadlineMs,now=()=>performance.now()}={}){ // 純測試可注入記憶體IO，正式入口只用固定source。
+             const guard=()=>{if(!validSource(source))throw new Error('fixed-runtime-source-unconfirmed');if(!Number.isFinite(deadlineMs)||now()>=deadlineMs)throw new Error('runtime-acquisition-deadline');};guard(); // 任一來源或時間未知都在首次請求前停止。
+             await io.prepare();guard();const bytes=await io.request(source,deadlineMs);guard(); // 只有一次request呼叫，無fallback、retry或改client。
+             if(!Buffer.isBuffer(bytes)||bytes.length!==source.bytes||digest(bytes)!==source.sha256)throw new Error('runtime-download-integrity'); // 正常200仍須精確壓縮長度與SHA。
+             const verified=await io.verify(bytes);guard();await io.write(bytes);guard(); // 完整101檔驗包先於落盤，與下載共用總截止。
+             const readback=await io.read();guard();if(!Buffer.isBuffer(readback)||!readback.equals(bytes))throw new Error('runtime-write-readback'); // 寫入後只核固定檔案，不掃描其他路徑。
+             return {status:'verified-fixed-package',archiveBytes:bytes.length,archiveSha256:source.sha256,sourceCommit:source.commit,verified}; // 不冒稱瀏覽器已逐HTTP讀回101檔。
+            } // 僅回傳有限包身份，不能提供一般下載功能。
+            export function requestFixed(source,deadlineMs){ // 正式一次GET，URL必須先通過固定來源結構且等於已凍結SOURCE。
+             if(!validSource(SOURCE)||JSON.stringify(source)!==JSON.stringify(SOURCE))return Promise.reject(new Error('fixed-runtime-source-unconfirmed')); // 測試可注入request替身，但正式外網不能換source。
+             return requestRuntimeOnce(source,deadlineMs); // 正式呼叫仍只可用凍結SOURCE，沒有動態URL輸入。
+            } // 固定正式外網入口在此結束。
+            export function requestRuntimeOnce(source,deadlineMs,{open=get,now=()=>performance.now(),setTimer=setTimeout,clearTimer=clearTimeout}={}){ // 純測試可替換請求與時計；正式入口不傳任何替身。
+             if(!validSource(source))return Promise.reject(new Error('fixed-runtime-source-unconfirmed')); // 替身邊界也保留固定repo、commit格式與包身份。
+             return new Promise((resolve,reject)=>{let request,response,timer,settled=false;const chunks=[];let size=0; // 請求、response與timer都是一次性並同時清理。
+              const finish=(error,value)=>{if(settled)return;settled=true;clearTimer(timer);if(error){response?.destroy();request?.destroy();reject(new Error(error));}else resolve(value);}; // 不輸出原錯誤URL或headers，不對拒絕作第二次嘗試。
+              const remaining=deadlineMs-now();if(!Number.isFinite(remaining)||remaining<=0){finish('runtime-acquisition-deadline');return;} // 父截止已到時不建立socket。
+              timer=setTimer(()=>finish('runtime-acquisition-deadline'),remaining); // DNS/TLS/headers/body全部共享同一絕對界。
+              try{request=open(source.url,{method:'GET',maxHeaderSize:8192,headers:{Accept:'application/octet-stream','Accept-Encoding':'identity'},agent:false},res=>{if(settled){res.destroy();return;}response=res; // 預設TLS驗證保留，無cookie、Authorization、代理或redirect跟隨。
+               if(res.statusCode!==200||res.headers.location!==undefined||res.headers['content-encoding']!==undefined&&res.headers['content-encoding']!=='identity'||res.headers['content-length']!==String(source.bytes)){finish('runtime-http-denied');return;} // 403/轉址/非200/未知編碼或長度都停止，不能採納錯誤頁。
+               res.on('data',chunk=>{if(settled)return;size+=chunk.length;if(size>source.bytes||size>2097152){finish('runtime-download-size');return;}chunks.push(Buffer.from(chunk));}); // 最多固定約1.96MB，不讓chunked或壓縮炸彈進記憶體。
+               res.once('end',()=>{if(!res.complete||size!==source.bytes){finish('runtime-download-incomplete');return;}finish(null,Buffer.concat(chunks,size));}); // 未完整自然結束不得變成可驗包資料。
+               res.once('error',()=>finish('runtime-download-failed'));res.once('aborted',()=>finish('runtime-download-incomplete')); // 中斷即失敗，不retry或續傳。
+              });request.once('error',()=>finish('runtime-download-failed'));}catch{finish('runtime-download-failed');} // 同步或非同步建連失敗均只留固定代碼。
+             }); // 每次正式CLI只有一次此函式呼叫。
+            } // 原Sites或artifact沒有任何取回路徑。
+            if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){ // 匯入純測試時不碰磁碟或網路。
+             const problems=[...inspectGate(process.env),...privatePrivacyProblems(process.env)];if(process.version!=='v24.22.1'||process.platform!=='linux'||process.arch!=='x64'||process.getuid?.()===0)problems.push('runtime-environment'); // 原精確Node與非root標準runner限制保留。
+             if(problems.length||!validSource(SOURCE)){console.error(JSON.stringify({outcome:'blocked',stage:'runtime-acquisition',fault:'runtime-source-or-gate-unconfirmed'}));process.exitCode=2;}else{ // 無來源commit的草稿必須在建目錄或請求前阻擋。
+              const deadlineMs=performance.now()+27000;try{const {verifyRuntime}=await import('./loopback.mjs'); // 完整載入與驗包也算原新增30秒步驟，外層28TERM+2KILL兜底。
+               const result=await acquireRuntime({prepare:async()=>{await mkdir('qa-runtime');const info=await lstat('qa-runtime');if(!info.isDirectory()||info.isSymbolicLink())throw new Error('runtime-directory');},request:requestFixed,verify:verifyRuntime,write:bytes=>writeFile(PACKAGE_PATH,bytes,{flag:'wx'}),read:()=>readFile(PACKAGE_PATH)},{deadlineMs}); // mkdir既存即停，wx禁止覆寫，清理不碰任何未知檔案。
+               console.log(JSON.stringify(result)); // 只記公開包身份，不印runtime內容或任意URL。
+              }catch{console.error(JSON.stringify({outcome:'blocked',stage:'runtime-acquisition',fault:'runtime-acquisition-unconfirmed'}));process.exitCode=2;} // 失敗保留停止，不進probe、不刪除未知檔案。
+             } // 無外部批准的草稿不會到此下載分支。
+            } // 此入口只供未來精確批准workflow，不在本離線準備執行。
+          QA_SOURCE_11: |
             import {createHash} from 'node:crypto'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             export const FIXTURE=Object.freeze({name:'moss0021-synthetic-day2.json',mimeType:'application/json',bytes:1106,sha256:'b9d77aa64759a713aa3e314102626299d7d15e29eac289a7bbd36460cebf5220'}); // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
             const DATA='eyJnYW1lIjoibW9zcy1hbmQtbW9vbiIsImJ1aWxkIjoibW9zcy1hbmQtbW9vbi1pbXBvcnQtZ3VhcmQtMDAyMS1jbG91ZC1jYW5kaWRhdGUtMSIsInN0YXRlIjp7InNjaGVtYSI6MSwic2xvdCI6MSwicmV2aXNpb24iOjEsImRheSI6MiwiY29pbnMiOjI0LCJncmlkIjpbbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbF0sImludmVudG9yeSI6eyJzZWVkOm1vc3MiOjQsInNlZWQ6bW9vbmZsb3dlciI6Miwid29vZCI6MiwiZmliZXIiOjIsInN0b25lIjoyfSwiYWN0aXZlUXVlc3RzIjpbXSwiY29tcGxldGVkUXVlc3RzIjpbXSwiZGlzY292ZXJpZXMiOltdLCJwdXp6bGVzIjpbXSwiZmVzdGl2YWwiOmZhbHNlLCJmZXN0aXZhbERheSI6bnVsbCwic3RhdHMiOnsicGxhbnRlZCI6MCwid2F0ZXJlZCI6MCwiaGFydmVzdGVkIjowLCJjcmFmdGVkIjowLCJ0cmFuc2FjdGlvbnMiOjAsImRheXNQbGF5ZWQiOjF9LCJyZWdpb24iOiJnYXJkZW4iLCJzZXR0aW5ncyI6eyJtdXNpYyI6MC4zNSwiYW1iaWVudCI6MC40NSwic2Z4IjowLjUsInJlZHVjZWRNb3Rpb24iOmZhbHNlLCJxdWFsaXR5IjoiaGlnaCIsInRleHRTcGVlZCI6MCwiam95c3RpY2siOmZhbHNlfSwicmVsYXRpb25zaGlwcyI6eyJtaXJhIjowLCJyb3dhbiI6MCwibHVtaSI6MCwicGlwIjowLCJzYWdlIjowLCJub2EiOjB9LCJtZW1vIjp7ImdhdGhlcmVkIjp7fSwidGFsa2VkIjp7fSwicmVzY3VlRGF5IjowLCJ0dXRvcmlhbFN0ZXAiOjAsImxhc3RNZXNzYWdlIjoi5pep5a6J77yM56ysIDIg5aSp44CC5paw5pyI77yM5o6h6ZuG5Y2A5bey5Yi35paw44CCIn0sInVuZG8iOm51bGx9fQo='; // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
@@ -321,7 +365,7 @@ jobs: # 只有一個標準runner job。
              if(data.game!=='moss-and-moon'||data.build!=='moss-and-moon-import-guard-0021-cloud-candidate-1'||data.state?.day!==2||data.state?.slot!==1||data.state?.festival!==false||data.state?.completedQuests?.length!==0)throw new Error('fixed-fixture-schema'); // 處理已核固定合成資料與位元組身份，不讀使用者檔案或任意路徑。
              return {name:FIXTURE.name,mimeType:FIXTURE.mimeType,buffer}; // 處理已核固定合成資料與位元組身份，不讀使用者檔案或任意路徑。
             } // 結束本有界分支並保留既定停止、回報與清理語義。
-          QA_SOURCE_11: |
+          QA_SOURCE_12: |
             import { pathToFileURL } from "node:url"; // 閘門僅用Node內建工具，不安裝依賴或連網。
             export function inspectGate(env) { // 公開runner方案不沿用私人repo或私人免費分鐘聲明。
               const problems = []; // 不輸出未知環境值，避免把秘密放入公開日誌。
@@ -341,7 +385,7 @@ jobs: # 只有一個標準runner job。
               if (problems.length) { console.error(JSON.stringify({ outcome: "blocked", gateProblems: problems })); process.exitCode = 2; } // 失敗在Playwright載入前停止。
               else console.log("Public fixed-repository manual probe gates satisfied; no artifact or cache storage configured."); // 只宣告前提檢查，不宣告browser可用。
             } // CLI閘門結束。
-          QA_SOURCE_12: |
+          QA_SOURCE_13: |
             export function visibleImportDOM({target,phase,selector,includeTarget}){ // 只核固定公開介面的文字與幾何，不能把隱藏遊戲資料當操作證據。
              if(location.href!==target.url)return {locationValid:false}; // 執行這個固定情境內的檢查或資料轉換，任何未知結果都不允許擴大後續操作。
              const q=selector=>document.querySelector(selector); // 只核固定公開介面的文字與幾何，不能把隱藏遊戲資料當操作證據。
@@ -354,9 +398,9 @@ jobs: # 只有一個標準runner job。
              if(includeTarget)result.target=inspect(selector); // 只核固定公開介面的文字與幾何，不能把隱藏遊戲資料當操作證據。
              return result; // 僅暴露本檔宣告的有限介面與結果，不提供額外瀏覽器或遊戲控制能力。
             } // 結束本有界分支並保留既定停止、回報與清理語義。
-          QA_SOURCE_13: |
+          QA_SOURCE_14: |
             import { createHash } from "node:crypto"; // 所有資料回收都以原始位元組SHA256核對。
-            export const TRANSFER = Object.freeze({ scope: "moss0022-synthetic-import-reload", version: 2, chunkChars: 4096, pngLimit: 2097152, reportLimit: 65536, logLimit: 8388608 }); // 每塊四KiB字元；PNG最多二MiB，整份log解析最多八MiB。
+            export const TRANSFER = Object.freeze({ scope: "moss0022-loopback-synthetic-import-reload", version: 2, chunkChars: 4096, pngLimit: 2097152, reportLimit: 65536, logLimit: 8388608 }); // 每塊四KiB字元；PNG最多二MiB，整份log解析最多八MiB。
             const digest = bytes => createHash("sha256").update(bytes).digest("hex"); // SHA只能證明傳輸一致，不能替代真圖判讀。
             export function identity(env) { // 只包含已公開repo與run身份，不輸出任意環境字串。
               if (env.GITHUB_REPOSITORY !== "KYStr/stteak-games" || !/^[1-9][0-9]*$/.test(env.GITHUB_RUN_ID || "") || !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA || "") || env.GITHUB_RUN_ATTEMPT !== "1") throw new Error("invalid-transfer-identity"); // 非預期身份不進公開log。
@@ -409,7 +453,81 @@ jobs: # 只有一個標準runner job。
               const p = report?.profile, n = report?.native, same = value => value?.id === 'chrome156-capability-only' && value.mode === 'capability-only' && value.version === '156.0.8078.47' && value.packageVersion === '156.0.8078.47-1'; // 只固定已明示精確身份，不讀任意版本或fallback。
               return report?.scope === 'native-chrome-capability-only' && report.target === null && same(p) && same(n?.profile) && n?.status === 'ready' && n.version === p.version && n.expectedVersion === p.version && n.packageObservation?.packageVersion === p.packageVersion && report.capability?.status === 'available' && report.capability.api === 'webgl2' && report.capability.hardwarePerformanceVerified === false && report.boot?.status === 'not-run' && report.boot.reason === 'capability-only-profile' && report.operation?.status === 'not-run' && report.operation.reason === 'capability-only-profile' && Array.isArray(report.screenshots) && report.screenshots.length === 0 && report.launch?.status === 'acknowledged' && report.cleanup?.status === 'close-acknowledged' && Array.isArray(report.faults) && report.faults.length === 0; // 必須零遊戲／零圖且原close確認；未知或缺欄不接受無圖成功。
             } // 能力產證不是完整供應鏈、遊戲、硬體或真機認證。
-          QA_SOURCE_14: |
+          QA_SOURCE_15: |
+            import {CONTRACT} from './runtime-contract.mjs'; // 唯一產品合約由同workflow凍結，不接受執行時外部設定。
+            import {createHash} from 'node:crypto'; // 只使用固定Node內建雜湊，不安裝新套件。
+            import {gunzipSync} from 'node:zlib'; // 解壓設硬容量上限，不能接受無界壓縮炸彈。
+            import {readFileSync} from 'node:fs'; // 僅在載入時讀同包固定收據，不在請求時讀磁碟。
+            import {createServer} from 'node:http'; // 只建立本機唯讀HTTP，不提供代理或下載器。
+            const sha=bytes=>createHash('sha256').update(bytes).digest('hex'); // 所有內容身份使用SHA256。
+            const rawReceipt=readFileSync(new URL('./runtime-receipt.json',import.meta.url)); // 來源限同目錄已凍結收據。
+            if(sha(rawReceipt)!==CONTRACT.receiptSha256)throw new Error('receipt-integrity'); // 收據遭置換直接拒絕載入模組。
+            const receipt=JSON.parse(rawReceipt); // 雜湊先成立才解析固定JSON。
+            export const TARGET=Object.freeze({host:'127.0.0.1',port:43122,origin:'http://127.0.0.1:43122',url:'http://127.0.0.1:43122/'}); // 固定單一origin與port，不接受環境變數替換。
+            const MIME=Object.freeze({html:'text/html; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',json:'application/json',wav:'audio/wav',glb:'model/gltf-binary',png:'image/png',svg:'image/svg+xml',txt:'text/plain; charset=utf-8'}); // 僅允許此候選實際使用的資源類型。
+            const fail=code=>{throw new Error(code);}; // 固定錯誤碼避免輸出任意來源內容。
+            const octal=b=>{const s=b.toString('ascii').replace(/\0.*$/s,'').trim();if(!/^[0-7]+$/.test(s))fail('tar-number');return parseInt(s,8);}; // 拒絕base256及未知數字格式。
+            const string=b=>{const n=b.indexOf(0);if(n<0)fail('tar-string');if(b.subarray(n).some(x=>x!==0))fail('tar-padding');return b.subarray(0,n).toString('utf8');}; // 字串尾部必須全零，不能藏第二路徑。
+            function unpack(bytes){ // 私有解析器只處理雜湊完全相同的固定包。
+             if(!Buffer.isBuffer(bytes)||bytes.length!==receipt.archive.bytes||bytes.length>CONTRACT.archiveBytes||sha(bytes)!==receipt.archive.sha256)fail('archive-integrity'); // 容量及精確身份同時成立。
+             const tar=gunzipSync(bytes,{maxOutputLength:CONTRACT.tarBytes}); // 解壓硬界依固定產品合約，不呼叫外部tar或shell。
+             if(tar.length!==receipt.archive.uncompressedTarBytes)fail('tar-size'); // 包含padding的tar大小也精確固定。
+             let offset=0,total=0;const files=new Map(); // 所有內容只放私有記憶體Map。
+             for(const expected of receipt.servedManifest){ // 嚴格沿固定產品檔案順序解析，不接受額外或重複項目。
+              const h=tar.subarray(offset,offset+512);if(h.length!==512)fail('tar-header'); // 每個標頭必須完整。
+              const check=octal(h.subarray(148,156));let sum=0;for(let i=0;i<512;i++)sum+=i>=148&&i<156?32:h[i];if(check!==sum)fail('tar-checksum'); // 獨立核USTAR標頭校驗和。
+              const path=string(h.subarray(0,100));if(path!==expected.path||!/^[-a-zA-Z0-9_./]+$/.test(path)||path.split('/').some(p=>!p||p==='..'||p.startsWith('.')))fail('tar-path'); // 精確白名單且拒隱藏、穿越、絕對或空路徑。
+              if(h[156]!==48||string(h.subarray(157,257))!==''||h.subarray(257,263).toString('binary')!=='ustar\0'||h.subarray(263,265).toString()!=='00'||string(h.subarray(345,500))!=='')fail('tar-type'); // 只接受無link及prefix的USTAR regular檔。
+              const size=octal(h.subarray(124,136));if(size!==expected.bytes||size>CONTRACT.largestFileBytes||files.has('/'+path))fail('entry-size'); // 每檔大小上限及身份一致，禁止重複。
+              const body=tar.subarray(offset+512,offset+512+size);if(body.length!==size||sha(body)!==expected.sha256)fail('entry-integrity'); // 逐檔核對原產品bytes。
+              const type=MIME[path.split('.').at(-1)];if(!type)fail('mime-denied'); // 未知類型不當成通用下載端點。
+              const end=offset+512+Math.ceil(size/512)*512;if(tar.subarray(offset+512+size,end).some(x=>x!==0))fail('entry-padding'); // 拒絕資源padding藏資料。
+              files.set('/'+path,{body:Buffer.from(body),type});total+=size;offset=end; // 複製到私有buffer，呼叫者不能改原壓縮包影響服務。
+             } // 完整清單驗完才可讓server使用。
+             if(files.size!==CONTRACT.files||total!==CONTRACT.servedBytes||tar.length-offset<1024||tar.subarray(offset).some(x=>x!==0))fail('tar-trailing'); // 嚴格限制檔數、總bytes與結尾全零。
+             return files; // Map永不暴露給外部呼叫者。
+            } // 包解析無網路、無解壓寫檔。
+            export function verifyRuntime(bytes){const files=unpack(bytes);return Object.freeze({archiveSha256:receipt.archive.sha256,servedFiles:files.size,servedBytes:CONTRACT.servedBytes,originalManifestFiles:receipt.originalRuntimeFiles,excludedMetadata:receipt.excludedMetadata.map(x=>x.path).join(',')});} // 只回傳非私密身份，不能取得可變Map。
+            export async function startLoopback(bytes,{deadlineMs,signal,now=()=>performance.now()}={}){ // 唯一啟動介面接受父程序絕對截止，不接受host、port或路徑。
+             if(process.version!=='v24.22.1')fail('node-version'); // 沿固定版本門檻拒絕未知Node。
+             if(!Number.isFinite(deadlineMs)||deadlineMs<=now()||deadlineMs-now()>CONTRACT.workMs)fail('deadline'); // 無期限或超產品原有父界均拒絕。
+             const files=unpack(bytes);if(now()>=deadlineMs)fail('deadline'); // 驗包時間算入原父界，逾時不bind。
+             let state='starting',timer,rejectStart,checkClosed=()=>{},requests=0,connections=0,served=0;const sockets=new Set(); // 所有能力與容量由單一lease持有。
+             const controller=new AbortController(); // 本lease可撤銷尚未完成的bind，不留下晚到listener。
+             const server=createServer({maxHeaderSize:8192,requestTimeout:3000,headersTimeout:3000,keepAliveTimeout:1000},(req,res)=>{ // HTTP標頭、請求與閒置連線有界。
+              const reject=status=>{res.writeHead(status,{'Content-Length':'0','Connection':'close'});res.end();}; // 拒絕時不回顯任意URL或body。
+              if(state!=='open'||now()>=deadlineMs){reject(503);void close();return;} // 到期先拒絕新資料，再關閉整個lease。
+              if(++requests>1024){reject(429);void close();return;} // 上限是請求總數，不因reload重設。
+              if(req.method!=='GET'){reject(405);return;} // 不接受HEAD、POST或其他方法。
+              const counts=new Map();for(let i=0;i<req.rawHeaders.length;i+=2){const name=req.rawHeaders[i].toLowerCase();counts.set(name,(counts.get(name)||0)+1);}if(counts.get('host')!==1||['origin','content-length','transfer-encoding','range'].some(name=>(counts.get(name)||0)>1)){reject(400);return;} // 原始重複關鍵標頭直接拒絕，不依Node合併規則猜測。
+              if(req.headers['sec-fetch-site']!==undefined&&!['same-origin','none'].includes(req.headers['sec-fetch-site'])){reject(403);return;} // 瀏覽器跨站或same-site子來源不能取得loopback資源。
+              if(req.headers.host!=='127.0.0.1:43122'||(req.headers.origin!==undefined&&req.headers.origin!==TARGET.origin)){reject(403);return;} // 精確Host及有Origin時同源，拒DNS重綁與跨來源請求。
+              if(req.headers['transfer-encoding']!==undefined||(req.headers['content-length']!==undefined&&req.headers['content-length']!=='0')){reject(400);return;} // GET不得攜帶body或chunked傳輸。
+              if(req.headers.range!==undefined){reject(416);return;} // 不新增range服務或部分資源語義。
+              const key=req.url==='/'?'/index.html':req.url,entry=files.get(key);if(!entry){reject(404);return;} // raw target精確比對，拒query、編碼變體、fallback與未知路徑。
+              if(served+entry.body.length>CONTRACT.responseBytes){reject(429);void close();return;}served+=entry.body.length; // 全lease最多合約bytes資源回傳，不因錯誤或reload重置。
+              res.writeHead(200,{'Content-Type':entry.type,'Content-Length':entry.body.length,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(entry.body); // 只送已核記憶體bytes，無CORS、cookie、proxy或外部讀取。
+             }); // server永不讀取request對應磁碟檔。
+             server.maxRequestsPerSocket=128;server.maxConnections=16; // 限制每連線請求及同時socket數。
+             server.on('connection',socket=>{sockets.add(socket);socket.once('close',()=>{sockets.delete(socket);checkClosed();});if(++connections>128||state==='closed'){socket.destroy();return;}socket.setTimeout(3000,()=>socket.destroy());}); // 連線生命期及總量有界，追蹤清理確認。
+             server.on('clientError',(_error,socket)=>socket.destroy()); // HTTP解析錯誤不回顯、不重試。
+             server.on('connect',(_req,socket)=>socket.destroy());server.on('upgrade',(_req,socket)=>socket.destroy()); // 禁止CONNECT隧道與WebSocket升級。
+             let closePromise;function close(){ // 冪等關閉lease，不延長父程序清理界。
+              if(closePromise)return closePromise;state='closed';clearTimeout(timer);files.clear();signal?.removeEventListener('abort',onAbort);rejectStart?.(new Error('lease-closed'));controller.abort(); // 先撤銷新能力並釋放資源Map。
+              closePromise=new Promise(resolve=>{let listenerClosed=false,settled=false;const closeEnd=Math.min(now()+5000,deadlineMs+5000); // 唯一清理截止不晚於父界加原五秒，外層共享截止仍優先。
+               const finish=status=>{if(settled)return;settled=true;clearTimeout(closeTimer);checkClosed=()=>{};resolve(Object.freeze({status,openSockets:sockets.size}));}; // 只封一次真實socket數，不因逾時或重入偽置零。
+               const closeTimer=setTimeout(()=>finish('cleanup-incomplete'),Math.max(1,closeEnd-now())); // ACK等待有界；失敗由外層原process硬停止兜底。
+               checkClosed=()=>{if(listenerClosed&&sockets.size===0)finish('closed');}; // 必須listener確認與每個已追蹤socket真close事件都完成。
+               server.close(()=>{listenerClosed=true;checkClosed();});server.closeAllConnections();for(const socket of sockets)socket.destroy(); // 先要求關閉，但destroy呼叫本身不是close事件證據。
+              });return closePromise; // 重入取得同一Promise及原截止，不另開五秒窗口。
+             } // 呼叫者仍須把close納入原5秒共同絕對截止。
+             const onAbort=()=>{void close();};if(signal?.aborted){await close();fail('aborted');}signal?.addEventListener('abort',onAbort,{once:true});timer=setTimeout(onAbort,Math.max(1,deadlineMs-now())); // 先設取消與原絕對截止再開始bind。
+             try{await new Promise((resolve,reject)=>{rejectStart=reject;const onError=()=>reject(new Error('listen-failed'));server.once('error',onError);server.listen({host:TARGET.host,port:TARGET.port,exclusive:true,signal:controller.signal},()=>{server.off('error',onError);if(state==='closed'){server.closeAllConnections();server.close();reject(new Error('late-bind'));return;}resolve();});});}catch(error){await close();throw error;} // 固定port占用即拒絕，不換port、不殺其他服務。
+             server.on('error',()=>{void close();}); // 運行期server錯誤只撤銷能力，不重啟。
+             if(state==='closed'||now()>=deadlineMs){await close();fail('deadline');}state='open';rejectStart=null; // 同一父截止自動關閉，啟動耗時不重設時限。
+             return Object.freeze({url:TARGET.url,close,snapshot:()=>Object.freeze({state,requests,connections,servedBytes:served,archiveSha256:receipt.archive.sha256})}); // 不暴露server、Map、磁碟或任意導航能力。
+            } // 本模組沒有下載器或任何外部HTTP請求。
+          QA_SOURCE_16: |
             import { Fault } from './core.mjs'; // 僅此reload專屬導航封存，固定錯誤碼不保存任意URL。
             export function createMossNavigationLease({ page, healthy, target, actionDeadlineMs, latch, onUnexpected = () => {}, now = () => performance.now() }) { // 同一page與action105時基，不建立browser或讀遊戲state。
               let phase = 'capability', fatal = null, token = null, initialUsed = false, reloadUsed = false; // 沒有任何reset或第二次reload入口。
@@ -423,7 +541,7 @@ jobs: # 只有一個標準runner job。
               const perform = async (kind, { deadlineMs, beforeInvoke }) => { const t = arm(kind, deadlineMs); try { pending(t); const current = page(); let response; if (kind === 'reload') { if (typeof beforeInvoke !== 'function') fail('navigation-unconfirmed'); const mark = beforeInvoke(); pending(t); if (current.url() !== target.url) fail('unexpected-navigation'); if (typeof mark !== 'function') fail('navigation-unconfirmed'); const timeout = Math.max(1, Math.floor(t.expires - now())); mark(); response = await current.reload({ waitUntil: 'domcontentloaded', timeout }); } else response = await current.goto(target.url, { waitUntil: 'domcontentloaded', timeout: Math.max(1, Math.floor(t.expires - now())) }); return finish(t, response); } catch (error) { if (!fatal) invalidate(error?.name === 'TimeoutError' || error?.code === 'operation-deadline' ? 'operation-deadline' : 'navigation-unconfirmed'); throw error; } }; // 預檢前後都核pending/base健康/URL，mark只同步metadata緊接native；API timeout是同一lease剩餘。
               return { onMainFrame, initial: args => perform('initial', args), reload: args => perform('reload', args), inFlight: () => !!token?.active, invalidateActive: (code = 'operation-deadline') => { if (token?.active) { invalidate(code); return true; } return false; }, assertDocument: ordinal => { guard(); if (ordinal === undefined ? !['document-1', 'document-2'].includes(phase) : phase !== 'document-' + ordinal) fail('navigation-unconfirmed'); if (page().url() !== target.url) fail('unexpected-navigation'); } }; // 只暴露此scope所需能力，沒有一般navigate或復活token介面。
             } // host唯一導航lease不讀寫storage、save或頁面內部物件。
-          QA_SOURCE_15: |
+          QA_SOURCE_17: |
             import { readFile, lstat, realpath } from 'node:fs/promises'; // 固定系統檔只讀，不安裝或修改原生Chrome與profile。
             import { createReadStream } from 'node:fs'; // 流式核已安裝binary，不把整個binary載入記憶體。
             import { createHash } from 'node:crypto'; // MD5僅比對原生dpkg資料庫，不冒稱新的數位簽章驗證。
@@ -431,7 +549,7 @@ jobs: # 只有一個標準runner job。
             import { promisify } from 'node:util'; // 任意stdout與stderr只在記憶體解析，不輸出到公開log。
             import { KERNEL, parseKernelValue, classifyAllowed } from './diagnostics.mjs'; // 復用原診斷的四個固定讀值與白名單錯誤類別。
             export const NATIVE = Object.freeze({ version: '155.0.8059.39', packageVersion: '155.0.8059.39-1', binary: '/opt/google/chrome/chrome', profile: '/etc/apparmor.d/chrome', sums: '/var/lib/dpkg/info/google-chrome-stable.md5sums' }); // 根據已核官方Ubuntu2404 image與Playwright chrome channel原路徑固定。
-            export const PROFILES = Object.freeze({ game155: Object.freeze({ id: 'chrome155-moss0022-synthetic-import-reload', mode: 'moss0022-synthetic-import-reload-155-scenario', version: '155.0.8059.39', packageVersion: '155.0.8059.39-1' }), moss156: Object.freeze({ id: 'chrome156-moss0022-synthetic-import-reload', mode: 'moss0022-synthetic-import-reload-156-scenario', version: '156.0.8078.47', packageVersion: '156.0.8078.47-1' }) }); // 本候選提出155及156各7pointer＋1固定檔案及一次正常reload保存權限；舊game/harvest/cap身份不沿用，不是任意升版或fallback。
+            export const PROFILES = Object.freeze({ game155: Object.freeze({ id: 'chrome155-moss0022-loopback-synthetic-import-reload', mode: 'moss0022-loopback-synthetic-import-reload-155-scenario', version: '155.0.8059.39', packageVersion: '155.0.8059.39-1' }), moss156: Object.freeze({ id: 'chrome156-moss0022-loopback-synthetic-import-reload', mode: 'moss0022-loopback-synthetic-import-reload-156-scenario', version: '156.0.8078.47', packageVersion: '156.0.8078.47-1' }) }); // 本候選提出155及156各7pointer＋1固定檔案及一次正常reload保存權限；舊game/harvest/cap身份不沿用，不是任意升版或fallback。
             export const IMAGE = Object.freeze({ os: 'ubuntu24', version: '20261012.334.1', tag: 'ubuntu24/20261012.334' }); // 精確綁定run03官方image來源，不接受main漂移。
             export const COMMANDS = Object.freeze({ package: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-W', '-f=${Package}\n${Version}\n${Architecture}\n${Status}\n${Maintainer}\n${Source}\n${Homepage}\n', 'google-chrome-stable']], binaryOwner: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-S', NATIVE.binary]], profileOwner: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-S', NATIVE.profile]], profileSums: ['/usr/bin/dpkg-query', ['--admindir=/var/lib/dpkg', '-W', '-f=${Conffiles}', 'apparmor']], version: [NATIVE.binary, ['--version']] }); // 固定查詢不含apt、sudo、安裝、profile載入或安全設定寫入。
             function packageLines(text) { if (typeof text !== 'string' || Buffer.byteLength(text, 'utf8') > 4096) return null; const lines = text.split('\n'); return lines.length === 8 && lines[7] === '' ? lines.slice(0, 7) : null; } // 只認同一次固定七欄及尾換行，缺欄、多欄或過大不猜。
@@ -511,7 +629,7 @@ jobs: # 只有一個標準runner job。
                 noLocalRules: async () => { assertActive(); const local = '/etc/apparmor.d/local/chrome'; try { if (!pathAccepted(await path({ path: local, type: 'file' }), { type: 'file' })) return false; return (await read(local)).split('\n').every(line => !line.replace(/#.*$/, '').trim()); } catch (error) { if (error?.code === 'ENOENT') return true; throw error; } }, // 既有空白／註解檔可接受，任何實際規則不擅自解讀或修改。
               }; // 無替代binary、OS、安全旗標或browser安裝入口。
             } // 原生唯讀介面結束。
-          QA_SOURCE_16: |
+          QA_SOURCE_18: |
             import {TARGET,ACTIONS,selectorFor,executeImportReload} from './scenario.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import {visibleImportDOM} from './import-dom.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             export {TARGET} from './scenario.mjs'; // 執行這個固定情境內的檢查或資料轉換，任何未知結果都不允許擴大後續操作。
@@ -527,9 +645,9 @@ jobs: # 只有一個標準runner job。
              }; // 結束本有界分支並保留既定停止、回報與清理語義。
             } // 結束本有界分支並保留既定停止、回報與清理語義。
             export async function runScenario({page,chooserLease,...options}){return executeImportReload(createImportAdapter(page,{chooserLease,...options}),options);} // 把單次選檔事件交給精確文件與有效期護欄，其他檔案事件仍永久拒絕。
-          QA_SOURCE_17: |
+          QA_SOURCE_19: |
             export function privatePrivacyProblems(env) { return ['DEBUG', 'PWDEBUG'].some(key => Object.hasOwn(env, key) && env[key] !== '') ? ['private-debug-environment-forbidden'] : []; } // 私有Buffer正常setFiles前禁止Playwright debug輸出；只回固定碼不記環境值。
-          QA_SOURCE_18: |
+          QA_SOURCE_20: |
             export function applyPrivateEventGate(report, invalid) { if (!invalid) return report; report.outcome = 'blocked'; if (!report.faults.includes('private-file-unconfirmed')) report.faults.push('private-file-unconfirmed'); if (!report.faultDetails.some(detail => detail.stage === 'post-close' && detail.code === 'private-file-unconfirmed')) report.faultDetails.push({ stage: 'post-close', code: 'private-file-unconfirmed' }); report.screenshots = []; return report; } // 只新file事件單調fatal，正常stop不算失敗；原先因果與operation當時觀察保留，取消圖公開資格。
             import { Fault, classifyError } from './core.mjs'; // final fatal只走原固定錯誤白名單，不增加任意文字出口。
             export function serializeSealedReport(report, { privateEventInvalid, fatal, events }) { // PNG host await後同步核所有事件，再同呼叫JSON封存；沒有新的browser API。
@@ -539,7 +657,11 @@ jobs: # 只有一個標準runner job。
               report.finalization = { stage: 'final-json', status: privateEventInvalid || faults.length ? 'blocked-by-events' : 'event-state-confirmed', topImageClaimWithdrawn: !!(privateEventInvalid || faults.length) && hadImageClaim, hostPngMayExist: hadImageClaim }; // 已開始host寫的PNG可能存在，不假稱已取消；原emitter只傳report明列圖。
               return JSON.stringify(report, null, 2) + '\n'; // gate與serialization間零await；晚事件不能改已返回字串，報告不是無限延後的監控承諾。
             } // file5/control8/fresh2與所有75/105/115界不因封口擴張。
-          QA_SOURCE_19: |
+          QA_SOURCE_21: |
+            import {startLoopback,verifyRuntime} from './loopback.mjs'; // 新固定127.0.0.1租約只服務本輪已核runtime，不能訪舊Site。
+            import {SOURCE,validSource} from './runtime-source.mjs'; // 固定下載commit未讀回前不允許任何browser或server。
+            import {readRuntimePackage} from './runtime-package.mjs'; // 僅讀本run固定已取回包並於server內重新驗證。
+            import {createSharedCleanup} from './shared-cleanup.mjs'; // browser及server同一五秒絕對清理界，不累加預算。
             import {createChooserLease} from './chooser-lease.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import { applyPrivateEventGate, serializeSealedReport } from './private-report.mjs'; // 最新同步event seal原文，無檔案採納權限。
             import { privatePrivacyProblems } from './private-privacy.mjs'; // 原debug及檔案隱私gate不減。
@@ -552,11 +674,12 @@ jobs: # 只有一個標準runner job。
             import { mkdir, writeFile } from 'node:fs/promises'; // 只寫短報告及原始PNG，不保存HTML、來源碼或登入資料。
             import { executeProbe, LIMITS, Fault } from './core.mjs'; // 共用單一固定目標及明確時間上限。
             import { inspectGate } from './gate.mjs'; // 正式入口自己重新核閘門，不能跳過前一個workflow步驟。
-            const problems = [...inspectGate(process.env), ...privatePrivacyProblems(process.env)]; // 任何外部瀏覽器動作之前先看授權與免費額度聲明。
+            const problems = [...inspectGate(process.env), ...privatePrivacyProblems(process.env)]; if(!validSource(SOURCE))problems.push('fixed-runtime-source-unconfirmed'); // 任何外部瀏覽器動作之前先看授權與免費額度聲明。
             if (process.platform !== "linux" || process.arch !== "x64" || process.getuid?.() === 0) problems.push("nonroot-linux-x64-required"); // 只允許既有標準Linux x64非root runner。
             if (problems.length) { console.error(JSON.stringify({ outcome: 'blocked', gateProblems: problems })); process.exit(2); } // 不合條件不載入Playwright，更不啟動瀏覽器。
             const scenario = selectedScenario(process.env.QA_SCENARIO); const TARGET = scenario.TARGET; // 身份閘門通過後選定唯一固定遊戲。
             await mkdir('artifacts', { recursive: true }); // 證據只有專用目錄，workflow不廣泛收集工作目錄。
+            let server,localPackage=null;const serverAbort=new AbortController(); // 同步abort可撤銷尚未取得handle的bind，停止後不能復活。
             let browser, context, page, snapshotLease, navigationLease, chooserLease, nativeProfile = null, privateEventInvalid = false, closed = false, fatal = null; // 把單次選檔事件交給精確文件與有效期護欄，其他檔案事件仍永久拒絕。
             const events = { pageerror: 0, crash: 0, unexpectedNavigation: 0 }; // 只留有限計數，不記錯誤訊息、堆疊或網址。
             async function bounded(action, milliseconds) { // Promise競速不假裝能取消底層操作；超時會鎖住後續流程並關閉唯一瀏覽器。
@@ -564,13 +687,9 @@ jobs: # 只有一個標準runner job。
               try { return await Promise.race([Promise.resolve().then(action), new Promise((_, reject) => { timer = setTimeout(() => { if (snapshotLease?.inFlight()) snapshotLease.invalidateActive(); if (navigationLease?.inFlight()) navigationLease.invalidateActive(); reject(new Fault('operation-deadline')); }, milliseconds); })]); } // 只有在途圖逾時使token永久失效；普通input timeout仍保留已核診斷窗口。
               finally { clearTimeout(timer); } // 成功與失敗都移除自身計時器。
             } // 不重新連線、不建立替代工作階段。
-            const healthy = () => { if (closed || fatal) throw new Fault(fatal || 'already-closed'); if (performance.now() >= workDeadline) { fatal = 'probe-deadline'; throw new Fault(fatal); } }; // 異常發生後只容許清理，不新增測試動作。
-            const scenarioOnly = () => { healthy(); if (!['moss0022-synthetic-import-reload-155-scenario', 'moss0022-synthetic-import-reload-156-scenario'].includes(nativeProfile?.mode)) throw new Fault('native-chrome-unverified'); }; // 只有本包兩個明示七次pointer＋一次固定檔案及一次reload權限可操作固定Moss，舊cap-only或未知mode同步拒絕。
-            async function close() { // 僅關閉本次建立的瀏覽器，不碰其他瀏覽器或系統設定。
-              closed = true; navigationLease?.invalidateActive('already-closed'); // 清理前失效在途導航，晚到metadata不能恢復文件phase。
-              if (!browser) return { status: 'no-browser-handle', processInventoryVerified: false, underlyingProcessCleanup: 'not-observed' }; // 無handle不代表底層從未建立程序。
-              await bounded(() => browser.close(), LIMITS.closeMs); if (browser.isConnected()) throw new Fault('cleanup-still-connected'); return { status: 'close-acknowledged', processInventoryVerified: false, underlyingProcessCleanup: 'browser-close-ack-only' }; // 最多花五秒清理；外層程序硬界會處理卡住的程序群組。
-            } // 不重新連線、不建立替代工作階段。
+            const healthy = () => { if(server&&server.snapshot().state!=='open'&&!closed)fatal ||= 'loopback-unavailable'; if (closed || fatal) throw new Fault(fatal || 'already-closed'); if (performance.now() >= workDeadline) { fatal = 'probe-deadline'; throw new Fault(fatal); } }; // 異常發生後只容許清理，不新增測試動作。
+            const scenarioOnly = () => { healthy(); if (!['moss0022-loopback-synthetic-import-reload-155-scenario', 'moss0022-loopback-synthetic-import-reload-156-scenario'].includes(nativeProfile?.mode)) throw new Fault('native-chrome-unverified'); }; // 只有本包兩個明示七次pointer＋一次固定檔案及一次reload權限可操作固定Moss，舊cap-only或未知mode同步拒絕。
+            const close=createSharedCleanup({browser:()=>browser,server:()=>server,abortServer:()=>serverAbort.abort(),invalidate:()=>{if(server&&server.snapshot().state!=='open'&&!closed)fatal ||= 'loopback-unavailable';closed=true;navigationLease?.invalidateActive('already-closed');}}); // 所有正常、例外、watchdog及SIGTERM路徑共用同一次五秒清理租約。
             const processStarted = performance.now(), workDeadline = processStarted + 105000; // 與本候選一百零五秒watchdog在同點起算，不把scene75秒外加到全程序。
             navigationLease = createMossNavigationLease({ page: () => page, healthy, target: TARGET, actionDeadlineMs: workDeadline, latch: code => { fatal ||= code; }, onUnexpected: () => { events.unexpectedNavigation = Math.min(40, events.unexpectedNavigation + 1); } }); // 初始capability允許blank；每一次主frame commit都由本輪armed lease處理。
             const baseSceneHealthy = createScenarioHealth({ healthy, url: () => page.url(), target: TARGET, deadlineMs: workDeadline, onFatal: code => { fatal = code; } }); const sceneHealthy = () => { baseSceneHealthy(); navigationLease.assertDocument(); }; // 全部非清理操作由healthy加同105界，scenario／snapshot另核固定URL，第一次同步錯址或截止即寫回共用fatal。
@@ -583,6 +702,7 @@ jobs: # 只有一個標準runner job。
             }, 105000); // 105秒動作截止後最多5秒清理；workflow110秒TERM、再5秒KILL，程序最晚115秒。
             process.once('SIGTERM', () => { closed = true; void close().finally(() => process.exit(124)); }); // 收到workflow截止後只清理，不繼續讀圖或操作。
             try { // 正式流程不讀使用者電腦與dot本身瀏覽器。
+              healthy();const runtime=await readRuntimePackage(healthy);healthy();localPackage=verifyRuntime(runtime);healthy();server=await startLoopback(runtime,{deadlineMs:workDeadline,signal:serverAbort.signal});healthy();if(server.url!==TARGET.url)throw new Fault('loopback-unavailable'); // server載包與bind計入同105秒父界，失敗不import或啟browser。
               const { chromium } = await import('playwright'); // 只有閘門通過才載入已鎖版的官方開源測試函式庫。
               const adapter = { // 把瀏覽器API限制在這份最小介面，不提供隱藏遊戲狀態通道。
                 target: TARGET, // 固定選定目標供共用核心核URL，不開另一遊戲。
@@ -636,16 +756,580 @@ jobs: # 只有一個標準runner job。
               await snapshotLease.persistForReport(report, writeFile); // 正常close後只存report明列且有效已ack／SHA一致的原Buffer；合法blocked診斷同規則，未確認圖不落盤不傳。
               report.environment = { cjkFontPackage: 'fonts-noto-cjk', cjkFontVersion: '1:20230817+repack1-3', viewport: { width: 1600, height: 900, deviceScaleFactor: 1 }, runner: 'github-hosted-standard-linux', browser: browser?.version() ?? null, channel: 'chrome', rootExecution: false, node: process.version, sandboxRequested: true, events }; // 沙箱請求與環境記錄不是硬體性能認證。
               report.fileInputIntegration={kind:'fixed-synthetic-buffer-only',osDialogOperated:false,lease:chooserLease?.snapshot()??null}; // 把單次選檔事件交給精確文件與有效期護欄，其他檔案事件仍永久拒絕。
+              report.runtimeDelivery={kind:'runner-fixed-loopback-package',sourceCommit:SOURCE.commit,localPackage,verifiedMap:server?.snapshot()??null,browserAllResourcesObserved:false,sitesDeploymentVerified:false}; // 分清已驗包與私有Map，不能把101資源瀏覽器讀回或Sites部署冒稱已驗。
               report.provenance = { repository: process.env.GITHUB_REPOSITORY, commit: process.env.GITHUB_SHA, workflowCommit: process.env.GITHUB_WORKFLOW_SHA, runId: process.env.GITHUB_RUN_ID, attempt: process.env.GITHUB_RUN_ATTEMPT }; // 只記不含秘密的GitHub執行身份。
               await writeFile('artifacts/report.json', serializeSealedReport(report, { privateEventInvalid, fatal, events })); // 結構化證據分欄，稍後僅以有序公開job log傳回，不上傳artifact。
               console.log(JSON.stringify({ outcome: report.outcome, faults: report.faults, elapsedMs: report.elapsedMs })); // 日誌只輸出最短結果，不印整個頁面或任意環境值。
               process.exitCode = report.outcome === 'evidence-collected-pending-review' ? 0 : 2; // 綠燈只代表probe產證成功，明確保留人工審圖與遊戲未驗狀態。
             } catch (error) { // 匯入或入口意外失敗也不盲目重試。
-              try { await close(); } catch {} // 盡力清理唯一既有瀏覽器。
-              await writeFile('artifacts/emergency.json', JSON.stringify({ outcome: 'blocked', fault: classifyAllowed(error), cleanupConfirmed: browser ? !browser.isConnected() : false })); // 僅記固定代碼，避免外部錯誤洩漏機密。
+              let emergencyCleanup=null;try { emergencyCleanup=await close(); } catch {} // 只保留同次雙資源清理ACK，拒絕或未知不能由browser終態補認。
+              await writeFile('artifacts/emergency.json', JSON.stringify({ outcome: 'blocked', fault: classifyAllowed(error), cleanupConfirmed: emergencyCleanup?.status==='close-acknowledged'&&emergencyCleanup?.loopback==='close-acknowledged-zero-sockets', cleanup:emergencyCleanup??{status:'incomplete',processInventoryVerified:false} })); // 僅記固定代碼，避免外部錯誤洩漏機密。
               process.exitCode = 2; // 不以意外例外假報成功。
             } finally { clearTimeout(hardStop); } // 正常封存後移除watchdog；外層硬截止仍由workflow管理。
-          QA_SOURCE_20: |
+          QA_SOURCE_22: |
+            export const CONTRACT=Object.freeze({receiptSha256:'d81d196f43b76b205a9a72501c3a4bcbfd2311d1462c50f6be9b1d472754aa6a',files:101,servedBytes:11001296,largestFileBytes:1403455,archiveBytes:2097152,tarBytes:12582912,workMs:105000,responseBytes:67108864}); // Moss唯一已核合約；Signal需另凍結本檔與收據，不接受環境或使用者輸入替換。
+          QA_SOURCE_23: |
+            import {open,lstat} from 'node:fs/promises'; // 只讀下載步驟本run固定包，不碰私檔或任意路徑。
+            import {constants} from 'node:fs'; // 使用既有檔案描述符與NOFOLLOW拒絕符號連結。
+            import {SOURCE,PACKAGE_PATH} from './runtime-source.mjs'; // 固定大小與路徑不能由環境變數變更。
+            export async function readRuntimePackage(healthy){ // 每次await前後同原105秒父界，不新增驗包時間。
+             healthy();const directory=await lstat('qa-runtime');healthy();if(!directory.isDirectory()||directory.isSymbolicLink())throw new Error('runtime-directory'); // 固定父目錄不能是link或其他型態。
+             const file=await open(PACKAGE_PATH,constants.O_RDONLY|constants.O_NOFOLLOW);try{healthy();const stat=await file.stat();healthy();if(!stat.isFile()||stat.size!==SOURCE.bytes)throw new Error('runtime-file-size'); // 僅讀同一fd，拒既有其他型態及大小。
+              const buffer=Buffer.alloc(SOURCE.bytes+1);let used=0;while(used<buffer.length){healthy();const result=await file.read(buffer,used,buffer.length-used,used);healthy();if(!result.bytesRead)break;used+=result.bytesRead;} // 最多多讀一byte偵測超量，磁碟置換不能導致無界配置。
+              if(used!==SOURCE.bytes)throw new Error('runtime-file-size');return buffer.subarray(0,used); // 只有完整固定大小交給server逐檔重新驗證。
+             }finally{await file.close();} // 正常或任何失敗都關本次fd，不刪外部檔案。
+            } // 此介面不開server、browser或網路。
+          QA_SOURCE_24: |
+            {
+              "status": "LOCAL_PACKAGE_ONLY_NOT_EXECUTION_APPROVAL",
+              "originalRuntimeFiles": 102,
+              "originalRuntimeAggregate": "1ab83ff007c347cf437a3173f41f5b0799704af40902cc08fd27e12ed26ab570",
+              "originalManifestSha256": "f6cf6da375df1b8ccf69ee91e2d9c99de72abd717ec80c5904f588bb7ffcb448",
+              "servedFiles": 101,
+              "servedBytes": 11001296,
+              "servedManifestAggregate": "1a39548cb2d7d765f873ce986afd736586729a3ce2b658a339e7eb7b3f71b688",
+              "excludedMetadata": [
+                {
+                  "path": ".gitattributes",
+                  "bytes": 8,
+                  "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+                }
+              ],
+              "archive": {
+                "file": "moss0022-served101.tar.gz",
+                "bytes": 1956711,
+                "sha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a",
+                "uncompressedTarBytes": 11079680,
+                "format": "deterministic USTAR regular files only; gzip mtime=0; mode0444 uid/gid0"
+              },
+              "caps": {
+                "archiveBytes": 2097152,
+                "uncompressedTarBytes": 12582912,
+                "servedBytes": 11001296,
+                "files": 101,
+                "largestFileBytes": 1403455
+              },
+              "verification": {
+                "freshMemoryReopenAll101Hashes": true,
+                "serverStarted": false,
+                "browser": false,
+                "CI": false,
+                "externalWrite": false,
+                "siteAccess": false
+              },
+              "servedManifest": [
+                {
+                  "path": "assets/audio/ambient-leaves.wav",
+                  "bytes": 128044,
+                  "sha256": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35"
+                },
+                {
+                  "path": "assets/audio/music-loop.wav",
+                  "bytes": 705644,
+                  "sha256": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02"
+                },
+                {
+                  "path": "assets/audio/sfx-harvest.wav",
+                  "bytes": 14444,
+                  "sha256": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50"
+                },
+                {
+                  "path": "assets/audio/sfx-plant.wav",
+                  "bytes": 9004,
+                  "sha256": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1"
+                },
+                {
+                  "path": "assets/audio/sfx-success.wav",
+                  "bytes": 38444,
+                  "sha256": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c"
+                },
+                {
+                  "path": "assets/audio/sfx-ui.wav",
+                  "bytes": 3244,
+                  "sha256": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538"
+                },
+                {
+                  "path": "assets/audio/sfx-water.wav",
+                  "bytes": 20844,
+                  "sha256": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d"
+                },
+                {
+                  "path": "assets/data/asset-manifest.json",
+                  "bytes": 227323,
+                  "sha256": "44f1af8cbb2eb6ff5aacb83618440dbf21ec97743f1275b61a72bebd1dd16720"
+                },
+                {
+                  "path": "assets/data/audio-manifest.json",
+                  "bytes": 19410,
+                  "sha256": "77e7c42365d1acd35ee3fb9513ece509569652ebb15be29558d6602ae5df7277"
+                },
+                {
+                  "path": "assets/data/colliders.json",
+                  "bytes": 18232,
+                  "sha256": "a9b3b54833daecdeebc66e77a2c35566df2d2406099b3a2194e6f69019595001"
+                },
+                {
+                  "path": "assets/data/model-index.json",
+                  "bytes": 21990,
+                  "sha256": "0ab3fa9db60a40fdcc6b8c89c516e43ced8ff2bbe825c61ef2ced2baf13b8680"
+                },
+                {
+                  "path": "assets/models/decoration-arch.glb",
+                  "bytes": 112588,
+                  "sha256": "e9a5b413e5ab4a7ee1fe85a12cb2e8abea07759bb5b5010d67c34017a748f132"
+                },
+                {
+                  "path": "assets/models/decoration-bench.glb",
+                  "bytes": 15956,
+                  "sha256": "004721d38646afb0fa77de15be566a34d1c8b7b4bd4d647712f79716cb775ed9"
+                },
+                {
+                  "path": "assets/models/decoration-birdbath.glb",
+                  "bytes": 25488,
+                  "sha256": "f064b7d32e5404f28698d7dbcfdc8e401b780ebecc36a69fc475a096e00d5c7f"
+                },
+                {
+                  "path": "assets/models/decoration-fence.glb",
+                  "bytes": 15956,
+                  "sha256": "1a3112ee1117aa5dab8a85eb9706aa1decf91ee85e7795cc28c6afbf2d2cf52b"
+                },
+                {
+                  "path": "assets/models/decoration-garland.glb",
+                  "bytes": 57704,
+                  "sha256": "ae63f49ddb2c87d6b40ed1896e3f3902747d5dc562866aeac6cd7cafbb21e6ef"
+                },
+                {
+                  "path": "assets/models/decoration-lantern.glb",
+                  "bytes": 45328,
+                  "sha256": "0de95f5a70f3083ef48184483b3bd3d0c4f26a85a2754df7193343c2d1be60b3"
+                },
+                {
+                  "path": "assets/models/decoration-moonstand.glb",
+                  "bytes": 40808,
+                  "sha256": "9bf33dc67b62a24764f6cad48b7eaa65ceaa1bccb4838110214588ca464f58b3"
+                },
+                {
+                  "path": "assets/models/decoration-planter.glb",
+                  "bytes": 95740,
+                  "sha256": "c1a8dfc56653587067d3827b5c2505c810ad5057e1dffd87dcfedbf848c00819"
+                },
+                {
+                  "path": "assets/models/decoration-pond.glb",
+                  "bytes": 53468,
+                  "sha256": "5f113503bf13de189136e9f999cd038665856a27e119e8c6396a44df6c3b2f8e"
+                },
+                {
+                  "path": "assets/models/decoration-stones.glb",
+                  "bytes": 15072,
+                  "sha256": "54934452d94cb6a7016d46d44dcb75ae1e993a2bc3c27f538405bb270ffdc232"
+                },
+                {
+                  "path": "assets/models/decoration-table.glb",
+                  "bytes": 30228,
+                  "sha256": "e200c65daed16933f7bc8c76cfe56af0f715ec34727d7b4b53c086bef92c614a"
+                },
+                {
+                  "path": "assets/models/decoration-windchime.glb",
+                  "bytes": 39736,
+                  "sha256": "3653c1e0e82819d194d2a11cdca38e3327f54674d0f3e85d42b7c477d3f97a86"
+                },
+                {
+                  "path": "assets/models/discovery-dew.glb",
+                  "bytes": 265808,
+                  "sha256": "e23395097313865aeb83318484638d6244fe2a4cb7bb28e399c5253baa4dd3d3"
+                },
+                {
+                  "path": "assets/models/discovery-leafprint.glb",
+                  "bytes": 168660,
+                  "sha256": "c0bfeef45a4939b6906abc3beb5f6d1ec9495aa103e9bfbb6d0537813bd59f9a"
+                },
+                {
+                  "path": "assets/models/discovery-lichen.glb",
+                  "bytes": 282720,
+                  "sha256": "5d0e0de0979ae27d0aef8292ac8cb46a682abdd249f0a17f4e83593538a3643c"
+                },
+                {
+                  "path": "assets/models/discovery-mica.glb",
+                  "bytes": 44024,
+                  "sha256": "e54b65a9a1c91b85b1d89e8a6a5a99d2bbc36d284697b704fd55b3b75103148d"
+                },
+                {
+                  "path": "assets/models/discovery-moth.glb",
+                  "bytes": 303812,
+                  "sha256": "fe9c8882f0fbd1d5be71fb99bed8b17bd4e911163276cd8d707ed7c6bc2b6ca3"
+                },
+                {
+                  "path": "assets/models/discovery-quartz.glb",
+                  "bytes": 57184,
+                  "sha256": "5209cbf85a2dbaa9bd5bb597e2eee2c1b20a3f6b66aeedaf37b49a9df0fbdb16"
+                },
+                {
+                  "path": "assets/models/discovery-reed.glb",
+                  "bytes": 183428,
+                  "sha256": "66ecb3913ede8cb06d7f8e8031a83d2fec09cb1d282d175a37454974dd53c085"
+                },
+                {
+                  "path": "assets/models/discovery-roundstone.glb",
+                  "bytes": 39848,
+                  "sha256": "ab5570c01fdfbb3d4e2d9da763d29492bc2a458ccf2dfbd1930e9ba0e8990b05"
+                },
+                {
+                  "path": "assets/models/discovery-seedwing.glb",
+                  "bytes": 92620,
+                  "sha256": "ecc32372cef9cccc213437ba6db6d1ff858031d58cbb022a437ed5662065f9b6"
+                },
+                {
+                  "path": "assets/models/discovery-shellspiral.glb",
+                  "bytes": 208800,
+                  "sha256": "7e4e4409f5b5c0a5a9be687e7c9aa824408b2e778cd0a45c806234b30527b993"
+                },
+                {
+                  "path": "assets/models/discovery-snail.glb",
+                  "bytes": 335516,
+                  "sha256": "e7912e48257339fc6c0e810ee196752e15df1bdb9e88a1a8d8a491b0553c7307"
+                },
+                {
+                  "path": "assets/models/discovery-waterbeetle.glb",
+                  "bytes": 223588,
+                  "sha256": "9633ff72b3c2b10d9dc558580dbe38e9204cfa47a182ba1af345bf368f6db35a"
+                },
+                {
+                  "path": "assets/models/gardener.glb",
+                  "bytes": 350256,
+                  "sha256": "31dd5cb0cba8d7ff357530326e6fff9cce664165baf98a802f5f6fd5a0493b97"
+                },
+                {
+                  "path": "assets/models/moon-cottage.glb",
+                  "bytes": 69752,
+                  "sha256": "7492d4a6d21e8ce3fefce6ea8fd21f0461bccb83ef4fa90b5d710ad0e8264811"
+                },
+                {
+                  "path": "assets/models/moss-rock.glb",
+                  "bytes": 54388,
+                  "sha256": "5db3e78b8f843357cf1ff1da74b4b14fdc6c0befda45f26a9975862d70858396"
+                },
+                {
+                  "path": "assets/models/plant-bluebell-0.glb",
+                  "bytes": 10732,
+                  "sha256": "3b5c7f0dca2be0a0b2c801718cc3f255fcdabc2de4db1fb53e49cfec67c147cf"
+                },
+                {
+                  "path": "assets/models/plant-bluebell-1.glb",
+                  "bytes": 18636,
+                  "sha256": "5fb5860a25ffea5517d974593bad0d294e7586f58af688a02df1241872d5b68f"
+                },
+                {
+                  "path": "assets/models/plant-bluebell-2.glb",
+                  "bytes": 31312,
+                  "sha256": "00028eaa351157eb31cabddffb17f4a435ee83c8e1e75ecaa3b329475c39e1ac"
+                },
+                {
+                  "path": "assets/models/plant-bluebell-3.glb",
+                  "bytes": 67240,
+                  "sha256": "70d56fc30c9c77c700e7cad7546361eb69e657730ad9b2784a74912c60fde234"
+                },
+                {
+                  "path": "assets/models/plant-fern-0.glb",
+                  "bytes": 11776,
+                  "sha256": "143eaa663eb3dc282699ee6faf418a1069fc142a7ede9b2eea71907863e4450e"
+                },
+                {
+                  "path": "assets/models/plant-fern-1.glb",
+                  "bytes": 43976,
+                  "sha256": "39df7ca5a3babca361a6e79b3212dd1ebb1838233b1c3eae32383b2b21346dc6"
+                },
+                {
+                  "path": "assets/models/plant-fern-2.glb",
+                  "bytes": 69320,
+                  "sha256": "a7888e3486548e76ea40ec383e320c56b5f6141327da065537f472ea2c930c22"
+                },
+                {
+                  "path": "assets/models/plant-fern-3.glb",
+                  "bytes": 94668,
+                  "sha256": "40aa33ae04538d06828db80324f8902eaa79a7fb1de9907807490f407b20b0cf"
+                },
+                {
+                  "path": "assets/models/plant-lavender-0.glb",
+                  "bytes": 11788,
+                  "sha256": "86806061be9a3dac72533bef03171f00ef70cec3b9165af39fb94536f6eb495b"
+                },
+                {
+                  "path": "assets/models/plant-lavender-1.glb",
+                  "bytes": 23936,
+                  "sha256": "1fce06a6e808d3643d80a276307c8af2954194652ffb98b6d30b7f1e34cdc15f"
+                },
+                {
+                  "path": "assets/models/plant-lavender-2.glb",
+                  "bytes": 52452,
+                  "sha256": "c9885ee105a6fc24b687b58227515bc761debb11d7744fd7671ab3c3676b4e95"
+                },
+                {
+                  "path": "assets/models/plant-lavender-3.glb",
+                  "bytes": 107372,
+                  "sha256": "3323967611133a0bd8b672f56411b63e1f2e27cdec08f049965ab3b418aaa628"
+                },
+                {
+                  "path": "assets/models/plant-lotus-0.glb",
+                  "bytes": 10720,
+                  "sha256": "3a065f118989dd0de61030080eb75ff164c830bc0c8cbab00ca8f12b473790c3"
+                },
+                {
+                  "path": "assets/models/plant-lotus-1.glb",
+                  "bytes": 18112,
+                  "sha256": "27cc7ccb3a9551a6bd3b80334f5b736f139131a81dc9f2330d747e48f42958b3"
+                },
+                {
+                  "path": "assets/models/plant-lotus-2.glb",
+                  "bytes": 20752,
+                  "sha256": "e7d9483384584111b62bfe82fb9921491115a4f9ca3ab0fcc051973ef551f13f"
+                },
+                {
+                  "path": "assets/models/plant-lotus-3.glb",
+                  "bytes": 57724,
+                  "sha256": "6beb16b0d339b089cd21215060542c0781041db9ff0d8dc1a7df5d7bfd9ac119"
+                },
+                {
+                  "path": "assets/models/plant-moonflower-0.glb",
+                  "bytes": 10740,
+                  "sha256": "84cbfd75d4f5e2db54e5975bdc8aa3eb53fa7f55aa0a442edbd322f880c4cdbc"
+                },
+                {
+                  "path": "assets/models/plant-moonflower-1.glb",
+                  "bytes": 14964,
+                  "sha256": "64fb96657ea8075373bc43af4b47652ed175892481f17eff511cc02f5d6cf028"
+                },
+                {
+                  "path": "assets/models/plant-moonflower-2.glb",
+                  "bytes": 23940,
+                  "sha256": "6ff3ab8d796ce4abee140ec41fee34d326dc4a4605ec5cebd4a179988d8c02d4"
+                },
+                {
+                  "path": "assets/models/plant-moonflower-3.glb",
+                  "bytes": 80444,
+                  "sha256": "daf05de7b3c5f981bba2ecc4f81507f887bf2a895a0ef44b80de5094bab2806f"
+                },
+                {
+                  "path": "assets/models/plant-moss-0.glb",
+                  "bytes": 19168,
+                  "sha256": "f9bea9931caa99068cf9594784b1694b15eadb45390d961bc9e7a68d92b875dd"
+                },
+                {
+                  "path": "assets/models/plant-moss-1.glb",
+                  "bytes": 13904,
+                  "sha256": "3751cae366037051824c16b94e1dbbcc5e1347945fd341bf145b239d557275a4"
+                },
+                {
+                  "path": "assets/models/plant-moss-2.glb",
+                  "bytes": 32916,
+                  "sha256": "2c775eef38e6e1ca7ce2056e5cdfb7e1798537527914cde9cf1b5acc93f43146"
+                },
+                {
+                  "path": "assets/models/plant-moss-3.glb",
+                  "bytes": 61436,
+                  "sha256": "2e4fee65e9c18cb34f16f356e2f5c5010878ed436adf69d5eaae90797b7924af"
+                },
+                {
+                  "path": "assets/models/plant-pumpkin-0.glb",
+                  "bytes": 10728,
+                  "sha256": "4fcd9d35ca7a64d8cc2075820163081f013c0797b1437d6101178b2201b66bba"
+                },
+                {
+                  "path": "assets/models/plant-pumpkin-1.glb",
+                  "bytes": 13352,
+                  "sha256": "081c2be37eaf42cc39bcb52b6f5965b5608a22896647cd8a52712a4c12925eaf"
+                },
+                {
+                  "path": "assets/models/plant-pumpkin-2.glb",
+                  "bytes": 31324,
+                  "sha256": "207e1982f80bfa769f4d0e9bbfcb1d7cd655dfa9d6c0d7e5f292eab4f0674ef4"
+                },
+                {
+                  "path": "assets/models/plant-pumpkin-3.glb",
+                  "bytes": 40852,
+                  "sha256": "33aa89be3a34ed41bbfcfeedf44233b7abf4cce18e1f97f8772fa65d1c94cf74"
+                },
+                {
+                  "path": "assets/models/plant-starcap-0.glb",
+                  "bytes": 16536,
+                  "sha256": "f83e8a780348e768c7197b6547b8b350a148ef848775ee848ebb3375f2801923"
+                },
+                {
+                  "path": "assets/models/plant-starcap-1.glb",
+                  "bytes": 16516,
+                  "sha256": "582efa3726c0e0bb5270656c2b5e6a974e168a38aec9de088bd3dc7abb30ac10"
+                },
+                {
+                  "path": "assets/models/plant-starcap-2.glb",
+                  "bytes": 27076,
+                  "sha256": "17ff47a512dfbba062027826446c5b0ec22ce3d20ca308bc8fc4188625453322"
+                },
+                {
+                  "path": "assets/models/plant-starcap-3.glb",
+                  "bytes": 90464,
+                  "sha256": "6e97e74e4b591ff2d43b914e0638a586605135cbed5f312af29d240b355cdbfe"
+                },
+                {
+                  "path": "assets/models/resident-1.glb",
+                  "bytes": 329644,
+                  "sha256": "0954f8d637b749692244ef36feaf6abc8651d6f27e562bcd342e69c012be711c"
+                },
+                {
+                  "path": "assets/models/resident-2.glb",
+                  "bytes": 440620,
+                  "sha256": "83d4ef979670fe92fb95098dffd3ccc499d21b0bf24b51a2c5ce082553485087"
+                },
+                {
+                  "path": "assets/models/resident-3.glb",
+                  "bytes": 342696,
+                  "sha256": "71ba38e0c593025f6b46165294b9405a77aaab1d9125092a6107dbf55ec68fb5"
+                },
+                {
+                  "path": "assets/models/resident-4.glb",
+                  "bytes": 377788,
+                  "sha256": "ebd638041bb8d4dba3915b1a0cd5946c8b74c8a515bd79d3bdac80f314e57ace"
+                },
+                {
+                  "path": "assets/models/resident-5.glb",
+                  "bytes": 326380,
+                  "sha256": "c6679d2668565984900ed314402cdc86277f379ba6feb8c6dfb81623125bbe69"
+                },
+                {
+                  "path": "assets/models/resident-6.glb",
+                  "bytes": 316588,
+                  "sha256": "8ffc939e58d65bc1234befc99c20fa7464c62f83b734dafcc3fd750a7e8c3cc1"
+                },
+                {
+                  "path": "assets/models/terrain-brook.glb",
+                  "bytes": 77676,
+                  "sha256": "2717d19d434aedd3168c148dcbfee5c3cd9e72412671137723408bee9fc7a3cf"
+                },
+                {
+                  "path": "assets/models/terrain-forest.glb",
+                  "bytes": 83492,
+                  "sha256": "9d7f184bb4639972af7939025c1d904fe7ab97132932352a7093eb5e67e22c9e"
+                },
+                {
+                  "path": "assets/models/terrain-hill.glb",
+                  "bytes": 298908,
+                  "sha256": "b62a5762cbb96e98385a6ab45b235a2af0bc861ec0784ee160d751193f20c30d"
+                },
+                {
+                  "path": "assets/models/tool-basket.glb",
+                  "bytes": 40700,
+                  "sha256": "e19a9185a59a8e79f95100d66ff17c4eb3416778e551597c3457e0ecb50c97c9"
+                },
+                {
+                  "path": "assets/models/tool-hoe.glb",
+                  "bytes": 7432,
+                  "sha256": "fe1e52d80adabcd101d9b6909c60656119378a5d781cff2158287e1111a62741"
+                },
+                {
+                  "path": "assets/models/tool-seed-pouch.glb",
+                  "bytes": 27020,
+                  "sha256": "9a77a0cedf925078264127439f0279721caceafa0b33faa4c029bb07a7d08659"
+                },
+                {
+                  "path": "assets/models/tool-trowel.glb",
+                  "bytes": 16444,
+                  "sha256": "4cd54c199004139a7f5c30a5a0a0dc630608044e1fe333bf38f1e651cdf31d31"
+                },
+                {
+                  "path": "assets/models/tool-watering-can.glb",
+                  "bytes": 39684,
+                  "sha256": "904dff3c2e3d467d3d389a7a1986a9249a90549c470dbc6f23f9c057a7d2f382"
+                },
+                {
+                  "path": "assets/models/tree-birch.glb",
+                  "bytes": 109392,
+                  "sha256": "20a96108e0dc2f578e0b1f01bd1e108e2abd83b8ddcd4d6f3ee88df4dfd941db"
+                },
+                {
+                  "path": "assets/models/tree-oak.glb",
+                  "bytes": 109388,
+                  "sha256": "9c11d768349bb8699fbe75ceddfe0a799e470be89ca46dfcd291f5f20e6afb99"
+                },
+                {
+                  "path": "assets/models/tree-pine.glb",
+                  "bytes": 31216,
+                  "sha256": "ca3f99b3f9b18ea8cbb8c58a6770574c5e9fb0beddf3348b867f5a008b497840"
+                },
+                {
+                  "path": "assets/models/tree-willow.glb",
+                  "bytes": 267800,
+                  "sha256": "c441282a2c949cd4def77ad1f79426190f8ebd3440f80092a0d789139aa1a1c3"
+                },
+                {
+                  "path": "audio.js",
+                  "bytes": 6472,
+                  "sha256": "da1af1471f9419d9a4de8d660d471d582c2725b1c5d358f79c98ea545b403cb3"
+                },
+                {
+                  "path": "bridge.js",
+                  "bytes": 1614,
+                  "sha256": "fa9a3f0b7f11cb2e5916b2cfa4765ee8c66d0fe76cacd63f537340160f9edbb9"
+                },
+                {
+                  "path": "content.js",
+                  "bytes": 11562,
+                  "sha256": "8184cb1f8f711d911c091231eaa0a6fcb18673343ecde9ddc5d67d31e84692cc"
+                },
+                {
+                  "path": "index.html",
+                  "bytes": 4200,
+                  "sha256": "12ba46c36cbb5c9d331ce43453e9b0058ac1366640741002691bbcffdaa0e51f"
+                },
+                {
+                  "path": "main.js",
+                  "bytes": 34985,
+                  "sha256": "aebfe033215329e77e3d33c5fb4d94b72514778da5780738507f8792ce60b67f"
+                },
+                {
+                  "path": "models.js",
+                  "bytes": 36993,
+                  "sha256": "bec312e56cfade74d120ff60b144a58b967782c6e66ae3067145c75c276f96bd"
+                },
+                {
+                  "path": "rules.js",
+                  "bytes": 22741,
+                  "sha256": "55fd3c6bff6d1536394fb52a9866899e6b478e43cce1e6889ffc112c8c66023d"
+                },
+                {
+                  "path": "storage.js",
+                  "bytes": 4219,
+                  "sha256": "31b60f4d37e69e7f79e5416e33f0ea8d336d4d532896932b20cdd00207675682"
+                },
+                {
+                  "path": "style.css",
+                  "bytes": 12648,
+                  "sha256": "7c67097e9f9f4a4c39dfb622b15d08533124192c73be85ccd861dc65e99550f0"
+                },
+                {
+                  "path": "vendor/THREE-LICENSE.txt",
+                  "bytes": 1081,
+                  "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+                },
+                {
+                  "path": "vendor/three.core.js",
+                  "bytes": 1403455,
+                  "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+                },
+                {
+                  "path": "vendor/three.module.js",
+                  "bytes": 603113,
+                  "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+                },
+                {
+                  "path": "world.js",
+                  "bytes": 25370,
+                  "sha256": "2498f688a70a64c3f48935c27654516ca7abaf6df912c440a8d3e99d4f40ee1a"
+                }
+              ]
+            }
+          QA_SOURCE_25: |
+            export const SOURCE=Object.freeze({repository:'KYStr/stteak-games',commit:'6268b406efe9df3f11e1df7d99ad19e0057d91b9',path:'qa-runtime/moss0022-served101.tar.gz',url:'https://raw.githubusercontent.com/KYStr/stteak-games/6268b406efe9df3f11e1df7d99ad19e0057d91b9/qa-runtime/moss0022-served101.tar.gz',bytes:1956711,sha256:'18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a'}); // 固定已批准且逐byte讀回的runtime commit與URL；只供本輪runner取包，不代表GUI已執行。
+            export const PACKAGE_PATH='qa-runtime/moss0022-served101.tar.gz'; // 只用本run新建專用目錄的固定檔案，不接受任意本機路徑。
+            export function validSource(value){return value?.repository==='KYStr/stteak-games'&&/^[a-f0-9]{40}$/.test(value.commit??'')&&value.path==='qa-runtime/moss0022-served101.tar.gz'&&value.url===`https://raw.githubusercontent.com/KYStr/stteak-games/${value.commit}/${value.path}`&&value.bytes===1956711&&value.sha256==='18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a';} // 只接受指定repo固定commit與固定包身份，沒有main、重導或任意URL入口。
+          QA_SOURCE_26: |
             import { Fault } from './core.mjs'; // 復用既有固定錯誤類別，不另造安全框架。
             export function createScenarioHealth({ healthy, url, target, deadlineMs, onFatal, now = () => performance.now() }) { // 只在HTTP200／固定URL gate後使用，與父watchdog共用單調時基。
               let latched = null; // 第一個錯址或父工作截止後永久鎖住，即使原頁返回也不恢復。
@@ -656,8 +1340,8 @@ jobs: # 只有一個標準runner job。
               }; // 單步input timeout不會進此latch，仍容許已核的唯一只讀診斷。
             } // 不開browser、不導覽、不改原生sandbox與清理期限。
             export function allowedPageURL(value, target, navigationStarted) { return value === target.url || !navigationStarted && value === 'about:blank'; } // 只有正式goto之前的能力頁可blank；goto開始後blank往返也屬離頁。
-          QA_SOURCE_21: |
-            export const TARGET=Object.freeze({url:'https://moss-moon-private-qa.agentkystr.chatgpt.site/',build:'moss-and-moon-pointer-owner-0022-cloud-candidate-1',version:'1.0.17-rebuild.4',expectedRuntimeSha256:'1ab83ff007c347cf437a3173f41f5b0799704af40902cc08fd27e12ed26ab570'}); // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
+          QA_SOURCE_27: |
+            export const TARGET=Object.freeze({url:'http://127.0.0.1:43122/',build:'moss-and-moon-pointer-owner-0022-cloud-candidate-1',version:'1.0.17-rebuild.4',expectedRuntimeSha256:'1ab83ff007c347cf437a3173f41f5b0799704af40902cc08fd27e12ed26ab570'}); // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
             export const LIMITS=Object.freeze({sceneMs:75000,readyMs:5000,coldMs:2000,domMs:1000,ackMs:2000,chooserMs:7000,importReadyMs:3000,baselineMs:1500,reloadMs:12000,pngMs:5000,finalMs:1000,freshMs:2000,maxPointers:7,maxDOM:11,reportBytes:65536}); // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
             export const ACTIONS=Object.freeze(['entry','tutorial','world','settings','entry-restored','tutorial-restored','world-restored']); // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
             export const selectorFor=phase=>phase.startsWith('entry')?'#start':phase.startsWith('tutorial')?'#close-panel':phase.startsWith('world')?'.hud button[data-open="settings"]':phase==='settings'?'#panel-body button[data-import]':null; // 固定本情境的不可變身份、上限或合成資料，不接受外部替換。
@@ -665,7 +1349,7 @@ jobs: # 只有一個標準runner job。
             function targetValid(t,phase){if(!t||t.selector!==selectorFor(phase)||t.matches!==1||t.tag!=='BUTTON'||t.disabled!==false||t.ariaDisabledOrInert!==false||t.active!==false||![t.fullyVisible,t.pointerEnabled,t.centerHit,t.geometryFinite,t.animationSafe,t.animationKnown,t.ancestorLimitOK,t.animationLimitOK].every(v=>v===true))return false;const r=t.rect,c=t.center;if(!r||!c||Object.keys(r).length!==6||Object.keys(c).length!==2||![...Object.values(r),...Object.values(c)].every(Number.isFinite)||r.left<0||r.top<0||r.right>1600||r.bottom>900||r.width<=0||r.height<=0||Math.abs(r.right-r.left-r.width)>.01||Math.abs(r.bottom-r.top-r.height)>.01||Math.abs(c.x-r.left-r.width/2)>.01||Math.abs(c.y-r.top-r.height/2)>.01)return false;return phase.startsWith('entry')?t.text==='走進庭園 →'&&t.ariaLabel==='':phase.startsWith('tutorial')?t.text==='×'&&t.ariaLabel==='關閉面板':phase.startsWith('world')?t.text==='Ⅱ'&&t.ariaLabel==='設定與暫停':t.text==='匯入備份'&&t.ariaLabel==='';} // 只核固定公開介面的文字與幾何，不能把隱藏遊戲資料當操作證據。
             export function valid(phase,s,includeTarget){if(!s)return false;const {target,...fields}=s;if(JSON.stringify(fields)!==JSON.stringify(expected(phase)))return false;return includeTarget?targetValid(target,phase):target===undefined;} // 只核固定公開介面的文字與幾何，不能把隱藏遊戲資料當操作證據。
             export async function executeImportReload(io,{deadlineMs,entryBudgetDeadlineMs,now=()=>performance.now()}={}){ // 使用單調期限限制此非同步步驟；逾時後不能採納晚回覆或延長授權。
-             const start=now(),end=Math.min(deadlineMs,entryBudgetDeadlineMs,start+LIMITS.sceneMs),result={scope:'moss0022-synthetic-import-reload',status:'blocked',evidenceClass:'browser-file-input-integration-not-os-picker',runtimeBytesVerified:false,actions:[],checkpoints:[],fileSelection:{status:'not-run'},reload:{status:'not-run'},faults:[],nativeOSDialog:'NOT_RUN',staleImportRace:'NOT_RUN',saveBytesRead:false,primaryOrBackupSourceVerified:false,crashDurabilityVerified:false};let epoch=1,domCount=0,pointers=0,ready=0,image=0,stopped=false; // 唯一正常重載受文件序號、期限及確認條件約束，不以畫面返回補認未知結果。
+             const start=now(),end=Math.min(deadlineMs,entryBudgetDeadlineMs,start+LIMITS.sceneMs),result={scope:'moss0022-loopback-synthetic-import-reload',status:'blocked',evidenceClass:'browser-file-input-integration-not-os-picker',runtimeBytesVerified:false,actions:[],checkpoints:[],fileSelection:{status:'not-run'},reload:{status:'not-run'},faults:[],nativeOSDialog:'NOT_RUN',staleImportRace:'NOT_RUN',saveBytesRead:false,primaryOrBackupSourceVerified:false,crashDurabilityVerified:false};let epoch=1,domCount=0,pointers=0,ready=0,image=0,stopped=false; // 唯一正常重載受文件序號、期限及確認條件約束，不以畫面返回補認未知結果。
              const fail=code=>{throw Object.assign(new Error(code),{code});}; // 建立此步驟的有限局部資料，內容不來自私人存檔或隱藏遊戲狀態。
              const guard=()=>{if(stopped||now()>=end)fail('scenario-deadline');io.healthy();io.assertEpoch(epoch);if(io.url()!==TARGET.url)fail('target-url-mismatch');}; // 使用單調期限限制此非同步步驟；逾時後不能採納晚回覆或延長授權。
              const step=async(cap,fn)=>{guard();const until=Math.min(end,now()+cap);const value=await io.bounded(()=>{guard();if(now()>=until)fail('operation-deadline');return fn(until);},until-now());guard();if(now()>=until)fail('operation-deadline');return value;}; // 使用單調期限限制此非同步步驟；逾時後不能採納晚回覆或延長授權。
@@ -687,12 +1371,26 @@ jobs: # 只有一個標準runner job。
              finally{stopped=true;result.elapsedMs=now()-start;result.counts={mouseAttempts:pointers,domAttempts:domCount,readyAttempts:ready,pngAttempts:image};result.chooser=io.chooserSnapshot();} // 保留單調停止與首個失敗原因，後來的事件不可重新開啟能力。
              return structuredClone(result); // 僅暴露本檔宣告的有限介面與結果，不提供額外瀏覽器或遊戲控制能力。
             } // 結束本有界分支並保留既定停止、回報與清理語義。
-          QA_SOURCE_22: |
+          QA_SOURCE_28: |
             import {pathToFileURL} from 'node:url'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import * as scenario from './playwright-adapter.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
-            export function selectedScenario(id){if(id!=='moss0022-synthetic-import-reload')throw new Error('reviewed-scenario-required');return scenario;} // 唯一正常重載受文件序號、期限及確認條件約束，不以畫面返回補認未知結果。
+            export function selectedScenario(id){if(id!=='moss0022-loopback-synthetic-import-reload')throw new Error('reviewed-scenario-required');return scenario;} // 唯一正常重載受文件序號、期限及確認條件約束，不以畫面返回補認未知結果。
             if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){selectedScenario(process.env.QA_SCENARIO);console.log('Fixed synthetic input-file integration; not OS picker.');} // 執行這個固定情境內的檢查或資料轉換，任何未知結果都不允許擴大後續操作。
-          QA_SOURCE_23: |
+          QA_SOURCE_29: |
+            export function createSharedCleanup({browser,server,abortServer,invalidate,now=()=>performance.now(),setTimer=setTimeout,clearTimer=clearTimeout}){ // browser與本輪server只有一次共用五秒清理租約，不累加各自五秒。
+             let pending=null; // 重入、watchdog與SIGTERM共用原promise，不重設截止。
+             return function close(){ // 清理可以重入但不能復活測試能力。
+              if(pending)return pending;const deadline=now()+5000;invalidate();abortServer(); // 同步先撤銷輸入與尚未完成bind，才等待既有handles。
+              let timer;const stop=(async()=>{ // 將兩項清理同時開始並共用同一絕對期限。
+               const handle=server(),instance=browser();const operations=[]; // 只關本輪已取得的handle，不尋找或kill未知程序。
+               if(handle)operations.push(Promise.resolve().then(()=>handle.close()).then(result=>{if(result?.status!=='closed'||result.openSockets!==0)throw new Error('cleanup-incomplete');return result;})); // server必須自己確認close及零socket，單純送close不算成功。
+               if(instance)operations.push(Promise.resolve().then(()=>instance.close()).then(()=>{if(instance.isConnected())throw new Error('cleanup-still-connected');})); // browser只採原close ACK，不虛構OS程序清單證據。
+               const outcomes=await Promise.allSettled(operations);if(outcomes.some(x=>x.status==='rejected')||now()>=deadline)throw new Error('cleanup-incomplete');return {status:instance?'close-acknowledged':'no-browser-handle',processInventoryVerified:false,underlyingProcessCleanup:instance?'browser-close-ack-only':'not-observed',loopback:handle?'close-acknowledged-zero-sockets':'aborted-before-handle',sharedDeadlineMs:5000}; // 任一晚回覆不能把逾時或未知改為成功。
+              })(); // 所有操作共用本次清理起點。
+              pending=Promise.race([stop,new Promise((_,reject)=>{timer=setTimer(()=>reject(new Error('cleanup-incomplete')),Math.max(0,deadline-now()));})]).finally(()=>clearTimer(timer));return pending; // 第一終態封存且移除timer，不新增第二輪清理。
+             }; // 僅返回固定cleanup能力，不暴露browser或server控制。
+            } // 純函式可用替身測競態，未啟任何真瀏覽器或server。
+          QA_SOURCE_30: |
             import { createHash } from 'node:crypto'; // 僅對本次原PNG記憶體字節核SHA，不改圖或讀其他檔案。
             import { Fault, LIMITS } from './core.mjs'; // 沿用既有五秒與二MiB限制及固定錯誤類別。
             export function createSnapshotLease({ page, healthy, latch, now = () => performance.now() }) { // 只包裝唯一既有page，不提供新browser或導航能力。
@@ -715,7 +1413,7 @@ jobs: # 只有一個標準runner job。
               }; // host落盤沒有closed誤擋，但仍受原程序watchdog與總硬截止。
               return { capture, persistForReport, invalidateActive, inFlight: () => !!attempt?.active }; // 最小固定接口，沒有重設token、取消後復活或第二圖入口。
             } // 原PNG是否可簽仍需有序回收與人工看圖，此helper不宣稱產品通過。
-          QA_SOURCE_24: |
+          QA_SOURCE_31: |
             import test from 'node:test'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import assert from 'node:assert/strict'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import {createHash} from 'node:crypto'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
@@ -745,9 +1443,9 @@ jobs: # 只有一個標準runner job。
             test('ordinary stop during pending metadata forbids late setFiles, despite healthy outer page',async()=>{let release;const page={url:()=>TARGET_URL};const l=createChooserLease({page,healthy(){},latch(){}});let submissions=0;const c={page:()=>page,isMultiple:()=>false,element:()=>({evaluate:()=>new Promise(resolve=>{release=resolve;})}),setFiles:async()=>{submissions++;}};l.arm();l.onChooser(c);l.acknowledgeTrigger();const pending=l.choose();while(!release)await new Promise(resolve=>setImmediate(resolve));l.stop();release(true);await assert.rejects(pending);assert.equal(submissions,0);assert.equal(l.snapshot().state,'stopped');}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             test('ordinary stop during pending setFiles never accepts late completion',async()=>{let finish;const f=fixture({setFilesHook:()=>new Promise(resolve=>{finish=resolve;})});await f.ready();const pending=f.lease.choose();while(!finish)await new Promise(resolve=>setImmediate(resolve));f.lease.stop();finish();await assert.rejects(pending);assert.equal(f.lease.snapshot().selectionAck,'pending');assert.equal(f.lease.snapshot().state,'stopped');}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             test('ordinary stop before arming is terminal without reopening fixture capability',()=>{const f=fixture();f.lease.stop();assert.throws(()=>f.lease.arm());assert.equal(f.lease.snapshot().state,'stopped');assert.equal(f.calls.length,0);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
-          QA_SOURCE_25: |
+          QA_SOURCE_32: |
             export function fakeNode(text = '', o = {}) { const rect = o.rect ?? { left: 100, top: 200, right: 500, bottom: 260, width: 400, height: 60 }; const node = { innerText: text, tagName: 'BUTTON', parentElement: o.parent ?? null, hidden: !!o.hidden, disabled: !!o.disabled, inert: !!o.inert, style: { display: 'block', visibility: 'visible', opacity: '1', pointerEvents: 'auto', overflowX: 'visible', overflowY: 'visible', ...o.style }, getClientRects: () => o.hidden ? [] : [rect], getBoundingClientRect: () => ({ ...rect }), getAttribute: key => key === 'aria-label' ? o.aria ?? null : key === 'aria-disabled' ? o.ariaDisabled ? 'true' : null : null, hasAttribute: key => key === 'inert' && !!o.inert, matches: selector => selector === ':active' ? !!o.active : selector === ':disabled' && !!o.disabled, contains: other => other === node, classList: { contains: name => name === 'selected' && !!o.selected }, selectedOptions: o.seed === undefined ? [] : [{ textContent: o.seed }], getAnimations: () => o.animations ?? [], querySelector: key => o.children?.[key] ?? null }; if (o.noAnimations) delete node.getAnimations; return node; } // 只含callback需要的公開DOM API，沒有click或style寫入。
-          QA_SOURCE_26: |
+          QA_SOURCE_33: |
             import test from 'node:test'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import assert from 'node:assert/strict'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import vm from 'node:vm'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
@@ -757,7 +1455,7 @@ jobs: # 只有一個標準runner job。
             function run(phase,o={}){const s=expected(phase),includeTarget=ACTIONS.includes(phase),nodes={};for(const [key,text]of Object.entries({'#day':s.dayText,'#build-label':s.buildLabel,'#panel-title':s.panelTitle,'#panel-body > p:first-child':s.settingsLabel,'#toast.show':s.importToast}))nodes[key]=fakeNode(text,{hidden:text===null});nodes['#welcome']=fakeNode('',{hidden:!s.welcomeVisible});nodes['#panel']=fakeNode('',{hidden:!s.panelVisible});nodes['#world']=fakeNode();nodes['#fatal']=fakeNode('',{hidden:true});const isEntry=phase.startsWith('entry'),isTutorial=phase.startsWith('tutorial'),isWorld=phase.startsWith('world');const target=fakeNode(isEntry?'走進庭園 →':isTutorial?'×':isWorld?'Ⅱ':'匯入備份',{aria:isTutorial?'關閉面板':isWorld?'設定與暫停':null,...o.target});if(includeTarget)nodes[selectorFor(phase)]=target;const queries=[];const sandbox={location:{href:TARGET.url},innerWidth:1600,innerHeight:900,devicePixelRatio:1,getComputedStyle:e=>e.style,document:{querySelector:selector=>{queries.push(selector);return nodes[selector]??null;},querySelectorAll:selector=>{queries.push(selector);return nodes[selector]?o.duplicate&&selector===selectorFor(phase)?[target,target]:[nodes[selector]]:[];},elementFromPoint:()=>o.overlay?fakeNode():target}};const output=vm.runInNewContext(`(${visibleImportDOM})(${JSON.stringify({target:TARGET,phase,includeTarget,selector:includeTarget?selectorFor(phase):null})})`,sandbox);return {output,queries};} // 只核固定公開介面的文字與幾何，不能把隱藏遊戲資料當操作證據。
             for(const phase of [...ACTIONS,'imported','restored'])test(`real callback matches exact phase ${phase}`,()=>{const r=run(phase);assert.equal(valid(phase,r.output,ACTIONS.includes(phase)),true,JSON.stringify(r.output));assert.ok(!r.queries.some(q=>q.includes('import-file')));}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             for(const o of [{duplicate:true},{overlay:true},{target:{disabled:true}},{target:{inert:true}},{target:{hidden:true}},{target:{active:true}},{target:{noAnimations:true}},{target:{rect:{left:-1,top:200,right:399,bottom:260,width:400,height:60}}}])test(`real callback unsafe target rejects ${JSON.stringify(o)}`,()=>{assert.equal(valid('settings',run('settings',o).output,true),false);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
-          QA_SOURCE_27: |
+          QA_SOURCE_34: |
             import {createChooserLease} from '../scripts/chooser-lease.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import test from 'node:test'; // 真core、deny-only file事件/PNG lease及正式probe listeners串接，全部IO為記憶體。
             import assert from 'node:assert/strict'; // 不把host await期間晚事件洗成成功。
@@ -787,7 +1485,7 @@ jobs: # 只有一個標準runner job。
             test('正常兩epoch之後額外同URL事件不能洗回成功', async () => { const f = await fixture({ kind: 'same-navigation' }); assert.equal(f.result.finalization.status, 'blocked-by-events'); }); // 原reloadlease全程不豁免額外commit。
             for (const kind of ['download', 'filechooser', 'pageerror', 'crash', 'navigation', 'same-navigation']) test(kind + '在JSON已封存之後不回填字串或claim當時已觀測', async () => { const f = await fixture({ kind, timing: 'after-json' }); assert.equal(f.result.finalization.status, 'event-state-confirmed'); assert.equal(f.result.outcome, 'evidence-collected-pending-review'); }); // 明確封存截止，不以事後事件改舊snapshot或重新序列化。
             test('任意fatal只固定分類，正式call在persist後同write參數內同步seal', async () => { const report = { outcome: 'evidence-collected-pending-review', faults: [], faultDetails: [], screenshots: [] }, text = serializeSealedReport(report, { privateEventInvalid: false, fatal: 'secret-file-path', events: { unexpectedNavigation: 0, pageerror: 0, crash: 0 } }); assert.ok(!text.includes('secret-file-path')); assert.ok(JSON.parse(text).faults.includes('unclassified-rejection')); const seal = await readFile(new URL('../scripts/private-report.mjs', import.meta.url), 'utf8'); assert.doesNotMatch(seal.split('\n').map(line => line.split(' //')[0]).join('\n'), /\bawait\b|page\.|browser\./); assert.equal(serializeSealedReport.constructor.name, 'Function'); assert.ok(source.indexOf("await writeFile('artifacts/report.json', serializeSealedReport(report, { privateEventInvalid, fatal, events }))") > source.indexOf('await snapshotLease.persistForReport(report, writeFile)')); }); // 不輸出error物件／堆疊／URL，也不新增API或時間。
-          QA_SOURCE_28: |
+          QA_SOURCE_35: |
             import test from 'node:test'; // 全部純mock，不執行dpkg、sysctl、版本命令或browser。
             import assert from 'node:assert/strict'; // 原生來源閘門每個必要檢查都有反例。
             import { createHash } from 'node:crypto'; // 合成profile字串只測checksum契約，不會寫到系統。
@@ -835,13 +1533,13 @@ jobs: # 只有一個標準runner job。
             test('owner拒絕保留未知而不是已觀測false', async () => { const mock = fixture(); const command = mock.io.command; mock.io.command = async key => { if (key === 'binaryOwner') throw new Error('secret'); return command(key); }; const r = await inspectNative(mock.io); assert.equal(r.packageObservation.ownerStatus, 'unavailable'); assert.equal(r.packageObservation.ownerMatches, null); assert.ok(!mock.calls.includes('binary-hash')); assert.ok(!mock.calls.includes('version')); }); // 缺資料與實際不符分開。
             test('metadata三秒四KiB最小環境，其他原命令設定不變', () => { for (const key of ['package', 'binaryOwner']) assert.deepEqual(commandOptions(key), { timeout: 3000, killSignal: 'SIGKILL', maxBuffer: 4096, encoding: 'utf8', env: { PATH: '/usr/bin:/bin', LANG: 'C', LC_ALL: 'C' } }); for (const key of ['profileOwner', 'profileSums', 'version']) assert.deepEqual(commandOptions(key), { timeout: 3000, killSignal: 'SIGKILL', maxBuffer: 262144, encoding: 'utf8' }); }); // 沒有額外二十秒Python診斷或命令重試。
             test('原NATIVE及image待parent驗證身份完全不擴增', () => { assert.equal(NATIVE.version, '155.0.8059.39'); assert.equal(NATIVE.packageVersion, '155.0.8059.39-1'); assert.equal(IMAGE.version, '20261012.334.1'); assert.equal(imageProvenance().status, 'pending-parent-verification'); assert.equal(imageProvenance().actual, null); }); // 這是舊browser身份門檻，不冒稱runtime已確認舊image池。
-            test('exact156完整原安全gate過才ready且只限新Moss profile', async () => { const m = fixture('', {}, PROFILES.moss156); const r = await inspectNative(m.io); assert.equal(r.status, 'ready'); assert.equal(profileFromReport(r), PROFILES.moss156); assert.equal(r.profile.mode, 'moss0022-synthetic-import-reload-156-scenario'); assert.equal(r.version, '156.0.8078.47'); assert.equal(r.binaryIntegrity.comparison, 'match'); assert.equal(m.calls.filter(v => v === 'package').length, 1); assert.equal(m.calls.filter(v => v === 'version').length, 1); assert.equal(r.image.status, 'pending-content-verification'); assert.equal(r.image.exactImageContentsVerified, false); assert.equal(r.image.installedBinaryBoundToOfficialDeb, false); assert.equal(r.image.actual, null); }); // ready不代表來源缺口消失或Moss玩法已實測通過。
+            test('exact156完整原安全gate過才ready且只限新Moss profile', async () => { const m = fixture('', {}, PROFILES.moss156); const r = await inspectNative(m.io); assert.equal(r.status, 'ready'); assert.equal(profileFromReport(r), PROFILES.moss156); assert.equal(r.profile.mode, 'moss0022-loopback-synthetic-import-reload-156-scenario'); assert.equal(r.version, '156.0.8078.47'); assert.equal(r.binaryIntegrity.comparison, 'match'); assert.equal(m.calls.filter(v => v === 'package').length, 1); assert.equal(m.calls.filter(v => v === 'version').length, 1); assert.equal(r.image.status, 'pending-content-verification'); assert.equal(r.image.exactImageContentsVerified, false); assert.equal(r.image.installedBinaryBoundToOfficialDeb, false); assert.equal(r.image.actual, null); }); // ready不代表來源缺口消失或Moss玩法已實測通過。
             for (const key of [...PATHS.map(x => x.key), 'kernel', 'package', 'binaryOwner', 'profileOwner', NATIVE.sums, NATIVE.profile, 'binary-hash', 'profileSums', 'local', '/etc/apparmor.d/disable/chrome', '/etc/apparmor.d/force-complain/chrome', 'version']) test(`156亦保原不可信${key}阻擋`, async () => { const m = fixture(key, {}, PROFILES.moss156), r = await inspectNative(m.io); assert.equal(r.status, 'blocked'); assert.equal(profileFromReport(r), null); if (key !== 'version') assert.ok(!m.calls.includes('version')); }); // 新版不移除任何來源／安全核對，失敗不是落回155。
             for (const key of ['google-chrome-stable', 'amd64', 'install ok installed', 'Chrome Linux Team']) test(`156 metadata ${key}不符零hash/version`, async () => { const m = fixture('', {}, PROFILES.moss156), command = m.io.command; m.io.command = async name => name === 'package' ? metadata.replace(NATIVE.packageVersion, PROFILES.moss156.packageVersion).replace(key, 'unknown') : command(name); const r = await inspectNative(m.io); assert.equal(r.status, 'blocked'); assert.equal(r.profile, null); assert.ok(!m.calls.includes('binary-hash')); assert.ok(!m.calls.includes('version')); }); // 不能只看Version單欄就認官方身份。
             test('兩profile精確字串且不同revision/第三版/偽格式無profile', () => { assert.equal(selectProfile(metadata), PROFILES.game155); assert.equal(selectProfile(metadata.replace(NATIVE.packageVersion, PROFILES.moss156.packageVersion)), PROFILES.moss156); for (const version of ['156.0.8078.47-2', '156.0.8078.48-1', '157.0.8100.1-1', '155.0.8059.39-2', '156.0.8078.47-1 extra']) assert.equal(selectProfile(metadata.replace(NATIVE.packageVersion, version)), null); }); // 沒有範圍、前綴或自動最新版本。
             test('156 metadata卻155 binary版本必拒且不能改選155', async () => { const m = fixture('', {}, PROFILES.moss156), command = m.io.command; m.io.command = async name => name === 'version' ? `Google Chrome ${PROFILES.game155.version}` : command(name); const r = await inspectNative(m.io); assert.equal(r.status, 'blocked'); assert.equal(r.profile.id, PROFILES.moss156.id); assert.equal(r.checks.binaryVersion, false); assert.equal(profileFromReport(r), null); }); // 混版不fallback，不啟browser試。
-            test('ready結果缺profile或混版不可被核心默認舊版', async () => { const m = fixture('', {}, PROFILES.moss156), r = await inspectNative(m.io); for (const change of [{ profile: null }, { version: PROFILES.game155.version }, { expectedVersion: PROFILES.game155.version }, { packageObservation: { packageVersion: PROFILES.game155.packageVersion } }, { profile: { ...r.profile, mode: 'moss0022-synthetic-import-reload-155-scenario' } }]) assert.equal(profileFromReport({ ...r, ...change }), null); }); // profile不是任意字串控制權。
-          QA_SOURCE_29: |
+            test('ready結果缺profile或混版不可被核心默認舊版', async () => { const m = fixture('', {}, PROFILES.moss156), r = await inspectNative(m.io); for (const change of [{ profile: null }, { version: PROFILES.game155.version }, { expectedVersion: PROFILES.game155.version }, { packageObservation: { packageVersion: PROFILES.game155.packageVersion } }, { profile: { ...r.profile, mode: 'moss0022-loopback-synthetic-import-reload-155-scenario' } }]) assert.equal(profileFromReport({ ...r, ...change }), null); }); // profile不是任意字串控制權。
+          QA_SOURCE_36: |
             import test from 'node:test'; // 純page替身和事件，不真的導航或啟動browser。
             import assert from 'node:assert/strict'; // 每個導航phase錯誤都必永久封存。
             import { createMossNavigationLease } from '../scripts/moss-navigation.mjs'; // 真固定Moss導航lease。
@@ -862,7 +1560,7 @@ jobs: # 只有一個標準runner job。
             test('action父界剩999ms確實限原生timeout且晚到不ack', async () => { const m = fixture({ cost: { reload: 1000 } }); await m.initial(); m.advance(104000); await assert.rejects(m.reload()); assert.equal(m.calls.at(-1).options.timeout, 999); assert.equal(m.state().fatal, 'probe-deadline'); }); // 不足完整尾額仍由模組提前零reload，此case獨立核helper更早父界。
             for (const kind of ['fatal', 'url', 'expiry', 'reenter', 'bad-return']) test('預檢callback同步' + kind + '在mark/native前拒絕', async () => { const m = fixture(); await m.initial(); let marks = 0; await assert.rejects(m.reload(() => { if (kind === 'fatal') m.setFatal('pageerror-observed'); if (kind === 'url') m.setURL(TARGET.url + '?wrong'); if (kind === 'expiry') m.advance(12000); if (kind === 'reenter') void m.reload().catch(() => {}); if (kind === 'bad-return') return undefined; return () => { marks++; }; })); assert.equal(marks, 0); assert.equal(m.calls.filter(c => c.kind === 'reload').length, 0); assert.equal(m.lease.inFlight(), false); }); // 導航預檢不是豁免fatal/錯頁/重arm，pending無觀察能力。
             test('預檢耗900ms仍按同expiry只給剩11100ms，不重新加12秒', async () => { const m = fixture(); await m.initial(); await m.reload(() => { m.advance(900); return () => {}; }); assert.equal(m.calls.at(-1).options.timeout, 11100); }); // timeout在預檢與第二次pending核完才算剩額。
-          QA_SOURCE_30: |
+          QA_SOURCE_37: |
             import test from 'node:test'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import assert from 'node:assert/strict'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import {TARGET,LIMITS,ACTIONS,selectorFor,expected,valid,executeImportReload} from '../scripts/scenario.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
@@ -881,7 +1579,16 @@ jobs: # 只有一個標準runner job。
             for(const key of ['fullyVisible','pointerEnabled','centerHit','geometryFinite','animationSafe','animationKnown','ancestorLimitOK','animationLimitOK'])test(`target !${key} fails`,()=>{const s=sample('settings');s.target[key]=false;assert.equal(valid('settings',s,true),false);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             test('normal budget nominal64.5s under75s; process115s does not claim entire CI120s',()=>{assert.equal(2*5+2*2+7*1+7*2+7+3+1.5+12+5+1,64.5);assert.equal(LIMITS.sceneMs,75000);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             test('complete and every blocked prefix remain far below64KiB including conservative12KiB core shell',async()=>{let max=0;for(const o of [{},...Array.from({length:7},(_,i)=>({unknown:i+1})),...ACTIONS.map(mismatch=>({mismatch})),{chooseFails:true},{reloadFails:true},{mismatch:'restored'}]){const r=await fixture(o).run();const variants=[r];if(r.checkpoints.length){const v=structuredClone(r),last=v.checkpoints.at(-1).state;for(const key of ['dayText','buildLabel','panelTitle','settingsLabel','importToast'])last[key]='界'.repeat(240);if(last.target){last.target.text='界'.repeat(240);last.target.ariaLabel='界'.repeat(240);last.target.rect={left:-1e308,top:-1e308,right:1e308,bottom:1e308,width:1e308,height:1e308};}variants.push(v);}for(const v of variants){const bytes=Buffer.byteLength(JSON.stringify(v,null,2))+12288;max=Math.max(max,bytes);assert.ok(bytes<65536);}}console.log(JSON.stringify({capacityFixtureOnly:true,conservativeWith12288ByteShell:max,reportLimit:65536}));}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
-          QA_SOURCE_31: |
+          QA_SOURCE_38: |
+            import test from 'node:test'; // 純替身測共享截止，不啟browser或HTTP listener。
+            import assert from 'node:assert/strict'; // 任何清理未知都不能當成已確認成功。
+            import {createSharedCleanup} from '../scripts/shared-cleanup.mjs'; // 測正式使用的同一清理函式。
+            function harness({hangBrowser=false,serverResult={status:'closed',openSockets:0},hangServer=false}={}){let clock=10,tick,releaseBrowser,releaseServer;const events=[],server={close(){events.push('server-close');return hangServer?new Promise(resolve=>releaseServer=resolve):Promise.resolve(serverResult);}},browser={close(){events.push('browser-close');return hangBrowser?new Promise(resolve=>releaseBrowser=resolve):Promise.resolve();},isConnected:()=>false};const close=createSharedCleanup({browser:()=>browser,server:()=>server,abortServer:()=>events.push('abort'),invalidate:()=>events.push('invalidate'),now:()=>clock,setTimer:(fn,ms)=>{assert.equal(ms,5000);tick=fn;return 1;},clearTimer:()=>events.push('clear')});return {close,events,expire:()=>{clock=5010;tick();},release:()=>{releaseBrowser?.();releaseServer?.(serverResult);}};} // 所有時計與handle都是明示替身，不能當原生cleanup證據。
+            test('兩個handle同時清理且重入不另開五秒',async()=>{const h=harness();const one=h.close(),two=h.close();assert.equal(one,two);const result=await one;assert.equal(result.sharedDeadlineMs,5000);assert.equal(result.loopback,'close-acknowledged-zero-sockets');assert.deepEqual(h.events,['invalidate','abort','server-close','browser-close','clear']);}); // 先撤能力，再並行關閉，沒有兩個累加deadline。
+            for(const hung of ['hangBrowser','hangServer'])test(`任何${hung}逾時後晚ACK不能復活`,async()=>{const h=harness({[hung]:true});const result=h.close();await Promise.resolve();h.expire();await assert.rejects(result,/cleanup-incomplete/);h.release();await Promise.resolve();assert.equal(h.close(),result);await assert.rejects(h.close(),/cleanup-incomplete/);assert.equal(h.events.filter(x=>x==='abort').length,1);}); // 同一已拒promise封存，後續不重開清理窗口。
+            for(const value of [{status:'closed',openSockets:1},{status:'unknown',openSockets:0},null])test(`server未知或留socket拒簽${JSON.stringify(value)}`,async()=>{const h=harness({serverResult:value});await assert.rejects(h.close(),/cleanup-incomplete/);}); // 送出close不等於listener及socket真正關閉。
+            test('沒有取得handle仍同步撤尚在bind的signal',async()=>{let abort=0,invalidate=0;const close=createSharedCleanup({browser:()=>null,server:()=>null,abortServer:()=>abort++,invalidate:()=>invalidate++});const result=await close();assert.equal(abort,1);assert.equal(invalidate,1);assert.equal(result.loopback,'aborted-before-handle');assert.equal(result.processInventoryVerified,false);}); // 無handle不是底層程序從未建立的證據。
+          QA_SOURCE_39: |
             import test from 'node:test'; // 只做固定helper純記憶體測試，不開browser、不連網、不產PNG。
             import assert from 'node:assert/strict'; // 任何未知或晚圖不得被mock洗成可接受證據。
             import { createHash } from 'node:crypto'; // 只核合成bytes與metadata一致，合成bytes不是圖片。
@@ -918,26 +1625,26 @@ jobs: # 只有一個標準runner job。
             test('超過二MiB拒絕不壓縮、不寫、不重截', async () => { const mock = fixture({ large: true }); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); assert.equal(mock.calls.length, 1); assert.equal(mock.writes.length, 0); }); // 小於限制才可沿原transport傳輸。
             test('host寫入失敗也不第二次落盤', async () => { const mock = fixture({ writeReject: true }); const metadata = await mock.lease.capture(); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /host-write-rejected/); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /artifact-size-limit/); assert.equal(mock.writes.length, 1); }); // 純host失敗不重啟browser補證據。
             test('已保存原圖不能再次保存或再次capture', async () => { const mock = fixture(); const metadata = await mock.lease.capture(); await mock.lease.persistForReport(reportWith(metadata), mock.writeFile); await assert.rejects(mock.lease.persistForReport(reportWith(metadata), mock.writeFile), /artifact-size-limit/); await assert.rejects(mock.lease.capture(), /artifact-size-limit/); assert.equal(mock.writes.length, 1); assert.equal(mock.calls.length, 1); }); // 成功後亦不能形成隱藏第二輪。
-          QA_SOURCE_32: |
+          QA_SOURCE_40: |
             import test from 'node:test'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import assert from 'node:assert/strict'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             import {TRANSFER,encodeTransfer,decodeTransfers} from '../scripts/log-transfer.mjs'; // 匯入此行列明的固定模組；不執行瀏覽器或讀取私人資料。
             const id={repository:'KYStr/stteak-games',runId:'999',commit:'a'.repeat(40),attempt:'1'}; // 建立此步驟的有限局部資料，內容不來自私人存檔或隱藏遊戲狀態。
             const report={outcome:'blocked',screenshots:[],reason:'mock-only-not-browser'}; // 只使用此輪單張原圖或有限回報快照，失敗不新增補拍。
-            test('new scope identity and64KiB report cap are explicit',()=>{assert.equal(TRANSFER.scope,'moss0022-synthetic-import-reload');assert.equal(TRANSFER.reportLimit,65536);assert.equal(TRANSFER.pngLimit,2097152);assert.equal(TRANSFER.logLimit,8388608);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
+            test('new scope identity and64KiB report cap are explicit',()=>{assert.equal(TRANSFER.scope,'moss0022-loopback-synthetic-import-reload');assert.equal(TRANSFER.reportLimit,65536);assert.equal(TRANSFER.pngLimit,2097152);assert.equal(TRANSFER.logLimit,8388608);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             test('strict full raw report roundtrip unchanged',()=>{const bytes=Buffer.from(JSON.stringify(report)),raw=encodeTransfer('report',bytes,id).join('\n');const result=decodeTransfers(raw,id);assert.deepEqual(result.report,report);assert.ok(result.outputs.report.bytes.equals(bytes));}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
             test('exact cap accepts; onebyte excess rejects without truncation',()=>{assert.ok(encodeTransfer('report',Buffer.alloc(65536,65),id).length>1);assert.throws(()=>encodeTransfer('report',Buffer.alloc(65537,65),id),/size-limit/);}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
-            for(const kind of ['scope','identity','missing','duplicate','sha','order'])test(`transport rejects ${kind}`,()=>{let lines=encodeTransfer('report',Buffer.from(JSON.stringify({...report,padding:'x'.repeat(5000)})),id);if(kind==='scope')lines[0]=lines[0].replace('moss0022-synthetic-import-reload','moss0020-three-cycles-reload');if(kind==='identity')lines[0]=lines[0].replace('"runId":"999"','"runId":"998"');if(kind==='missing')lines.splice(1,1);if(kind==='duplicate')lines.splice(2,0,lines[1]);if(kind==='sha')lines[1]=lines[1].slice(0,-1)+(lines[1].endsWith('A')?'B':'A');if(kind==='order')[lines[1],lines[2]]=[lines[2],lines[1]];assert.throws(()=>decodeTransfers(lines.join('\n'),id));}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
+            for(const kind of ['scope','identity','missing','duplicate','sha','order'])test(`transport rejects ${kind}`,()=>{let lines=encodeTransfer('report',Buffer.from(JSON.stringify({...report,padding:'x'.repeat(5000)})),id);if(kind==='scope')lines[0]=lines[0].replace('moss0022-loopback-synthetic-import-reload','moss0020-three-cycles-reload');if(kind==='identity')lines[0]=lines[0].replace('"runId":"999"','"runId":"998"');if(kind==='missing')lines.splice(1,1);if(kind==='duplicate')lines.splice(2,0,lines[1]);if(kind==='sha')lines[1]=lines[1].slice(0,-1)+(lines[1].endsWith('A')?'B':'A');if(kind==='order')[lines[1],lines[2]]=[lines[2],lines[1]];assert.throws(()=>decodeTransfers(lines.join('\n'),id));}); // 以純記憶體反例核對這項成功或拒絕條件，不把測試替身當成真實操作。
         run: | # 總界30秒，不啟browser或安裝依賴。
           timeout --signal=TERM --kill-after=2s 28s node --input-type=module -e '
           import {mkdir,writeFile,readFile,lstat} from "node:fs/promises"; // 固定離線來源、檔案身份及物化檢查；不執行瀏覽器或外部寫入。 // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
           import {dirname} from "node:path"; // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
           import {createHash} from "node:crypto"; // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
-          const manifest=[{"env":"QA_SOURCE_0","path":"LICENSE","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"env":"QA_SOURCE_1","path":"fixtures/moss0021-synthetic-day2.json","bytes":1106,"sha256":"b9d77aa64759a713aa3e314102626299d7d15e29eac289a7bbd36460cebf5220"},{"env":"QA_SOURCE_2","path":"fixtures/receipt.json","bytes":330,"sha256":"ce4d73ff54c91f6f474731342cbf33a4386e672d590b85d7ca5e663ac568fdbb"},{"env":"QA_SOURCE_3","path":"package-lock.json","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"env":"QA_SOURCE_4","path":"package.json","bytes":392,"sha256":"f0ac519f2f9ff827e77abea1847960536d335a632ff0d622d9ec730e8c704331"},{"env":"QA_SOURCE_5","path":"scripts/check.mjs","bytes":3580,"sha256":"98517d2ab794efed3925e330ee43c0fda884191526408998e04e6e38776afa7f"},{"env":"QA_SOURCE_6","path":"scripts/chooser-lease.mjs","bytes":8070,"sha256":"06ad1b5a0280a44fa0ac945d0bfbbdca2b021a6294524f8644adde5b753a2e39"},{"env":"QA_SOURCE_7","path":"scripts/core.mjs","bytes":10292,"sha256":"405ee32301754f98321a2c65f2c8e84b3d88192627db777f3b22a85ed1a606bf"},{"env":"QA_SOURCE_8","path":"scripts/diagnostics.mjs","bytes":4608,"sha256":"063da03452e3fe7ebfb680c06caf6394639115efc5b6f2d23935e881d83247e5"},{"env":"QA_SOURCE_9","path":"scripts/emit-evidence.mjs","bytes":1987,"sha256":"a865fda7646a03b4c6258cea7efdabb54bbcb197e66cb2ed5200c7038b389b20"},{"env":"QA_SOURCE_10","path":"scripts/fixed-fixture.mjs","bytes":3200,"sha256":"4bc2dd8b9ab82b76c83210f24fed2d47eef7fdb2cd5c16f1e2611aa9e45b5f95"},{"env":"QA_SOURCE_11","path":"scripts/gate.mjs","bytes":2913,"sha256":"e24b7381aa8b3aa4a77adc284dfcc9394e4de45c22763a0cf17923c50e51e353"},{"env":"QA_SOURCE_12","path":"scripts/import-dom.mjs","bytes":6261,"sha256":"f4bd292eb46769b9ac44a0d9891a3f03fd7e39685fe8629afcecc60f17ff233c"},{"env":"QA_SOURCE_13","path":"scripts/log-transfer.mjs","bytes":9749,"sha256":"20b5ba0e68f3e3a33f5060438f6c3b226a6c44f28721e952e33837d123f6ce1a"},{"env":"QA_SOURCE_14","path":"scripts/moss-navigation.mjs","bytes":4972,"sha256":"7a2df7a01edbc1f994b1ea9908a102a769ad0f9f4e01c850ae60508e9e931271"},{"env":"QA_SOURCE_15","path":"scripts/native.mjs","bytes":22443,"sha256":"644178e682a32804f5ac2f749b87159a7e7c8706bf3acd8ac1a090a2a68ee619"},{"env":"QA_SOURCE_16","path":"scripts/playwright-adapter.mjs","bytes":3620,"sha256":"a1e9dbf67e64ee5fba66b18aa13a2da286cf6b8caad9dda2fd78d3eed94d440e"},{"env":"QA_SOURCE_17","path":"scripts/private-privacy.mjs","bytes":277,"sha256":"b7ee4a24ff45dba14726309450aa19d4a5312dfede5af745647f13b483b278b2"},{"env":"QA_SOURCE_18","path":"scripts/private-report.mjs","bytes":2376,"sha256":"ee08181dea9295ac06b9edacc01b3b21e1f3d74fb7373b5c53461ec937eb1d46"},{"env":"QA_SOURCE_19","path":"scripts/probe.mjs","bytes":17537,"sha256":"c3eec3c03c5e788281a96e420b252e2a2b26c3c20d1b59e48dcc306bd91e3aba"},{"env":"QA_SOURCE_20","path":"scripts/scenario-health.mjs","bytes":1400,"sha256":"1f052168e806d84fdb0a178f089c82844e69fb5f2828adb61d9e69c167791c0c"},{"env":"QA_SOURCE_21","path":"scripts/scenario.mjs","bytes":11285,"sha256":"d8eb097c38e84e8ea5a7eabf424101b52e21977a7e0f60a1c2ee72e2713c082a"},{"env":"QA_SOURCE_22","path":"scripts/select-scenario.mjs","bytes":809,"sha256":"0619a2f12975ba349712c341e9dfd798cd858e815df6137dcae7a346d772c5ff"},{"env":"QA_SOURCE_23","path":"scripts/snapshot-lease.mjs","bytes":4212,"sha256":"0fa2fde72b476d9ed5f650d18c477b210abec09c63eeeea4deb447d9467a97e9"},{"env":"QA_SOURCE_24","path":"tests/chooser-lease.test.mjs","bytes":9814,"sha256":"f3c0ac52d5e3d4af68fe7d4a6301b6290fe697bea65e0b9e7b68d0637de22e25"},{"env":"QA_SOURCE_25","path":"tests/dom-node.mjs","bytes":1204,"sha256":"4e659daa1eefbb3d9641977fee484e545632773e2516303926ca71acf749b34b"},{"env":"QA_SOURCE_26","path":"tests/dom.test.mjs","bytes":3209,"sha256":"78ecc30891098373c98fe153b8b14f4f6a9071b03d2d6bb2f6af900c782a5eb2"},{"env":"QA_SOURCE_27","path":"tests/final-seal.test.mjs","bytes":10630,"sha256":"6d8ccc1968e052145fff32cfb32a0a26e67e96d64cfd420f5d1c336ab02ff6c0"},{"env":"QA_SOURCE_28","path":"tests/native.test.mjs","bytes":23770,"sha256":"23d7ba650a5847c780c22f91fed98de44362efd6b8084799b07693afca393d65"},{"env":"QA_SOURCE_29","path":"tests/navigation.test.mjs","bytes":9006,"sha256":"335e45ef72920763c09f292dc67ea4427833d886399929076c73aac388c1d9d7"},{"env":"QA_SOURCE_30","path":"tests/scenario.test.mjs","bytes":7927,"sha256":"8ba2ceae3ef55c593db82e0abf03383f3506f77b8bb37399cc3371800287f50c"},{"env":"QA_SOURCE_31","path":"tests/snapshot-lease.test.mjs","bytes":11396,"sha256":"93fd38668c2e836c931c6292a1bad63dbe1edd00a3acdb5c8d6d8d574dacab1c"},{"env":"QA_SOURCE_32","path":"tests/transport.test.mjs","bytes":2606,"sha256":"dba8aa60bcb44d63503e80adaa9e597f0e41d17f151fe4e07025329c7b9f34fe"}]; // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
+          const manifest=[{"env":"QA_SOURCE_0","path":"LICENSE","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"env":"QA_SOURCE_1","path":"fixtures/moss0021-synthetic-day2.json","bytes":1106,"sha256":"b9d77aa64759a713aa3e314102626299d7d15e29eac289a7bbd36460cebf5220"},{"env":"QA_SOURCE_2","path":"fixtures/receipt.json","bytes":330,"sha256":"ce4d73ff54c91f6f474731342cbf33a4386e672d590b85d7ca5e663ac568fdbb"},{"env":"QA_SOURCE_3","path":"package-lock.json","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"env":"QA_SOURCE_4","path":"package.json","bytes":392,"sha256":"f0ac519f2f9ff827e77abea1847960536d335a632ff0d622d9ec730e8c704331"},{"env":"QA_SOURCE_5","path":"scripts/check.mjs","bytes":3580,"sha256":"98517d2ab794efed3925e330ee43c0fda884191526408998e04e6e38776afa7f"},{"env":"QA_SOURCE_6","path":"scripts/chooser-lease.mjs","bytes":8010,"sha256":"7e4be71079929baf2ede65c2df6d7d33a2e10686cf3a23abb40f642a64c63947"},{"env":"QA_SOURCE_7","path":"scripts/core.mjs","bytes":10316,"sha256":"74233b61d94f2dba0f47d10e0ab18686c5be8bd3bdfd934945d6d20b192aae7c"},{"env":"QA_SOURCE_8","path":"scripts/diagnostics.mjs","bytes":4608,"sha256":"063da03452e3fe7ebfb680c06caf6394639115efc5b6f2d23935e881d83247e5"},{"env":"QA_SOURCE_9","path":"scripts/emit-evidence.mjs","bytes":1987,"sha256":"a865fda7646a03b4c6258cea7efdabb54bbcb197e66cb2ed5200c7038b389b20"},{"env":"QA_SOURCE_10","path":"scripts/fetch-runtime.mjs","bytes":7102,"sha256":"375ea406deca2e14cfd17d98a971ff52caaba7c68b3d8194cdd195cb539578d6"},{"env":"QA_SOURCE_11","path":"scripts/fixed-fixture.mjs","bytes":3200,"sha256":"4bc2dd8b9ab82b76c83210f24fed2d47eef7fdb2cd5c16f1e2611aa9e45b5f95"},{"env":"QA_SOURCE_12","path":"scripts/gate.mjs","bytes":2913,"sha256":"e24b7381aa8b3aa4a77adc284dfcc9394e4de45c22763a0cf17923c50e51e353"},{"env":"QA_SOURCE_13","path":"scripts/import-dom.mjs","bytes":6261,"sha256":"f4bd292eb46769b9ac44a0d9891a3f03fd7e39685fe8629afcecc60f17ff233c"},{"env":"QA_SOURCE_14","path":"scripts/log-transfer.mjs","bytes":9758,"sha256":"2ef41902dc1561e761bca2f7ea6d1d5c7034b7b911edf087a4c5152c41ea0f04"},{"env":"QA_SOURCE_15","path":"scripts/loopback.mjs","bytes":11528,"sha256":"0c3cdc602c2681e0f9ea220eda3cf84845bd7d0e7c17929a11706e24d57c82d3"},{"env":"QA_SOURCE_16","path":"scripts/moss-navigation.mjs","bytes":4972,"sha256":"7a2df7a01edbc1f994b1ea9908a102a769ad0f9f4e01c850ae60508e9e931271"},{"env":"QA_SOURCE_17","path":"scripts/native.mjs","bytes":22479,"sha256":"1b0cb6a2d341ad3e7eddecfb02209d11d366dc1c2a700d5d40df2e816ca483d5"},{"env":"QA_SOURCE_18","path":"scripts/playwright-adapter.mjs","bytes":3620,"sha256":"a1e9dbf67e64ee5fba66b18aa13a2da286cf6b8caad9dda2fd78d3eed94d440e"},{"env":"QA_SOURCE_19","path":"scripts/private-privacy.mjs","bytes":277,"sha256":"b7ee4a24ff45dba14726309450aa19d4a5312dfede5af745647f13b483b278b2"},{"env":"QA_SOURCE_20","path":"scripts/private-report.mjs","bytes":2376,"sha256":"ee08181dea9295ac06b9edacc01b3b21e1f3d74fb7373b5c53461ec937eb1d46"},{"env":"QA_SOURCE_21","path":"scripts/probe.mjs","bytes":18828,"sha256":"33888a0cb706eb8f63ec191beee909863a7e17dc187055effd41f93d76e892d6"},{"env":"QA_SOURCE_22","path":"scripts/runtime-contract.mjs","bytes":360,"sha256":"bb557725500263d7ede8936cb9771e2402ba53ab63d5315440c5c6766e6257ae"},{"env":"QA_SOURCE_23","path":"scripts/runtime-package.mjs","bytes":1510,"sha256":"9462c5972698c0863a7236826d8a4b27150402de71f5dcaaeeb030dad8ac7c91"},{"env":"QA_SOURCE_24","path":"scripts/runtime-receipt.json","bytes":17977,"sha256":"d81d196f43b76b205a9a72501c3a4bcbfd2311d1462c50f6be9b1d472754aa6a"},{"env":"QA_SOURCE_25","path":"scripts/runtime-source.mjs","bytes":1128,"sha256":"8a1132f4432709354a1271551335b4bc429182d7102c751342f1b7d21d6055cc"},{"env":"QA_SOURCE_26","path":"scripts/scenario-health.mjs","bytes":1400,"sha256":"1f052168e806d84fdb0a178f089c82844e69fb5f2828adb61d9e69c167791c0c"},{"env":"QA_SOURCE_27","path":"scripts/scenario.mjs","bytes":11264,"sha256":"6ba6ab86902b3a30c69606d8383463ada0888049db93d6b17a636704de3c0165"},{"env":"QA_SOURCE_28","path":"scripts/select-scenario.mjs","bytes":818,"sha256":"74c025c2becacf61ab96d0911a2b00b45a5089de85de66c52f99151034428c2b"},{"env":"QA_SOURCE_29","path":"scripts/shared-cleanup.mjs","bytes":2219,"sha256":"cd7e0f0566b3d4e51957c658e7535bd45f5ce554addc244ad68550e6843b72b7"},{"env":"QA_SOURCE_30","path":"scripts/snapshot-lease.mjs","bytes":4212,"sha256":"0fa2fde72b476d9ed5f650d18c477b210abec09c63eeeea4deb447d9467a97e9"},{"env":"QA_SOURCE_31","path":"tests/chooser-lease.test.mjs","bytes":9814,"sha256":"f3c0ac52d5e3d4af68fe7d4a6301b6290fe697bea65e0b9e7b68d0637de22e25"},{"env":"QA_SOURCE_32","path":"tests/dom-node.mjs","bytes":1204,"sha256":"4e659daa1eefbb3d9641977fee484e545632773e2516303926ca71acf749b34b"},{"env":"QA_SOURCE_33","path":"tests/dom.test.mjs","bytes":3209,"sha256":"78ecc30891098373c98fe153b8b14f4f6a9071b03d2d6bb2f6af900c782a5eb2"},{"env":"QA_SOURCE_34","path":"tests/final-seal.test.mjs","bytes":10630,"sha256":"6d8ccc1968e052145fff32cfb32a0a26e67e96d64cfd420f5d1c336ab02ff6c0"},{"env":"QA_SOURCE_35","path":"tests/native.test.mjs","bytes":23788,"sha256":"90bd2597d0fc9ca7f00a0a8e566dc05c8b4f4d53b5ea20330bb1d4c1621611ff"},{"env":"QA_SOURCE_36","path":"tests/navigation.test.mjs","bytes":9006,"sha256":"335e45ef72920763c09f292dc67ea4427833d886399929076c73aac388c1d9d7"},{"env":"QA_SOURCE_37","path":"tests/scenario.test.mjs","bytes":7927,"sha256":"8ba2ceae3ef55c593db82e0abf03383f3506f77b8bb37399cc3371800287f50c"},{"env":"QA_SOURCE_38","path":"tests/shared-cleanup.test.mjs","bytes":2896,"sha256":"6f22883efee266e8a8381470f1a4eb08650e14263f46ee26e22145d4f0b5af46"},{"env":"QA_SOURCE_39","path":"tests/snapshot-lease.test.mjs","bytes":11396,"sha256":"93fd38668c2e836c931c6292a1bad63dbe1edd00a3acdb5c8d6d8d574dacab1c"},{"env":"QA_SOURCE_40","path":"tests/transport.test.mjs","bytes":2624,"sha256":"73afe19722120215e69c77b0a5672568a76011e8e14f3a7dc19d2f7f8c7543eb"}]; // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
           const keys=Object.keys(process.env).filter(key=>/^QA_SOURCE_/.test(key)).sort(); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
           if(JSON.stringify(keys)!==JSON.stringify(manifest.map(x=>x.env).sort()))throw new Error("payload-env-allowlist"); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
           for(const entry of manifest){ // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
-           if(!/^(?:LICENSE|package(?:-lock)?\.json|(?:scripts|tests)\/[a-z0-9.-]+\.mjs|fixtures\/[a-z0-9.-]+\.json)$/.test(entry.path))throw new Error("payload-path"); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
+           if(!/^(?:scripts\/runtime-receipt\.json|LICENSE|package(?:-lock)?\.json|(?:scripts|tests)\/[a-z0-9.-]+\.mjs|fixtures\/[a-z0-9.-]+\.json)$/.test(entry.path))throw new Error("payload-path"); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
            const bytes=Buffer.from(process.env[entry.env],"utf8"); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
            if(bytes.length!==entry.bytes||createHash("sha256").update(bytes).digest("hex")!==entry.sha256)throw new Error("payload-integrity"); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
            await mkdir(dirname(entry.path),{recursive:true}); // 固定白名單逐檔物化與完整性驗證；不啟動瀏覽器或取得任意路徑。
@@ -949,6 +1656,8 @@ jobs: # 只有一個標準runner job。
           '
       - name: Cheap gates and pure mocks first # 先便宜否證，不通過就不下載套件或browser。
         run: timeout --signal=TERM --kill-after=2s 58s bash -c 'node scripts/gate.mjs && node scripts/select-scenario.mjs && npm run check && npm test' # 全部語法／mock只用記憶體，不連網或建立真PNG。
+      - name: Fetch and verify one pinned runtime package # 新能力待獨審批准，固定commit未讀回即零請求停止。
+        run: timeout --signal=TERM --kill-after=2s 28s node scripts/fetch-runtime.mjs # 取包及101檔完整驗證共30秒，不redirect、不retry、不用憑證。
       - name: Install exact official test dependency # 僅公開npmregistry的兩個鎖版套件。
         run: timeout --signal=TERM --kill-after=3s 117s npm ci --ignore-scripts --no-audit --no-fund # 不執行依賴安裝script，不配置登入token。
       - name: Install only official Ubuntu CJK font # 僅字型與fontconfig既有快取觸發，不裝browser或改任何安全設定。
