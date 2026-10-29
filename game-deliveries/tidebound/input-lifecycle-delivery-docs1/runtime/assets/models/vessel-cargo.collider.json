@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.vessel.cargo",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "capsule",
+      "radius": 2.5,
+      "length": 8,
+      "axis": "z",
+      "center": [
+        0,
+        0,
+        -0.7
+      ]
+    }
+  ]
+}

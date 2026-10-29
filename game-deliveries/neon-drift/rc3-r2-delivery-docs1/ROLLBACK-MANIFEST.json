@@ -1,0 +1,99 @@
+{
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": "THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+    },
+    {
+      "path": "assets/audio/click.wav",
+      "bytes": 4014,
+      "sha256": "1a7d2ccdf0c78008d27024a647019653fce6b3f5e1e5f433f84c8e7f752cf8e3"
+    },
+    {
+      "path": "assets/audio/impact.wav",
+      "bytes": 10628,
+      "sha256": "d6ddf32baf73bb9020756d3f27b1bdfcef5c80caae492c6dbdf3a6a96c93541b"
+    },
+    {
+      "path": "assets/audio/music.wav",
+      "bytes": 814198,
+      "sha256": "1b8454184a57685f9eff4720aad9f26d92583038b49ddf2508fc7fee452c19f6"
+    },
+    {
+      "path": "assets/audio/success.wav",
+      "bytes": 61784,
+      "sha256": "52d177250059ea3f8a689aa8226ddac9607499089fead724ddd66db7b783c37b"
+    },
+    {
+      "path": "assets/colliders/comet.json",
+      "bytes": 696,
+      "sha256": "e4e934cdc7ef416d0ccf203904c556e362b4b072d801b8651f0a824716bf9b0f"
+    },
+    {
+      "path": "assets/colliders/phantom.json",
+      "bytes": 638,
+      "sha256": "fc0778c0e3a401c56e5d87f7afd04ad91a652bb86391be03faedd24d2049b4ca"
+    },
+    {
+      "path": "assets/colliders/stinger.json",
+      "bytes": 638,
+      "sha256": "9984d1555965d8ad75eae2670d93655941e5cfb974b80e31438c0b77e82b9bef"
+    },
+    {
+      "path": "assets/models/comet.gltf",
+      "bytes": 129785,
+      "sha256": "0394a54b95585d93b5430c1dddf1148398b1616f783e237c36c622eff6398e9a"
+    },
+    {
+      "path": "assets/models/dock-warehouse.gltf",
+      "bytes": 4980,
+      "sha256": "7132ca37cf6b68f7621503fb1fc7469fbbad0b9d94acd50127ae5aef9d993334"
+    },
+    {
+      "path": "assets/models/highway-tower.gltf",
+      "bytes": 4974,
+      "sha256": "17ddc06c685b6655cc269c8b4bb91ef4c193718a9182e820772444ebbdb32545"
+    },
+    {
+      "path": "assets/models/oldtown-shop.gltf",
+      "bytes": 4972,
+      "sha256": "f0108d0e1f0f64ea3e051b02ae6abb40b669b134d5b1ecf674d0baac234a58b0"
+    },
+    {
+      "path": "assets/models/phantom.gltf",
+      "bytes": 129696,
+      "sha256": "01329e7e1367d469a72a0e8b0f76373deb8dcd69f20b9bb7f78d29c62b8cc4fe"
+    },
+    {
+      "path": "assets/models/stinger.gltf",
+      "bytes": 129744,
+      "sha256": "096ae2f40c50891cd2ca941ee4b2d6727fe3346f8bf9612fd9fcbda46562b787"
+    },
+    {
+      "path": "game.js",
+      "bytes": 828657,
+      "sha256": "cf8cb0a59603bb924d62bb451ad13da340d4af60e2b3be059328b0fc41508885"
+    },
+    {
+      "path": "index.html",
+      "bytes": 5137,
+      "sha256": "2250d933784855de9fbb252d7072074164e6fa6b1032b2da98271d20fd0d5640"
+    },
+    {
+      "path": "release.json",
+      "bytes": 1138,
+      "sha256": "5f2254b6e15e0d27f01cb804809bee33645174b01897daba3ef475a9ff2b57fb"
+    },
+    {
+      "path": "style.css",
+      "bytes": 18346,
+      "sha256": "ed72fdae14ac6752afa817f32e5b2caefd69b7d932ce93f860e617df6eef589a"
+    }
+  ]
+}

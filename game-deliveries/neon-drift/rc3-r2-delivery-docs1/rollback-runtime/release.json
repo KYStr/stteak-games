@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "gameId": "neon-drift",
+  "buildId": "neon-drift-race-persistence-20261028-rc2",
+  "version": "1.0.14-rc.2",
+  "channel": "isolated-unpublished-release-candidate",
+  "preparedDate": "2026-10-28",
+  "entry": "index.html",
+  "sourceMainSha256": "0b077c3ba947afd2f5dd42a9f65fece9354ed6a7c2b9ede4e6608c5fd469f3cf",
+  "bundleSha256": "cf8cb0a59603bb924d62bb451ad13da340d4af60e2b3be059328b0fc41508885",
+  "baselineBuildId": "neon-drift-input-lifecycle-20261028-rc1",
+  "baselineBundleSha256": "74d0c819557ba8eaf3be7958d260b4cd05b79f2f4d05b6a9aef581edce14b686",
+  "changeScope": "Result persistence messaging only; no physics/storage/input changes.",
+  "acceptance": {
+    "portableTests": "PASS 85/85",
+    "wholeMainProgression": "PASS 15/15 CPU fixture",
+    "GUI": "NOT_RUN",
+    "physicalTouch": "NOT_RUN",
+    "audioListening": "NOT_RUN",
+    "GPUAndPerformance": "NOT_RUN",
+    "browserBFCache": "NOT_RUN",
+    "priorGUIPassInherited": false,
+    "independentReview": "PENDING"
+  },
+  "publication": "NOT_PERFORMED",
+  "rollbackBundleSha256": "74d0c819557ba8eaf3be7958d260b4cd05b79f2f4d05b6a9aef581edce14b686"
+}

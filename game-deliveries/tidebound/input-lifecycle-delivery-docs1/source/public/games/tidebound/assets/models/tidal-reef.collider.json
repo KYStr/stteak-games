@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.environment.reef",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "box",
+      "size": [
+        6.6964,
+        3.3931,
+        8.3658
+      ],
+      "center": [
+        0.2617,
+        -0.8074,
+        -0.3354
+      ],
+      "purpose": "interchange-only; live world collisions use world.js island/reef volumes"
+    }
+  ]
+}

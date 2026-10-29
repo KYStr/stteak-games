@@ -1,0 +1,19 @@
+{
+  "name": "stteak-eight-games",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Eight original browser-game source projects; public source snapshot, not QA acceptance.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "setup": "node scripts/public.mjs setup",
+    "build": "node scripts/public.mjs build",
+    "bundle": "node scripts/public.mjs bundle",
+    "test": "node scripts/public.mjs test",
+    "dev": "node scripts/public.mjs serve",
+    "test:release": "node --test tests/public-release.test.mjs"
+  }
+}

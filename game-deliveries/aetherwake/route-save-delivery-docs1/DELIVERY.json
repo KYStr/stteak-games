@@ -1,0 +1,14 @@
+{
+  "candidateId": "aetherwake-route-save-20261028-01-delivery-docs.1",
+  "basedOnCandidateId": "aetherwake-route-save-20261028-01",
+  "runtimeBuildId": "aetherwake-route-save-20261028-01",
+  "runtimeVersion": "1.0.0-rc.7-input.2-continuity.2-route.1",
+  "runtimeAggregate": "9a9712e5f59e54d31acc1402e3a05ba80f8a407e454911c450313d47877a0ca9",
+  "scope": "Documentation and delivery-only helper scripts. No production code, gameplay, dependency lock, assets or runtime changes.",
+  "maintainabilityDefectsAddressed": ["AW-M10-DOC-001", "AW-M10-DOC-002"],
+  "sourceCommit": null,
+  "candidateUrl": null,
+  "independentReview": null,
+  "scores": null,
+  "publication": "NOT_RUN"
+}

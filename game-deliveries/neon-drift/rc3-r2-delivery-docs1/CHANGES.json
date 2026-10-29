@@ -1,0 +1,37 @@
+{
+  "changes": {
+    "candidate": {
+      "modified": [
+        "README.md"
+      ],
+      "added": [
+        "assets/games/neon-drift/generation/vehicle-kit.md",
+        "docs/ASSETS-AND-RIGHTS.md",
+        "docs/DELIVERY.md",
+        "docs/DEVELOPMENT.md"
+      ],
+      "unchanged": 65
+    },
+    "runtime": {
+      "modified": [
+        "release.json"
+      ],
+      "added": [],
+      "unchanged": 18
+    },
+    "rollback-runtime": {
+      "modified": [],
+      "added": [],
+      "unchanged": 19
+    }
+  },
+  "counts": {
+    "candidate": 70,
+    "runtime": 19,
+    "rollback-runtime": 19
+  },
+  "relativeLinksVerified": 8,
+  "noGameplayChanges": true,
+  "noProductTestsRun": true,
+  "noDependencyInstall": true
+}

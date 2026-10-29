@@ -1,0 +1,640 @@
+{
+  "schemaVersion": 1,
+  "gameId": "neon-drift",
+  "version": "1.0.0",
+  "generatedAt": "2026-10-25",
+  "sourceRecipe": "../../../games/neon-drift/tools/generate-assets.mjs",
+  "runtimeBase": "public/games/neon-drift/assets/",
+  "coordinateContract": {
+    "unit": "meter",
+    "up": "+Y",
+    "forward": "+Z",
+    "pivot": "road-center for cars; base-center for scenery"
+  },
+  "assets": [
+    {
+      "id": "neon-drift.vehicle.comet",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/comet.gltf",
+        "colliders/comet.json"
+      ],
+      "sha256": {
+        "models/comet.gltf": "0394a54b95585d93b5430c1dddf1148398b1616f783e237c36c622eff6398e9a",
+        "colliders/comet.json": "e4e934cdc7ef416d0ccf203904c556e362b4b072d801b8651f0a824716bf9b0f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "road-center",
+        "dimensions": [
+          2.298,
+          1.3625,
+          4.425
+        ],
+        "triangles": 964,
+        "meshes": 47,
+        "collision": "colliders/comet.json",
+        "materialSlots": [
+          "paint",
+          "glass",
+          "trim",
+          "rubber",
+          "rim",
+          "headlight",
+          "brake",
+          "decal"
+        ],
+        "uv": "Generated UVs on body/cabin and Three.js primitive UVs on modular pieces.",
+        "rig": "Rigid vehicle hierarchy, no skin skeleton; wheel-front-left/right and wheel-rear-left/right are explicit mounting groups.",
+        "animations": [
+          {
+            "name": "wheel-spin",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "steer-left",
+            "duration": 0.25,
+            "loop": false,
+            "rootMotion": false
+          }
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 964,
+            "distance": 0
+          },
+          {
+            "level": 1,
+            "policy": "Ghost uses identical reusable geometry with transparent material; no extra vehicle topology."
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "textures": "No external texture dependency. PBR base colors, metalness, roughness and emissive slots."
+      },
+      "budget": {
+        "runtimeBytes": 130481,
+        "maxSimultaneousInstances": 2
+      },
+      "reuse": {
+        "tags": [
+          "original",
+          "vehicle",
+          "rigid",
+          "paintable",
+          "wheel-mounts"
+        ],
+        "compatibleWith": [
+          "neon-vehicle-rigid-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.170.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "neon-drift.vehicle.stinger",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/stinger.gltf",
+        "colliders/stinger.json"
+      ],
+      "sha256": {
+        "models/stinger.gltf": "096ae2f40c50891cd2ca941ee4b2d6727fe3346f8bf9612fd9fcbda46562b787",
+        "colliders/stinger.json": "9984d1555965d8ad75eae2670d93655941e5cfb974b80e31438c0b77e82b9bef"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "road-center",
+        "dimensions": [
+          2.199,
+          1.5525,
+          3.9056
+        ],
+        "triangles": 964,
+        "meshes": 47,
+        "collision": "colliders/stinger.json",
+        "materialSlots": [
+          "paint",
+          "glass",
+          "trim",
+          "rubber",
+          "rim",
+          "headlight",
+          "brake",
+          "decal"
+        ],
+        "uv": "Generated UVs on body/cabin and Three.js primitive UVs on modular pieces.",
+        "rig": "Rigid vehicle hierarchy, no skin skeleton; wheel-front-left/right and wheel-rear-left/right are explicit mounting groups.",
+        "animations": [
+          {
+            "name": "wheel-spin",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "steer-left",
+            "duration": 0.25,
+            "loop": false,
+            "rootMotion": false
+          }
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 964,
+            "distance": 0
+          },
+          {
+            "level": 1,
+            "policy": "Ghost uses identical reusable geometry with transparent material; no extra vehicle topology."
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "textures": "No external texture dependency. PBR base colors, metalness, roughness and emissive slots."
+      },
+      "budget": {
+        "runtimeBytes": 130382,
+        "maxSimultaneousInstances": 2
+      },
+      "reuse": {
+        "tags": [
+          "original",
+          "vehicle",
+          "rigid",
+          "paintable",
+          "wheel-mounts"
+        ],
+        "compatibleWith": [
+          "neon-vehicle-rigid-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.170.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "neon-drift.vehicle.phantom",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/phantom.gltf",
+        "colliders/phantom.json"
+      ],
+      "sha256": {
+        "models/phantom.gltf": "01329e7e1367d469a72a0e8b0f76373deb8dcd69f20b9bb7f78d29c62b8cc4fe",
+        "colliders/phantom.json": "fc0778c0e3a401c56e5d87f7afd04ad91a652bb86391be03faedd24d2049b4ca"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "road-center",
+        "dimensions": [
+          2.408,
+          1.2725,
+          4.8464
+        ],
+        "triangles": 964,
+        "meshes": 47,
+        "collision": "colliders/phantom.json",
+        "materialSlots": [
+          "paint",
+          "glass",
+          "trim",
+          "rubber",
+          "rim",
+          "headlight",
+          "brake",
+          "decal"
+        ],
+        "uv": "Generated UVs on body/cabin and Three.js primitive UVs on modular pieces.",
+        "rig": "Rigid vehicle hierarchy, no skin skeleton; wheel-front-left/right and wheel-rear-left/right are explicit mounting groups.",
+        "animations": [
+          {
+            "name": "wheel-spin",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "steer-left",
+            "duration": 0.25,
+            "loop": false,
+            "rootMotion": false
+          }
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 964,
+            "distance": 0
+          },
+          {
+            "level": 1,
+            "policy": "Ghost uses identical reusable geometry with transparent material; no extra vehicle topology."
+          }
+        ],
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "textures": "No external texture dependency. PBR base colors, metalness, roughness and emissive slots."
+      },
+      "budget": {
+        "runtimeBytes": 130334,
+        "maxSimultaneousInstances": 2
+      },
+      "reuse": {
+        "tags": [
+          "original",
+          "vehicle",
+          "rigid",
+          "paintable",
+          "wheel-mounts"
+        ],
+        "compatibleWith": [
+          "neon-vehicle-rigid-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.170.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "neon-drift.environment.dock-warehouse",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/dock-warehouse.gltf"
+      ],
+      "sha256": {
+        "models/dock-warehouse.gltf": "7132ca37cf6b68f7621503fb1fc7469fbbad0b9d94acd50127ae5aef9d993334"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          21.35,
+          9.22,
+          13.35
+        ],
+        "triangles": 24,
+        "collision": "Static scenery exclusion outside drivable corridor and camera clearance; not drivable.",
+        "materialSlots": [
+          "structure",
+          "neon"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 24,
+            "distance": 0
+          },
+          {
+            "level": 1,
+            "triangles": 12,
+            "distance": 220,
+            "removedMesh": "neon-cornice",
+            "policy": "compact-visible-instances"
+          }
+        ],
+        "runtimeDetailLod": {
+          "windowBands": {
+            "distance": 170,
+            "source": "runtime-procedural",
+            "policy": "compact-visible-instances"
+          }
+        },
+        "textureColorSpace": {
+          "baseColor": "sRGB"
+        },
+        "grid": 1
+      },
+      "budget": {
+        "runtimeBytes": 4980,
+        "maxSimultaneousInstances": 160
+      },
+      "reuse": {
+        "tags": [
+          "modular",
+          "district",
+          "instancing"
+        ],
+        "compatibleWith": [
+          "neon-city-grid-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.170.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "neon-drift.environment.highway-tower",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/highway-tower.gltf"
+      ],
+      "sha256": {
+        "models/highway-tower.gltf": "17ddc06c685b6655cc269c8b4bb91ef4c193718a9182e820772444ebbdb32545"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          13.35,
+          38.22,
+          13.35
+        ],
+        "triangles": 24,
+        "collision": "Static scenery exclusion outside drivable corridor and camera clearance; not drivable.",
+        "materialSlots": [
+          "structure",
+          "neon"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 24,
+            "distance": 0
+          },
+          {
+            "level": 1,
+            "triangles": 12,
+            "distance": 220,
+            "removedMesh": "neon-cornice",
+            "policy": "compact-visible-instances"
+          }
+        ],
+        "runtimeDetailLod": {
+          "windowBands": {
+            "distance": 170,
+            "source": "runtime-procedural",
+            "policy": "compact-visible-instances"
+          }
+        },
+        "textureColorSpace": {
+          "baseColor": "sRGB"
+        },
+        "grid": 1
+      },
+      "budget": {
+        "runtimeBytes": 4974,
+        "maxSimultaneousInstances": 160
+      },
+      "reuse": {
+        "tags": [
+          "modular",
+          "district",
+          "instancing"
+        ],
+        "compatibleWith": [
+          "neon-city-grid-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.170.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "neon-drift.environment.oldtown-shop",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/oldtown-shop.gltf"
+      ],
+      "sha256": {
+        "models/oldtown-shop.gltf": "f0108d0e1f0f64ea3e051b02ae6abb40b669b134d5b1ecf674d0baac234a58b0"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          9.35,
+          9.22,
+          9.35
+        ],
+        "triangles": 24,
+        "collision": "Static scenery exclusion outside drivable corridor and camera clearance; not drivable.",
+        "materialSlots": [
+          "structure",
+          "neon"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "triangles": 24,
+            "distance": 0
+          },
+          {
+            "level": 1,
+            "triangles": 12,
+            "distance": 220,
+            "removedMesh": "neon-cornice",
+            "policy": "compact-visible-instances"
+          }
+        ],
+        "runtimeDetailLod": {
+          "windowBands": {
+            "distance": 170,
+            "source": "runtime-procedural",
+            "policy": "compact-visible-instances"
+          }
+        },
+        "textureColorSpace": {
+          "baseColor": "sRGB"
+        },
+        "grid": 1
+      },
+      "budget": {
+        "runtimeBytes": 4972,
+        "maxSimultaneousInstances": 160
+      },
+      "reuse": {
+        "tags": [
+          "modular",
+          "district",
+          "instancing"
+        ],
+        "compatibleWith": [
+          "neon-city-grid-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.170.0"
+      ],
+      "derivatives": []
+    }
+  ],
+  "budgets": {
+    "initialTransferTargetBytes": 8000000,
+    "maxVehicleInstances": 2,
+    "maxDynamicLights": 4,
+    "shadowMaps": 0,
+    "postprocess": "ACES tone mapping; no full-screen bloom or reflection pass",
+    "textureBytesDecoded": 0,
+    "geometryPolicy": "Instanced road furniture and buildings. Window and roof detail removed at 170/220 m; coarse skyline boxes cull at 280/440 m by quality. No sprite replacement for core objects."
+  },
+  "presentationContract": {
+    "source": "games/neon-drift/src/presentation.js",
+    "lod": {
+      "rooflines": 220,
+      "windowBands": 170,
+      "skylineLow": 280,
+      "skylineDefault": 440
+    }
+  },
+  "proceduralSources": [
+    {
+      "id": "neon-drift.road-kit",
+      "source": "games/neon-drift/src/renderer.js",
+      "sha256": "8c1845d493278ed310c96f1eafbb7fc68432b13a4d7ec2bbe9173026cb633c71",
+      "bytes": 36078,
+      "description": "Editable road ribbons, ramps, 3D curbs, armco, posts, road details (lane paint / kerbs / guide lamps / chevrons / puddles / start checkers / drain grates), contact shadows and district instancing. Bundled into runtime game.js.",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      }
+    },
+    {
+      "id": "neon-drift.track-layouts",
+      "source": "games/neon-drift/src/content.js",
+      "sha256": "1e94a18b886ef2eb4b2eba3afa8d4f945b6bbc540c8fd833b3cc1dc71c787d9f",
+      "bytes": 7905,
+      "description": "Three authored closed courses with elevation, width, checkpoint distances and optional legal offset corridors. Also supplies independent collision and recovery coordinates.",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      }
+    },
+    {
+      "id": "neon-drift.presentation",
+      "source": "games/neon-drift/src/presentation.js",
+      "sha256": "9ff791f277e14f01a2d585f185bb7b9565d361d94e0bd85ff7234c24e4cbd238",
+      "bytes": 1366,
+      "description": "Shared data-driven menu/theme and exact distance-culling contract; not GPU measurements.",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      }
+    },
+    {
+      "id": "neon-drift.vehicle-kit",
+      "source": "assets/games/neon-drift/sources/models.js",
+      "sha256": "146f8fe5cff7f1976406331b1211068c3d8fe86d75a4cafc3b588b70063d7959",
+      "bytes": 7393,
+      "description": "Three original rigid vehicle bodies, wheel mounts, light modules, material slots and three geometric decal patterns.",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Neon Drift Maker / 3D asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.170.0 GLTFExporter / Node.js",
+        "promptRecord": "generation/vehicle-kit.md",
+        "referenceSources": [],
+        "rights": "Original project geometry and material design. Distributed with the project; no third-party models, textures, logos or fonts."
+      }
+    }
+  ]
+}

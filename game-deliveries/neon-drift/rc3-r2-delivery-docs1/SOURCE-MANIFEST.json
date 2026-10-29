@@ -1,0 +1,354 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 1984,
+      "sha256": "ec6135604a87cde474941f690b287e0891463bd2381ea968a6a0fee9563a670f"
+    },
+    {
+      "path": "assets/games/neon-drift/audio-manifest.json",
+      "bytes": 4068,
+      "sha256": "1d2b1e7ff505628dafed370baf8a9a0ea86f27dd7215bc44ae36b2f7509a07e6"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/audio/click.wav",
+      "bytes": 4014,
+      "sha256": "1a7d2ccdf0c78008d27024a647019653fce6b3f5e1e5f433f84c8e7f752cf8e3"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/audio/impact.wav",
+      "bytes": 10628,
+      "sha256": "d6ddf32baf73bb9020756d3f27b1bdfcef5c80caae492c6dbdf3a6a96c93541b"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/audio/music.wav",
+      "bytes": 814198,
+      "sha256": "1b8454184a57685f9eff4720aad9f26d92583038b49ddf2508fc7fee452c19f6"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/audio/success.wav",
+      "bytes": 61784,
+      "sha256": "52d177250059ea3f8a689aa8226ddac9607499089fead724ddd66db7b783c37b"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/colliders/comet.json",
+      "bytes": 696,
+      "sha256": "e4e934cdc7ef416d0ccf203904c556e362b4b072d801b8651f0a824716bf9b0f"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/colliders/phantom.json",
+      "bytes": 638,
+      "sha256": "fc0778c0e3a401c56e5d87f7afd04ad91a652bb86391be03faedd24d2049b4ca"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/colliders/stinger.json",
+      "bytes": 638,
+      "sha256": "9984d1555965d8ad75eae2670d93655941e5cfb974b80e31438c0b77e82b9bef"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/models/comet.gltf",
+      "bytes": 129785,
+      "sha256": "0394a54b95585d93b5430c1dddf1148398b1616f783e237c36c622eff6398e9a"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/models/dock-warehouse.gltf",
+      "bytes": 4980,
+      "sha256": "7132ca37cf6b68f7621503fb1fc7469fbbad0b9d94acd50127ae5aef9d993334"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/models/highway-tower.gltf",
+      "bytes": 4974,
+      "sha256": "17ddc06c685b6655cc269c8b4bb91ef4c193718a9182e820772444ebbdb32545"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/models/oldtown-shop.gltf",
+      "bytes": 4972,
+      "sha256": "f0108d0e1f0f64ea3e051b02ae6abb40b669b134d5b1ecf674d0baac234a58b0"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/models/phantom.gltf",
+      "bytes": 129696,
+      "sha256": "01329e7e1367d469a72a0e8b0f76373deb8dcd69f20b9bb7f78d29c62b8cc4fe"
+    },
+    {
+      "path": "assets/games/neon-drift/generated/models/stinger.gltf",
+      "bytes": 129744,
+      "sha256": "096ae2f40c50891cd2ca941ee4b2d6727fe3346f8bf9612fd9fcbda46562b787"
+    },
+    {
+      "path": "assets/games/neon-drift/generation/vehicle-kit.md",
+      "bytes": 2128,
+      "sha256": "3650fc87f8c085d857d0e3a3b7089612b6a654df5c6091d4de9573d6e349b7d8"
+    },
+    {
+      "path": "assets/games/neon-drift/manifest.json",
+      "bytes": 19804,
+      "sha256": "67953781e54353affb2c377bb0e7d29b06af26489438de72227c603c60db812d"
+    },
+    {
+      "path": "assets/games/neon-drift/sources/audio-score.json",
+      "bytes": 638,
+      "sha256": "0bcf25bf5b4f585b70b7120df5488f74e6c88a0b2d5e2a018d1b31a715ef92c6"
+    },
+    {
+      "path": "assets/games/neon-drift/sources/models.js",
+      "bytes": 7393,
+      "sha256": "146f8fe5cff7f1976406331b1211068c3d8fe86d75a4cafc3b588b70063d7959"
+    },
+    {
+      "path": "docs/ASSETS-AND-RIGHTS.md",
+      "bytes": 2177,
+      "sha256": "3af3bf5dd55ceeaac8ddfa9bba08f4ea73c7ca4d5f5cc8628d5cec7fda709afe"
+    },
+    {
+      "path": "docs/DELIVERY.md",
+      "bytes": 1956,
+      "sha256": "b7c932c6b811c4a8d711979a9ecca1e9baa7010ba3cb40958e034e1a7f613178"
+    },
+    {
+      "path": "docs/DEVELOPMENT.md",
+      "bytes": 3723,
+      "sha256": "20bdc30f3f48862d388eaf821f02a3d948ad549d67935683542e07ff38af0d9f"
+    },
+    {
+      "path": "games/neon-drift/package-lock.json",
+      "bytes": 14260,
+      "sha256": "c437ec3e9d3c2683972fb8ef0e470365aa1575e4a33973516009e45e6a1be12a"
+    },
+    {
+      "path": "games/neon-drift/package.json",
+      "bytes": 388,
+      "sha256": "a845b83048f9766ec5ccaa76ec4b0b139eb5d3f0fcae65690bfc6a19f6a6ea93"
+    },
+    {
+      "path": "games/neon-drift/src/audio.js",
+      "bytes": 6027,
+      "sha256": "618123b1557ec52f4cc2d9d8be1a270c38f35b8bfe64e22eda2d95d169254352"
+    },
+    {
+      "path": "games/neon-drift/src/bridge.js",
+      "bytes": 1539,
+      "sha256": "dfad3431df7775a67471bd62a0c90dc4854f28bdf08c6cd5d00bf2c21712191e"
+    },
+    {
+      "path": "games/neon-drift/src/content.js",
+      "bytes": 7905,
+      "sha256": "1e94a18b886ef2eb4b2eba3afa8d4f945b6bbc540c8fd833b3cc1dc71c787d9f"
+    },
+    {
+      "path": "games/neon-drift/src/frame-history.js",
+      "bytes": 1063,
+      "sha256": "b5d753d5f781e94b0e9268f3b4207e46b096381b1f107302bab7b47d2f4225bb"
+    },
+    {
+      "path": "games/neon-drift/src/index.html",
+      "bytes": 5137,
+      "sha256": "2250d933784855de9fbb252d7072074164e6fa6b1032b2da98271d20fd0d5640"
+    },
+    {
+      "path": "games/neon-drift/src/input.js",
+      "bytes": 3295,
+      "sha256": "500cc8481f10d0007bf9aa79958a48401f73b6fd949d47b401cf4fa4489908e8"
+    },
+    {
+      "path": "games/neon-drift/src/main.js",
+      "bytes": 40004,
+      "sha256": "b125d9cebba22774a262c1747fdc37019dd68dbd57b248b2df6b9a916fdbd9ce"
+    },
+    {
+      "path": "games/neon-drift/src/notifications.js",
+      "bytes": 867,
+      "sha256": "e452081760ad1171a70d74ef53467f66f90963c133f870c8971e8ee8a2a87df5"
+    },
+    {
+      "path": "games/neon-drift/src/physics.js",
+      "bytes": 14929,
+      "sha256": "ddc38b2ab3c3493133b7917d4b2318fcab49c319112a54a92fa3af8aa66225ed"
+    },
+    {
+      "path": "games/neon-drift/src/presentation.js",
+      "bytes": 1366,
+      "sha256": "9ff791f277e14f01a2d585f185bb7b9565d361d94e0bd85ff7234c24e4cbd238"
+    },
+    {
+      "path": "games/neon-drift/src/profiler.js",
+      "bytes": 5351,
+      "sha256": "1c4c4bb857ded465216c586f864a97c81ce5fe12f16d5576511f6dc078d92b83"
+    },
+    {
+      "path": "games/neon-drift/src/renderer.js",
+      "bytes": 36078,
+      "sha256": "8c1845d493278ed310c96f1eafbb7fc68432b13a4d7ec2bbe9173026cb633c71"
+    },
+    {
+      "path": "games/neon-drift/src/storage.js",
+      "bytes": 9428,
+      "sha256": "6b9b301fa7b7c230197f3449fd94b911896051a4021379c66ba6b12058bd2f0b"
+    },
+    {
+      "path": "games/neon-drift/src/style.css",
+      "bytes": 18346,
+      "sha256": "ed72fdae14ac6752afa817f32e5b2caefd69b7d932ce93f860e617df6eef589a"
+    },
+    {
+      "path": "games/neon-drift/tools/build.mjs",
+      "bytes": 778,
+      "sha256": "a7b87c9d97106e53781e555109432e3f23b9705af46360c5403b7aa76c6431fd"
+    },
+    {
+      "path": "games/neon-drift/tools/generate-assets.mjs",
+      "bytes": 8092,
+      "sha256": "6043a65aa312063023db412a52f4d08c97663d0fd3df54f1cbed28189f88cbad"
+    },
+    {
+      "path": "games/neon-drift/tools/generate-audio.mjs",
+      "bytes": 3424,
+      "sha256": "74d0cdc4a85c065e7964d74b9082aaaaa23155c2becf1ac625c7a0303ed4f57a"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 279,
+      "sha256": "aa5a2ad7312d6281d249956c1de5eed26943740e48db63a0e6fc0b07ee2131f6"
+    },
+    {
+      "path": "package.json",
+      "bytes": 580,
+      "sha256": "2e28d52d6f596775ffbcc4098da239be9de83fac0adc05d2769bbc699e568368"
+    },
+    {
+      "path": "public/games/neon-drift/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": "public/games/neon-drift/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/click.wav",
+      "bytes": 4014,
+      "sha256": "1a7d2ccdf0c78008d27024a647019653fce6b3f5e1e5f433f84c8e7f752cf8e3"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/impact.wav",
+      "bytes": 10628,
+      "sha256": "d6ddf32baf73bb9020756d3f27b1bdfcef5c80caae492c6dbdf3a6a96c93541b"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/music.wav",
+      "bytes": 814198,
+      "sha256": "1b8454184a57685f9eff4720aad9f26d92583038b49ddf2508fc7fee452c19f6"
+    },
+    {
+      "path": "public/games/neon-drift/assets/audio/success.wav",
+      "bytes": 61784,
+      "sha256": "52d177250059ea3f8a689aa8226ddac9607499089fead724ddd66db7b783c37b"
+    },
+    {
+      "path": "public/games/neon-drift/assets/colliders/comet.json",
+      "bytes": 696,
+      "sha256": "e4e934cdc7ef416d0ccf203904c556e362b4b072d801b8651f0a824716bf9b0f"
+    },
+    {
+      "path": "public/games/neon-drift/assets/colliders/phantom.json",
+      "bytes": 638,
+      "sha256": "fc0778c0e3a401c56e5d87f7afd04ad91a652bb86391be03faedd24d2049b4ca"
+    },
+    {
+      "path": "public/games/neon-drift/assets/colliders/stinger.json",
+      "bytes": 638,
+      "sha256": "9984d1555965d8ad75eae2670d93655941e5cfb974b80e31438c0b77e82b9bef"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/comet.gltf",
+      "bytes": 129785,
+      "sha256": "0394a54b95585d93b5430c1dddf1148398b1616f783e237c36c622eff6398e9a"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/dock-warehouse.gltf",
+      "bytes": 4980,
+      "sha256": "7132ca37cf6b68f7621503fb1fc7469fbbad0b9d94acd50127ae5aef9d993334"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/highway-tower.gltf",
+      "bytes": 4974,
+      "sha256": "17ddc06c685b6655cc269c8b4bb91ef4c193718a9182e820772444ebbdb32545"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/oldtown-shop.gltf",
+      "bytes": 4972,
+      "sha256": "f0108d0e1f0f64ea3e051b02ae6abb40b669b134d5b1ecf674d0baac234a58b0"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/phantom.gltf",
+      "bytes": 129696,
+      "sha256": "01329e7e1367d469a72a0e8b0f76373deb8dcd69f20b9bb7f78d29c62b8cc4fe"
+    },
+    {
+      "path": "public/games/neon-drift/assets/models/stinger.gltf",
+      "bytes": 129744,
+      "sha256": "096ae2f40c50891cd2ca941ee4b2d6727fe3346f8bf9612fd9fcbda46562b787"
+    },
+    {
+      "path": "public/games/neon-drift/game.js",
+      "bytes": 829245,
+      "sha256": "f0ef12cff7ffae059e66b289b57b64c974f54edcbe6a9e6deba09997a7382484"
+    },
+    {
+      "path": "public/games/neon-drift/index.html",
+      "bytes": 5137,
+      "sha256": "2250d933784855de9fbb252d7072074164e6fa6b1032b2da98271d20fd0d5640"
+    },
+    {
+      "path": "public/games/neon-drift/style.css",
+      "bytes": 18346,
+      "sha256": "ed72fdae14ac6752afa817f32e5b2caefd69b7d932ce93f860e617df6eef589a"
+    },
+    {
+      "path": "tests/games/neon-drift/bridge.test.js",
+      "bytes": 1905,
+      "sha256": "5ed2808870926e7296277fe155f6b76858c2788b525ebf370a90d2547586215c"
+    },
+    {
+      "path": "tests/games/neon-drift/core.test.js",
+      "bytes": 16195,
+      "sha256": "daa671dafaad9e8826ab01bdacc5a7f880512030e97c0623ebf32a869507bd51"
+    },
+    {
+      "path": "tests/games/neon-drift/driver.js",
+      "bytes": 2053,
+      "sha256": "f4fb3bb565e897b2c8f434a176513792ff7c57315330af5783f26277de1d6517"
+    },
+    {
+      "path": "tests/games/neon-drift/frame-history.test.js",
+      "bytes": 7923,
+      "sha256": "4c622c98d55cfe0ef48c51b3e7aff3986007db127d0e1f6edc6f508fd38d0ead"
+    },
+    {
+      "path": "tests/games/neon-drift/input-harness.js",
+      "bytes": 3939,
+      "sha256": "e6d9dd849fe9389ad4234910f3f1bbb56dce273f7cfcb6a116f07a8b5c1631d4"
+    },
+    {
+      "path": "tests/games/neon-drift/input-lifecycle.test.js",
+      "bytes": 7758,
+      "sha256": "579fd1368255720151eb09cd9f5f917260931edb9f60b927caccf63b14d4e8f7"
+    },
+    {
+      "path": "tests/games/neon-drift/notifications.test.js",
+      "bytes": 5784,
+      "sha256": "839a06f47ebb89efe95b73a4f4adf7a489edf243869675cb232d7fbfff8b0e40"
+    },
+    {
+      "path": "tests/games/neon-drift/storage-recovery.test.js",
+      "bytes": 5593,
+      "sha256": "b93d93071681eb8c9f995715a3587b34af1c132aa2c40e578a106cbcfa973b3d"
+    },
+    {
+      "path": "tests/games/neon-drift/tutorial-progress.test.js",
+      "bytes": 11870,
+      "sha256": "07bc10eddec4f84394bc4c017565a8a77380ecba8bcbb4d1a0eb77b5bd4ceb02"
+    }
+  ]
+}

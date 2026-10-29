@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "gameId": "tidebound",
+  "buildId": "tidebound-cloud-input-lifecycle-20261028-01",
+  "version": "1.0",
+  "channel": "isolated-unpublished-release-candidate",
+  "preparedDate": "2026-10-28",
+  "entry": "index.html",
+  "sourceMainSha256": "16e67577acf518644f06fc1acc1f325a8e434f42092ef400f775ccad7cac40f0",
+  "bundleSha256": "a5f50424ef3786f6979c90c92ae410a52a707740543e6e9777567e0180916511",
+  "upstreamReviewedBundleSha256": "a5f50424ef3786f6979c90c92ae410a52a707740543e6e9777567e0180916511",
+  "acceptance": {
+    "portableTests": "PASS",
+    "build": "PASS",
+    "GUI": "NOT_RUN",
+    "physicalTouch": "NOT_RUN",
+    "audioListening": "NOT_RUN",
+    "GPUAndPerformance": "NOT_RUN",
+    "browserBFCache": "NOT_RUN",
+    "priorGUIPassInherited": false
+  },
+  "publication": "NOT_PERFORMED",
+  "rollbackBundleSha256": "2a673559a608d74f688c0300257da7c0744a46131e60ca74ded83a2641327a36"
+}

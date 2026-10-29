@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "gameId": "neon-drift",
+  "buildId": "neon-drift-audio-lifecycle-20261028-rc3",
+  "version": "1.0.14-rc.3",
+  "channel": "isolated-unpublished-release-candidate",
+  "preparedDate": "2026-10-28",
+  "entry": "index.html",
+  "sourceMainSha256": "b125d9cebba22774a262c1747fdc37019dd68dbd57b248b2df6b9a916fdbd9ce",
+  "bundleSha256": "f0ef12cff7ffae059e66b289b57b64c974f54edcbe6a9e6deba09997a7382484",
+  "baselineBuildId": "neon-drift-race-persistence-20261028-rc2",
+  "baselineBundleSha256": "cf8cb0a59603bb924d62bb451ad13da340d4af60e2b3be059328b0fc41508885",
+  "changeScope": "Live SFX gain bus and cross-run success timer cancellation. Same-run pause semantics retained. No asset/gameplay changes.",
+  "acceptance": {
+    "focusedSfx": "2/2",
+    "mainAudio": "2/2",
+    "busAndTimer": "7/7",
+    "prior85and15": "NOT_RERUN",
+    "GUI": "NOT_RUN",
+    "audioListening": "NOT_RUN",
+    "independentReview": "PENDING"
+  },
+  "publication": "NOT_PERFORMED",
+  "rollbackBundleSha256": "cf8cb0a59603bb924d62bb451ad13da340d4af60e2b3be059328b0fc41508885"
+}

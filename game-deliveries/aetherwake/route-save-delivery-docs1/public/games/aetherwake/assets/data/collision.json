@@ -1,0 +1,367 @@
+{
+  "schemaVersion": 1,
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "geometryIndependent": true,
+  "assets": {
+    "aetherwake.island-1": {
+      "shape": "cylinder",
+      "radius": 38,
+      "height": 0.6,
+      "top": 0,
+      "decorativeUprights": [
+        {
+          "shape": "cylinder",
+          "x": 25.431049241162608,
+          "z": -37.86092668423343,
+          "y": 0,
+          "radius": 0.18,
+          "height": 4.6
+        },
+        {
+          "shape": "cylinder",
+          "x": 25.431049241162608,
+          "z": -32.26092668423344,
+          "y": 0,
+          "radius": 0.18,
+          "height": 4.6
+        },
+        {
+          "shape": "cylinder",
+          "x": 32.63104924116261,
+          "z": -37.86092668423343,
+          "y": 0,
+          "radius": 0.18,
+          "height": 4.6
+        },
+        {
+          "shape": "cylinder",
+          "x": 32.63104924116261,
+          "z": -32.26092668423344,
+          "y": 0,
+          "radius": 0.18,
+          "height": 4.6
+        }
+      ],
+      "decorativeUprightPolicy": "All centres and footprints outside radius*1.04; gameplay landing disk ends within radius. No upright lies inside the playable disk."
+    },
+    "aetherwake.island-2": {
+      "shape": "cylinder",
+      "radius": 34,
+      "height": 0.6,
+      "top": 0,
+      "decorativeUprights": [
+        {
+          "shape": "cylinder",
+          "x": -28.330509741242597,
+          "z": 32.92602590798895,
+          "y": 0,
+          "radius": 0.48,
+          "height": 5.7
+        },
+        {
+          "shape": "cylinder",
+          "x": -21.730509741242596,
+          "z": 32.92602590798895,
+          "y": 0,
+          "radius": 0.48,
+          "height": 5.7
+        }
+      ],
+      "decorativeUprightPolicy": "All centres and footprints outside radius*1.04; gameplay landing disk ends within radius. No upright lies inside the playable disk."
+    },
+    "aetherwake.island-3": {
+      "shape": "cylinder",
+      "radius": 34,
+      "height": 0.6,
+      "top": 0,
+      "decorativeUprights": [
+        {
+          "shape": "cylinder",
+          "x": 33.86033641214097,
+          "z": 15.760735582161878,
+          "y": 0,
+          "radius": 0.66,
+          "height": 5.8
+        },
+        {
+          "shape": "cylinder",
+          "x": 39.86033641214097,
+          "z": 15.760735582161878,
+          "y": 0,
+          "radius": 0.66,
+          "height": 5.8
+        },
+        {
+          "shape": "cylinder",
+          "x": 33.86033641214097,
+          "z": 21.760735582161878,
+          "y": 0,
+          "radius": 0.66,
+          "height": 4.6
+        },
+        {
+          "shape": "cylinder",
+          "x": 39.86033641214097,
+          "z": 21.760735582161878,
+          "y": 0,
+          "radius": 0.66,
+          "height": 4.6
+        },
+        {
+          "shape": "cylinder",
+          "x": 41.36033641214097,
+          "z": 22.06073558216188,
+          "y": 0,
+          "radius": 1.2,
+          "height": 1.1
+        }
+      ],
+      "decorativeUprightPolicy": "All centres and footprints outside radius*1.04; gameplay landing disk ends within radius. No upright lies inside the playable disk."
+    },
+    "aetherwake.island-4": {
+      "shape": "cylinder",
+      "radius": 41,
+      "height": 0.6,
+      "top": 0,
+      "decorativeUprights": [
+        {
+          "shape": "cylinder",
+          "x": 12.693823623583226,
+          "z": -45.82969465012353,
+          "y": 0,
+          "radius": 0.48,
+          "height": 7.8
+        },
+        {
+          "shape": "cylinder",
+          "x": 19.893823623583227,
+          "z": -45.82969465012353,
+          "y": 0,
+          "radius": 0.48,
+          "height": 7.8
+        }
+      ],
+      "decorativeUprightPolicy": "All centres and footprints outside radius*1.04; gameplay landing disk ends within radius. No upright lies inside the playable disk."
+    },
+    "aetherwake.island-5": {
+      "shape": "cylinder",
+      "radius": 34,
+      "height": 0.6,
+      "top": 0,
+      "decorativeUprights": [
+        {
+          "shape": "cylinder",
+          "x": -42.98405229952046,
+          "z": -6.184741449911231,
+          "y": 0,
+          "radius": 0.504,
+          "height": 5.5
+        },
+        {
+          "shape": "cylinder",
+          "x": -40.029766810693516,
+          "z": -5.204440760738228,
+          "y": 0,
+          "radius": 0.504,
+          "height": 6.1
+        },
+        {
+          "shape": "cylinder",
+          "x": -37.21200936749697,
+          "z": -6.526951699066132,
+          "y": 0,
+          "radius": 0.504,
+          "height": 5.5
+        },
+        {
+          "shape": "cylinder",
+          "x": -36.078436790276136,
+          "z": -9.425883468332081,
+          "y": 0,
+          "radius": 0.504,
+          "height": 6.1
+        },
+        {
+          "shape": "cylinder",
+          "x": -37.251665243076,
+          "z": -12.30899414748183,
+          "y": 0,
+          "radius": 0.504,
+          "height": 5.5
+        },
+        {
+          "shape": "cylinder",
+          "x": -40.08729752230368,
+          "z": -13.592731569109997,
+          "y": 0,
+          "radius": 0.504,
+          "height": 6.1
+        },
+        {
+          "shape": "cylinder",
+          "x": -43.02785903143764,
+          "z": -12.572001339477186,
+          "y": 0,
+          "radius": 0.504,
+          "height": 5.5
+        }
+      ],
+      "decorativeUprightPolicy": "All centres and footprints outside radius*1.04; gameplay landing disk ends within radius. No upright lies inside the playable disk."
+    },
+    "aetherwake.island-6": {
+      "shape": "cylinder",
+      "radius": 38,
+      "height": 0.6,
+      "top": 0,
+      "decorativeUprights": [
+        {
+          "shape": "cylinder",
+          "x": 9.952079807224177,
+          "z": 43.486916984997585,
+          "y": 0,
+          "radius": 0.54,
+          "height": 5.3
+        },
+        {
+          "shape": "cylinder",
+          "x": 16.952079807224177,
+          "z": 43.486916984997585,
+          "y": 0,
+          "radius": 0.54,
+          "height": 5.3
+        }
+      ],
+      "decorativeUprightPolicy": "All centres and footprints outside radius*1.04; gameplay landing disk ends within radius. No upright lies inside the playable disk."
+    },
+    "aetherwake.pilot": {
+      "shape": "capsule",
+      "radius": 0.3,
+      "height": 1.85
+    },
+    "aetherwake.station-1": {
+      "shape": "cylinder",
+      "radius": 1.45,
+      "height": 4.2
+    },
+    "aetherwake.station-2": {
+      "shape": "cylinder",
+      "radius": 1.45,
+      "height": 4.2
+    },
+    "aetherwake.station-3": {
+      "shape": "cylinder",
+      "radius": 1.45,
+      "height": 4.2
+    },
+    "aetherwake.relic-01": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-02": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-03": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-04": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-05": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-06": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-07": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-08": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-09": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-10": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-11": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    },
+    "aetherwake.relic-12": {
+      "shape": "sphere",
+      "radius": 1.15,
+      "center": [
+        0,
+        0.7,
+        0
+      ]
+    }
+  }
+}
