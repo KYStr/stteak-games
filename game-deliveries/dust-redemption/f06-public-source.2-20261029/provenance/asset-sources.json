@@ -1,0 +1,62 @@
+{
+  "repository": "KYStr/stteak-games",
+  "commit": "469102e4ba891a8620d5971df29064ab13300464",
+  "files": [
+    {
+      "path": "assets/games/dust-redemption/manifest.json",
+      "bytes": 45709,
+      "sha256": "4d20f1b8e2562f0da0ad91c5d1ad4800c66c32d21fd835dc73b385c623a6664a",
+      "gitBlob": "70b9a69ec73246c86fa4236494c6c38e27c25167",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/manifest.json"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/generate.mjs",
+      "bytes": 5796,
+      "sha256": "2195b11a37dcea2c69214055a08a091427fed4ad50de7073161a4d816c623bcc",
+      "gitBlob": "548943b7d7e81e12518b93595c28b4929df74e5f",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/audio/generate.mjs"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/manifest.json",
+      "bytes": 7910,
+      "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a",
+      "gitBlob": "7fc55cda98b012e1b859ae1d8b0ffcd8ddbd30f2",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/sound-project.json",
+      "bytes": 2268,
+      "sha256": "865fd8bcfd65063ccf2ce75c564ae32515c7e7fb64c9bdcfa9bec03daa1c0769",
+      "gitBlob": "daa677f3a6c45392233af0bc879cfb6973770121",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/audio/sound-project.json"
+    },
+    {
+      "path": "assets/games/dust-redemption/field-props/manifest.json",
+      "bytes": 16699,
+      "sha256": "59cf7e05e90c2ae5e66df0d87f18dc4cbc41fb2b523a2b352c90599b2762f51f",
+      "gitBlob": "974abe643d70af4e20d9ed5e78224731dc7fb91b",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/field-props/manifest.json"
+    },
+    {
+      "path": "assets/games/dust-redemption/generation/production-record.md",
+      "bytes": 2899,
+      "sha256": "3f5acf90bf3b4f039c93faca30d5319c6b31ca0c9e287c6dbef36701cca644fd",
+      "gitBlob": "19802167d1bb3350203e60c45d73eb7dcd7af11b",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/generation/production-record.md"
+    },
+    {
+      "path": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "bytes": 27581,
+      "sha256": "bcd42eaec09cb2cb2640bfadb4dcd54ee5f67029fdd7ab93694dc7fccad39a75",
+      "gitBlob": "33d6c428d591cf28c27dd893731ab1da9fc9269e",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/recipes/build-frontier-kit.mjs"
+    },
+    {
+      "path": "assets/games/dust-redemption/sources/palette.json",
+      "bytes": 1724,
+      "sha256": "b27ae976b5289bbac19eb91a0787a039b0b47189c3bcf022473b4edd968841f3",
+      "gitBlob": "6e02e220613f6e4e316150511da70bfb13c89814",
+      "url": "https://github.com/KYStr/stteak-games/blob/469102e4ba891a8620d5971df29064ab13300464/assets/games/dust-redemption/sources/palette.json"
+    }
+  ]
+}

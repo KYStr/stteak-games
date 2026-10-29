@@ -1,0 +1,783 @@
+{
+  "sourceId": "f06-public-source.2-20261029",
+  "scope": "Byte identities only, not execution results or quality scores.",
+  "files": [
+    {
+      "path": "games/dust-redemption/build.mjs",
+      "origin": "f06-product",
+      "bytes": 2065,
+      "sha256": "3120190702b5698a1c29ca15eb87dbaac0a141481227a4684c209a929aebafe0",
+      "gitBlob": "b98ba2e1889eb6b6fcaca9115c915482f88c07c3"
+    },
+    {
+      "path": "games/dust-redemption/cargo-tether.js",
+      "origin": "f06-product",
+      "bytes": 831,
+      "sha256": "1a606f0cae0c0269f6a6be9ef987404c918eee3965af018f11cd51ce9d5468df",
+      "gitBlob": "8f9810631585a7ccb601edfabf38c40737e03a41"
+    },
+    {
+      "path": "games/dust-redemption/departure-guidance.js",
+      "origin": "f06-product",
+      "bytes": 5901,
+      "sha256": "1429402296bc3f4b60e733ede2d3b2af5211e0659b2e31e84d06d983982d7b3f",
+      "gitBlob": "bd509274db0981dd72167a3d2cf34b1d8295d539"
+    },
+    {
+      "path": "games/dust-redemption/enemy-tactics.js",
+      "origin": "f06-product",
+      "bytes": 16304,
+      "sha256": "ad0c997a319ab034310970aa1a5e06cc948e7fe10d172ad1eb7c72988ca88955",
+      "gitBlob": "95c2e1b94759d37dd3db02c8aab9e839239d6d0e"
+    },
+    {
+      "path": "games/dust-redemption/expansion-content.js",
+      "origin": "f06-product",
+      "bytes": 78639,
+      "sha256": "fc4344f5eab4326f0fac6087d2d59c9999c22505ecc0e34246128507f45ebe64",
+      "gitBlob": "97e79778b8b62fd44e20df709a2e4288f6b9c431"
+    },
+    {
+      "path": "games/dust-redemption/field-props.js",
+      "origin": "f06-product",
+      "bytes": 22780,
+      "sha256": "ef45eda0d893b147de737b75b05da8538408953393820bb338f069046bc3d1a4",
+      "gitBlob": "12edf298408479eaa4c61d5de8abbb38b0df789d"
+    },
+    {
+      "path": "games/dust-redemption/field-system.js",
+      "origin": "f06-product",
+      "bytes": 86304,
+      "sha256": "a5b55dd4f495075b4e0c465e0bf87f8eb161cc463ee343aa0515fe866ca538cc",
+      "gitBlob": "e95b4a45ec17f092912684b46c224d18540b1ac7"
+    },
+    {
+      "path": "games/dust-redemption/game.js",
+      "origin": "f06-product",
+      "bytes": 132683,
+      "sha256": "f06ac0a4af9334ee5ba4264c2623fe00f564c2d30103d7765185b80fc5827639",
+      "gitBlob": "030b7515d5742daa84a025cc0cbeb83671ab370c"
+    },
+    {
+      "path": "games/dust-redemption/ledger-flow.js",
+      "origin": "f06-product",
+      "bytes": 30217,
+      "sha256": "cd1fc8043cd6b9061da818bc6e5b04d5acc4159c6d5dface7c1fa6c30a4f206e",
+      "gitBlob": "55f0dc5afd766ebc5ebfbd0e4b52dc22769c7233"
+    },
+    {
+      "path": "games/dust-redemption/ledger-props.js",
+      "origin": "f06-product",
+      "bytes": 24061,
+      "sha256": "4141b773fb7b975da6dfb5b62f7d45cb20d98fe1ef74ed8dc4df2546317f922c",
+      "gitBlob": "4b21da5660ee32bfdf15992cdfff15988b457813"
+    },
+    {
+      "path": "games/dust-redemption/ledger-system.js",
+      "origin": "f06-product",
+      "bytes": 37140,
+      "sha256": "b47b181badc96b5aa97e3d4fbc8db247d29ae9613ee5683fdedbc6049eca2c82",
+      "gitBlob": "e61a97d585633b665333615be3ee2c5d4eb2f68e"
+    },
+    {
+      "path": "games/dust-redemption/mission-flow-v1.js",
+      "origin": "f06-product",
+      "bytes": 24537,
+      "sha256": "0f24bd95b11f02cec48b591cf2e5106ee4bbaf671c5973b7d185e2ca201b56ea",
+      "gitBlob": "d8971aa1a5a82b630ac9f86888d52ea610c48dd8"
+    },
+    {
+      "path": "games/dust-redemption/mission-flow.js",
+      "origin": "f06-product",
+      "bytes": 24830,
+      "sha256": "4f36802e422fc948a1b58a5c0e17f0715349f3cd80220f7c9b6ee682efc762c6",
+      "gitBlob": "a09d03c919b09aa73b2057dfad01b7b8ef14013d"
+    },
+    {
+      "path": "games/dust-redemption/mission-props.js",
+      "origin": "f06-product",
+      "bytes": 23275,
+      "sha256": "92d502f68b2f0108bc07e261e87a12d93529f11a8cc8a56c4f897719586b9b22",
+      "gitBlob": "290e402b3d5732d8336e48066ca5db238e4090ef"
+    },
+    {
+      "path": "games/dust-redemption/mission-system.js",
+      "origin": "f06-product",
+      "bytes": 48205,
+      "sha256": "4d70184e60cf2b4f4b2e9e53e2522cbc48568eb68729378f987c05a4b786f5f5",
+      "gitBlob": "9ac3ec9edeb4c72ba8c9c073f14cf8683bc3e8cb"
+    },
+    {
+      "path": "games/dust-redemption/night-flow.js",
+      "origin": "f06-product",
+      "bytes": 26363,
+      "sha256": "acf7fb1731dc9070fa65c491ee648c9be9f393e4c999195b2efbe372192b9940",
+      "gitBlob": "bf43d4ca6af9c464b87e4bce593814c031fa39a2"
+    },
+    {
+      "path": "games/dust-redemption/night-props.js",
+      "origin": "f06-product",
+      "bytes": 19078,
+      "sha256": "80726ceddbbf303c5bb81ca33c244adde3dc9d0cce65514a22030f0d3376797e",
+      "gitBlob": "0b5fd1c615b974873920a69db0e7bd19fe57355d"
+    },
+    {
+      "path": "games/dust-redemption/night-system.js",
+      "origin": "f06-product",
+      "bytes": 29625,
+      "sha256": "8785c1545404cac63046f934a5585d225647926bc9039653bf8d81bddcf5f5bc",
+      "gitBlob": "8416d9ba2690ed9fd5868fbcf6c60e26fa3c4d6d"
+    },
+    {
+      "path": "games/dust-redemption/package-lock.json",
+      "origin": "f06-product",
+      "bytes": 2636,
+      "sha256": "2f56db1b4ad1c8f8d18acb113507b896760b7bd4f36784c694683e22861f2830",
+      "gitBlob": "124ed2fff1ba035c6b2dab863cc27d1c0dc7f3ff"
+    },
+    {
+      "path": "games/dust-redemption/package.json",
+      "origin": "f06-product",
+      "bytes": 353,
+      "sha256": "5371e47b23e08957111bb7205458ea207ed9bfbb332d972208099ce63c66aa86",
+      "gitBlob": "b4ab65a849216c7c49cf6aa5d04f97809892a630"
+    },
+    {
+      "path": "games/dust-redemption/pact-flow.js",
+      "origin": "f06-product",
+      "bytes": 28291,
+      "sha256": "ef312c37fdfd8d838a1126abffe4685510807278aa037aeac0b10362aa88a82f",
+      "gitBlob": "f2f3bc04258372b9f1131ccbde1e2c7a177f0415"
+    },
+    {
+      "path": "games/dust-redemption/pact-props.js",
+      "origin": "f06-product",
+      "bytes": 29401,
+      "sha256": "338803fa70ac4217931b2adf64ed0fd7aa0414f80823c33c1aa15c795cc20fde",
+      "gitBlob": "a4d9c4210119d61f89e7bc5ad25753eea84309dd"
+    },
+    {
+      "path": "games/dust-redemption/pact-system.js",
+      "origin": "f06-product",
+      "bytes": 33050,
+      "sha256": "2635e12c50c7554c93793712dea28797882354ab5a318002581ee4327dda41f0",
+      "gitBlob": "ef8971fa591dd687f9027e192199951d110e2574"
+    },
+    {
+      "path": "games/dust-redemption/render-batches.js",
+      "origin": "f06-product",
+      "bytes": 9956,
+      "sha256": "f15942c8cdafa65aed00c677729ee386f6052aa5270b994a26564289ab5a7ae9",
+      "gitBlob": "0d7c674a5a6ea71e61f83475ab2239b676ce4aaf"
+    },
+    {
+      "path": "games/dust-redemption/signal-flow.js",
+      "origin": "f06-product",
+      "bytes": 27884,
+      "sha256": "9cd6ae4f59ff7b02893ee36009038bfc26a8f96577edbbcce860b93b0cda8ca3",
+      "gitBlob": "1dca7f90263f5703e6101c982116d98f7c2c7c34"
+    },
+    {
+      "path": "games/dust-redemption/signal-props.js",
+      "origin": "f06-product",
+      "bytes": 30581,
+      "sha256": "56ee663c1689ef2a587787d9e143eae764f33cd98bcc37e98176629563a4789d",
+      "gitBlob": "08ee23418f240e086f7e61dffe8a9eccbb253bc3"
+    },
+    {
+      "path": "games/dust-redemption/signal-system.js",
+      "origin": "f06-product",
+      "bytes": 37615,
+      "sha256": "9bbcd96067c5b774c2608e96eca1ef8f3176f14cdb0e36a715894695dec56b08",
+      "gitBlob": "6b81e3528aadd5a0664de4b9d49a28ef2bfb73ff"
+    },
+    {
+      "path": "games/dust-redemption/water-flow.js",
+      "origin": "f06-product",
+      "bytes": 29320,
+      "sha256": "dec290d1602ccb1145ef8eb3fef841d932078039ed27f1ec3757d5b1ec7baf21",
+      "gitBlob": "047fccfec6e95c520c11faf1ed9c26e9b9cc76ae"
+    },
+    {
+      "path": "games/dust-redemption/water-props.js",
+      "origin": "f06-product",
+      "bytes": 24786,
+      "sha256": "a2ac8dfe649bf99ef04d09260a1f99571e48f00688dc9732239a48d0efba1d31",
+      "gitBlob": "bab14ceff38c62dca4249adb3ad00d98dd5e3995"
+    },
+    {
+      "path": "games/dust-redemption/water-system.js",
+      "origin": "f06-product",
+      "bytes": 35554,
+      "sha256": "9f55a81076a8df5a8e8d736c57bfb01950bdd1fb5bf3ab46b5b215697107e0d9",
+      "gitBlob": "ec55574d84715f917f96e36ba65dc0b0e854c499"
+    },
+    {
+      "path": "package.json",
+      "origin": "f06-product",
+      "bytes": 33,
+      "sha256": "a90fc33418afa2b9cbf4768524b021135b965ecdf993457505bfae3ac44a8428",
+      "gitBlob": "f84528506796fb565716eaf2798e653919e3aa33"
+    },
+    {
+      "path": "public/games/dust-redemption/.gitattributes",
+      "origin": "f06-product",
+      "bytes": 19,
+      "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "gitBlob": "6313b56c57848efce05faa7aa7e901ccfc2886ea"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/enemy.wav",
+      "origin": "f06-product",
+      "bytes": 24742,
+      "sha256": "2411fb9d63040cccfa2d083ae9241daa3e7b80ecf4e15dda7e49b267c058760d",
+      "gitBlob": "0dab82bd9c09f8bcf2f17d230971cc89c512ea11"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/hit.wav",
+      "origin": "f06-product",
+      "bytes": 13274,
+      "sha256": "87fcb8420538badf13d528938039affed92d7b8c0d5da0d4c7e523f3d37dd667",
+      "gitBlob": "b92138db9ffdac9eeea40491c97b1c0cf1d25b8e"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/hurt.wav",
+      "origin": "f06-product",
+      "bytes": 33560,
+      "sha256": "df71bcd27ba58cbd3ebc656623acd0434a20716ff4e81c3fa1edbd2b9d4bd454",
+      "gitBlob": "a892435f9a1a6865f3e011424077253984703dad"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/manifest.json",
+      "origin": "f06-product",
+      "bytes": 7910,
+      "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a",
+      "gitBlob": "7fc55cda98b012e1b859ae1d8b0ffcd8ddbd30f2"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/reload.wav",
+      "origin": "f06-product",
+      "bytes": 44144,
+      "sha256": "a9b8d786adbf930e28c021f5fd3101c9bff0b25aef5995d086816b05c983c82c",
+      "gitBlob": "49778e70a4d7152d9aba9c27fbf63fd869cfc27a"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/revolver.wav",
+      "origin": "f06-product",
+      "bytes": 33560,
+      "sha256": "cf73989af90bebd8e692ecef6dbbe31cbc890c8ad0bf5ce570d5341972ddf23d",
+      "gitBlob": "d45ffe211ddb31b85662c7cd0a1a3310c6a1140d"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/rifle.wav",
+      "origin": "f06-product",
+      "bytes": 26504,
+      "sha256": "6efb2b079b949d27bf33a72f7a0fabd112b5f4a5baf9154d74ddedb92d84499e",
+      "gitBlob": "2debecc7710559a931ce0429912bb55350ac05ff"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/step.wav",
+      "origin": "f06-product",
+      "bytes": 15920,
+      "sha256": "4594f305d80dc961d046d172254b36732fdb7af200beddc73baaa5745f03139a",
+      "gitBlob": "aa7ee82219ae950a3573ed73b692f699ea7714cf"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/stone.wav",
+      "origin": "f06-product",
+      "bytes": 20330,
+      "sha256": "a6d9328fbf555d9352bf24571757060d731b3cc79c5547ece9bb36795ff32fc3",
+      "gitBlob": "f75b67a2cc29133153efed267383c4500308452b"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/success.wav",
+      "origin": "f06-product",
+      "bytes": 83834,
+      "sha256": "59914aa0d58d76a33ffafe207518db16b242e59ee646ce8d59d5f840568b3911",
+      "gitBlob": "a5ff12e77c7c9c51a8c62c7f2daccc7d3096ddaa"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/ui.wav",
+      "origin": "f06-product",
+      "bytes": 10628,
+      "sha256": "7d110a84e7473e31c99671fd46a1c581c538a0b44f84260fd370f85911fa5e87",
+      "gitBlob": "22f518d8ed7c70761ea8c981a94116069ad8a669"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/warning.wav",
+      "origin": "f06-product",
+      "bytes": 38852,
+      "sha256": "1c0986b8cd6aea7ac320f1e09d14f36aa3882bb8678880ccd6f84919b2818dcb",
+      "gitBlob": "377882f3d699f65b0b629ca35e90cb55eb6378c8"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/data/colliders.json",
+      "origin": "f06-product",
+      "bytes": 9259,
+      "sha256": "21d06ffcecd0c28d04ebeec11be5dce3274101eb71d1ee410330b7674c0b2324",
+      "gitBlob": "ab12d8c2a22b8e9b5b3ec1eef4b7f65e31dc8546"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/data/rig.json",
+      "origin": "f06-product",
+      "bytes": 5081,
+      "sha256": "ec0622185ffa81df65a3ab927efb0cfa629d4407435dacbcfe86c5c335c51e25",
+      "gitBlob": "e70bc885144a82b655dbc2b6bc0655c429ec3207"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/models/frontier-kit.glb",
+      "origin": "f06-product",
+      "bytes": 2352012,
+      "sha256": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f",
+      "gitBlob": "d5c4a8b2b0d07d104e31e6e33343faa38ca110c2"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/cloth-grain.png",
+      "origin": "f06-product",
+      "bytes": 335,
+      "sha256": "c66aea461ba84f57408d2b641bd6b30a5e3850ddf3994bee69bee513aa7db91f",
+      "gitBlob": "f6d04b8fa41cdccde5dde2d6372d59ddfc7424a2"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/stone-grain.png",
+      "origin": "f06-product",
+      "bytes": 14261,
+      "sha256": "734fb16f62f58987eac7aa3a42c174c1abde36fd2cfa62563ddd8f3cccc25604",
+      "gitBlob": "93341815a2621f80d478aa451328aede54ffee2b"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/wood-grain.png",
+      "origin": "f06-product",
+      "bytes": 13263,
+      "sha256": "6bf8bfc1de3e46f08e9cb241c1cbdbe9cc5ce1aa0f9d6f8057aff32fcdf6d2f1",
+      "gitBlob": "23c10659e7d808d96507e26e43b1aacee74bd6bc"
+    },
+    {
+      "path": "public/games/dust-redemption/audio.js",
+      "origin": "f06-product",
+      "bytes": 7485,
+      "sha256": "2d4aa9d1723f84a4f05925a8a9e28a3115ad65ddc737ac7d4c0e9bbca4c4e09f",
+      "gitBlob": "7876157bce77cd06b6838e43ad2f7c902672913a"
+    },
+    {
+      "path": "public/games/dust-redemption/bridge.js",
+      "origin": "f06-product",
+      "bytes": 1794,
+      "sha256": "99b48741f95fa7e59f9506a281817e8b7e8a8a7cddf95a862bc48a7abecae6ce",
+      "gitBlob": "1bc863a26aa6fabaca3c79bae2ab58b05a1a918c"
+    },
+    {
+      "path": "public/games/dust-redemption/cargo-tether.js",
+      "origin": "f06-product",
+      "bytes": 831,
+      "sha256": "1a606f0cae0c0269f6a6be9ef987404c918eee3965af018f11cd51ce9d5468df",
+      "gitBlob": "8f9810631585a7ccb601edfabf38c40737e03a41"
+    },
+    {
+      "path": "public/games/dust-redemption/content.js",
+      "origin": "f06-product",
+      "bytes": 25412,
+      "sha256": "f0e004ec3f45066e389767553b2479823f73b7d907d3e522b7fdf41f815a3dd1",
+      "gitBlob": "61dd627b90e23d706102a6f84664fbf0dcfd213a"
+    },
+    {
+      "path": "public/games/dust-redemption/departure-guidance.js",
+      "origin": "f06-product",
+      "bytes": 5901,
+      "sha256": "1429402296bc3f4b60e733ede2d3b2af5211e0659b2e31e84d06d983982d7b3f",
+      "gitBlob": "bd509274db0981dd72167a3d2cf34b1d8295d539"
+    },
+    {
+      "path": "public/games/dust-redemption/enemy-tactics.js",
+      "origin": "f06-product",
+      "bytes": 16304,
+      "sha256": "ad0c997a319ab034310970aa1a5e06cc948e7fe10d172ad1eb7c72988ca88955",
+      "gitBlob": "95c2e1b94759d37dd3db02c8aab9e839239d6d0e"
+    },
+    {
+      "path": "public/games/dust-redemption/expansion-content.js",
+      "origin": "f06-product",
+      "bytes": 78639,
+      "sha256": "fc4344f5eab4326f0fac6087d2d59c9999c22505ecc0e34246128507f45ebe64",
+      "gitBlob": "97e79778b8b62fd44e20df709a2e4288f6b9c431"
+    },
+    {
+      "path": "public/games/dust-redemption/field-props.js",
+      "origin": "f06-product",
+      "bytes": 22780,
+      "sha256": "ef45eda0d893b147de737b75b05da8538408953393820bb338f069046bc3d1a4",
+      "gitBlob": "12edf298408479eaa4c61d5de8abbb38b0df789d"
+    },
+    {
+      "path": "public/games/dust-redemption/field-system.js",
+      "origin": "f06-product",
+      "bytes": 86304,
+      "sha256": "a5b55dd4f495075b4e0c465e0bf87f8eb161cc463ee343aa0515fe866ca538cc",
+      "gitBlob": "e95b4a45ec17f092912684b46c224d18540b1ac7"
+    },
+    {
+      "path": "public/games/dust-redemption/game.js",
+      "origin": "f06-product",
+      "bytes": 132683,
+      "sha256": "f06ac0a4af9334ee5ba4264c2623fe00f564c2d30103d7765185b80fc5827639",
+      "gitBlob": "030b7515d5742daa84a025cc0cbeb83671ab370c"
+    },
+    {
+      "path": "public/games/dust-redemption/index.html",
+      "origin": "f06-product",
+      "bytes": 3070,
+      "sha256": "7dbb2c2b5583a906de1bce4084ee0e98a1a693f0b9be826d051d2f58d8915302",
+      "gitBlob": "ebeaaa05a379f0e16f3b06f41043ae264162d0a4"
+    },
+    {
+      "path": "public/games/dust-redemption/ledger-flow.js",
+      "origin": "f06-product",
+      "bytes": 30217,
+      "sha256": "cd1fc8043cd6b9061da818bc6e5b04d5acc4159c6d5dface7c1fa6c30a4f206e",
+      "gitBlob": "55f0dc5afd766ebc5ebfbd0e4b52dc22769c7233"
+    },
+    {
+      "path": "public/games/dust-redemption/ledger-props.js",
+      "origin": "f06-product",
+      "bytes": 24061,
+      "sha256": "4141b773fb7b975da6dfb5b62f7d45cb20d98fe1ef74ed8dc4df2546317f922c",
+      "gitBlob": "4b21da5660ee32bfdf15992cdfff15988b457813"
+    },
+    {
+      "path": "public/games/dust-redemption/ledger-system.js",
+      "origin": "f06-product",
+      "bytes": 37140,
+      "sha256": "b47b181badc96b5aa97e3d4fbc8db247d29ae9613ee5683fdedbc6049eca2c82",
+      "gitBlob": "e61a97d585633b665333615be3ee2c5d4eb2f68e"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-flow-v1.js",
+      "origin": "f06-product",
+      "bytes": 24537,
+      "sha256": "0f24bd95b11f02cec48b591cf2e5106ee4bbaf671c5973b7d185e2ca201b56ea",
+      "gitBlob": "d8971aa1a5a82b630ac9f86888d52ea610c48dd8"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-flow.js",
+      "origin": "f06-product",
+      "bytes": 24830,
+      "sha256": "4f36802e422fc948a1b58a5c0e17f0715349f3cd80220f7c9b6ee682efc762c6",
+      "gitBlob": "a09d03c919b09aa73b2057dfad01b7b8ef14013d"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-props.js",
+      "origin": "f06-product",
+      "bytes": 23275,
+      "sha256": "92d502f68b2f0108bc07e261e87a12d93529f11a8cc8a56c4f897719586b9b22",
+      "gitBlob": "290e402b3d5732d8336e48066ca5db238e4090ef"
+    },
+    {
+      "path": "public/games/dust-redemption/mission-system.js",
+      "origin": "f06-product",
+      "bytes": 48205,
+      "sha256": "4d70184e60cf2b4f4b2e9e53e2522cbc48568eb68729378f987c05a4b786f5f5",
+      "gitBlob": "9ac3ec9edeb4c72ba8c9c073f14cf8683bc3e8cb"
+    },
+    {
+      "path": "public/games/dust-redemption/night-flow.js",
+      "origin": "f06-product",
+      "bytes": 26363,
+      "sha256": "acf7fb1731dc9070fa65c491ee648c9be9f393e4c999195b2efbe372192b9940",
+      "gitBlob": "bf43d4ca6af9c464b87e4bce593814c031fa39a2"
+    },
+    {
+      "path": "public/games/dust-redemption/night-props.js",
+      "origin": "f06-product",
+      "bytes": 19078,
+      "sha256": "80726ceddbbf303c5bb81ca33c244adde3dc9d0cce65514a22030f0d3376797e",
+      "gitBlob": "0b5fd1c615b974873920a69db0e7bd19fe57355d"
+    },
+    {
+      "path": "public/games/dust-redemption/night-system.js",
+      "origin": "f06-product",
+      "bytes": 29625,
+      "sha256": "8785c1545404cac63046f934a5585d225647926bc9039653bf8d81bddcf5f5bc",
+      "gitBlob": "8416d9ba2690ed9fd5868fbcf6c60e26fa3c4d6d"
+    },
+    {
+      "path": "public/games/dust-redemption/pact-flow.js",
+      "origin": "f06-product",
+      "bytes": 28291,
+      "sha256": "ef312c37fdfd8d838a1126abffe4685510807278aa037aeac0b10362aa88a82f",
+      "gitBlob": "f2f3bc04258372b9f1131ccbde1e2c7a177f0415"
+    },
+    {
+      "path": "public/games/dust-redemption/pact-props.js",
+      "origin": "f06-product",
+      "bytes": 29401,
+      "sha256": "338803fa70ac4217931b2adf64ed0fd7aa0414f80823c33c1aa15c795cc20fde",
+      "gitBlob": "a4d9c4210119d61f89e7bc5ad25753eea84309dd"
+    },
+    {
+      "path": "public/games/dust-redemption/pact-system.js",
+      "origin": "f06-product",
+      "bytes": 33050,
+      "sha256": "2635e12c50c7554c93793712dea28797882354ab5a318002581ee4327dda41f0",
+      "gitBlob": "ef8971fa591dd687f9027e192199951d110e2574"
+    },
+    {
+      "path": "public/games/dust-redemption/physics.js",
+      "origin": "f06-product",
+      "bytes": 2550,
+      "sha256": "2260f80ab8eda6387ca948a75084284fc32af0a6b2974fbcdae20a6b2a80e46d",
+      "gitBlob": "7fa10a1585803653fcbf7f1f1aadc3524972a507"
+    },
+    {
+      "path": "public/games/dust-redemption/render-batches.js",
+      "origin": "f06-product",
+      "bytes": 9956,
+      "sha256": "f15942c8cdafa65aed00c677729ee386f6052aa5270b994a26564289ab5a7ae9",
+      "gitBlob": "0d7c674a5a6ea71e61f83475ab2239b676ce4aaf"
+    },
+    {
+      "path": "public/games/dust-redemption/rules.js",
+      "origin": "f06-product",
+      "bytes": 34051,
+      "sha256": "97ac178e461c56160b3a51b1b3642771d03a0a3a4064567f5b0bee0aa92bb731",
+      "gitBlob": "84e58edd1c63bd81415ef7d8aff559ecb9f54ef8"
+    },
+    {
+      "path": "public/games/dust-redemption/signal-flow.js",
+      "origin": "f06-product",
+      "bytes": 27884,
+      "sha256": "9cd6ae4f59ff7b02893ee36009038bfc26a8f96577edbbcce860b93b0cda8ca3",
+      "gitBlob": "1dca7f90263f5703e6101c982116d98f7c2c7c34"
+    },
+    {
+      "path": "public/games/dust-redemption/signal-props.js",
+      "origin": "f06-product",
+      "bytes": 30581,
+      "sha256": "56ee663c1689ef2a587787d9e143eae764f33cd98bcc37e98176629563a4789d",
+      "gitBlob": "08ee23418f240e086f7e61dffe8a9eccbb253bc3"
+    },
+    {
+      "path": "public/games/dust-redemption/signal-system.js",
+      "origin": "f06-product",
+      "bytes": 37186,
+      "sha256": "03ead433ae81ba14642a2eba6e15f2733ba129c850cbb972dd1ce05c4a160b6d",
+      "gitBlob": "09419ac61ae2423ed39cec8fcbc3170ab95bb633"
+    },
+    {
+      "path": "public/games/dust-redemption/storage.js",
+      "origin": "f06-product",
+      "bytes": 6565,
+      "sha256": "ba57973408cf67c0028b68f91b73cd717b1c5c038f4f22cb93cffb27d87f1b18",
+      "gitBlob": "069f51d4f6c44d8d804449abf927c50ba86f6965"
+    },
+    {
+      "path": "public/games/dust-redemption/style.css",
+      "origin": "f06-product",
+      "bytes": 15645,
+      "sha256": "ea01047dd07b93736578d9ee59aa2fa1493efb16c1a391e26eb3d0e113c59594",
+      "gitBlob": "e47f4732b9a74ae506745ebd75c10983d8e925c4"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/BufferGeometryUtils.js",
+      "origin": "f06-product",
+      "bytes": 35551,
+      "sha256": "248b3e8420bd3de805ca01845c1b0cc62aa2766f3c56bdcead265e306f8e715c",
+      "gitBlob": "0f0c0583091c11181390c01710f20a03060ce3a4"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/GLTFLoader.js",
+      "origin": "f06-product",
+      "bytes": 114744,
+      "sha256": "2904f2823e23d5bc1d64512bf4c0d777ac44d728d47c34a9e3d48ce8ef6b761d",
+      "gitBlob": "d82db2b57d02c7de1d479b6f53e11d6d5501b5e9"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/SkeletonUtils.js",
+      "origin": "f06-product",
+      "bytes": 11074,
+      "sha256": "98b7b2b72f64f0132669976fd5992436c3bab2d077023c7871db1ecf7e0f279f",
+      "gitBlob": "0f393b44123f9342be925c9462a9eb9ed4336451"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/THREE-LICENSE.txt",
+      "origin": "f06-product",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "gitBlob": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/three.core.js",
+      "origin": "f06-product",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "gitBlob": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5"
+    },
+    {
+      "path": "public/games/dust-redemption/vendor/three.module.js",
+      "origin": "f06-product",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "gitBlob": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4"
+    },
+    {
+      "path": "public/games/dust-redemption/water-flow.js",
+      "origin": "f06-product",
+      "bytes": 29320,
+      "sha256": "dec290d1602ccb1145ef8eb3fef841d932078039ed27f1ec3757d5b1ec7baf21",
+      "gitBlob": "047fccfec6e95c520c11faf1ed9c26e9b9cc76ae"
+    },
+    {
+      "path": "public/games/dust-redemption/water-props.js",
+      "origin": "f06-product",
+      "bytes": 24786,
+      "sha256": "a2ac8dfe649bf99ef04d09260a1f99571e48f00688dc9732239a48d0efba1d31",
+      "gitBlob": "bab14ceff38c62dca4249adb3ad00d98dd5e3995"
+    },
+    {
+      "path": "public/games/dust-redemption/water-system.js",
+      "origin": "f06-product",
+      "bytes": 35554,
+      "sha256": "9f55a81076a8df5a8e8d736c57bfb01950bdd1fb5bf3ab46b5b215697107e0d9",
+      "gitBlob": "ec55574d84715f917f96e36ba65dc0b0e854c499"
+    },
+    {
+      "path": "public/games/dust-redemption/world.js",
+      "origin": "f06-product",
+      "bytes": 25505,
+      "sha256": "cc08fb4f3b2b9dc8d8a7bb6507578dc00d1244d338d6518d59141a2350147f27",
+      "gitBlob": "cb270d5935c85ccd82b70dd374842dca5bcf4282"
+    },
+    {
+      "path": "tests/games/dust-redemption/cargo-tether.test.js",
+      "origin": "f06-product",
+      "bytes": 1550,
+      "sha256": "3f7a4f7eb3669fa75fcb0de89cab3232fa540257e8272c4e8de22b0d57b344f5",
+      "gitBlob": "a6ad8fa4ae2d16a16f2df354db6a65910f18b021"
+    },
+    {
+      "path": "tests/games/dust-redemption/enemy-tactics.test.js",
+      "origin": "f06-product",
+      "bytes": 18096,
+      "sha256": "dff02d16de42cd2f6e7d2c011dae55bfc17445dceacb1f2a19167a218cd0a037",
+      "gitBlob": "4106af3232f9cb873138448e3c202dcfb71f25ea"
+    },
+    {
+      "path": "tests/games/dust-redemption/escape-repeat.test.js",
+      "origin": "f06-product",
+      "bytes": 6857,
+      "sha256": "668a598477b446cc42f16f097f88cd4f861dc902fd1ec0e8b29a4a8e755e4a5e",
+      "gitBlob": "1e5f8bec1943bbe90ebcd2b92d85fe2094956863"
+    },
+    {
+      "path": "tests/games/dust-redemption/fire-union.test.js",
+      "origin": "f06-product",
+      "bytes": 10434,
+      "sha256": "96fd0e0881e15468ae7572c825209430475337f0349c94c05d9080de09de8250",
+      "gitBlob": "db2663e1bb24bc057d57c77999c69110f895aea9"
+    },
+    {
+      "path": "tests/games/dust-redemption/pad-ownership.test.js",
+      "origin": "f06-product",
+      "bytes": 10184,
+      "sha256": "936bb0ebbd9d04d095ca85e2e5fe51fdd3b643c6cb47b663793289cf000e142a",
+      "gitBlob": "d385b936efe3508acbf1fa1fde59db9e0a4e7e8e"
+    },
+    {
+      "path": "tests/games/dust-redemption/physics.test.js",
+      "origin": "f06-product",
+      "bytes": 8316,
+      "sha256": "193cd9b1ed9f73da715cfcee610f37b5ac9ecb1d9d2d6ac3ebb0b9a44d8518cf",
+      "gitBlob": "ba853f89530eae0c180d20c00f3fdf9d5345a0a0"
+    },
+    {
+      "path": "tests/games/dust-redemption/rules.test.js",
+      "origin": "f06-product",
+      "bytes": 12000,
+      "sha256": "24307e04123a6ed3f5e0912b89a7a97fbcedaf522538aca2b2153ba2be870a62",
+      "gitBlob": "d53b9c5b11ec264d7c05de248989cc5a0027ca8b"
+    },
+    {
+      "path": "tests/games/dust-redemption/storage-supplies.test.js",
+      "origin": "f06-product",
+      "bytes": 5261,
+      "sha256": "8e368b15cca95d3e42893e659bf4e67c8f813c2c9b2803124e48d313271acaa6",
+      "gitBlob": "528f5d57b1a98a187c6859cac80414ab7c4cedfc"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/generate.mjs",
+      "origin": "pinned-asset-source",
+      "bytes": 5796,
+      "sha256": "2195b11a37dcea2c69214055a08a091427fed4ad50de7073161a4d816c623bcc",
+      "gitBlob": "548943b7d7e81e12518b93595c28b4929df74e5f"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/manifest.json",
+      "origin": "pinned-asset-source",
+      "bytes": 7910,
+      "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a",
+      "gitBlob": "7fc55cda98b012e1b859ae1d8b0ffcd8ddbd30f2"
+    },
+    {
+      "path": "assets/games/dust-redemption/audio/sound-project.json",
+      "origin": "pinned-asset-source",
+      "bytes": 2268,
+      "sha256": "865fd8bcfd65063ccf2ce75c564ae32515c7e7fb64c9bdcfa9bec03daa1c0769",
+      "gitBlob": "daa677f3a6c45392233af0bc879cfb6973770121"
+    },
+    {
+      "path": "assets/games/dust-redemption/field-props/manifest.json",
+      "origin": "pinned-asset-source",
+      "bytes": 16699,
+      "sha256": "59cf7e05e90c2ae5e66df0d87f18dc4cbc41fb2b523a2b352c90599b2762f51f",
+      "gitBlob": "974abe643d70af4e20d9ed5e78224731dc7fb91b"
+    },
+    {
+      "path": "assets/games/dust-redemption/generation/production-record.md",
+      "origin": "pinned-asset-source",
+      "bytes": 2899,
+      "sha256": "3f5acf90bf3b4f039c93faca30d5319c6b31ca0c9e287c6dbef36701cca644fd",
+      "gitBlob": "19802167d1bb3350203e60c45d73eb7dcd7af11b"
+    },
+    {
+      "path": "assets/games/dust-redemption/manifest.json",
+      "origin": "pinned-asset-source",
+      "bytes": 45709,
+      "sha256": "4d20f1b8e2562f0da0ad91c5d1ad4800c66c32d21fd835dc73b385c623a6664a",
+      "gitBlob": "70b9a69ec73246c86fa4236494c6c38e27c25167"
+    },
+    {
+      "path": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "origin": "pinned-asset-source",
+      "bytes": 27581,
+      "sha256": "bcd42eaec09cb2cb2640bfadb4dcd54ee5f67029fdd7ab93694dc7fccad39a75",
+      "gitBlob": "33d6c428d591cf28c27dd893731ab1da9fc9269e"
+    },
+    {
+      "path": "assets/games/dust-redemption/sources/palette.json",
+      "origin": "pinned-asset-source",
+      "bytes": 1724,
+      "sha256": "b27ae976b5289bbac19eb91a0787a039b0b47189c3bcf022473b4edd968841f3",
+      "gitBlob": "6e02e220613f6e4e316150511da70bfb13c89814"
+    },
+    {
+      "path": "tests/extension-probe.mjs",
+      "origin": "extension-probe-input",
+      "bytes": 4350,
+      "sha256": "ce48f4c415b2ae3a3f67b015d06939758960fc2e116d223c5940118d2839d971",
+      "gitBlob": "39ef634541b4b55c742c5afc0c9c7a3dc2251ca1"
+    },
+    {
+      "path": "tests/captured-dom-harness.mjs",
+      "origin": "extension-probe-input",
+      "bytes": 7061,
+      "sha256": "b780f19b8766c7f66fe31f270061851666a3818464a3b011e585443817976214",
+      "gitBlob": "e9096e39ddfdc844705b0e7811251c152c56465b"
+    },
+    {
+      "path": "tests/earned-after-dawn-pact.json",
+      "origin": "extension-probe-input",
+      "bytes": 104159,
+      "sha256": "0fde17aa511471d40144f5917c3722ad16472f0e9227fcb26d32c4baa757b6c3",
+      "gitBlob": "2617ed2a48df7ac2a3e4e7e4debdba480bb5d57e"
+    }
+  ]
+}

@@ -1,0 +1,500 @@
+{
+  "schemaVersion": 1,
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "assets": {
+    "hero": {
+      "assetId": "dust-redemption.hero",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "enemy-guard": {
+      "assetId": "dust-redemption.enemy-guard",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "enemy-flanker": {
+      "assetId": "dust-redemption.enemy-flanker",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "enemy-shotgun": {
+      "assetId": "dust-redemption.enemy-shotgun",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "enemy-sniper": {
+      "assetId": "dust-redemption.enemy-sniper",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "npc-mara": {
+      "assetId": "dust-redemption.npc-mara",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "npc-elias": {
+      "assetId": "dust-redemption.npc-elias",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "npc-june": {
+      "assetId": "dust-redemption.npc-june",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "npc-sol": {
+      "assetId": "dust-redemption.npc-sol",
+      "shape": "capsule",
+      "radius": 0.28,
+      "height": 1.85,
+      "center": [
+        0,
+        0.925,
+        0
+      ],
+      "combatHeight": 1.35,
+      "coverHeight": 0.95,
+      "coverMuzzleHeight": 0.55,
+      "peekMuzzleHeight": 1.65
+    },
+    "crate-low": {
+      "assetId": "dust-redemption.crate-low",
+      "shape": "box",
+      "size": [
+        1.55,
+        0.9,
+        1.05
+      ],
+      "center": [
+        0,
+        0.4675,
+        0
+      ],
+      "cover": "low",
+      "vaultable": true
+    },
+    "crate-high": {
+      "assetId": "dust-redemption.crate-high",
+      "shape": "box",
+      "size": [
+        1.25,
+        1.65,
+        1.05
+      ],
+      "center": [
+        0,
+        0.8425,
+        0
+      ],
+      "cover": "high",
+      "vaultable": false
+    },
+    "barrel": {
+      "assetId": "dust-redemption.barrel",
+      "shape": "cylinder",
+      "radius": 0.37,
+      "height": 0.95,
+      "center": [
+        0,
+        0.475,
+        0
+      ],
+      "cover": "low",
+      "vaultable": true
+    },
+    "rock-low": {
+      "assetId": "dust-redemption.rock-low",
+      "shape": "box",
+      "size": [
+        2.145,
+        0.85,
+        1.4949999999999999
+      ],
+      "center": [
+        -0.04036,
+        0.425,
+        0.02644
+      ],
+      "cover": "low",
+      "vaultable": true
+    },
+    "rock-high": {
+      "assetId": "dust-redemption.rock-high",
+      "shape": "box",
+      "size": [
+        2.64,
+        2.25,
+        1.8399999999999999
+      ],
+      "center": [
+        0.01344,
+        1.125,
+        -0.05283
+      ],
+      "cover": "high",
+      "vaultable": false
+    },
+    "wall-wood": {
+      "assetId": "dust-redemption.wall-wood",
+      "shape": "box",
+      "size": [
+        2,
+        1.85,
+        0.3
+      ],
+      "center": [
+        0,
+        0.925,
+        0.0725
+      ],
+      "cover": "high",
+      "vaultable": false
+    },
+    "rail-segment": {
+      "assetId": "dust-redemption.rail-segment",
+      "shape": "box",
+      "size": [
+        1.9,
+        0.24,
+        4
+      ],
+      "center": [
+        0,
+        0.12,
+        0
+      ],
+      "cover": "none",
+      "vaultable": true
+    },
+    "station-canopy": {
+      "assetId": "dust-redemption.station-canopy",
+      "shape": "compound",
+      "children": [
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            2.8,
+            0.2
+          ],
+          "center": [
+            -2,
+            1.4,
+            -1
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            2.8,
+            0.2
+          ],
+          "center": [
+            -2,
+            1.4,
+            1
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            2.8,
+            0.2
+          ],
+          "center": [
+            2,
+            1.4,
+            -1
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            2.8,
+            0.2
+          ],
+          "center": [
+            2,
+            1.4,
+            1
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            4.6,
+            0.5,
+            3
+          ],
+          "center": [
+            0,
+            2.95,
+            0
+          ]
+        }
+      ],
+      "cover": "high",
+      "vaultable": false
+    },
+    "mine-arch": {
+      "assetId": "dust-redemption.mine-arch",
+      "shape": "compound",
+      "children": [
+        {
+          "shape": "box",
+          "size": [
+            0.32,
+            2.8,
+            0.4
+          ],
+          "center": [
+            -1.25,
+            1.4,
+            -0.0425
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.32,
+            2.8,
+            0.4
+          ],
+          "center": [
+            1.25,
+            1.4,
+            -0.0425
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            2.85,
+            0.35,
+            0.5
+          ],
+          "center": [
+            0,
+            2.8,
+            -0.0425
+          ]
+        }
+      ],
+      "cover": "high",
+      "vaultable": false
+    },
+    "water-tower": {
+      "assetId": "dust-redemption.water-tower",
+      "shape": "compound",
+      "children": [
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            3,
+            0.2
+          ],
+          "center": [
+            -0.8,
+            1.5,
+            -0.8
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            3,
+            0.2
+          ],
+          "center": [
+            -0.8,
+            1.5,
+            0.8
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            3,
+            0.2
+          ],
+          "center": [
+            0.8,
+            1.5,
+            -0.8
+          ]
+        },
+        {
+          "shape": "box",
+          "size": [
+            0.2,
+            3,
+            0.2
+          ],
+          "center": [
+            0.8,
+            1.5,
+            0.8
+          ]
+        },
+        {
+          "shape": "cylinder",
+          "radius": 1.17,
+          "height": 1.8,
+          "center": [
+            0,
+            3.8,
+            0
+          ]
+        }
+      ],
+      "cover": "high",
+      "vaultable": false
+    },
+    "weapon-revolver": {
+      "assetId": "dust-redemption.weapon-revolver",
+      "shape": "box",
+      "size": [
+        0.14,
+        0.25,
+        0.45
+      ],
+      "center": [
+        0,
+        0.15287,
+        -0.0239
+      ],
+      "combat": false
+    },
+    "weapon-rifle": {
+      "assetId": "dust-redemption.weapon-rifle",
+      "shape": "box",
+      "size": [
+        0.08,
+        0.23,
+        1.12
+      ],
+      "center": [
+        0,
+        0.11935,
+        0.01214
+      ],
+      "combat": false
+    },
+    "horse": {
+      "assetId": "dust-redemption.horse",
+      "shape": "capsule",
+      "radius": 0.42,
+      "height": 2.25,
+      "center": [
+        0,
+        1.125,
+        -0.09157
+      ],
+      "combat": false
+    },
+    "saloon-front": {
+      "assetId": "dust-redemption.saloon-front",
+      "shape": "box",
+      "size": [
+        4.4,
+        3.9,
+        0.35
+      ],
+      "center": [
+        0,
+        1.95,
+        -0.425
+      ],
+      "cover": "high",
+      "vaultable": false
+    }
+  }
+}

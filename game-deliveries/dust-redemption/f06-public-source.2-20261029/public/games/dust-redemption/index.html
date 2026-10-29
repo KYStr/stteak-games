@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#242d29" />
+    <title>荒塵之旅 · Dust & Redemption</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23242d29'/%3E%3Cpath d='M16 5 27 16 16 27 5 16Z' fill='%23d0ab6e'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23242d29'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="world" tabindex="0" aria-label="荒塵之旅 3D 戰場，按 Esc 暫停或查看操作"></canvas>
+    <div id="vignette"></div>
+    <div id="damage"></div>
+    <header id="hud">
+      <div>
+        <span class="eyebrow">DUST & REDEMPTION</span
+        ><strong id="mission-name">荒塵之旅</strong
+        ><small id="mission-sub">邊境，日落以前。</small>
+      </div>
+      <nav>
+        <button id="rotate-left" title="Q 旋轉相機" aria-label="相機向左旋轉九十度">↶</button
+        ><button id="rotate-right" title="C 旋轉相機" aria-label="相機向右旋轉九十度">↷</button
+        ><button id="help-button">操作</button
+        ><button id="pause-button">暫停</button>
+      </nav>
+    </header>
+    <div id="objective" aria-live="polite"></div>
+    <div id="labels"></div>
+    <div id="reticle">＋</div>
+    <div id="toast" role="status"></div>
+    <div id="context"></div>
+    <footer id="combat-hud">
+      <div class="vitals">
+        <span>生命 <b id="hp">100</b></span
+        ><i><em id="hp-fill"></em></i><small id="cover-state">自由移動</small>
+      </div>
+      <div class="ammo">
+        <small id="weapon-name">左輪</small
+        ><strong id="ammo">6 <span>/ 36</span></strong
+        ><small id="reload-state">R 換彈</small>
+      </div>
+      <div class="field-note">
+        <span id="status-note">先讀地形，再作決定。</span
+        ><small>E 互動／掩體 · Space 翻越 · F 道具</small>
+      </div>
+    </footer>
+    <div id="touch-controls">
+      <div id="move-pad"><span>移動</span><i></i></div>
+      <div id="aim-pad"><span>拖曳瞄準</span></div>
+      <div class="touch-actions">
+        <button id="touch-interact">互動<br />掩體</button
+        ><button id="touch-reload">換彈</button
+        ><button id="touch-vault">翻越</button
+        ><button id="touch-item">道具</button
+        ><button id="touch-fire">開火</button>
+      </div>
+    </div>
+    <main id="overlay">
+      <section class="panel loading">
+        <p class="eyebrow">DUST & REDEMPTION</p>
+        <h1>荒塵之旅</h1>
+        <p>正在準備邊境、角色與光影…</p>
+      </section>
+    </main>
+    <div id="portrait-guide">
+      橫放裝置，展開邊境視野。<small>觸控操作適用橫向螢幕。</small>
+    </div>
+    <script type="module" src="game.js"></script>
+  </body>
+</html>

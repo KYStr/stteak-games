@@ -1,0 +1,34 @@
+{
+  "title": "Dust & Redemption — Original frontier sound project",
+  "version": 1,
+  "author": "stteak / Codex procedural asset production",
+  "license": "CC0-1.0",
+  "sampleRate": 44100,
+  "channels": 1,
+  "bitsPerSample": 16,
+  "targetPeak": 0.8,
+  "seed": 193749,
+  "effects": [
+    { "id": "revolver", "duration": 0.38, "design": "Broad low powder report, bright cylinder transient, short dry decay." },
+    { "id": "rifle", "duration": 0.3, "design": "Sharper crack than revolver, narrow metallic bolt snap and lower dust tail." },
+    { "id": "enemy", "duration": 0.28, "design": "Softened distant firearm report, reduced high-frequency attack and body." },
+    { "id": "stone", "duration": 0.23, "design": "Short sandstone impact with three quiet gravel fragments." },
+    { "id": "hit", "duration": 0.15, "design": "Damped cloth/body impact, deliberately restrained and non-graphic." },
+    { "id": "hurt", "duration": 0.38, "design": "Low breath-like noise and falling tone that remains distinct from gunfire." },
+    { "id": "reload", "duration": 0.5, "design": "Three timed steel clicks and a restrained spring rattle." },
+    { "id": "step", "duration": 0.18, "design": "Dry earth crunch with a low boot thump and no pitched note." },
+    { "id": "warning", "duration": 0.44, "design": "Two rising sine pulses; no resemblance to real emergency-service sirens." },
+    { "id": "success", "duration": 0.95, "design": "Original sparse A3–E4–B4 voiced pluck, staggered 80 ms apart." },
+    { "id": "ui", "duration": 0.12, "design": "Quiet wood-and-string selection tick with quick release." }
+  ],
+  "music": {
+    "title": "Dustfall: open-road ostinato",
+    "origin": "Newly authored numerical note sequence for this game; no recording, sample library or reference melody.",
+    "beatSeconds": 1.15,
+    "notesHz": [110, 0, 164.81, 0, 146.83, 0, 123.47, 82.41],
+    "noteNames": ["A2", "rest", "E3", "rest", "D3", "rest", "B2", "E2"],
+    "voice": "One decaying triangle pluck; 1 second duration and low amplitude.",
+    "percussion": "47 Hz decaying sine on alternating beats, 0.1 seconds, falling to 70% pitch.",
+    "arrangement": "Sparse eight-beat loop with three rests. No vocals or sampled instruments. Playback suspended with the game."
+  }
+}

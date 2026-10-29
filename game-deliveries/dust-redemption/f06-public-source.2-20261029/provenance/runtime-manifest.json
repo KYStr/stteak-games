@@ -1,0 +1,307 @@
+[
+  {
+    "path": ".gitattributes",
+    "bytes": 19,
+    "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+  },
+  {
+    "path": "assets/audio/enemy.wav",
+    "bytes": 24742,
+    "sha256": "2411fb9d63040cccfa2d083ae9241daa3e7b80ecf4e15dda7e49b267c058760d"
+  },
+  {
+    "path": "assets/audio/hit.wav",
+    "bytes": 13274,
+    "sha256": "87fcb8420538badf13d528938039affed92d7b8c0d5da0d4c7e523f3d37dd667"
+  },
+  {
+    "path": "assets/audio/hurt.wav",
+    "bytes": 33560,
+    "sha256": "df71bcd27ba58cbd3ebc656623acd0434a20716ff4e81c3fa1edbd2b9d4bd454"
+  },
+  {
+    "path": "assets/audio/manifest.json",
+    "bytes": 7910,
+    "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a"
+  },
+  {
+    "path": "assets/audio/reload.wav",
+    "bytes": 44144,
+    "sha256": "a9b8d786adbf930e28c021f5fd3101c9bff0b25aef5995d086816b05c983c82c"
+  },
+  {
+    "path": "assets/audio/revolver.wav",
+    "bytes": 33560,
+    "sha256": "cf73989af90bebd8e692ecef6dbbe31cbc890c8ad0bf5ce570d5341972ddf23d"
+  },
+  {
+    "path": "assets/audio/rifle.wav",
+    "bytes": 26504,
+    "sha256": "6efb2b079b949d27bf33a72f7a0fabd112b5f4a5baf9154d74ddedb92d84499e"
+  },
+  {
+    "path": "assets/audio/step.wav",
+    "bytes": 15920,
+    "sha256": "4594f305d80dc961d046d172254b36732fdb7af200beddc73baaa5745f03139a"
+  },
+  {
+    "path": "assets/audio/stone.wav",
+    "bytes": 20330,
+    "sha256": "a6d9328fbf555d9352bf24571757060d731b3cc79c5547ece9bb36795ff32fc3"
+  },
+  {
+    "path": "assets/audio/success.wav",
+    "bytes": 83834,
+    "sha256": "59914aa0d58d76a33ffafe207518db16b242e59ee646ce8d59d5f840568b3911"
+  },
+  {
+    "path": "assets/audio/ui.wav",
+    "bytes": 10628,
+    "sha256": "7d110a84e7473e31c99671fd46a1c581c538a0b44f84260fd370f85911fa5e87"
+  },
+  {
+    "path": "assets/audio/warning.wav",
+    "bytes": 38852,
+    "sha256": "1c0986b8cd6aea7ac320f1e09d14f36aa3882bb8678880ccd6f84919b2818dcb"
+  },
+  {
+    "path": "assets/data/colliders.json",
+    "bytes": 9259,
+    "sha256": "21d06ffcecd0c28d04ebeec11be5dce3274101eb71d1ee410330b7674c0b2324"
+  },
+  {
+    "path": "assets/data/rig.json",
+    "bytes": 5081,
+    "sha256": "ec0622185ffa81df65a3ab927efb0cfa629d4407435dacbcfe86c5c335c51e25"
+  },
+  {
+    "path": "assets/models/frontier-kit.glb",
+    "bytes": 2352012,
+    "sha256": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f"
+  },
+  {
+    "path": "assets/textures/cloth-grain.png",
+    "bytes": 335,
+    "sha256": "c66aea461ba84f57408d2b641bd6b30a5e3850ddf3994bee69bee513aa7db91f"
+  },
+  {
+    "path": "assets/textures/stone-grain.png",
+    "bytes": 14261,
+    "sha256": "734fb16f62f58987eac7aa3a42c174c1abde36fd2cfa62563ddd8f3cccc25604"
+  },
+  {
+    "path": "assets/textures/wood-grain.png",
+    "bytes": 13263,
+    "sha256": "6bf8bfc1de3e46f08e9cb241c1cbdbe9cc5ce1aa0f9d6f8057aff32fcdf6d2f1"
+  },
+  {
+    "path": "audio.js",
+    "bytes": 7485,
+    "sha256": "2d4aa9d1723f84a4f05925a8a9e28a3115ad65ddc737ac7d4c0e9bbca4c4e09f"
+  },
+  {
+    "path": "bridge.js",
+    "bytes": 1794,
+    "sha256": "99b48741f95fa7e59f9506a281817e8b7e8a8a7cddf95a862bc48a7abecae6ce"
+  },
+  {
+    "path": "cargo-tether.js",
+    "bytes": 831,
+    "sha256": "1a606f0cae0c0269f6a6be9ef987404c918eee3965af018f11cd51ce9d5468df"
+  },
+  {
+    "path": "content.js",
+    "bytes": 25412,
+    "sha256": "f0e004ec3f45066e389767553b2479823f73b7d907d3e522b7fdf41f815a3dd1"
+  },
+  {
+    "path": "departure-guidance.js",
+    "bytes": 5901,
+    "sha256": "1429402296bc3f4b60e733ede2d3b2af5211e0659b2e31e84d06d983982d7b3f"
+  },
+  {
+    "path": "enemy-tactics.js",
+    "bytes": 16304,
+    "sha256": "ad0c997a319ab034310970aa1a5e06cc948e7fe10d172ad1eb7c72988ca88955"
+  },
+  {
+    "path": "expansion-content.js",
+    "bytes": 78639,
+    "sha256": "fc4344f5eab4326f0fac6087d2d59c9999c22505ecc0e34246128507f45ebe64"
+  },
+  {
+    "path": "field-props.js",
+    "bytes": 22780,
+    "sha256": "ef45eda0d893b147de737b75b05da8538408953393820bb338f069046bc3d1a4"
+  },
+  {
+    "path": "field-system.js",
+    "bytes": 86304,
+    "sha256": "a5b55dd4f495075b4e0c465e0bf87f8eb161cc463ee343aa0515fe866ca538cc"
+  },
+  {
+    "path": "game.js",
+    "bytes": 132683,
+    "sha256": "f06ac0a4af9334ee5ba4264c2623fe00f564c2d30103d7765185b80fc5827639"
+  },
+  {
+    "path": "index.html",
+    "bytes": 3070,
+    "sha256": "7dbb2c2b5583a906de1bce4084ee0e98a1a693f0b9be826d051d2f58d8915302"
+  },
+  {
+    "path": "ledger-flow.js",
+    "bytes": 30217,
+    "sha256": "cd1fc8043cd6b9061da818bc6e5b04d5acc4159c6d5dface7c1fa6c30a4f206e"
+  },
+  {
+    "path": "ledger-props.js",
+    "bytes": 24061,
+    "sha256": "4141b773fb7b975da6dfb5b62f7d45cb20d98fe1ef74ed8dc4df2546317f922c"
+  },
+  {
+    "path": "ledger-system.js",
+    "bytes": 37140,
+    "sha256": "b47b181badc96b5aa97e3d4fbc8db247d29ae9613ee5683fdedbc6049eca2c82"
+  },
+  {
+    "path": "mission-flow-v1.js",
+    "bytes": 24537,
+    "sha256": "0f24bd95b11f02cec48b591cf2e5106ee4bbaf671c5973b7d185e2ca201b56ea"
+  },
+  {
+    "path": "mission-flow.js",
+    "bytes": 24830,
+    "sha256": "4f36802e422fc948a1b58a5c0e17f0715349f3cd80220f7c9b6ee682efc762c6"
+  },
+  {
+    "path": "mission-props.js",
+    "bytes": 23275,
+    "sha256": "92d502f68b2f0108bc07e261e87a12d93529f11a8cc8a56c4f897719586b9b22"
+  },
+  {
+    "path": "mission-system.js",
+    "bytes": 48205,
+    "sha256": "4d70184e60cf2b4f4b2e9e53e2522cbc48568eb68729378f987c05a4b786f5f5"
+  },
+  {
+    "path": "night-flow.js",
+    "bytes": 26363,
+    "sha256": "acf7fb1731dc9070fa65c491ee648c9be9f393e4c999195b2efbe372192b9940"
+  },
+  {
+    "path": "night-props.js",
+    "bytes": 19078,
+    "sha256": "80726ceddbbf303c5bb81ca33c244adde3dc9d0cce65514a22030f0d3376797e"
+  },
+  {
+    "path": "night-system.js",
+    "bytes": 29625,
+    "sha256": "8785c1545404cac63046f934a5585d225647926bc9039653bf8d81bddcf5f5bc"
+  },
+  {
+    "path": "pact-flow.js",
+    "bytes": 28291,
+    "sha256": "ef312c37fdfd8d838a1126abffe4685510807278aa037aeac0b10362aa88a82f"
+  },
+  {
+    "path": "pact-props.js",
+    "bytes": 29401,
+    "sha256": "338803fa70ac4217931b2adf64ed0fd7aa0414f80823c33c1aa15c795cc20fde"
+  },
+  {
+    "path": "pact-system.js",
+    "bytes": 33050,
+    "sha256": "2635e12c50c7554c93793712dea28797882354ab5a318002581ee4327dda41f0"
+  },
+  {
+    "path": "physics.js",
+    "bytes": 2550,
+    "sha256": "2260f80ab8eda6387ca948a75084284fc32af0a6b2974fbcdae20a6b2a80e46d"
+  },
+  {
+    "path": "render-batches.js",
+    "bytes": 9956,
+    "sha256": "f15942c8cdafa65aed00c677729ee386f6052aa5270b994a26564289ab5a7ae9"
+  },
+  {
+    "path": "rules.js",
+    "bytes": 34051,
+    "sha256": "97ac178e461c56160b3a51b1b3642771d03a0a3a4064567f5b0bee0aa92bb731"
+  },
+  {
+    "path": "signal-flow.js",
+    "bytes": 27884,
+    "sha256": "9cd6ae4f59ff7b02893ee36009038bfc26a8f96577edbbcce860b93b0cda8ca3"
+  },
+  {
+    "path": "signal-props.js",
+    "bytes": 30581,
+    "sha256": "56ee663c1689ef2a587787d9e143eae764f33cd98bcc37e98176629563a4789d"
+  },
+  {
+    "path": "signal-system.js",
+    "bytes": 37186,
+    "sha256": "03ead433ae81ba14642a2eba6e15f2733ba129c850cbb972dd1ce05c4a160b6d"
+  },
+  {
+    "path": "storage.js",
+    "bytes": 6565,
+    "sha256": "ba57973408cf67c0028b68f91b73cd717b1c5c038f4f22cb93cffb27d87f1b18"
+  },
+  {
+    "path": "style.css",
+    "bytes": 15645,
+    "sha256": "ea01047dd07b93736578d9ee59aa2fa1493efb16c1a391e26eb3d0e113c59594"
+  },
+  {
+    "path": "vendor/BufferGeometryUtils.js",
+    "bytes": 35551,
+    "sha256": "248b3e8420bd3de805ca01845c1b0cc62aa2766f3c56bdcead265e306f8e715c"
+  },
+  {
+    "path": "vendor/GLTFLoader.js",
+    "bytes": 114744,
+    "sha256": "2904f2823e23d5bc1d64512bf4c0d777ac44d728d47c34a9e3d48ce8ef6b761d"
+  },
+  {
+    "path": "vendor/SkeletonUtils.js",
+    "bytes": 11074,
+    "sha256": "98b7b2b72f64f0132669976fd5992436c3bab2d077023c7871db1ecf7e0f279f"
+  },
+  {
+    "path": "vendor/THREE-LICENSE.txt",
+    "bytes": 1081,
+    "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+  },
+  {
+    "path": "vendor/three.core.js",
+    "bytes": 1403455,
+    "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+  },
+  {
+    "path": "vendor/three.module.js",
+    "bytes": 603113,
+    "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+  },
+  {
+    "path": "water-flow.js",
+    "bytes": 29320,
+    "sha256": "dec290d1602ccb1145ef8eb3fef841d932078039ed27f1ec3757d5b1ec7baf21"
+  },
+  {
+    "path": "water-props.js",
+    "bytes": 24786,
+    "sha256": "a2ac8dfe649bf99ef04d09260a1f99571e48f00688dc9732239a48d0efba1d31"
+  },
+  {
+    "path": "water-system.js",
+    "bytes": 35554,
+    "sha256": "9f55a81076a8df5a8e8d736c57bfb01950bdd1fb5bf3ab46b5b215697107e0d9"
+  },
+  {
+    "path": "world.js",
+    "bytes": 25505,
+    "sha256": "cc08fb4f3b2b9dc8d8a7bb6507578dc00d1244d338d6518d59141a2350147f27"
+  }
+]

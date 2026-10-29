@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "units": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "palette": {
+    "sand": "#be885b", "sandLight": "#d8ab70", "stone": "#956c50",
+    "wood": "#694c37", "woodLight": "#9a7651", "woodDark": "#493b32",
+    "iron": "#444c50", "steel": "#84918d", "teal": "#397d7a",
+    "cream": "#e4d3a0", "rust": "#a14f38", "coal": "#303331"
+  },
+  "characters": [
+    { "id": "hero", "coat": "#397d7a", "shirt": "#e4d3a0", "skin": "#bc8563", "hat": "#b8996f", "trousers": "#414d52", "accessory": "poncho" },
+    { "id": "enemy-guard", "coat": "#805b48", "shirt": "#b1a38b", "skin": "#bd8564", "hat": "#514b41", "trousers": "#373c3a", "accessory": "badge" },
+    { "id": "enemy-flanker", "coat": "#a5553d", "shirt": "#d8b17e", "skin": "#865a43", "hat": "#6c4534", "trousers": "#554b40", "accessory": "scarf" },
+    { "id": "enemy-shotgun", "coat": "#695447", "shirt": "#907e64", "skin": "#b08a6d", "hat": "#3c3f3a", "trousers": "#3d443e", "accessory": "bandolier" },
+    { "id": "enemy-sniper", "coat": "#6c7969", "shirt": "#b5a484", "skin": "#be9873", "hat": "#505f52", "trousers": "#4b5148", "accessory": "hood" },
+    { "id": "npc-mara", "coat": "#c49c5c", "shirt": "#e6d8ae", "skin": "#92654a", "hat": "#694a36", "trousers": "#4f6362", "accessory": "badge" },
+    { "id": "npc-elias", "coat": "#496e70", "shirt": "#c4bd9d", "skin": "#b68160", "hat": "#a29170", "trousers": "#4a4e49", "accessory": "apron" },
+    { "id": "npc-june", "coat": "#c17655", "shirt": "#e5c99d", "skin": "#d1a074", "hat": "#7c6450", "trousers": "#5b635d", "accessory": "scarf" },
+    { "id": "npc-sol", "coat": "#767f6e", "shirt": "#ccbfa1", "skin": "#82654c", "hat": "#d2bc8f", "trousers": "#514c43", "accessory": "bandolier" }
+  ]
+}

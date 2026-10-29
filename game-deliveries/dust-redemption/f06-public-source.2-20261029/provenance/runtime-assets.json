@@ -1,0 +1,168 @@
+{
+  "sourceId": "f06-public-source.2-20261029",
+  "scope": "Current shipped bytes mapped to retained original recipes; no regeneration performed for this snapshot.",
+  "files": [
+    {
+      "path": "public/games/dust-redemption/assets/audio/enemy.wav",
+      "bytes": 24742,
+      "sha256": "2411fb9d63040cccfa2d083ae9241daa3e7b80ecf4e15dda7e49b267c058760d",
+      "gitBlob": "0dab82bd9c09f8bcf2f17d230971cc89c512ea11",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/hit.wav",
+      "bytes": 13274,
+      "sha256": "87fcb8420538badf13d528938039affed92d7b8c0d5da0d4c7e523f3d37dd667",
+      "gitBlob": "b92138db9ffdac9eeea40491c97b1c0cf1d25b8e",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/hurt.wav",
+      "bytes": 33560,
+      "sha256": "df71bcd27ba58cbd3ebc656623acd0434a20716ff4e81c3fa1edbd2b9d4bd454",
+      "gitBlob": "a892435f9a1a6865f3e011424077253984703dad",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/manifest.json",
+      "bytes": 7910,
+      "sha256": "d7d7b79c0bf98f9c00c4a0765bc928d64ada55e0d49dc3347185b9a8f3dfb54a",
+      "gitBlob": "7fc55cda98b012e1b859ae1d8b0ffcd8ddbd30f2",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/reload.wav",
+      "bytes": 44144,
+      "sha256": "a9b8d786adbf930e28c021f5fd3101c9bff0b25aef5995d086816b05c983c82c",
+      "gitBlob": "49778e70a4d7152d9aba9c27fbf63fd869cfc27a",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/revolver.wav",
+      "bytes": 33560,
+      "sha256": "cf73989af90bebd8e692ecef6dbbe31cbc890c8ad0bf5ce570d5341972ddf23d",
+      "gitBlob": "d45ffe211ddb31b85662c7cd0a1a3310c6a1140d",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/rifle.wav",
+      "bytes": 26504,
+      "sha256": "6efb2b079b949d27bf33a72f7a0fabd112b5f4a5baf9154d74ddedb92d84499e",
+      "gitBlob": "2debecc7710559a931ce0429912bb55350ac05ff",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/step.wav",
+      "bytes": 15920,
+      "sha256": "4594f305d80dc961d046d172254b36732fdb7af200beddc73baaa5745f03139a",
+      "gitBlob": "aa7ee82219ae950a3573ed73b692f699ea7714cf",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/stone.wav",
+      "bytes": 20330,
+      "sha256": "a6d9328fbf555d9352bf24571757060d731b3cc79c5547ece9bb36795ff32fc3",
+      "gitBlob": "f75b67a2cc29133153efed267383c4500308452b",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/success.wav",
+      "bytes": 83834,
+      "sha256": "59914aa0d58d76a33ffafe207518db16b242e59ee646ce8d59d5f840568b3911",
+      "gitBlob": "a5ff12e77c7c9c51a8c62c7f2daccc7d3096ddaa",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/ui.wav",
+      "bytes": 10628,
+      "sha256": "7d110a84e7473e31c99671fd46a1c581c538a0b44f84260fd370f85911fa5e87",
+      "gitBlob": "22f518d8ed7c70761ea8c981a94116069ad8a669",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/audio/warning.wav",
+      "bytes": 38852,
+      "sha256": "1c0986b8cd6aea7ac320f1e09d14f36aa3882bb8678880ccd6f84919b2818dcb",
+      "gitBlob": "377882f3d699f65b0b629ca35e90cb55eb6378c8",
+      "recipe": "assets/games/dust-redemption/audio/generate.mjs",
+      "editableInput": "assets/games/dust-redemption/audio/sound-project.json",
+      "record": "assets/games/dust-redemption/audio/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/data/colliders.json",
+      "bytes": 9259,
+      "sha256": "21d06ffcecd0c28d04ebeec11be5dce3274101eb71d1ee410330b7674c0b2324",
+      "gitBlob": "ab12d8c2a22b8e9b5b3ec1eef4b7f65e31dc8546",
+      "recipe": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "editableInput": "assets/games/dust-redemption/sources/palette.json",
+      "record": "assets/games/dust-redemption/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/data/rig.json",
+      "bytes": 5081,
+      "sha256": "ec0622185ffa81df65a3ab927efb0cfa629d4407435dacbcfe86c5c335c51e25",
+      "gitBlob": "e70bc885144a82b655dbc2b6bc0655c429ec3207",
+      "recipe": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "editableInput": "assets/games/dust-redemption/sources/palette.json",
+      "record": "assets/games/dust-redemption/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/models/frontier-kit.glb",
+      "bytes": 2352012,
+      "sha256": "b567d57319aeaf7d622ad26bff2a023923e14f03f9560da798a5ebf4ea87a42f",
+      "gitBlob": "d5c4a8b2b0d07d104e31e6e33343faa38ca110c2",
+      "recipe": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "editableInput": "assets/games/dust-redemption/sources/palette.json",
+      "record": "assets/games/dust-redemption/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/cloth-grain.png",
+      "bytes": 335,
+      "sha256": "c66aea461ba84f57408d2b641bd6b30a5e3850ddf3994bee69bee513aa7db91f",
+      "gitBlob": "f6d04b8fa41cdccde5dde2d6372d59ddfc7424a2",
+      "recipe": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "editableInput": "assets/games/dust-redemption/sources/palette.json",
+      "record": "assets/games/dust-redemption/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/stone-grain.png",
+      "bytes": 14261,
+      "sha256": "734fb16f62f58987eac7aa3a42c174c1abde36fd2cfa62563ddd8f3cccc25604",
+      "gitBlob": "93341815a2621f80d478aa451328aede54ffee2b",
+      "recipe": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "editableInput": "assets/games/dust-redemption/sources/palette.json",
+      "record": "assets/games/dust-redemption/manifest.json"
+    },
+    {
+      "path": "public/games/dust-redemption/assets/textures/wood-grain.png",
+      "bytes": 13263,
+      "sha256": "6bf8bfc1de3e46f08e9cb241c1cbdbe9cc5ce1aa0f9d6f8057aff32fcdf6d2f1",
+      "gitBlob": "23c10659e7d808d96507e26e43b1aacee74bd6bc",
+      "recipe": "assets/games/dust-redemption/recipes/build-frontier-kit.mjs",
+      "editableInput": "assets/games/dust-redemption/sources/palette.json",
+      "record": "assets/games/dust-redemption/manifest.json"
+    }
+  ]
+}
