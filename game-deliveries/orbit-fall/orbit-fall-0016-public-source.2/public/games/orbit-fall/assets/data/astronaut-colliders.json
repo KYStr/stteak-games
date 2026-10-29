@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit-fall.astronaut.collision",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "hip-center",
+  "collider": {
+    "shape": "capsule",
+    "radius": 0.36,
+    "halfHeight": 0.6,
+    "position": [
+      0,
+      0,
+      0
+    ]
+  },
+  "sockets": []
+}

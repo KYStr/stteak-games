@@ -1,0 +1,771 @@
+{
+  "schemaVersion": 1,
+  "subsetId": "orbit-fall-0016-public-source.2",
+  "derivedFrom": "orbit-fall-0016-failure-return-cloud-candidate-1-delivery-docs.2",
+  "previousPublicSubset": "orbit-fall-0016-public-source.1",
+  "sameQualityIdentity": false,
+  "runtimeAggregate": "5d57fe403cef9d3d8ebb6ac910f45d95dfebd8e7b81cc28dd011d630274383d3",
+  "originalRuntimeAggregate": "a7e60751b899f93ddcd90e11631d070d38642bebf0af780bab0b9ad4781e57d9",
+  "runtimeChanges": [
+    "vendor/rapier.mjs: modified-file notice comment only"
+  ],
+  "hashScope": "all public subset files except this manifest itself",
+  "files": [
+    {
+      "path": "ASSET-PROVENANCE.md",
+      "bytes": 2889,
+      "sha256": "3640d4bfed5d8765557bf9787b80cc1e6feb80817684b4081afbbe48c4d11e88",
+      "gitBlobSha": "f29c9b7e0ad759bccea51431e63451e4ee632506"
+    },
+    {
+      "path": "BUILD-CONTRACT.md",
+      "bytes": 3555,
+      "sha256": "1a1cc58d12f168c59e61032b0d8a4adf8cd960d031e88bcfc9f2983fa5b4b5bd",
+      "gitBlobSha": "2b406dee42baa714913d4510bf6bf9d047c1e30e"
+    },
+    {
+      "path": "CONTENT-EXTENSION.md",
+      "bytes": 3566,
+      "sha256": "34db0461868c722b3cf411ea7c951d2e4f80169836b4a1dc5f0c882a56f00e10",
+      "gitBlobSha": "692556f5589e20877649a7cc7964bfd5f2251bce"
+    },
+    {
+      "path": "KNOWN-LIMITS.md",
+      "bytes": 1455,
+      "sha256": "f120bf20c2d0ca2440df382484b1795291ba92b7c29fe5a7f684ab2036114b26",
+      "gitBlobSha": "2749f846981d6794f524707f3f89ef0aa7f3ff1c"
+    },
+    {
+      "path": "PUBLIC-DELIVERY-NOTES.md",
+      "bytes": 1689,
+      "sha256": "d5b6b60c20bd9a081bf94356ee02592386ea727dd13f6a5650d409efa7c16a31",
+      "gitBlobSha": "628d6f24cf807d85696b345064ec17835923865e"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1694,
+      "sha256": "33a3526d060dcc936ac729f5ab359c1aabed4de0cde277aba5429611f8c67e60",
+      "gitBlobSha": "628234c712705fa05f74a3443554005f0e571101"
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "bytes": 1538,
+      "sha256": "7b86edcc3fc3a20bcec67bf6dcaae01f21043d76d018e337b43e7ece22c9f0d1",
+      "gitBlobSha": "868cf3c9c9988802b75dcd0a0c685e9eb0c66122"
+    },
+    {
+      "path": "assets/games/orbit-fall/.gitattributes",
+      "bytes": 55,
+      "sha256": "69e297b189a9a7b75ee00bddcc477bc66a9b6eaf6c9b67be468ca6dd20122ad3",
+      "gitBlobSha": "4d032f534702e757312c3d216c1692b4cfff0146"
+    },
+    {
+      "path": "assets/games/orbit-fall/README.md",
+      "bytes": 3638,
+      "sha256": "1dec96dd7a602523fff8bdcbc638034c207491e5260241f8ca85e685dddef87a",
+      "gitBlobSha": "eb42f39176375c7893456962683675bf5e33b1f8"
+    },
+    {
+      "path": "assets/games/orbit-fall/generation/design-record.md",
+      "bytes": 2270,
+      "sha256": "2bb00dbaf35de3dc3ec0fd6ef8e7806ba4d3689ef552ac64221641b3660d1610",
+      "gitBlobSha": "25c1ac2db45f309c29b1ce5bd8e887abd711f3b1"
+    },
+    {
+      "path": "assets/games/orbit-fall/manifest.json",
+      "bytes": 66612,
+      "sha256": "5f3b94cca9b5e883a6672dc4809ebe52e832f2833e5dece31a8797ece407af7b",
+      "gitBlobSha": "81689ef1e60b98f2a6a23f01c84ac11cf77e7ca4"
+    },
+    {
+      "path": "assets/games/orbit-fall/recipes/build-assets.mjs",
+      "bytes": 9137,
+      "sha256": "96c955e8f132bf6d611f06861fc56cd8054bc2684ea30b682174e85dcc049e0e",
+      "gitBlobSha": "21f88f5a5291f0e2c6fbd02b2c3e7f3e368abb86"
+    },
+    {
+      "path": "assets/games/orbit-fall/recipes/build-audio.mjs",
+      "bytes": 3376,
+      "sha256": "5bb6d02f5d3a10c85e4f9abcc6f0251b978af493803c499c4d524e772dea8000",
+      "gitBlobSha": "ed38d2e2fe057bd1d41b746aa7bfb2526e011732"
+    },
+    {
+      "path": "assets/games/orbit-fall/recipes/verify-assets.mjs",
+      "bytes": 6096,
+      "sha256": "69b3fd556bcdbff6b7806070974703d7484140db030f94fee66e20b36e82b29f",
+      "gitBlobSha": "65f1779774491d61a3a194960021a332d56a5649"
+    },
+    {
+      "path": "assets/games/orbit-fall/recipes/verify-audio.mjs",
+      "bytes": 4558,
+      "sha256": "4817f82d3683992d55f19b00d3985e9fbdde876379ce58fcc9e2cd6ca94a8075",
+      "gitBlobSha": "594f274a17664c603e180fd5b9c5ed43aa1e73c7"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/audio-source.js",
+      "bytes": 6098,
+      "sha256": "d85916b9d290a8c10b116fca0538fa7e7031b0ee2207d087066978db9024d305",
+      "gitBlobSha": "6ccf8793656a960276ade44520e7eb76eba97246"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/models-source.js",
+      "bytes": 20335,
+      "sha256": "47dce984cd7f6c1129d7b1102a97b9492e22b2a6c8419057caccb18071f1c683",
+      "gitBlobSha": "9e5b6121e1936aeab75ad1adeb4a25ae69a9dc1b"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/sound-synthesis.mjs",
+      "bytes": 5123,
+      "sha256": "bbbbd5e3c2acfb1de1354f08cabde4d4729642d3bad660543cc5b18723efa511",
+      "gitBlobSha": "e04894dc510a8c83af6f020c5a4014181732efc1"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/buffer-geometry-utils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751",
+      "gitBlobSha": "c84dc7b2bbc99849373e17a6efae609e326f9536"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/gltf-loader.js",
+      "bytes": 114739,
+      "sha256": "67ac5551fdafa6e349bd80c8f8e5e39c136d6b2fb1ad647db9abb21dc86f9e4a",
+      "gitBlobSha": "38f8c14fb500631f01d39cd54c202eefddcf0987"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/skeleton-utils.js",
+      "bytes": 11062,
+      "sha256": "0761b1e003917b215d25dd81439d854b36034b5a57ce84c2cfe3b02428d7b253",
+      "gitBlobSha": "e208c7422862941bc55a4cfca4fd2b3a91285954"
+    },
+    {
+      "path": "assets/games/orbit-fall/sources/vendor/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "gitBlobSha": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/.gitattributes",
+      "bytes": 86,
+      "sha256": "de346929bb74e62a2554dc1c953c390a3891f762e7522d7b51eef552b725f119",
+      "gitBlobSha": "510fca791a026f8094abd663c3d2d797fb721f9d"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/manifest.json",
+      "bytes": 1187,
+      "sha256": "c9e2698e7b8d1f5c09174c3c08b487d5b53c95c591abee4ef75ffe02fb788573",
+      "gitBlobSha": "9ef467ef68de0ab8c983ded3799baf51013ce53c"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/rapier-0.19.0.mjs",
+      "bytes": 2219371,
+      "sha256": "1ade6875c663c1398f490d4fa67837386b2d7e0aad45fe54e9b7af52b8198a49",
+      "gitBlobSha": "6431559c6df9a1f92005942adecd7e9ae3b92b1a"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/rapier-0.19.0.wasm",
+      "bytes": 1555075,
+      "sha256": "c8cf07035996629dbf6156c82fec836ddc1c6cff78cf6afde726c30585da2bfd",
+      "gitBlobSha": "9d1b9b69b867018439f92caf2e7fa4873fc7b5cb"
+    },
+    {
+      "path": "assets/games/orbit-fall/vendor-sources/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "gitBlobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "path": "dependencies/three-0.180.0.tgz",
+      "bytes": 7750248,
+      "sha256": "ad66d724565ee29a2467277fa84daa5ed0211d6b8d446e9ef29f6bae0cd14144",
+      "gitBlobSha": "1facfca4ee66087f45100a767b1850736dc68c60"
+    },
+    {
+      "path": "games/orbit-fall/.gitattributes",
+      "bytes": 19,
+      "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "gitBlobSha": "6313b56c57848efce05faa7aa7e901ccfc2886ea"
+    },
+    {
+      "path": "games/orbit-fall/build.mjs",
+      "bytes": 2305,
+      "sha256": "f8aeed5844bfb8fb84cd2b6970edafac39effa665880ac2559921a59b8352ae2",
+      "gitBlobSha": "e6b6c4473551d340b3e6cc2e72533c5e03aaf242"
+    },
+    {
+      "path": "games/orbit-fall/hazards.js",
+      "bytes": 566,
+      "sha256": "d8c1cf57be04b59b5b98aacb77f5971edca0c655040d2fc7014ffb32d45789f7",
+      "gitBlobSha": "99767b1408db56cdc65a94569eba982b5ec00ec6"
+    },
+    {
+      "path": "games/orbit-fall/optics.js",
+      "bytes": 5765,
+      "sha256": "974a039f7af83d48b4978786a6b650f34e44934c6dbcda6202f11764590459df",
+      "gitBlobSha": "48a832ea39154836cede2c457763dec414530c74"
+    },
+    {
+      "path": "games/orbit-fall/package-lock.json",
+      "bytes": 853,
+      "sha256": "bf5c3b6fa63fb4616e3fd266f915f687a994ccf9051b76436194c375323abd42",
+      "gitBlobSha": "8a70d11b6353e9c3d2e7abaa515fc9d5786807e8"
+    },
+    {
+      "path": "games/orbit-fall/package.json",
+      "bytes": 162,
+      "sha256": "3c6f7c13319f5ff56b1bd6f3b7fe616e83b276b284746206840484f162327878",
+      "gitBlobSha": "011a53240238986e5dfd04dc632c5f02de8ab898"
+    },
+    {
+      "path": "games/orbit-fall/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "gitBlobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "path": "games/orbit-fall/rapier-init-patch.mjs",
+      "bytes": 4832,
+      "sha256": "7c9821a8c0e7c83bbff5e71506034c615eff20be7bed57bfdd6d4b78127d9ce5",
+      "gitBlobSha": "ed3986ae28a7b69a3ad483f16d00e1ee6d441f79"
+    },
+    {
+      "path": "package.json",
+      "bytes": 69,
+      "sha256": "a1850694b7e47a3bb86a7c3411552f1d9a8e8e2fadc57aa04a31f37fac0ff67b",
+      "gitBlobSha": "bb366ee6033f7a99058ec2f1bfc38f50a919f071"
+    },
+    {
+      "path": "public/games/orbit-fall/.gitattributes",
+      "bytes": 67,
+      "sha256": "2cf6c8dd955913beecb3d0d7cb00dab86e5da2bebcb1cf5b71db72bd0f78dfa0",
+      "gitBlobSha": "7be47da2b6d6be0acf6ef3c524c946f9e1ba5a7c"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/ambient-loop.wav",
+      "bytes": 1152044,
+      "sha256": "a046ad9e402fafe33c2d940709018fad0af0c9a11d8f9f6b54351818b988b35f",
+      "gitBlobSha": "3492bc374d483347bc361f85d49743c06015976e"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/brake.wav",
+      "bytes": 20204,
+      "sha256": "6bc75a1569ca8d6aa112f6411151e4d1cf19d204ffc7ae8656648ef4e831c052",
+      "gitBlobSha": "b9bee567d34aaf57df07a840a43b5881fe2adce5"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/click.wav",
+      "bytes": 3884,
+      "sha256": "c025930c125637ef5b7aa67f1067183bd34b37db9db45bd8fd06b1fc47eb035c",
+      "gitBlobSha": "1f7ed5421ac68b756a2e280e2f1dbf233dd78677"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/damage.wav",
+      "bytes": 21644,
+      "sha256": "65c34968c3e85b7ae5f2586fc6ab1370fac5d93e7b092a39c41b7b9eca0160b9",
+      "gitBlobSha": "f41b3a7dd810bf2f93ff74840a5f1bafcf9dd785"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/door.wav",
+      "bytes": 36044,
+      "sha256": "2c4ab2b7aaee3fd089a023d84055caad62e5f67a63671b7fa10d70dd601ec99f",
+      "gitBlobSha": "07ee6baee4efa67c0db5828b5cd302a04a874852"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/ending.wav",
+      "bytes": 163244,
+      "sha256": "cf446b080993fcf851cd0eac4b73aa39032a91d089638bfa0dc871003a3ad16c",
+      "gitBlobSha": "22b9c893ab55b25fdcfe1c5f70cc4ed0a349e691"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/fail.wav",
+      "bytes": 62444,
+      "sha256": "d7e80837aab53dd75a4758c096d85a63c255588deaf5a5ce7607337202f2b76b",
+      "gitBlobSha": "d9c8d4c9e43a89e69d11e711cda59440d00dda2b"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/interact.wav",
+      "bytes": 7724,
+      "sha256": "c53aab4fd616d02f7a815c0d72a52f55fae315c5fb4a6e22ae81a451418791ad",
+      "gitBlobSha": "e5c046481be686a6e699d61a16da6c6fc0cc888c"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/low-oxygen.wav",
+      "bytes": 38444,
+      "sha256": "dbaedefef9826f56ab7794be484a2cd0db7727908aacee18e7eae75782b1d6d4",
+      "gitBlobSha": "2cd0d89c14b2f63944ccc4cbda0295d4aee8434a"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/magnet.wav",
+      "bytes": 14444,
+      "sha256": "ba6876e111e8a84eaa1ba8aeaf5a208021e2e94d609177523c457dcfa39ce86d",
+      "gitBlobSha": "e215376711f35dca2520eedf118fd139c3ef424b"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/power.wav",
+      "bytes": 55244,
+      "sha256": "2cfc9c866f49812897601c650cac7b8bf8548d923d8a26715ad05fd31ddc16b4",
+      "gitBlobSha": "f7b6cd6c8060bde15a65200011de5fabaf30b365"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/signal.wav",
+      "bytes": 36044,
+      "sha256": "09fec7da9c1514e723f79044156cdf31f72765a4f7af7440a1bfc44dfcc0dc19",
+      "gitBlobSha": "a2670996da29c929227c995b02987b96e7b6be27"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/success.wav",
+      "bytes": 81644,
+      "sha256": "34b44f9e50e449a76d9eb2f1a9b9655bd57860a7c63eec724df70038692a5a13",
+      "gitBlobSha": "383957d645a69be7ec1cdb69399f4e19aa41052b"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/tether.wav",
+      "bytes": 23084,
+      "sha256": "7ff1fc55ff1b39537d474d362508a4a62975a45723c21ffbc6ea6b52eae9c356",
+      "gitBlobSha": "1a6f0f4243c47bd25218cf156f96c3fca67959b0"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/audio/thruster-loop.wav",
+      "bytes": 96044,
+      "sha256": "329ae6a950adf73fdf419c0bc8686fa2a5afa5b51115057305fcc46443c247ee",
+      "gitBlobSha": "b05b5c3d5f86ff8ace2b46a5c2cdeb879583a7a6"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/astronaut-colliders.json",
+      "bytes": 299,
+      "sha256": "325ee40aba708cb5e3763d49973870dead5747d4075206c2ec0555999890eaf2",
+      "gitBlobSha": "c53a38a0e7656d0732de2d8683762ce245c603b6"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/audio-catalog.json",
+      "bytes": 9503,
+      "sha256": "41ac87c135847e3a4a455158f5b8aa985114dac95f53bd00fcbc88372ba27d8d",
+      "gitBlobSha": "b25a536f739ef31532ef03a656477c655b7a3f86"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-arc-colliders.json",
+      "bytes": 458,
+      "sha256": "c6e7855731fe6765ba9f022dff63d4c869eb76e77174121fc9c2a9c6685844ee",
+      "gitBlobSha": "9c936ee272d02bd98d49a92eee44f63b9a336a83"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-beacon-colliders.json",
+      "bytes": 455,
+      "sha256": "0c5751317770262df94fb6167116d1f5af3e3145a4a0beced0bb69b91bba66bf",
+      "gitBlobSha": "6fee9649e22c2ed8d98e0f34e29119fd82dd608a"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-console-colliders.json",
+      "bytes": 462,
+      "sha256": "82d0b439afe488383e8256e21da3ad652ec199cfbb472f047310df1b593115c9",
+      "gitBlobSha": "c10ee7f809f6cf846f3c125dc516a8cecb609607"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-crate-colliders.json",
+      "bytes": 365,
+      "sha256": "e8be9898992b4e54a3798ba5513d32770f4af77644789d38178f34f8bcc5607a",
+      "gitBlobSha": "e7b255c4f454e62709213ca029bd52cb2c5b0a55"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-debris-colliders.json",
+      "bytes": 468,
+      "sha256": "ba3fbf88a7c1b65633284429a97ea7e75a2f0e779419c40296bb7fb159cc2fee",
+      "gitBlobSha": "1480c950b63150d6602a314f7650d5a54e5256f6"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-gate-colliders.json",
+      "bytes": 465,
+      "sha256": "64421039d5adf5de652c2e922be86098e37f33253c6dc639a09a4f8c1252f627",
+      "gitBlobSha": "9c033bb71a9f74bff6fe0a3ec51a1aca109ece62"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-leak-colliders.json",
+      "bytes": 452,
+      "sha256": "b1436582e3920be5760b9a1e1ae04a7b9fb9e69f16cba47ca8e84f3df51f2b35",
+      "gitBlobSha": "2f24a64460253c15366b0bbcc1958edeb4a20ee8"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-magnetic-colliders.json",
+      "bytes": 461,
+      "sha256": "80293d1f1ae5fcd5e210374799265528a9b781e8da3af2f52eb44f3694483e5e",
+      "gitBlobSha": "75b6b41551e08d74976fcc1bed8eb9bec43f4a23"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-memory-colliders.json",
+      "bytes": 458,
+      "sha256": "ad3acedf557232f83c300b9accf97b2d76f2204b40e826554e38528309b0b2c1",
+      "gitBlobSha": "abaa9045346af50d1dc6b2385b2cebe336a19f04"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-mirror-colliders.json",
+      "bytes": 511,
+      "sha256": "3bb188f70fdd67889f05cab838ebfaf26419dd6fe63d7b48a0f7d2206c337455",
+      "gitBlobSha": "7de6d8473d9598f0b0255797ac73966106fd7456"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-oxygen-colliders.json",
+      "bytes": 471,
+      "sha256": "aff8da6682a5a13413b71287141a7779dcbcb052b2a305a4b3ddd39444d7fcc8",
+      "gitBlobSha": "b935e2a583c8baef400c88c3640f7b09e2bceb83"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-receiver-colliders.json",
+      "bytes": 506,
+      "sha256": "406bbfe6c2d398988c3255727e411e13fcd0f28c53a6bf2789edf725f4290e36",
+      "gitBlobSha": "34b96c1dfc8837216bc3139397d1331fa315b6e1"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/device-tether-colliders.json",
+      "bytes": 467,
+      "sha256": "9b1a50956063d0988a1b1e920fba2b9029236790dd211945d3286b3869440513",
+      "gitBlobSha": "6ecec08f38cdc9f565cf9faff294ce0c33cc9a4d"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/model-catalog.json",
+      "bytes": 9838,
+      "sha256": "366f7beeab328c0296f3b9474051e76ce83c08b8fda5177531cc18b5186b1b3b",
+      "gitBlobSha": "222bad322e879b5bda4de05f3eb8de3d11f602a5"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-airlock-colliders.json",
+      "bytes": 1661,
+      "sha256": "19c30b7b61b534e47cb36cb2af369b2959904f2bf5e88006a434630b0f5ffb1c",
+      "gitBlobSha": "ed54df5253934b3316f81fbe78dfed1aaed037f1"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-core-colliders.json",
+      "bytes": 1658,
+      "sha256": "3f24a6d43ca4f21d4ef0f1bce213068953001a3138b53bcbcf4df8789564140c",
+      "gitBlobSha": "9cb01d9ee21bdef4c40e9d3acd270bd9ce0f850e"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-habitat-colliders.json",
+      "bytes": 1661,
+      "sha256": "2516b9773614fa9dfda081e4c1cdbe873c20b267d9848e7096e83c149a31a2c4",
+      "gitBlobSha": "e14d12403fc2de0e6ca3580cb7204abdd20c0098"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/data/room-maintenance-colliders.json",
+      "bytes": 1665,
+      "sha256": "648dfd37878a4a9c69fba95907917fd817c3535aff47af60d0e2786a6b585a55",
+      "gitBlobSha": "0d69d33cbacc2e0ae1600e268634750706391eae"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/astronaut.glb",
+      "bytes": 157484,
+      "sha256": "2f2f86fde7bf971f788275d3cf185e127e814d931eedb6111d248fde99a3dbb5",
+      "gitBlobSha": "895d9f7ef9849c761c3ad337fc0e14f427b21e00"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-arc.glb",
+      "bytes": 121804,
+      "sha256": "748c951a3e0d4166626bb82c32acae79f1b7114f3ecd176a52b9bc2cc14013f4",
+      "gitBlobSha": "cbb62b067bcbb5aa874c3880c2a5013c1d479b9f"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-beacon.glb",
+      "bytes": 24272,
+      "sha256": "668ed82cd34e98f8e79f7fdde48b35013b08b524f0f8b09b73db37ce6607bfb6",
+      "gitBlobSha": "badb700786bc5337c0dd19091110d26ff28442b9"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-console.glb",
+      "bytes": 23144,
+      "sha256": "10d463bf1f1d82eccf7a46916c04ca879c7e19e5b5d378f4da122d0567c59d31",
+      "gitBlobSha": "a6294be5dd45a2103c5dcdf548c698d4c8013f33"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-crate.glb",
+      "bytes": 28196,
+      "sha256": "cd8503a6d764ebe99162c7ff021855d1b2c358510f37836fdda38ab60f8ef799",
+      "gitBlobSha": "513aeb55789d54a6f12110807a6f67f391e8736e"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-debris.glb",
+      "bytes": 11772,
+      "sha256": "1b78fa65e3190e2e40b9d9dcc3b53477c3274594d278e2b1d8f5aa029fb7a815",
+      "gitBlobSha": "9ce70ad6c467e8568bf532cf8d0aa7527100c38c"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-gate.glb",
+      "bytes": 24332,
+      "sha256": "9c4969d902cb73498a494f62b6a893cce348a8953989853e8fe5dfbc24cdfe12",
+      "gitBlobSha": "dccfd1c5713383ad47c9d1804bb5872bb4e74140"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-leak.glb",
+      "bytes": 34932,
+      "sha256": "678bb57bcd092a52ebb788ecaa1dee0ebf8a029b5dd24ab42cbfbb0e5321fa8d",
+      "gitBlobSha": "0e35ef19d3d9c306cf122086b99e4255c7cc9f20"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-magnetic.glb",
+      "bytes": 14528,
+      "sha256": "5b364ef7a2e4fb5f12235296ff3b286b59bd28df6c540e78e93fbf48b6599c94",
+      "gitBlobSha": "5956d30e1ed9a6b01a59153d86dd1c76e09e4083"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-memory.glb",
+      "bytes": 33464,
+      "sha256": "5ad7cfdc3a4e9f747d277c3255a9b564b242489be62c8bbe326462b41037843c",
+      "gitBlobSha": "e7ab017a289f815819feaba824763a606db9acce"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-mirror.glb",
+      "bytes": 20764,
+      "sha256": "8d23cdee81021d2ef1ea9226a7717600b208b63d72410f28d880e9587db9c03e",
+      "gitBlobSha": "d6245a79e3846806f947f3ea9bb96aedbf98892f"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-oxygen.glb",
+      "bytes": 79260,
+      "sha256": "009e6e8a428a936e8b9e97262de7a75f53d906c4b1a279830a1e0024c6ad2dbf",
+      "gitBlobSha": "971f922b9eec93ad06d2e42029728413f26155ea"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-receiver.glb",
+      "bytes": 22896,
+      "sha256": "746a9f74e91ac6b258ee746265db03c9a424894deb3d6739218acdcd689e68e5",
+      "gitBlobSha": "14bd2b108e53eff3f654b399d5a66d6890726c47"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/device-tether.glb",
+      "bytes": 19104,
+      "sha256": "c867161c4d4a40657ef950a286eaa500e470b7de408eb19b988d619ef7451bba",
+      "gitBlobSha": "18ce95fe94c2500af37168b43d0f3db78d5b46af"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-airlock.glb",
+      "bytes": 161112,
+      "sha256": "8513a4bd8604b2333185604eb05190007e53ee06ec75450d1a05f1d123cc3999",
+      "gitBlobSha": "bbbabdd12e2efea5d0535a64e3699d7287de9d6f"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-core.glb",
+      "bytes": 161024,
+      "sha256": "778675cf3a7acb1050e164bd04371bc77142e065ead7473e76525ffdb025fe50",
+      "gitBlobSha": "a28b38fd291c087541ef6166f57b4b72816584c6"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-habitat.glb",
+      "bytes": 182796,
+      "sha256": "95c45e051ebf3206be6c92f71ae97495ccdbca8047383fefe065dcfbfb94e517",
+      "gitBlobSha": "21e422c9ee295e84236516a379e7d3d24ae718e9"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/models/room-maintenance.glb",
+      "bytes": 176624,
+      "sha256": "880ffa219c15f0fb158142275ee157d2ba7cb2d18f42fbea5b90532ea94f9dd9",
+      "gitBlobSha": "bf3943271a3b76c7ccf768dc48db5b1de237bacc"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/buffer-geometry-utils.js",
+      "bytes": 35562,
+      "sha256": "0054b0332ad40e359acdd2ac2e71ee49f704b91511d33387aeaec5ed855de059",
+      "gitBlobSha": "f556c2e3ac164987223a27709e001c7be7c5e202"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/gltf-loader.js",
+      "bytes": 114757,
+      "sha256": "f488d85ed2b395eaef2d6abd8a95cc3176a6007e253d5fd7fc2d76b297410467",
+      "gitBlobSha": "d415696ac2d2c741b722916826653c3feffaa59c"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/skeleton-utils.js",
+      "bytes": 11085,
+      "sha256": "6f0249a93264157300d4bde7d2da5b655a5922cae786137d19527f1bfc004e3c",
+      "gitBlobSha": "ceb5c7120edca32350f15ceb5670fcbd789ae4dd"
+    },
+    {
+      "path": "public/games/orbit-fall/assets/runtime/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "gitBlobSha": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9"
+    },
+    {
+      "path": "public/games/orbit-fall/audio.js",
+      "bytes": 6098,
+      "sha256": "d85916b9d290a8c10b116fca0538fa7e7031b0ee2207d087066978db9024d305",
+      "gitBlobSha": "6ccf8793656a960276ade44520e7eb76eba97246"
+    },
+    {
+      "path": "public/games/orbit-fall/bootstrap.js",
+      "bytes": 2510,
+      "sha256": "1d738dd4b3cc11cca30c8eddc7bde6340ac12aa69a6f579d9ecf6d74752674d3",
+      "gitBlobSha": "e0da44aa84f08c3858a9a432af22789ad4a58a63"
+    },
+    {
+      "path": "public/games/orbit-fall/bridge.js",
+      "bytes": 1370,
+      "sha256": "59d4314f685ce18b11366f4f74c8e669d66b8d753fd90acffe81507d1a60a0d3",
+      "gitBlobSha": "153e5453bc154f092f304c61e8f5c7f387335050"
+    },
+    {
+      "path": "public/games/orbit-fall/content.js",
+      "bytes": 10067,
+      "sha256": "add4e4866fa2fd527492fe676b5e6f3a84f5ea82372282854a4cc693d2d427ff",
+      "gitBlobSha": "c6aa1df9ff65715b026f887b2907f76d8b347ad8"
+    },
+    {
+      "path": "public/games/orbit-fall/hazards.js",
+      "bytes": 566,
+      "sha256": "d8c1cf57be04b59b5b98aacb77f5971edca0c655040d2fc7014ffb32d45789f7",
+      "gitBlobSha": "99767b1408db56cdc65a94569eba982b5ec00ec6"
+    },
+    {
+      "path": "public/games/orbit-fall/index.html",
+      "bytes": 2738,
+      "sha256": "b040d6bca2335052e654f55af2038be2f4698739ded93a9d9047cc57ccd1beec",
+      "gitBlobSha": "9672a8044c1b6784f936192f9058a2da5bbe6a5a"
+    },
+    {
+      "path": "public/games/orbit-fall/main.js",
+      "bytes": 36255,
+      "sha256": "743cc6a0d68fb1de56107e3a944a87c3c888a0ecf99ed020271478836867ed67",
+      "gitBlobSha": "b42782195eea7409d228ecb636ebd1616640e8d3"
+    },
+    {
+      "path": "public/games/orbit-fall/marker-layout.js",
+      "bytes": 8026,
+      "sha256": "538445834200463950284b30fe2d3a8d8d4c5eb61face499e12a9200293c2749",
+      "gitBlobSha": "55a0fd8a31eee81507c58ff5fa0f5fe28ecbf269"
+    },
+    {
+      "path": "public/games/orbit-fall/measurement.js",
+      "bytes": 5245,
+      "sha256": "6bc96c5086ebde80bd6d9989153a8d7a8b8c6f71032706fb6bbb62043d6ee5b5",
+      "gitBlobSha": "8ccdefbfa87f41465b55173cede7d38efb9587cd"
+    },
+    {
+      "path": "public/games/orbit-fall/models.js",
+      "bytes": 20335,
+      "sha256": "47dce984cd7f6c1129d7b1102a97b9492e22b2a6c8419057caccb18071f1c683",
+      "gitBlobSha": "9e5b6121e1936aeab75ad1adeb4a25ae69a9dc1b"
+    },
+    {
+      "path": "public/games/orbit-fall/optics.js",
+      "bytes": 5765,
+      "sha256": "974a039f7af83d48b4978786a6b650f34e44934c6dbcda6202f11764590459df",
+      "gitBlobSha": "48a832ea39154836cede2c457763dec414530c74"
+    },
+    {
+      "path": "public/games/orbit-fall/physics.js",
+      "bytes": 4590,
+      "sha256": "70be688db92863dbec0712e7a41f969ab4d9bc94d644d0a07279f0a310584c5c",
+      "gitBlobSha": "948368804be0ce820dc13aaa730124c7318168d3"
+    },
+    {
+      "path": "public/games/orbit-fall/player-backup-ui.js",
+      "bytes": 14845,
+      "sha256": "2fa5a1d596edf959757ad160c7ea382d4d41ae2e615b63130102c844aab1b429",
+      "gitBlobSha": "be14c85877dae18e08a111ebd908bcae6a6a481c"
+    },
+    {
+      "path": "public/games/orbit-fall/player-backup.js",
+      "bytes": 15901,
+      "sha256": "5ab21cc969536b11a0595055b82ac1a09bd4bb40ce45476923e0a5c2a888e842",
+      "gitBlobSha": "a546ec0c8f05e62737b4ebcc909cc8106c3e79d1"
+    },
+    {
+      "path": "public/games/orbit-fall/rules.js",
+      "bytes": 10841,
+      "sha256": "81487bcb26e6d50f685d930a5fc5b1593dff0d3c98497c8ddd3128992f8cae4c",
+      "gitBlobSha": "2b4038b50be2c87325ddbff19f5349f3d6e04a13"
+    },
+    {
+      "path": "public/games/orbit-fall/scene.js",
+      "bytes": 17758,
+      "sha256": "0aa8a74c51b45d71433b2148449e49f80d60cc6fec34848e1cafa19003e54a5c",
+      "gitBlobSha": "7c51cd6a100ca60f085d57f0a8e482196f0c948e"
+    },
+    {
+      "path": "public/games/orbit-fall/settings.js",
+      "bytes": 2663,
+      "sha256": "85c93f038d7785459fb877a7ce5937e859cf11ace87b6e6ec0e5492c1293d4a7",
+      "gitBlobSha": "1a40835313ed6c1fc2413af78f5601bccae91487"
+    },
+    {
+      "path": "public/games/orbit-fall/storage.js",
+      "bytes": 8937,
+      "sha256": "c89bd73fb76eb816d959f8cdf3422fe3c4da789257c878c07a51543b87fb479b",
+      "gitBlobSha": "a1715b0a60803263c8b93e958f0989e9fc428ace"
+    },
+    {
+      "path": "public/games/orbit-fall/style.css",
+      "bytes": 11108,
+      "sha256": "e187cefccec35d294b9c43e128bceefc6c10be5f2cc6413009c43f1cec684475",
+      "gitBlobSha": "8e2ce5eea7c95ce4166d82dfbc1968ed813b6a00"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "gitBlobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/rapier.mjs",
+      "bytes": 2220413,
+      "sha256": "96e9905a2661e9641f4ff5b79ee4ce2d7773f4943b11af58cac123eb53740163",
+      "gitBlobSha": "ae2dd589f5edd0b00c687d652c8287608b18ddc4"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "gitBlobSha": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "gitBlobSha": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5"
+    },
+    {
+      "path": "public/games/orbit-fall/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "gitBlobSha": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4"
+    },
+    {
+      "path": "runtime-manifest.json",
+      "bytes": 13709,
+      "sha256": "5d60b039cc471e9137836deb6dda545c5064df2b918fbe2ed5dfe278f6e198e2",
+      "gitBlobSha": "1fc165c10156b4244d4da0266a8cc63f991998ff"
+    },
+    {
+      "path": "source-provenance.json",
+      "bytes": 45141,
+      "sha256": "dea57a10db39a03d8d4a8a9da34bbcad2a2376986435adf1bda7fce946d56f38",
+      "gitBlobSha": "e79a388b82936b53f3fd67d215ed60a60067e7d7"
+    },
+    {
+      "path": "tools/check-challenge-extension.mjs",
+      "bytes": 6422,
+      "sha256": "b0e2729b8fc69d6c6c7943566c0f881f627c3fe2427ee19fe6c40efac02b7707",
+      "gitBlobSha": "e1a6dbf7640396d9e089510105fdae8e42a91fdf"
+    },
+    {
+      "path": "tools/clean-rebuild.py",
+      "bytes": 4218,
+      "sha256": "003991fd1d9c0f8e3cb6d2d740fe9e3b398dda9d0d4defd524154785305f2852",
+      "gitBlobSha": "7042b675f9c1d9459a9cedf30842b98d7e13efca"
+    },
+    {
+      "path": "tools/fixtures/main-fixture.mjs",
+      "bytes": 7178,
+      "sha256": "fdeeef7803d1a2aeeeb46c4a3cc7e5ad35ae37dcc76649cfc19b0960226b2c06",
+      "gitBlobSha": "4d949ff4b6c64cad479954ea364f10d473c071b2"
+    },
+    {
+      "path": "tools/prepare-offline-dependencies.py",
+      "bytes": 4210,
+      "sha256": "87bf820dd6a5768b0463e66997afbfae5d2d4126bfc81a141963c289e8dacd69",
+      "gitBlobSha": "a04492f0dad64f465e12dcd69fa7a8d4a19b4688"
+    },
+    {
+      "path": "tools/verify-delivery.py",
+      "bytes": 5564,
+      "sha256": "30f2ba02db385c81d40d7e9ee0e595f383ed9359b95e67d96c630a9141d035dd",
+      "gitBlobSha": "c1019f9542346a14bab3ac733894f5814e0ad7c6"
+    }
+  ]
+}

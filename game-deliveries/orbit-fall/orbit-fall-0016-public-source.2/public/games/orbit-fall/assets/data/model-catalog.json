@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "assets": [
+    {
+      "id": "orbit-fall.astronaut",
+      "runtime": [
+        "assets/models/astronaut.glb",
+        "assets/data/astronaut-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/astronaut.glb": "2f2f86fde7bf971f788275d3cf185e127e814d931eedb6111d248fde99a3dbb5"
+      },
+      "budget": {
+        "runtimeBytes": 157484,
+        "triangles": 2918,
+        "meshes": 42,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 1,
+        "vertexBytes": 106308,
+        "maxSimultaneousInstances": 1
+      }
+    },
+    {
+      "id": "orbit-fall.room-airlock",
+      "runtime": [
+        "assets/models/room-airlock.glb",
+        "assets/data/room-airlock-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-airlock.glb": "8513a4bd8604b2333185604eb05190007e53ee06ec75450d1a05f1d123cc3999"
+      },
+      "budget": {
+        "runtimeBytes": 161112,
+        "triangles": 4500,
+        "meshes": 48,
+        "instancedMeshes": 11,
+        "skinnedMeshes": 0,
+        "vertexBytes": 99744,
+        "maxSimultaneousInstances": 1
+      }
+    },
+    {
+      "id": "orbit-fall.room-maintenance",
+      "runtime": [
+        "assets/models/room-maintenance.glb",
+        "assets/data/room-maintenance-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-maintenance.glb": "880ffa219c15f0fb158142275ee157d2ba7cb2d18f42fbea5b90532ea94f9dd9"
+      },
+      "budget": {
+        "runtimeBytes": 176624,
+        "triangles": 4140,
+        "meshes": 64,
+        "instancedMeshes": 11,
+        "skinnedMeshes": 0,
+        "vertexBytes": 100208,
+        "maxSimultaneousInstances": 1
+      }
+    },
+    {
+      "id": "orbit-fall.room-habitat",
+      "runtime": [
+        "assets/models/room-habitat.glb",
+        "assets/data/room-habitat-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-habitat.glb": "95c45e051ebf3206be6c92f71ae97495ccdbca8047383fefe065dcfbfb94e517"
+      },
+      "budget": {
+        "runtimeBytes": 182796,
+        "triangles": 4192,
+        "meshes": 64,
+        "instancedMeshes": 11,
+        "skinnedMeshes": 0,
+        "vertexBytes": 103528,
+        "maxSimultaneousInstances": 1
+      }
+    },
+    {
+      "id": "orbit-fall.room-core",
+      "runtime": [
+        "assets/models/room-core.glb",
+        "assets/data/room-core-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-core.glb": "778675cf3a7acb1050e164bd04371bc77142e065ead7473e76525ffdb025fe50"
+      },
+      "budget": {
+        "runtimeBytes": 161024,
+        "triangles": 4428,
+        "meshes": 51,
+        "instancedMeshes": 13,
+        "skinnedMeshes": 0,
+        "vertexBytes": 95776,
+        "maxSimultaneousInstances": 1
+      }
+    },
+    {
+      "id": "orbit-fall.device-crate",
+      "runtime": [
+        "assets/models/device-crate.glb",
+        "assets/data/device-crate-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-crate.glb": "cd8503a6d764ebe99162c7ff021855d1b2c358510f37836fdda38ab60f8ef799"
+      },
+      "budget": {
+        "runtimeBytes": 28196,
+        "triangles": 408,
+        "meshes": 11,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 15728,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-receiver",
+      "runtime": [
+        "assets/models/device-receiver.glb",
+        "assets/data/device-receiver-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-receiver.glb": "746a9f74e91ac6b258ee746265db03c9a424894deb3d6739218acdcd689e68e5"
+      },
+      "budget": {
+        "runtimeBytes": 22896,
+        "triangles": 372,
+        "meshes": 8,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 13208,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-mirror",
+      "runtime": [
+        "assets/models/device-mirror.glb",
+        "assets/data/device-mirror-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-mirror.glb": "8d23cdee81021d2ef1ea9226a7717600b208b63d72410f28d880e9587db9c03e"
+      },
+      "budget": {
+        "runtimeBytes": 20764,
+        "triangles": 192,
+        "meshes": 7,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 11520,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-gate",
+      "runtime": [
+        "assets/models/device-gate.glb",
+        "assets/data/device-gate-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-gate.glb": "9c4969d902cb73498a494f62b6a893cce348a8953989853e8fe5dfbc24cdfe12"
+      },
+      "budget": {
+        "runtimeBytes": 24332,
+        "triangles": 144,
+        "meshes": 12,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 10080,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-oxygen",
+      "runtime": [
+        "assets/models/device-oxygen.glb",
+        "assets/data/device-oxygen-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-oxygen.glb": "009e6e8a428a936e8b9e97262de7a75f53d906c4b1a279830a1e0024c6ad2dbf"
+      },
+      "budget": {
+        "runtimeBytes": 79260,
+        "triangles": 2052,
+        "meshes": 15,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 62264,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-console",
+      "runtime": [
+        "assets/models/device-console.glb",
+        "assets/data/device-console-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-console.glb": "10d463bf1f1d82eccf7a46916c04ca879c7e19e5b5d378f4da122d0567c59d31"
+      },
+      "budget": {
+        "runtimeBytes": 23144,
+        "triangles": 132,
+        "meshes": 11,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 9240,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-leak",
+      "runtime": [
+        "assets/models/device-leak.glb",
+        "assets/data/device-leak-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-leak.glb": "678bb57bcd092a52ebb788ecaa1dee0ebf8a029b5dd24ab42cbfbb0e5321fa8d"
+      },
+      "budget": {
+        "runtimeBytes": 34932,
+        "triangles": 434,
+        "meshes": 14,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 18028,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-arc",
+      "runtime": [
+        "assets/models/device-arc.glb",
+        "assets/data/device-arc-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-arc.glb": "748c951a3e0d4166626bb82c32acae79f1b7114f3ecd176a52b9bc2cc14013f4"
+      },
+      "budget": {
+        "runtimeBytes": 121804,
+        "triangles": 3376,
+        "meshes": 24,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 95136,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-debris",
+      "runtime": [
+        "assets/models/device-debris.glb",
+        "assets/data/device-debris-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-debris.glb": "1b78fa65e3190e2e40b9d9dcc3b53477c3274594d278e2b1d8f5aa029fb7a815"
+      },
+      "budget": {
+        "runtimeBytes": 11772,
+        "triangles": 72,
+        "meshes": 4,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 5976,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-magnetic",
+      "runtime": [
+        "assets/models/device-magnetic.glb",
+        "assets/data/device-magnetic-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-magnetic.glb": "5b364ef7a2e4fb5f12235296ff3b286b59bd28df6c540e78e93fbf48b6599c94"
+      },
+      "budget": {
+        "runtimeBytes": 14528,
+        "triangles": 84,
+        "meshes": 7,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 5880,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-tether",
+      "runtime": [
+        "assets/models/device-tether.glb",
+        "assets/data/device-tether-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-tether.glb": "c867161c4d4a40657ef950a286eaa500e470b7de408eb19b988d619ef7451bba"
+      },
+      "budget": {
+        "runtimeBytes": 19104,
+        "triangles": 396,
+        "meshes": 4,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 13608,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-beacon",
+      "runtime": [
+        "assets/models/device-beacon.glb",
+        "assets/data/device-beacon-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-beacon.glb": "668ed82cd34e98f8e79f7fdde48b35013b08b524f0f8b09b73db37ce6607bfb6"
+      },
+      "budget": {
+        "runtimeBytes": 24272,
+        "triangles": 456,
+        "meshes": 5,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 17232,
+        "maxSimultaneousInstances": 8
+      }
+    },
+    {
+      "id": "orbit-fall.device-memory",
+      "runtime": [
+        "assets/models/device-memory.glb",
+        "assets/data/device-memory-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-memory.glb": "5ad7cfdc3a4e9f747d277c3255a9b564b242489be62c8bbe326462b41037843c"
+      },
+      "budget": {
+        "runtimeBytes": 33464,
+        "triangles": 428,
+        "meshes": 13,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 17336,
+        "maxSimultaneousInstances": 8
+      }
+    }
+  ]
+}

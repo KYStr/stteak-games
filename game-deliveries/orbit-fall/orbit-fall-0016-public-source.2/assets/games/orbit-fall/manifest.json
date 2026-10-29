@@ -1,0 +1,2198 @@
+{
+  "schemaVersion": 1,
+  "gameId": "orbit-fall",
+  "version": "1.0.1",
+  "createdAt": "2026-10-25",
+  "recipe": "recipes/build-assets.mjs",
+  "assets": [
+    {
+      "id": "orbit-fall.astronaut",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/astronaut.glb",
+        "assets/data/astronaut-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/astronaut.glb": "2f2f86fde7bf971f788275d3cf185e127e814d931eedb6111d248fde99a3dbb5",
+        "assets/data/astronaut-colliders.json": "325ee40aba708cb5e3763d49973870dead5747d4075206c2ec0555999890eaf2"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "hip-center",
+        "dimensions": [
+          1.14,
+          2.146,
+          0.952
+        ],
+        "triangles": 2918,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "porcelain",
+          "glass",
+          "gold",
+          "cyan",
+          "trim",
+          "dark",
+          "hull",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": "orbit-suit-v1",
+        "clips": [
+          {
+            "name": "idle",
+            "duration": 4,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "thrust",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "brake",
+            "duration": 0.6,
+            "loop": false,
+            "rootMotion": false
+          },
+          {
+            "name": "anchored",
+            "duration": 1,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "damaged",
+            "duration": 0.5,
+            "loop": false,
+            "rootMotion": false
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 157484,
+        "triangles": 2918,
+        "meshes": 42,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 1,
+        "vertexBytes": 106308,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "astronaut",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.room-airlock",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/room-airlock.glb",
+        "assets/data/room-airlock-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-airlock.glb": "8513a4bd8604b2333185604eb05190007e53ee06ec75450d1a05f1d123cc3999",
+        "assets/data/room-airlock-colliders.json": "19c30b7b61b534e47cb36cb2af369b2959904f2bf5e88006a434630b0f5ffb1c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "floor-center",
+        "dimensions": [
+          18.4,
+          7.315,
+          16.515
+        ],
+        "triangles": 4500,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "joint",
+          "amber",
+          "hull",
+          "cyan",
+          "green",
+          "porcelain"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 161112,
+        "triangles": 4500,
+        "meshes": 48,
+        "instancedMeshes": 11,
+        "skinnedMeshes": 0,
+        "vertexBytes": 99744,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "room",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.room-maintenance",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/room-maintenance.glb",
+        "assets/data/room-maintenance-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-maintenance.glb": "880ffa219c15f0fb158142275ee157d2ba7cb2d18f42fbea5b90532ea94f9dd9",
+        "assets/data/room-maintenance-colliders.json": "648dfd37878a4a9c69fba95907917fd817c3535aff47af60d0e2786a6b585a55"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "floor-center",
+        "dimensions": [
+          18.4,
+          7.315,
+          16.515
+        ],
+        "triangles": 4140,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "joint",
+          "amber",
+          "hull",
+          "cyan"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 176624,
+        "triangles": 4140,
+        "meshes": 64,
+        "instancedMeshes": 11,
+        "skinnedMeshes": 0,
+        "vertexBytes": 100208,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "room",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.room-habitat",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/room-habitat.glb",
+        "assets/data/room-habitat-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-habitat.glb": "95c45e051ebf3206be6c92f71ae97495ccdbca8047383fefe065dcfbfb94e517",
+        "assets/data/room-habitat-colliders.json": "2516b9773614fa9dfda081e4c1cdbe873c20b267d9848e7096e83c149a31a2c4"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "floor-center",
+        "dimensions": [
+          18.4,
+          7.315,
+          16.515
+        ],
+        "triangles": 4192,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "joint",
+          "amber",
+          "hull",
+          "cyan",
+          "porcelain",
+          "green"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 182796,
+        "triangles": 4192,
+        "meshes": 64,
+        "instancedMeshes": 11,
+        "skinnedMeshes": 0,
+        "vertexBytes": 103528,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "room",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.room-core",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/room-core.glb",
+        "assets/data/room-core-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/room-core.glb": "778675cf3a7acb1050e164bd04371bc77142e065ead7473e76525ffdb025fe50",
+        "assets/data/room-core-colliders.json": "3f24a6d43ca4f21d4ef0f1bce213068953001a3138b53bcbcf4df8789564140c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "floor-center",
+        "dimensions": [
+          18.4,
+          7.315,
+          16.515
+        ],
+        "triangles": 4428,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "joint",
+          "amber",
+          "hull",
+          "cyan"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 161024,
+        "triangles": 4428,
+        "meshes": 51,
+        "instancedMeshes": 13,
+        "skinnedMeshes": 0,
+        "vertexBytes": 95776,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "room",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-crate",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-crate.glb",
+        "assets/data/device-crate-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-crate.glb": "cd8503a6d764ebe99162c7ff021855d1b2c358510f37836fdda38ab60f8ef799",
+        "assets/data/device-crate-colliders.json": "e8be9898992b4e54a3798ba5513d32770f4af77644789d38178f34f8bcc5607a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.41,
+          1.4,
+          1.5013
+        ],
+        "triangles": 408,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "hull",
+          "dark",
+          "trim",
+          "amber",
+          "cyan"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 28196,
+        "triangles": 408,
+        "meshes": 11,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 15728,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-receiver",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-receiver.glb",
+        "assets/data/device-receiver-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-receiver.glb": "746a9f74e91ac6b258ee746265db03c9a424894deb3d6739218acdcd689e68e5",
+        "assets/data/device-receiver-colliders.json": "406bbfe6c2d398988c3255727e411e13fcd0f28c53a6bf2789edf725f4290e36"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.41,
+          1.255,
+          2
+        ],
+        "triangles": 372,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "amber",
+          "cyan",
+          "trim"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 22896,
+        "triangles": 372,
+        "meshes": 8,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 13208,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-mirror",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-mirror.glb",
+        "assets/data/device-mirror-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-mirror.glb": "8d23cdee81021d2ef1ea9226a7717600b208b63d72410f28d880e9587db9c03e",
+        "assets/data/device-mirror-colliders.json": "3bb188f70fdd67889f05cab838ebfaf26419dd6fe63d7b48a0f7d2206c337455"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.67,
+          2.425,
+          0.86
+        ],
+        "triangles": 192,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "gold",
+          "glass",
+          "cyan",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 20764,
+        "triangles": 192,
+        "meshes": 7,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 11520,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-gate",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-gate.glb",
+        "assets/data/device-gate-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-gate.glb": "9c4969d902cb73498a494f62b6a893cce348a8953989853e8fe5dfbc24cdfe12",
+        "assets/data/device-gate-colliders.json": "64421039d5adf5de652c2e922be86098e37f33253c6dc639a09a4f8c1252f627"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          4.22,
+          4.475,
+          0.805
+        ],
+        "triangles": 144,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "trim",
+          "amber",
+          "hull",
+          "joint",
+          "glass"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 24332,
+        "triangles": 144,
+        "meshes": 12,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 10080,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-oxygen",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-oxygen.glb",
+        "assets/data/device-oxygen-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-oxygen.glb": "009e6e8a428a936e8b9e97262de7a75f53d906c4b1a279830a1e0024c6ad2dbf",
+        "assets/data/device-oxygen-colliders.json": "aff8da6682a5a13413b71287141a7779dcbcb052b2a305a4b3ddd39444d7fcc8"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.695,
+          2.53,
+          1.2203
+        ],
+        "triangles": 2052,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "porcelain",
+          "trim",
+          "green",
+          "hull",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 79260,
+        "triangles": 2052,
+        "meshes": 15,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 62264,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-console",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-console.glb",
+        "assets/data/device-console-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-console.glb": "10d463bf1f1d82eccf7a46916c04ca879c7e19e5b5d378f4da122d0567c59d31",
+        "assets/data/device-console-colliders.json": "82d0b439afe488383e8256e21da3ad652ec199cfbb472f047310df1b593115c9"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.55,
+          2.0781,
+          1.15
+        ],
+        "triangles": 132,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "hull",
+          "glass",
+          "cyan",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 23144,
+        "triangles": 132,
+        "meshes": 11,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 9240,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-leak",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-leak.glb",
+        "assets/data/device-leak-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-leak.glb": "678bb57bcd092a52ebb788ecaa1dee0ebf8a029b5dd24ab42cbfbb0e5321fa8d",
+        "assets/data/device-leak-colliders.json": "b1436582e3920be5760b9a1e1ae04a7b9fb9e69f16cba47ca8e84f3df51f2b35"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.1,
+          2,
+          1.94
+        ],
+        "triangles": 434,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "hull",
+          "cyan"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 34932,
+        "triangles": 434,
+        "meshes": 14,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 18028,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-arc",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-arc.glb",
+        "assets/data/device-arc-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-arc.glb": "748c951a3e0d4166626bb82c32acae79f1b7114f3ecd176a52b9bc2cc14013f4",
+        "assets/data/device-arc-colliders.json": "c6e7855731fe6765ba9f022dff63d4c869eb76e77174121fc9c2a9c6685844ee"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.49,
+          1.8633,
+          0.69
+        ],
+        "triangles": 3376,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "porcelain",
+          "amber",
+          "cyan"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 121804,
+        "triangles": 3376,
+        "meshes": 24,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 95136,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-debris",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-debris.glb",
+        "assets/data/device-debris-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-debris.glb": "1b78fa65e3190e2e40b9d9dcc3b53477c3274594d278e2b1d8f5aa029fb7a815",
+        "assets/data/device-debris-colliders.json": "ba3fbf88a7c1b65633284429a97ea7e75a2f0e779419c40296bb7fb159cc2fee"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.7229,
+          1.5121,
+          1.3718
+        ],
+        "triangles": 72,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "trim",
+          "hull",
+          "dark",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 11772,
+        "triangles": 72,
+        "meshes": 4,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 5976,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-magnetic",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-magnetic.glb",
+        "assets/data/device-magnetic-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-magnetic.glb": "5b364ef7a2e4fb5f12235296ff3b286b59bd28df6c540e78e93fbf48b6599c94",
+        "assets/data/device-magnetic-colliders.json": "80293d1f1ae5fcd5e210374799265528a9b781e8da3af2f52eb44f3694483e5e"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          2.5,
+          0.385,
+          2.1
+        ],
+        "triangles": 84,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "cyan",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 14528,
+        "triangles": 84,
+        "meshes": 7,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 5880,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-tether",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-tether.glb",
+        "assets/data/device-tether-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-tether.glb": "c867161c4d4a40657ef950a286eaa500e470b7de408eb19b988d619ef7451bba",
+        "assets/data/device-tether-colliders.json": "9b1a50956063d0988a1b1e920fba2b9029236790dd211945d3286b3869440513"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          0.42,
+          0.815,
+          0.9396
+        ],
+        "triangles": 396,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "hull",
+          "cyan",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 19104,
+        "triangles": 396,
+        "meshes": 4,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 13608,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-beacon",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-beacon.glb",
+        "assets/data/device-beacon-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-beacon.glb": "668ed82cd34e98f8e79f7fdde48b35013b08b524f0f8b09b73db37ce6607bfb6",
+        "assets/data/device-beacon-colliders.json": "0c5751317770262df94fb6167116d1f5af3e3145a4a0beced0bb69b91bba66bf"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.8,
+          3.2,
+          1.7235
+        ],
+        "triangles": 456,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "hull",
+          "amber",
+          "cyan"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 24272,
+        "triangles": 456,
+        "meshes": 5,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 17232,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.device-memory",
+      "version": "1.0.1",
+      "kind": "model",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "assets/models/device-memory.glb",
+        "assets/data/device-memory-colliders.json"
+      ],
+      "sha256": {
+        "assets/models/device-memory.glb": "5ad7cfdc3a4e9f747d277c3255a9b564b242489be62c8bbe326462b41037843c",
+        "assets/data/device-memory-colliders.json": "ad3acedf557232f83c300b9accf97b2d76f2204b40e826554e38528309b0b2c1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter + retained source recipe",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original procedural work created for stteak; no third-party visual assets or trademarks."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "base-center",
+        "dimensions": [
+          1.55,
+          3.32,
+          1.15
+        ],
+        "triangles": 428,
+        "collision": "separate simplified collider JSON",
+        "materialSlots": [
+          "dark",
+          "trim",
+          "hull",
+          "glass",
+          "cyan",
+          "amber"
+        ],
+        "lod": [
+          {
+            "level": 0,
+            "description": "Single low-poly LOD; room culling and instanced repeating panels, DPR/shadow reduction keep geometry intact."
+          }
+        ],
+        "textureColorSpace": {},
+        "uv": "Native UVs from Three.js primitive geometry; untextured PBR materials",
+        "skeleton": null,
+        "clips": []
+      },
+      "budget": {
+        "runtimeBytes": 33464,
+        "triangles": 428,
+        "meshes": 13,
+        "instancedMeshes": 0,
+        "skinnedMeshes": 0,
+        "vertexBytes": 17336,
+        "maxSimultaneousInstances": 8
+      },
+      "reuse": {
+        "tags": [
+          "device",
+          "3d",
+          "orbit-kit-v1"
+        ],
+        "compatibleWith": [
+          "orbit-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.runtime.gltf-loader",
+      "version": "0.180.0",
+      "kind": "runtime-code",
+      "source": "sources/vendor/gltf-loader.js",
+      "runtime": [
+        "assets/runtime/gltf-loader.js"
+      ],
+      "sha256": {
+        "assets/runtime/gltf-loader.js": "f488d85ed2b395eaef2d6abd8a95cc3176a6007e253d5fd7fc2d76b297410467"
+      },
+      "provenance": {
+        "method": "vendored-with-relative-import-rewrite",
+        "creator": "Three.js authors",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 from locked npm package",
+        "referenceSources": [
+          "https://github.com/mrdoob/three.js/tree/r180"
+        ],
+        "rights": "MIT; retained license at sources/vendor/three-LICENSE.txt and runtime assets/runtime/three-LICENSE.txt"
+      },
+      "spec": {
+        "format": "ES module",
+        "changes": "Only local relative import paths rewritten"
+      },
+      "budget": {
+        "runtimeBytes": 114757
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.runtime.buffer-geometry-utils",
+      "version": "0.180.0",
+      "kind": "runtime-code",
+      "source": "sources/vendor/buffer-geometry-utils.js",
+      "runtime": [
+        "assets/runtime/buffer-geometry-utils.js"
+      ],
+      "sha256": {
+        "assets/runtime/buffer-geometry-utils.js": "0054b0332ad40e359acdd2ac2e71ee49f704b91511d33387aeaec5ed855de059"
+      },
+      "provenance": {
+        "method": "vendored-with-relative-import-rewrite",
+        "creator": "Three.js authors",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 from locked npm package",
+        "referenceSources": [
+          "https://github.com/mrdoob/three.js/tree/r180"
+        ],
+        "rights": "MIT; retained license at sources/vendor/three-LICENSE.txt and runtime assets/runtime/three-LICENSE.txt"
+      },
+      "spec": {
+        "format": "ES module",
+        "changes": "Only local relative import paths rewritten"
+      },
+      "budget": {
+        "runtimeBytes": 35562
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.runtime.skeleton-utils",
+      "version": "0.180.0",
+      "kind": "runtime-code",
+      "source": "sources/vendor/skeleton-utils.js",
+      "runtime": [
+        "assets/runtime/skeleton-utils.js"
+      ],
+      "sha256": {
+        "assets/runtime/skeleton-utils.js": "6f0249a93264157300d4bde7d2da5b655a5922cae786137d19527f1bfc004e3c"
+      },
+      "provenance": {
+        "method": "vendored-with-relative-import-rewrite",
+        "creator": "Three.js authors",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 from locked npm package",
+        "referenceSources": [
+          "https://github.com/mrdoob/three.js/tree/r180"
+        ],
+        "rights": "MIT; retained license at sources/vendor/three-LICENSE.txt and runtime assets/runtime/three-LICENSE.txt"
+      },
+      "spec": {
+        "format": "ES module",
+        "changes": "Only local relative import paths rewritten"
+      },
+      "budget": {
+        "runtimeBytes": 11085
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.runtime.models",
+      "version": "1.0.1",
+      "kind": "runtime-code",
+      "source": "sources/models-source.js",
+      "runtime": [
+        "models.js"
+      ],
+      "sha256": {
+        "models.js": "47dce984cd7f6c1129d7b1102a97b9492e22b2a6c8419057caccb18071f1c683"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained ES module",
+        "referenceSources": [],
+        "rights": "Original model runtime and generation recipes for stteak"
+      },
+      "spec": {
+        "format": "ES module",
+        "contract": "Local GLB loading, geometry sharing, named skeletal animations, explicit active/danger arc state"
+      },
+      "budget": {
+        "runtimeBytes": 20335
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.ambient-loop",
+      "version": "1.0.0",
+      "kind": "music-or-loop",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/ambient-loop.wav"
+      ],
+      "sha256": {
+        "assets/audio/ambient-loop.wav": "a046ad9e402fafe33c2d940709018fad0af0c9a11d8f9f6b54351818b988b35f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 24,
+        "loop": true,
+        "loopPoints": [
+          0,
+          576000
+        ],
+        "peakDbFS": -7.53501446322833,
+        "rmsDbFS": -17.434029139486555,
+        "loopBoundaryDifference": 0,
+        "use": "Quiet four-chord station ambience, 24-second seamless loop"
+      },
+      "budget": {
+        "runtimeBytes": 1152044,
+        "decodedBytes": 2304000,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.thruster-loop",
+      "version": "1.0.0",
+      "kind": "music-or-loop",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/thruster-loop.wav"
+      ],
+      "sha256": {
+        "assets/audio/thruster-loop.wav": "329ae6a950adf73fdf419c0bc8686fa2a5afa5b51115057305fcc46443c247ee"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 2,
+        "loop": true,
+        "loopPoints": [
+          0,
+          48000
+        ],
+        "peakDbFS": -6.37517544663302,
+        "rmsDbFS": -18.124912886930996,
+        "loopBoundaryDifference": 0,
+        "use": "Low-pass pneumatic thrust loop"
+      },
+      "budget": {
+        "runtimeBytes": 96044,
+        "decodedBytes": 192000,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.brake",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/brake.wav"
+      ],
+      "sha256": {
+        "assets/audio/brake.wav": "6bc75a1569ca8d6aa112f6411151e4d1cf19d204ffc7ae8656648ef4e831c052"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.42,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -16.83460066625568,
+        "loopBoundaryDifference": null,
+        "use": "Descending pneumatic braking impulse"
+      },
+      "budget": {
+        "runtimeBytes": 20204,
+        "decodedBytes": 40320,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.magnet",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/magnet.wav"
+      ],
+      "sha256": {
+        "assets/audio/magnet.wav": "ba6876e111e8a84eaa1ba8aeaf5a208021e2e94d609177523c457dcfa39ce86d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.3,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -14.45005128357087,
+        "loopBoundaryDifference": null,
+        "use": "Magnetic boot lock, paired low clicks"
+      },
+      "budget": {
+        "runtimeBytes": 14444,
+        "decodedBytes": 28800,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.tether",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/tether.wav"
+      ],
+      "sha256": {
+        "assets/audio/tether.wav": "7ff1fc55ff1b39537d474d362508a4a62975a45723c21ffbc6ea6b52eae9c356"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.48,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -13.578986250827391,
+        "loopBoundaryDifference": null,
+        "use": "Traction beam startup, soft upward overtone"
+      },
+      "budget": {
+        "runtimeBytes": 23084,
+        "decodedBytes": 46080,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.interact",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/interact.wav"
+      ],
+      "sha256": {
+        "assets/audio/interact.wav": "c53aab4fd616d02f7a815c0d72a52f55fae315c5fb4a6e22ae81a451418791ad"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.16,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -11.692896537843387,
+        "loopBoundaryDifference": null,
+        "use": "Nearby panel accepted"
+      },
+      "budget": {
+        "runtimeBytes": 7724,
+        "decodedBytes": 15360,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.power",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/power.wav"
+      ],
+      "sha256": {
+        "assets/audio/power.wav": "2cfc9c866f49812897601c650cac7b8bf8548d923d8a26715ad05fd31ddc16b4"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 1.15,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -14.636796873892399,
+        "loopBoundaryDifference": null,
+        "use": "Power path restored, ascending three-note confirmation"
+      },
+      "budget": {
+        "runtimeBytes": 55244,
+        "decodedBytes": 110400,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.signal",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/signal.wav"
+      ],
+      "sha256": {
+        "assets/audio/signal.wav": "09fec7da9c1514e723f79044156cdf31f72765a4f7af7440a1bfc44dfcc0dc19"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.75,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -13.781269954013917,
+        "loopBoundaryDifference": null,
+        "use": "Optional signal found, radio onset and two notes"
+      },
+      "budget": {
+        "runtimeBytes": 36044,
+        "decodedBytes": 72000,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.low-oxygen",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/low-oxygen.wav"
+      ],
+      "sha256": {
+        "assets/audio/low-oxygen.wav": "dbaedefef9826f56ab7794be484a2cd0db7727908aacee18e7eae75782b1d6d4"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.8,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -14.298057442852999,
+        "loopBoundaryDifference": null,
+        "use": "Low register two-beat oxygen notification, runtime limited to once per 8 seconds"
+      },
+      "budget": {
+        "runtimeBytes": 38444,
+        "decodedBytes": 76800,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.damage",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/damage.wav"
+      ],
+      "sha256": {
+        "assets/audio/damage.wav": "65c34968c3e85b7ae5f2586fc6ab1370fac5d93e7b092a39c41b7b9eca0160b9"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.45,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -13.910375965832635,
+        "loopBoundaryDifference": null,
+        "use": "Muted suit impact and falling pressure"
+      },
+      "budget": {
+        "runtimeBytes": 21644,
+        "decodedBytes": 43200,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.fail",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/fail.wav"
+      ],
+      "sha256": {
+        "assets/audio/fail.wav": "d7e80837aab53dd75a4758c096d85a63c255588deaf5a5ce7607337202f2b76b"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 1.3,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -11.818569870090709,
+        "loopBoundaryDifference": null,
+        "use": "Loss cue, low descending interval"
+      },
+      "budget": {
+        "runtimeBytes": 62444,
+        "decodedBytes": 124800,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.success",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/success.wav"
+      ],
+      "sha256": {
+        "assets/audio/success.wav": "34b44f9e50e449a76d9eb2f1a9b9655bd57860a7c63eec724df70038692a5a13"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 1.7,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -15.629898017376489,
+        "loopBoundaryDifference": null,
+        "use": "Deck repair complete, resolving original chord"
+      },
+      "budget": {
+        "runtimeBytes": 81644,
+        "decodedBytes": 163200,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.ending",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/ending.wav"
+      ],
+      "sha256": {
+        "assets/audio/ending.wav": "cf446b080993fcf851cd0eac4b73aa39032a91d089638bfa0dc871003a3ad16c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 3.4,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -15.584327763402255,
+        "loopBoundaryDifference": null,
+        "use": "Journey completion, calm layered arpeggio"
+      },
+      "budget": {
+        "runtimeBytes": 163244,
+        "decodedBytes": 326400,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.door",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/door.wav"
+      ],
+      "sha256": {
+        "assets/audio/door.wav": "2c4ab2b7aaee3fd089a023d84055caad62e5f67a63671b7fa10d70dd601ec99f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.75,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -17.075117429887044,
+        "loopBoundaryDifference": null,
+        "use": "Pressure seal and sliding motor"
+      },
+      "budget": {
+        "runtimeBytes": 36044,
+        "decodedBytes": 72000,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.audio.click",
+      "version": "1.0.0",
+      "kind": "sound-effect",
+      "source": "sources/sound-synthesis.mjs",
+      "runtime": [
+        "assets/audio/click.wav"
+      ],
+      "sha256": {
+        "assets/audio/click.wav": "c025930c125637ef5b7aa67f1067183bd34b37db9db45bd8fd06b1fc47eb035c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained deterministic PCM synthesis score, Node.js",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original synthesis and composition for stteak. No external recordings, samples, or music."
+      },
+      "spec": {
+        "sampleRate": 24000,
+        "channels": 1,
+        "bitDepth": 16,
+        "format": "PCM WAV",
+        "duration": 0.08,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -4.1521661432324235,
+        "rmsDbFS": -11.404903601856214,
+        "loopBoundaryDifference": null,
+        "use": "Interface confirmation"
+      },
+      "budget": {
+        "runtimeBytes": 3884,
+        "decodedBytes": 7680,
+        "maxSimultaneousVoices": 16
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "orbit-fall.runtime.audio-engine",
+      "version": "1.0.1",
+      "kind": "runtime-code",
+      "source": "sources/audio-source.js",
+      "runtime": [
+        "audio.js"
+      ],
+      "sha256": {
+        "audio.js": "d85916b9d290a8c10b116fca0538fa7e7031b0ee2207d087066978db9024d305"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Orbit / Fall asset maker",
+        "createdAt": "2026-10-25",
+        "tool": "Retained ES module",
+        "referenceSources": [],
+        "rights": "Original sound engine for stteak"
+      },
+      "spec": {
+        "format": "ES module",
+        "contract": "User-gesture unlock; paused menus mute music/thrust but allow signal/ending/fail/success/click; hidden documents suspend AudioContext"
+      },
+      "budget": {
+        "runtimeBytes": 6098
+      },
+      "dependencies": [],
+      "derivatives": []
+    }
+  ]
+}

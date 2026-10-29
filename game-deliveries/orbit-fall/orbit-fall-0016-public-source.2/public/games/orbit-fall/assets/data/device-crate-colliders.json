@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit-fall.device-crate.collision",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "base-center",
+  "collider": {
+    "shape": "box",
+    "halfExtents": [
+      0.7,
+      0.7,
+      0.7
+    ],
+    "position": [
+      0,
+      0.7,
+      0
+    ]
+  },
+  "sockets": [
+    [
+      0,
+      0.72,
+      0.76
+    ]
+  ]
+}

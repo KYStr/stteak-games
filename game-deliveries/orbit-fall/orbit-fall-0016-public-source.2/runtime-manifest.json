@@ -1,0 +1,421 @@
+{
+  "candidateId": "orbit-fall-0016-public-source.2",
+  "runtimeBuildId": "orbit-fall-0016-failure-return-cloud-candidate-1",
+  "aggregate": "5d57fe403cef9d3d8ebb6ac910f45d95dfebd8e7b81cc28dd011d630274383d3",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 67,
+      "sha256": "2cf6c8dd955913beecb3d0d7cb00dab86e5da2bebcb1cf5b71db72bd0f78dfa0"
+    },
+    {
+      "path": "assets/audio/ambient-loop.wav",
+      "bytes": 1152044,
+      "sha256": "a046ad9e402fafe33c2d940709018fad0af0c9a11d8f9f6b54351818b988b35f"
+    },
+    {
+      "path": "assets/audio/brake.wav",
+      "bytes": 20204,
+      "sha256": "6bc75a1569ca8d6aa112f6411151e4d1cf19d204ffc7ae8656648ef4e831c052"
+    },
+    {
+      "path": "assets/audio/click.wav",
+      "bytes": 3884,
+      "sha256": "c025930c125637ef5b7aa67f1067183bd34b37db9db45bd8fd06b1fc47eb035c"
+    },
+    {
+      "path": "assets/audio/damage.wav",
+      "bytes": 21644,
+      "sha256": "65c34968c3e85b7ae5f2586fc6ab1370fac5d93e7b092a39c41b7b9eca0160b9"
+    },
+    {
+      "path": "assets/audio/door.wav",
+      "bytes": 36044,
+      "sha256": "2c4ab2b7aaee3fd089a023d84055caad62e5f67a63671b7fa10d70dd601ec99f"
+    },
+    {
+      "path": "assets/audio/ending.wav",
+      "bytes": 163244,
+      "sha256": "cf446b080993fcf851cd0eac4b73aa39032a91d089638bfa0dc871003a3ad16c"
+    },
+    {
+      "path": "assets/audio/fail.wav",
+      "bytes": 62444,
+      "sha256": "d7e80837aab53dd75a4758c096d85a63c255588deaf5a5ce7607337202f2b76b"
+    },
+    {
+      "path": "assets/audio/interact.wav",
+      "bytes": 7724,
+      "sha256": "c53aab4fd616d02f7a815c0d72a52f55fae315c5fb4a6e22ae81a451418791ad"
+    },
+    {
+      "path": "assets/audio/low-oxygen.wav",
+      "bytes": 38444,
+      "sha256": "dbaedefef9826f56ab7794be484a2cd0db7727908aacee18e7eae75782b1d6d4"
+    },
+    {
+      "path": "assets/audio/magnet.wav",
+      "bytes": 14444,
+      "sha256": "ba6876e111e8a84eaa1ba8aeaf5a208021e2e94d609177523c457dcfa39ce86d"
+    },
+    {
+      "path": "assets/audio/power.wav",
+      "bytes": 55244,
+      "sha256": "2cfc9c866f49812897601c650cac7b8bf8548d923d8a26715ad05fd31ddc16b4"
+    },
+    {
+      "path": "assets/audio/signal.wav",
+      "bytes": 36044,
+      "sha256": "09fec7da9c1514e723f79044156cdf31f72765a4f7af7440a1bfc44dfcc0dc19"
+    },
+    {
+      "path": "assets/audio/success.wav",
+      "bytes": 81644,
+      "sha256": "34b44f9e50e449a76d9eb2f1a9b9655bd57860a7c63eec724df70038692a5a13"
+    },
+    {
+      "path": "assets/audio/tether.wav",
+      "bytes": 23084,
+      "sha256": "7ff1fc55ff1b39537d474d362508a4a62975a45723c21ffbc6ea6b52eae9c356"
+    },
+    {
+      "path": "assets/audio/thruster-loop.wav",
+      "bytes": 96044,
+      "sha256": "329ae6a950adf73fdf419c0bc8686fa2a5afa5b51115057305fcc46443c247ee"
+    },
+    {
+      "path": "assets/data/astronaut-colliders.json",
+      "bytes": 299,
+      "sha256": "325ee40aba708cb5e3763d49973870dead5747d4075206c2ec0555999890eaf2"
+    },
+    {
+      "path": "assets/data/audio-catalog.json",
+      "bytes": 9503,
+      "sha256": "41ac87c135847e3a4a455158f5b8aa985114dac95f53bd00fcbc88372ba27d8d"
+    },
+    {
+      "path": "assets/data/device-arc-colliders.json",
+      "bytes": 458,
+      "sha256": "c6e7855731fe6765ba9f022dff63d4c869eb76e77174121fc9c2a9c6685844ee"
+    },
+    {
+      "path": "assets/data/device-beacon-colliders.json",
+      "bytes": 455,
+      "sha256": "0c5751317770262df94fb6167116d1f5af3e3145a4a0beced0bb69b91bba66bf"
+    },
+    {
+      "path": "assets/data/device-console-colliders.json",
+      "bytes": 462,
+      "sha256": "82d0b439afe488383e8256e21da3ad652ec199cfbb472f047310df1b593115c9"
+    },
+    {
+      "path": "assets/data/device-crate-colliders.json",
+      "bytes": 365,
+      "sha256": "e8be9898992b4e54a3798ba5513d32770f4af77644789d38178f34f8bcc5607a"
+    },
+    {
+      "path": "assets/data/device-debris-colliders.json",
+      "bytes": 468,
+      "sha256": "ba3fbf88a7c1b65633284429a97ea7e75a2f0e779419c40296bb7fb159cc2fee"
+    },
+    {
+      "path": "assets/data/device-gate-colliders.json",
+      "bytes": 465,
+      "sha256": "64421039d5adf5de652c2e922be86098e37f33253c6dc639a09a4f8c1252f627"
+    },
+    {
+      "path": "assets/data/device-leak-colliders.json",
+      "bytes": 452,
+      "sha256": "b1436582e3920be5760b9a1e1ae04a7b9fb9e69f16cba47ca8e84f3df51f2b35"
+    },
+    {
+      "path": "assets/data/device-magnetic-colliders.json",
+      "bytes": 461,
+      "sha256": "80293d1f1ae5fcd5e210374799265528a9b781e8da3af2f52eb44f3694483e5e"
+    },
+    {
+      "path": "assets/data/device-memory-colliders.json",
+      "bytes": 458,
+      "sha256": "ad3acedf557232f83c300b9accf97b2d76f2204b40e826554e38528309b0b2c1"
+    },
+    {
+      "path": "assets/data/device-mirror-colliders.json",
+      "bytes": 511,
+      "sha256": "3bb188f70fdd67889f05cab838ebfaf26419dd6fe63d7b48a0f7d2206c337455"
+    },
+    {
+      "path": "assets/data/device-oxygen-colliders.json",
+      "bytes": 471,
+      "sha256": "aff8da6682a5a13413b71287141a7779dcbcb052b2a305a4b3ddd39444d7fcc8"
+    },
+    {
+      "path": "assets/data/device-receiver-colliders.json",
+      "bytes": 506,
+      "sha256": "406bbfe6c2d398988c3255727e411e13fcd0f28c53a6bf2789edf725f4290e36"
+    },
+    {
+      "path": "assets/data/device-tether-colliders.json",
+      "bytes": 467,
+      "sha256": "9b1a50956063d0988a1b1e920fba2b9029236790dd211945d3286b3869440513"
+    },
+    {
+      "path": "assets/data/model-catalog.json",
+      "bytes": 9838,
+      "sha256": "366f7beeab328c0296f3b9474051e76ce83c08b8fda5177531cc18b5186b1b3b"
+    },
+    {
+      "path": "assets/data/room-airlock-colliders.json",
+      "bytes": 1661,
+      "sha256": "19c30b7b61b534e47cb36cb2af369b2959904f2bf5e88006a434630b0f5ffb1c"
+    },
+    {
+      "path": "assets/data/room-core-colliders.json",
+      "bytes": 1658,
+      "sha256": "3f24a6d43ca4f21d4ef0f1bce213068953001a3138b53bcbcf4df8789564140c"
+    },
+    {
+      "path": "assets/data/room-habitat-colliders.json",
+      "bytes": 1661,
+      "sha256": "2516b9773614fa9dfda081e4c1cdbe873c20b267d9848e7096e83c149a31a2c4"
+    },
+    {
+      "path": "assets/data/room-maintenance-colliders.json",
+      "bytes": 1665,
+      "sha256": "648dfd37878a4a9c69fba95907917fd817c3535aff47af60d0e2786a6b585a55"
+    },
+    {
+      "path": "assets/models/astronaut.glb",
+      "bytes": 157484,
+      "sha256": "2f2f86fde7bf971f788275d3cf185e127e814d931eedb6111d248fde99a3dbb5"
+    },
+    {
+      "path": "assets/models/device-arc.glb",
+      "bytes": 121804,
+      "sha256": "748c951a3e0d4166626bb82c32acae79f1b7114f3ecd176a52b9bc2cc14013f4"
+    },
+    {
+      "path": "assets/models/device-beacon.glb",
+      "bytes": 24272,
+      "sha256": "668ed82cd34e98f8e79f7fdde48b35013b08b524f0f8b09b73db37ce6607bfb6"
+    },
+    {
+      "path": "assets/models/device-console.glb",
+      "bytes": 23144,
+      "sha256": "10d463bf1f1d82eccf7a46916c04ca879c7e19e5b5d378f4da122d0567c59d31"
+    },
+    {
+      "path": "assets/models/device-crate.glb",
+      "bytes": 28196,
+      "sha256": "cd8503a6d764ebe99162c7ff021855d1b2c358510f37836fdda38ab60f8ef799"
+    },
+    {
+      "path": "assets/models/device-debris.glb",
+      "bytes": 11772,
+      "sha256": "1b78fa65e3190e2e40b9d9dcc3b53477c3274594d278e2b1d8f5aa029fb7a815"
+    },
+    {
+      "path": "assets/models/device-gate.glb",
+      "bytes": 24332,
+      "sha256": "9c4969d902cb73498a494f62b6a893cce348a8953989853e8fe5dfbc24cdfe12"
+    },
+    {
+      "path": "assets/models/device-leak.glb",
+      "bytes": 34932,
+      "sha256": "678bb57bcd092a52ebb788ecaa1dee0ebf8a029b5dd24ab42cbfbb0e5321fa8d"
+    },
+    {
+      "path": "assets/models/device-magnetic.glb",
+      "bytes": 14528,
+      "sha256": "5b364ef7a2e4fb5f12235296ff3b286b59bd28df6c540e78e93fbf48b6599c94"
+    },
+    {
+      "path": "assets/models/device-memory.glb",
+      "bytes": 33464,
+      "sha256": "5ad7cfdc3a4e9f747d277c3255a9b564b242489be62c8bbe326462b41037843c"
+    },
+    {
+      "path": "assets/models/device-mirror.glb",
+      "bytes": 20764,
+      "sha256": "8d23cdee81021d2ef1ea9226a7717600b208b63d72410f28d880e9587db9c03e"
+    },
+    {
+      "path": "assets/models/device-oxygen.glb",
+      "bytes": 79260,
+      "sha256": "009e6e8a428a936e8b9e97262de7a75f53d906c4b1a279830a1e0024c6ad2dbf"
+    },
+    {
+      "path": "assets/models/device-receiver.glb",
+      "bytes": 22896,
+      "sha256": "746a9f74e91ac6b258ee746265db03c9a424894deb3d6739218acdcd689e68e5"
+    },
+    {
+      "path": "assets/models/device-tether.glb",
+      "bytes": 19104,
+      "sha256": "c867161c4d4a40657ef950a286eaa500e470b7de408eb19b988d619ef7451bba"
+    },
+    {
+      "path": "assets/models/room-airlock.glb",
+      "bytes": 161112,
+      "sha256": "8513a4bd8604b2333185604eb05190007e53ee06ec75450d1a05f1d123cc3999"
+    },
+    {
+      "path": "assets/models/room-core.glb",
+      "bytes": 161024,
+      "sha256": "778675cf3a7acb1050e164bd04371bc77142e065ead7473e76525ffdb025fe50"
+    },
+    {
+      "path": "assets/models/room-habitat.glb",
+      "bytes": 182796,
+      "sha256": "95c45e051ebf3206be6c92f71ae97495ccdbca8047383fefe065dcfbfb94e517"
+    },
+    {
+      "path": "assets/models/room-maintenance.glb",
+      "bytes": 176624,
+      "sha256": "880ffa219c15f0fb158142275ee157d2ba7cb2d18f42fbea5b90532ea94f9dd9"
+    },
+    {
+      "path": "assets/runtime/buffer-geometry-utils.js",
+      "bytes": 35562,
+      "sha256": "0054b0332ad40e359acdd2ac2e71ee49f704b91511d33387aeaec5ed855de059"
+    },
+    {
+      "path": "assets/runtime/gltf-loader.js",
+      "bytes": 114757,
+      "sha256": "f488d85ed2b395eaef2d6abd8a95cc3176a6007e253d5fd7fc2d76b297410467"
+    },
+    {
+      "path": "assets/runtime/skeleton-utils.js",
+      "bytes": 11085,
+      "sha256": "6f0249a93264157300d4bde7d2da5b655a5922cae786137d19527f1bfc004e3c"
+    },
+    {
+      "path": "assets/runtime/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "audio.js",
+      "bytes": 6098,
+      "sha256": "d85916b9d290a8c10b116fca0538fa7e7031b0ee2207d087066978db9024d305"
+    },
+    {
+      "path": "bootstrap.js",
+      "bytes": 2510,
+      "sha256": "1d738dd4b3cc11cca30c8eddc7bde6340ac12aa69a6f579d9ecf6d74752674d3"
+    },
+    {
+      "path": "bridge.js",
+      "bytes": 1370,
+      "sha256": "59d4314f685ce18b11366f4f74c8e669d66b8d753fd90acffe81507d1a60a0d3"
+    },
+    {
+      "path": "content.js",
+      "bytes": 10067,
+      "sha256": "add4e4866fa2fd527492fe676b5e6f3a84f5ea82372282854a4cc693d2d427ff"
+    },
+    {
+      "path": "hazards.js",
+      "bytes": 566,
+      "sha256": "d8c1cf57be04b59b5b98aacb77f5971edca0c655040d2fc7014ffb32d45789f7"
+    },
+    {
+      "path": "index.html",
+      "bytes": 2738,
+      "sha256": "b040d6bca2335052e654f55af2038be2f4698739ded93a9d9047cc57ccd1beec"
+    },
+    {
+      "path": "main.js",
+      "bytes": 36255,
+      "sha256": "743cc6a0d68fb1de56107e3a944a87c3c888a0ecf99ed020271478836867ed67"
+    },
+    {
+      "path": "marker-layout.js",
+      "bytes": 8026,
+      "sha256": "538445834200463950284b30fe2d3a8d8d4c5eb61face499e12a9200293c2749"
+    },
+    {
+      "path": "measurement.js",
+      "bytes": 5245,
+      "sha256": "6bc96c5086ebde80bd6d9989153a8d7a8b8c6f71032706fb6bbb62043d6ee5b5"
+    },
+    {
+      "path": "models.js",
+      "bytes": 20335,
+      "sha256": "47dce984cd7f6c1129d7b1102a97b9492e22b2a6c8419057caccb18071f1c683"
+    },
+    {
+      "path": "optics.js",
+      "bytes": 5765,
+      "sha256": "974a039f7af83d48b4978786a6b650f34e44934c6dbcda6202f11764590459df"
+    },
+    {
+      "path": "physics.js",
+      "bytes": 4590,
+      "sha256": "70be688db92863dbec0712e7a41f969ab4d9bc94d644d0a07279f0a310584c5c"
+    },
+    {
+      "path": "player-backup-ui.js",
+      "bytes": 14845,
+      "sha256": "2fa5a1d596edf959757ad160c7ea382d4d41ae2e615b63130102c844aab1b429"
+    },
+    {
+      "path": "player-backup.js",
+      "bytes": 15901,
+      "sha256": "5ab21cc969536b11a0595055b82ac1a09bd4bb40ce45476923e0a5c2a888e842"
+    },
+    {
+      "path": "rules.js",
+      "bytes": 10841,
+      "sha256": "81487bcb26e6d50f685d930a5fc5b1593dff0d3c98497c8ddd3128992f8cae4c"
+    },
+    {
+      "path": "scene.js",
+      "bytes": 17758,
+      "sha256": "0aa8a74c51b45d71433b2148449e49f80d60cc6fec34848e1cafa19003e54a5c"
+    },
+    {
+      "path": "settings.js",
+      "bytes": 2663,
+      "sha256": "85c93f038d7785459fb877a7ce5937e859cf11ace87b6e6ec0e5492c1293d4a7"
+    },
+    {
+      "path": "storage.js",
+      "bytes": 8937,
+      "sha256": "c89bd73fb76eb816d959f8cdf3422fe3c4da789257c878c07a51543b87fb479b"
+    },
+    {
+      "path": "style.css",
+      "bytes": 11108,
+      "sha256": "e187cefccec35d294b9c43e128bceefc6c10be5f2cc6413009c43f1cec684475"
+    },
+    {
+      "path": "vendor/rapier-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "vendor/rapier.mjs",
+      "bytes": 2220413,
+      "sha256": "96e9905a2661e9641f4ff5b79ee4ce2d7773f4943b11af58cac123eb53740163"
+    },
+    {
+      "path": "vendor/three-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    }
+  ],
+  "publicDistributionId": "orbit-fall-0016-public-source.2",
+  "derivedFromRuntimeAggregate": "a7e60751b899f93ddcd90e11631d070d38642bebf0af780bab0b9ad4781e57d9",
+  "sameQualityIdentity": false,
+  "internalBuildLabelUnchanged": true
+}

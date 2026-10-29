@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "id": "orbit-fall.room-maintenance.collision",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "floor-center",
+  "collider": {
+    "shape": "compound",
+    "parts": [
+      {
+        "shape": "box",
+        "halfExtents": [
+          9,
+          0.2,
+          8
+        ],
+        "position": [
+          0,
+          -0.2,
+          0
+        ]
+      },
+      {
+        "shape": "box",
+        "halfExtents": [
+          0.2,
+          4,
+          8
+        ],
+        "position": [
+          -9.2,
+          4,
+          0
+        ]
+      },
+      {
+        "shape": "box",
+        "halfExtents": [
+          0.2,
+          4,
+          8
+        ],
+        "position": [
+          9.2,
+          4,
+          0
+        ]
+      },
+      {
+        "shape": "box",
+        "halfExtents": [
+          9,
+          4,
+          0.2
+        ],
+        "position": [
+          0,
+          4,
+          -8.2
+        ]
+      },
+      {
+        "shape": "box",
+        "halfExtents": [
+          9,
+          4,
+          0.2
+        ],
+        "position": [
+          0,
+          4,
+          8.2
+        ]
+      },
+      {
+        "shape": "box",
+        "halfExtents": [
+          9,
+          0.2,
+          8
+        ],
+        "position": [
+          0,
+          8.2,
+          0
+        ]
+      }
+    ],
+    "note": "Door transitions replace corresponding wall collider only when route open."
+  },
+  "sockets": {
+    "west": [
+      -9,
+      2.2,
+      0
+    ],
+    "east": [
+      9,
+      2.2,
+      0
+    ],
+    "north": [
+      0,
+      2.2,
+      -8
+    ],
+    "south": [
+      0,
+      2.2,
+      8
+    ]
+  }
+}
