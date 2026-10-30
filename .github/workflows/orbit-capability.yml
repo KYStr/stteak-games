@@ -3,7 +3,7 @@ on: # 中文：只保留既有手動入口，沒有自動觸發。
   workflow_dispatch: # 中文：根統籌未另決策前不得派發。
     inputs: # 中文：不接受任意URL、flags、路線或額外檔案。
       confirm_native_chrome: # 中文：固定新scope明示確認，不沿其他遊戲授權。
-        description: 'Crown C1: normal tutorial 2-3-4; max13 reads/1 click/6 key events/4 waits/1 PNG; one W-up readiness transaction9750ms; 70s scenario, 115/119/120s original bounds; no retry' # 中文：原界線如實列出。
+        description: 'Crown C1r4: normal tutorial 2-3-4; max18 reads/9 waits/35 operations, 1 click/6 key events/1 PNG; one W-down, up to6 safe1 rounds in one shared9750ms W-up readiness transaction; 70s scene, 77s driver/89s focus admission; original115/119/120s bounds; no retry' # 中文：原界線如實列出。
         type: boolean # 中文：不能用非空字串猜同意。
         default: false # 中文：預設不執行。
         required: true # 中文：由root掌控後續派發。
