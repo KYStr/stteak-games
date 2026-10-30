@@ -3,7 +3,7 @@ name: Aether route1 fixed-source bounded native prefix
   workflow_dispatch:
     inputs:
       confirm_native_chrome:
-        description: Aether normal first station reload only; 4PNG+1 stop-viewport PNG <=2MiB; one camera click + fresh interior nav horizontal100ms trial + stop shared9s;600s work/605s total; one attempt
+        description: Aether normal first station reload only; 4PNG+1 stop-viewport PNG <=2MiB; one camera click on same-stage or strict observed next-stage + fresh interior nav horizontal100ms trial + stop shared9s;600s work/605s total; one attempt
         type: boolean
         default: false
         required: true
@@ -55,7 +55,7 @@ jobs:
           SOFTWARE.
         QA_SOURCE_1: |
           {
-            "candidateId": "aether-route1-native-workflow.r30-camera-entry",
+            "candidateId": "aether-route1-native-workflow.r31-stage-transition",
             "files": [
               {
                 "path": "LICENSE",
@@ -84,8 +84,8 @@ jobs:
               },
               {
                 "path": "scripts/components/camera-entry.mjs",
-                "bytes": 4082,
-                "sha256": "8a1f1ee69719ad0672cbe6ecb512bd71a77a52ba816e24040ec94b439a98db33"
+                "bytes": 4386,
+                "sha256": "e4f110031c218d2ed3d0909d53cc374602f041f511c5ec176d9f4f29300b9926"
               },
               {
                 "path": "scripts/components/identity.mjs",
@@ -99,8 +99,13 @@ jobs:
               },
               {
                 "path": "scripts/components/scenario.mjs",
-                "bytes": 12767,
-                "sha256": "728380c08d173aacdbed8f6ce8287dd97d55330bc7c4a1cecc6e240de3e7044a"
+                "bytes": 13376,
+                "sha256": "8420b0cc71984b20a19ae1873cd6ec72d8b9ebb15716e131fe0ef4ef56405045"
+              },
+              {
+                "path": "scripts/components/stage-transition.mjs",
+                "bytes": 2134,
+                "sha256": "32191cc15ebd891519a2d40e6aec460cba840ea3a9dda62164e4cbec31baac41"
               },
               {
                 "path": "scripts/components/visible-reader.mjs",
@@ -189,8 +194,8 @@ jobs:
               },
               {
                 "path": "source-policy.json",
-                "bytes": 604,
-                "sha256": "c3381b40b4502fbbe8be7c7866a98b4d2bd38a4cd69a287434162c8372817df9"
+                "bytes": 608,
+                "sha256": "f3ccf2d9c33aa64c9d942f61e26ebffe4faae4e26d77a8ade7e7087f4c627777"
               }
             ]
           }
@@ -340,19 +345,19 @@ jobs:
         QA_SOURCE_6: |
           const entries=new WeakMap(),errors=new WeakMap(); // 中文：只本人空白token及原錯身份，不讀錯誤屬性。
           export const ENTRY_REASONS=Object.freeze(['distance-not-near','episode-used','location','focus','visibility','fatal','hud','modal','landing','flight-mode','energy-format','energy-low','energy-high','height-format','course-format','landing-detail','same-course','same-region','same-station','viewport-width','viewport-height','route','station']); // 中文：caller只保存原首拒，沒有raw或座標。
-          export function createCameraEntry(error){const token=Object.freeze({});entries.set(token,{stage:'entry-unconfirmed',reason:'caller-evaluation'});errors.set(error,token);return token;} // 中文：原拒絕物件已存在後才建立同次診斷。
+          export function createCameraEntry(error,entryKind='same-stage'){const token=Object.freeze({});entries.set(token,{entryKind,stage:'entry-unconfirmed',reason:'caller-evaluation'});errors.set(error,token);return token;} // 中文：原拒絕物件已存在後才建立同次診斷。
           export function entryStage(token,stage,reason=null){const v=entries.get(token);if(v){v.stage=stage;v.reason=reason;}} // 中文：外來token不寫入，不執行getter。
           export function entryUnconfirmed(token,reason){const v=entries.get(token);if(v&&v.stage!=='initialized')entryStage(token,'entry-unconfirmed',reason);} // 中文：初始化成功不被後續r29已覆蓋的失敗覆蓋。
           export function bindCameraEntry(error,token){if(error!==null&&(typeof error==='object'||typeof error==='function'))errors.set(error,token);} // 中文：保原throw身份，primitive未知不強轉或讀message。
-          export function cameraEntryOf(error){const v=entries.get(errors.get(error));return v?Object.freeze({stage:v.stage,reason:v.reason}):null;} // 中文：取固定內部資料單次投影，不回token或surface。
+          export function cameraEntryOf(error){const v=entries.get(errors.get(error));return v?Object.freeze({entryKind:v.entryKind,stage:v.stage,reason:v.reason}):null;} // 中文：取固定內部資料單次投影，不回token或surface。
           export function entryMark(token,value,reason){if(!value)entryStage(token,'caller-rejected',reason);return value;} // 中文：原真值直接返回以保短路；caller停止在首拒。
           export function recoveryStableEntry(s,previous,token){ // 中文：只替代camera caller一次，原far分支仍用舊函式。
            const e=/^(\d{1,3})%$/.exec(s.labels['energy-value']??'');const m=(v,k)=>entryMark(token,v,k); // 中文：原energy regex仍在validFlight之前，取值次數不合併。
            return m(s.locationValid===true,'location')&&m(s.focused===true,'focus')&&m(s.visibility==='visible','visibility')&&m(!s.fatal,'fatal')&&m(s.hud,'hud')&&m(!s.modal,'modal')&&m(!s.landing,'landing')&&m(s.labels['flight-mode']==='乘風滑翔','flight-mode')&&m(e,'energy-format')&&m(Number(e[1])>=25,'energy-low')&&m(Number(e[1])<=100,'energy-high')&&m(/^(-?\d+) m 高度$/.test(s.labels.altitude??''),'height-format')&&m(/^航線觀測 · [1-7]\/8$/.test(s.labels['course-title']??''),'course-format')&&m(!/落到島中央/.test(s.labels['course-detail']??''),'landing-detail')&&['course-title','region','station-count'].every((k,i)=>m(typeof s.labels[k]==='string'&&s.labels[k]===previous.labels[k],['same-course','same-region','same-station'][i]))&&m(s.viewport.width===previous.width,'viewport-width')&&m(s.viewport.height===previous.height,'viewport-height'); // 中文：逐項原順序與every原多次getter，不存文字/精確能量。
           } // 中文：throw不吞，交caller保留原throw身份。
-          export function assertCameraEntry(value){ // 中文：正式輸出只允固定兩欄own-data或null。
-           if(value===null||value===undefined)return;if(!value||typeof value!=='object'||Array.isArray(value))throw Error('camera-entry-shape');const ds=Object.getOwnPropertyDescriptors(value),keys=['stage','reason'];if(Reflect.ownKeys(ds).length!==2||keys.some(k=>!ds[k]?.enumerable||!Object.hasOwn(ds[k],'value')))throw Error('camera-entry-shape');const stage=ds.stage.value,reason=ds.reason.value; // 中文：descriptor單讀，額外symbol/accessor/type不執行或洗白。
-           if(!(stage==='initialized'&&reason===null||stage==='caller-rejected'&&ENTRY_REASONS.includes(reason)||stage==='entry-unconfirmed'&&['caller-evaluation','call-preparation','adapter-active','adapter-used','adapter-initialization'].includes(reason)))throw Error('camera-entry-shape'); // 中文：stage與reason互斥且封閉，未知不冒已初始化或可動。
+          export function assertCameraEntry(value){ // 中文：正式輸出只允固定三欄own-data或null。
+           if(value===null||value===undefined)return;if(!value||typeof value!=='object'||Array.isArray(value))throw Error('camera-entry-shape');const ds=Object.getOwnPropertyDescriptors(value),keys=['entryKind','stage','reason'];if(Reflect.ownKeys(ds).length!==3||keys.some(k=>!ds[k]?.enumerable||!Object.hasOwn(ds[k],'value')))throw Error('camera-entry-shape');const stage=ds.stage.value,reason=ds.reason.value;if(!['same-stage','stage-transition'].includes(ds.entryKind.value))throw Error('camera-entry-shape'); // 中文：descriptor單讀，額外symbol/accessor/type不執行或洗白。
+           if(ds.entryKind.value==='stage-transition'&&(stage==='caller-rejected'||reason==='caller-evaluation'))throw Error('camera-entry-shape');if(!(stage==='initialized'&&reason===null||stage==='caller-rejected'&&ENTRY_REASONS.includes(reason)||stage==='entry-unconfirmed'&&['caller-evaluation','call-preparation','adapter-active','adapter-used','adapter-initialization'].includes(reason)))throw Error('camera-entry-shape'); // 中文：stage與reason互斥且封閉，未知不冒已初始化或可動。
           } // 中文：schema有效不代表原生通過。
         QA_SOURCE_7: |
           import {createHash} from 'node:crypto'; // 中文：只核網路response原bytes，不讀頁面隱藏state。
@@ -382,6 +387,7 @@ jobs:
            const v=Object.fromEntries(keys.map(k=>[k,ds[k].value]));if(!['not-attempted','pre-refused','nav-accepted','nav-refused','strategy-refused','post-read-stopped','unconfirmed'].includes(v.stage)||!['not-attempted','attempted','acknowledged'].includes(v.camera)||!['unknown','overhead','follow'].includes(v.mode)||![null,true,false].includes(v.freshNav)||!['not-attempted','attempted','acknowledged'].includes(v.hold)||![null,'arrival-observed','same-course-observed','changed'].includes(v.post)||!['not-attempted','captured','unconfirmed'].includes(v.image)||!(v.preFailure===null||PRE_REASONS.includes(v.preFailure))||((v.stage==='pre-refused')!==(v.preFailure!==null)))throw Error('camera-trial-shape'); // 中文：首拒只允pre-refused，其餘原有限欄位完整封閉。
           } // 中文：不把schema有效當遊戲或原生通過。
         QA_SOURCE_9: |
+          import {stageExpected} from './stage-transition.mjs'; // 中文：新段資格獨立，不刪原同段準入。
           import {createCameraEntry,entryMark,entryStage,entryUnconfirmed,bindCameraEntry,recoveryStableEntry} from './camera-entry.mjs'; // 中文：同次入口有限投影，不讀新surface。
           const recoveryFacts=new WeakMap(); // 中文：準入診斷只綁本模組原錯誤身份，不讀任意錯誤屬性。
           export const recoveryObservationOf=error=>recoveryFacts.get(error)??null; // 中文：固定布林與枚舉；無原文、座標或新增surface讀取。
@@ -405,13 +411,13 @@ jobs:
            const started=now(),sceneEnd=Math.min(workEnd,started+480000),approachEnd=Math.min(sceneEnd,started+420000);if(workEnd-started<480000)throw Error('scene-reserve-missing');port.restrict?.(sceneEnd);let s=await port.read();if(!s.landing||s.hud||s.modal)throw Error('fresh-landing-required'); // 中文：原開始前置不變。
            await port.capture('entry');await port.click('start');await port.click('world');await port.hold(['Space'],100);const steps=new Set();let arrival=null,previous=null,recoveryUsed=false; // 中文：全run一次旗標，不因尋回成功重置。
            const observe=surface=>{if(!surface.hud||surface.modal||surface.landing)throw Error('route-interrupted');const m=/^航線觀測 · ([1-8])\/8$/.exec(surface.labels['course-title']??'');if(m){const step=Number(m[1]);if(step>steps.size+1)throw Error('unobserved-route-step');steps.add(step);}return surface.labels['flight-mode']==='安全地面'&&surface.labels.region?.includes('蘆光庭')&&surface.labels['station-count']==='觀測台 0 / 3'&&steps.size===8;}; // 中文：每次既有read都先原逐步/到站判準，不跳過八步。
-           for(let turn=0;turn<358&&now()<approachEnd;turn++){s=await port.read();let readAt=now();if(observe(s)){arrival=s;break;} // 中文：正常分支仍一讀一判斷，沒有額外query。
-            if(!s.nav){const recoveryStart=now(),counts=port.snapshot(),parentEnd=Math.min(approachEnd,sceneEnd,workEnd,port.deadline());const admission={episodeAlreadyUsed:null,previousMissing:null,previousAgeNegative:null,previousAgeExpired:null,distanceTooNear:null,offsetTooSmall:null,surfaceUnstable:null,readsInsufficient:null,holdsInsufficient:null,parentReserveInsufficient:null};const rejected=((admission.episodeAlreadyUsed=recoveryUsed)||(admission.previousMissing=!previous)||(admission.previousAgeNegative=readAt-previous.at<0)||(admission.previousAgeExpired=readAt-previous.at>2500)||(admission.distanceTooNear=previous.distance<100)||(admission.offsetTooSmall=Math.abs(previous.dx)<=80)||(admission.surfaceUnstable=!recoveryStable(s,previous))||(admission.readsInsufficient=counts.reads>438)||(admission.holdsInsufficient=counts.holds>358)||(admission.parentReserveInsufficient=parentEnd-recoveryStart<=7000));const descending=rejected&&steps.size===8&&!recoveryUsed&&!!previous&&readAt-previous.at>=0&&readAt-previous.at<=2500&&descentCapacity(counts)&&parentEnd-recoveryStart>7000&&descentStable(s,previous,steps.size===8);if(rejected&&!descending){const error=Error('nav-recovery-not-admitted');recoveryFacts.set(error,Object.freeze({reason:Object.keys(admission).find(k=>admission[k]===true),checks:Object.freeze(admission),surface:surfaceKinds(s,steps.size===8)}));const entry=createCameraEntry(error);try{if(entryMark(entry,admission.distanceTooNear===true,'distance-not-near')&&entryMark(entry,!recoveryUsed,'episode-used')&&recoveryStableEntry(s,previous,entry)&&entryMark(entry,s.labels['route-label']==='安全風道','route')&&entryMark(entry,s.labels['station-count']==='觀測台 0 / 3','station')){recoveryUsed=true;entryStage(entry,'entry-unconfirmed','call-preparation');try{await port.cameraNavTrial(parentEnd,Object.fromEntries(['route-label','course-title','region','station-count'].map(k=>[k,s.labels[k]])),decideFlight,observe,entry);}catch{}}}catch(callerError){entryUnconfirmed(entry,'caller-evaluation');bindCameraEntry(callerError,entry);throw callerError;}throw error;}recoveryUsed=true;const recoveryEnd=recoveryStart+7000,key=descending?'Shift':previous.dx<0?'a':'d'; // 中文：原far/下降準入不變；僅已建立distanceTooNear原錯時，在throw撤權前單次相機/合法水平短段；封段仍原錯不連續航行。
+           for(let turn=0;turn<358&&now()<approachEnd;turn++){s=await port.read();let readAt=now(),prefix=0;while(steps.has(prefix+1))prefix++;if(observe(s)){arrival=s;break;} // 中文：正常分支仍一讀一判斷，沒有額外query。
+            if(!s.nav){const recoveryStart=now(),counts=port.snapshot(),parentEnd=Math.min(approachEnd,sceneEnd,workEnd,port.deadline());const expected=stageExpected(s,previous,prefix,steps,readAt,recoveryUsed,counts,parentEnd-recoveryStart);if(expected){const error=Error('nav-recovery-not-admitted'),entry=createCameraEntry(error,'stage-transition');previous=null;recoveryUsed=true;entryStage(entry,'entry-unconfirmed','call-preparation');try{await port.cameraNavTrial(parentEnd,expected,decideFlight,observe,entry);}catch{}throw error;}const admission={episodeAlreadyUsed:null,previousMissing:null,previousAgeNegative:null,previousAgeExpired:null,distanceTooNear:null,offsetTooSmall:null,surfaceUnstable:null,readsInsufficient:null,holdsInsufficient:null,parentReserveInsufficient:null};const rejected=((admission.episodeAlreadyUsed=recoveryUsed)||(admission.previousMissing=!previous)||(admission.previousAgeNegative=readAt-previous.at<0)||(admission.previousAgeExpired=readAt-previous.at>2500)||(admission.distanceTooNear=previous.distance<100)||(admission.offsetTooSmall=Math.abs(previous.dx)<=80)||(admission.surfaceUnstable=!recoveryStable(s,previous))||(admission.readsInsufficient=counts.reads>438)||(admission.holdsInsufficient=counts.holds>358)||(admission.parentReserveInsufficient=parentEnd-recoveryStart<=7000));const descending=rejected&&steps.size===8&&!recoveryUsed&&!!previous&&readAt-previous.at>=0&&readAt-previous.at<=2500&&descentCapacity(counts)&&parentEnd-recoveryStart>7000&&descentStable(s,previous,steps.size===8);if(rejected&&!descending){const error=Error('nav-recovery-not-admitted');recoveryFacts.set(error,Object.freeze({reason:Object.keys(admission).find(k=>admission[k]===true),checks:Object.freeze(admission),surface:surfaceKinds(s,steps.size===8)}));const entry=createCameraEntry(error);try{if(entryMark(entry,admission.distanceTooNear===true,'distance-not-near')&&entryMark(entry,!recoveryUsed,'episode-used')&&recoveryStableEntry(s,previous,entry)&&entryMark(entry,s.labels['route-label']==='安全風道','route')&&entryMark(entry,s.labels['station-count']==='觀測台 0 / 3','station')){recoveryUsed=true;entryStage(entry,'entry-unconfirmed','call-preparation');try{await port.cameraNavTrial(parentEnd,Object.fromEntries(['route-label','course-title','region','station-count'].map(k=>[k,s.labels[k]])),decideFlight,observe,entry);}catch{}}}catch(callerError){entryUnconfirmed(entry,'caller-evaluation');bindCameraEntry(callerError,entry);throw callerError;}throw error;}recoveryUsed=true;const recoveryEnd=recoveryStart+7000,key=descending?'Shift':previous.dx<0?'a':'d'; // 中文：原far/下降準入不變；僅已建立distanceTooNear原錯時，在throw撤權前單次相機/合法水平短段；封段仍原錯不連續航行。
              const gate=()=>{if(now()>=Math.min(recoveryEnd,approachEnd,sceneEnd,workEnd,port.deadline()))throw Error('nav-recovery-deadline');}; // 中文：原撤權與較早phase永久優先。
              for(let attempt=0;attempt<2;attempt++){gate();await port.hold([key],100,recoveryEnd);gate();s=await port.read(null,recoveryEnd);gate();readAt=now();if(observe(s)){arrival=s;break;}if(!(descending?descentStable(s,previous,steps.size===8):recoveryStable(s,previous)))throw Error('nav-recovery-surface-changed');if(s.nav)break;if(attempt===1)throw Error('nav-recovery-exhausted');} // 中文：最多兩對原hold/read；先arrival，再核原far或精確下降提示；恢復即停，不增隱藏資料。
              previous=null;if(arrival)break; // 中文：舊導航不跨episode延續，也不允第二episode。
             } // 中文：null不是已證遮擋；所有未准入狀態仍停止。
-            const a=decideFlight(s);previous={at:readAt,dx:s.nav.x-s.viewport.width/2,distance:Number(/(\d+)m/.exec(s.nav.text)[1]),width:s.viewport.width,height:s.viewport.height,labels:Object.fromEntries(['course-title','region','station-count'].map(k=>[k,s.labels[k]]))};await port.hold(a.keys,a.ms); // 中文：僅成功合法可見控制迭代留短期記憶；正常策略函式未改。
+            const a=decideFlight(s);previous={safeRoute:s.labels['route-label']==='安全風道',at:readAt,dx:s.nav.x-s.viewport.width/2,distance:Number(/(\d+)m/.exec(s.nav.text)[1]),width:s.viewport.width,height:s.viewport.height,labels:Object.fromEntries(['course-title','region','station-count'].map(k=>[k,s.labels[k]]))};await port.hold(a.keys,a.ms); // 中文：僅成功合法可見控制迭代留短期記憶；正常策略函式未改。
            } // 中文：沒有第三次尋回、額外等待或新輸入鍵。
            if(!arrival)throw Error('natural-arrival-not-proven');const suffixEnd=Math.min(sceneEnd,now()+60000);port.restrict?.(suffixEnd);const gate=()=>{if(now()>=suffixEnd||now()>=sceneEnd)throw Error('suffix-deadline');}; // 中文：一進自然後綴就固定最早界，含arrival PNG，不重新起算。
            const suffix=async fn=>{gate();const value=await Promise.resolve().then(()=>{gate();return fn();});gate();return value;}; // 中文：每個真能力前後均核，同時正式adapter單向縮host界防內部排隊越界。
@@ -420,6 +426,16 @@ jobs:
            await suffix(()=>port.capture('activated'));return {outcome:'VISIBLE_ROUTE1_COLLECTED_PENDING_REVIEW',steps:[...steps],reloadClockBefore:before,reloadClockAfter:clock(s.labels.clock),pb:'NOT_PROVEN',physicalReachability:'OBSERVED_ONLY_IF_THIS_BRANCH_REACHED',qualityScore:null}; // 中文：最後PNG抵界也不得成功，未改任何評分或自然前置。
           } // 中文：場景結束，不重開窗口或重試。
         QA_SOURCE_10: |
+          export function stageExpected(s,previous,k,steps,readAt,used,counts,remaining){ // 中文：只當次既有公開surface與原observe結果，不讀舊導航方向或距離。
+           if(used||!previous||!Number.isInteger(k)||k<1||k>6||steps.size!==k+1||!steps.has(k+1))return null; // 中文：只准真新增連續下一段，拒重複回退及第八段。
+           const age=readAt-previous.at,l=s.labels,e=/^(\d{1,3})%$/.exec(l['energy-value']??''); // 中文：年齡與能量有限且不將原文送報告。
+           if(!Number.isFinite(age)||age<0||age>2500||previous.safeRoute!==true||previous.labels['course-title']!==`航線觀測 · ${k}/8`||l['course-title']!==`航線觀測 · ${k+1}/8`)return null; // 中文：舊記憶只能證前一段身份，不可控制新段。
+           if(s.locationValid!==true||s.focused!==true||s.visibility!=='visible'||s.fatal||!s.hud||s.modal||s.landing||l['flight-mode']!=='乘風滑翔'||!e||Number(e[1])<25||Number(e[1])>100||!/^(-?\d+) m 高度$/.test(l.altitude??'')||/落到島中央/.test(l['course-detail']??''))return null; // 中文：完整正常滑翔門，不把缺nav當遮擋。
+           if(l['route-label']!=='安全風道'||l['station-count']!=='觀測台 0 / 3'||typeof l.region!=='string'||l.region!==previous.labels.region||l['station-count']!==previous.labels['station-count']||s.dpr!==1||s.viewport.width!==1600||s.viewport.height!==900||previous.width!==1600||previous.height!==900)return null; // 中文：固定原視窗與前後路線站點，不跨區換目標。
+           if(!Number.isInteger(counts.reads)||counts.reads<0||counts.reads>437||!Number.isInteger(counts.holds)||counts.holds<0||counts.holds>359||!Number.isInteger(counts.clicks)||counts.clicks<0||counts.clicks>5||!Array.isArray(counts.held)||counts.held.length!==0||!Number.isFinite(remaining)||remaining<=9000)return null; // 中文：原總額內保留完整三讀一持一點，九秒嚴格餘額。
+           return Object.freeze(Object.fromEntries(['route-label','course-title','region','station-count'].map(key=>[key,l[key]]))); // 中文：expected只取當次新段，不輸座標或復用舊nav。
+          } // 中文：拒絕不授權任何能力。
+        QA_SOURCE_11: |
           export function readVisibleAether({url,action=null}){ // 中文：新重製唯讀DOM，不沿舊入口PASS、不讀遊戲state。
            if(location.href!==url)return {locationValid:false}; // 中文：非固定來源不收集文字。
            const allowed=['start','continue','interact','close-modal','world','camera','camera-after','camera-post'];if(action!==null&&!allowed.includes(action))throw Error('reader-action'); // 中文：不接受任意selector或seed欄。
@@ -453,10 +469,10 @@ jobs:
            return result; // 中文：序列化結果不含節點或全頁HTML。
           } // 中文：模組載入不觸發瀏覽器。
           export function readStopViewport({url}){return {locationValid:location.href===url,focused:document.hasFocus(),visibility:document.visibilityState,width:innerWidth,height:innerHeight,dpr:devicePixelRatio};} // 中文：只停止頁安全身份與焦點/尺寸，不核地圖或HUD、不讀文字/座標/遊戲state。
-        QA_SOURCE_11: |
+        QA_SOURCE_12: |
           export class Fault extends Error {constructor(code){super(code);this.code=code;}} // 中文：固定錯誤碼避免任意錯誤輸出。
           export const LIMITS=Object.freeze({closeMs:5000}); // 中文：只保留既有共同五秒清理，不自填工作總界。
-        QA_SOURCE_12: |
+        QA_SOURCE_13: |
           import {assertCameraEntry} from './components/camera-entry.mjs'; // 中文：同次新入口精確schema在任何stdout前驗證。
           import {assertCameraTrial} from './components/pre-admission.mjs'; // 中文：新有限envelope先驗，raw或型別錯零stdout。
           import {IMAGE_LIMITS,imageLimit,validateImage,TOTAL_IMAGE_BYTES} from './image-contract.mjs'; // 中文：沿同固定五圖契約，stop-viewport單張2MiB，合計10485760B。
@@ -470,7 +486,7 @@ jobs:
           let report;try{report=await read('artifacts/report.json',65536);}catch(e){if(e.code!=='ENOENT')throw e;} // 中文：child尚未產報告可只交supervisor，不把其他錯誤當缺檔。
           if(report){const r=JSON.parse(report);if(r.candidateId!==SOURCE.candidateId||r.sourceCommit!==SOURCE.sourceCommit||r.capsuleCommit!==SOURCE.commit||!Array.isArray(r.screenshots)||r.screenshots.length>5)throw Error('report-shape');assertCameraTrial(r.result?.input?.cameraTrialObservation);assertCameraEntry(r.result?.report?.cameraEntry);streams.push({id:'report',bytes:report});const allowed=new Set(Object.keys(IMAGE_LIMITS));let total=0;for(const item of r.screenshots){if(!allowed.delete(item.label)||item.file!==item.label+'.png')throw Error('image-name');const b=await read('artifacts/'+item.file,imageLimit(item.label));if(b.length!==item.bytes||sha(b)!==item.sha256||!b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('image-integrity');validateImage(item.label,b);if((total+=b.length)>TOTAL_IMAGE_BYTES)throw Error('image-total');streams.push({id:item.label,bytes:b});}} // 中文：全部固定原圖先驗完，才輸出任何公共圖像。
           for(const {id,bytes} of streams){const base64=bytes.toString('base64'),chunks=Math.ceil(base64.length/16384);const lines=['AETHER_EVIDENCE_BEGIN '+JSON.stringify({id,bytes:bytes.length,sha256:sha(bytes),chunks}),...Array.from({length:chunks},(_,i)=>'AETHER_EVIDENCE_CHUNK '+JSON.stringify({id,index:i,data:base64.slice(i*16384,(i+1)*16384)})),'AETHER_EVIDENCE_END '+JSON.stringify({id})];for(const line of lines)await new Promise((resolve,reject)=>process.stdout.write(line+'\n',e=>e?reject(e):resolve()));} // 中文：原四張各2MiB加stop-viewport2MiB與兩份64KiBJSON為硬界，逐塊背壓寫完，不使用新artifact服務。
-        QA_SOURCE_13: |
+        QA_SOURCE_14: |
           import {imageLimit,validateImage,TOTAL_IMAGE_BYTES} from './image-contract.mjs'; // 中文：落檔前固定五圖名/各界/總界，原四圖外最多map-stop。
           import {nativeObservation} from './native-observation.mjs'; // 中文：只保留既有同次inspect的白名單事實。
           import {isMain} from './main-entry.mjs'; // 中文：實體主入口判定沿用原核心。
@@ -489,7 +505,7 @@ jobs:
            }finally{process.off('SIGTERM',stop);} // 中文：不重開清理窗。
           } // 中文：import不launch。
           if(await isMain(import.meta.url)){try{process.exitCode=await entry();}catch{console.error('AETHER_ENTRY_BLOCKED');process.exitCode=2;}} // 中文：只固定錯誤，禁止自動重試或輸出任意原生資訊。
-        QA_SOURCE_14: |
+        QA_SOURCE_15: |
           import {cameraEntryOf} from './components/camera-entry.mjs'; // 中文：報告只讀原錯身份對應的有限入口事實。
           import {nativeObservation} from './native-observation.mjs'; // 中文：同一次既有原生資料白名單，不補OS查詢。
           import {classifyAllowed} from './native/diagnostics.mjs'; // 中文：只分類原launch exception，禁止原stderr。
@@ -527,12 +543,12 @@ jobs:
            } // 中文：只返回有界收據。
            return Object.freeze({run,close,snapshot:()=>({fatal,stopped,workEnd,totalEnd,owner:owner.snapshot()})}); // 中文：不暴露browser/context/page或任意取網。
           } // 中文：新host必新獨審，歷史.2不適用。
-        QA_SOURCE_15: |
+        QA_SOURCE_16: |
           export const IMAGE_LIMITS=Object.freeze({entry:2097152,arrival:2097152,resumed:2097152,activated:2097152,'stop-viewport':2097152}); // 中文：原四張外只增一次停止點整viewport，固定檔名不接受任意路徑。
           export const TOTAL_IMAGE_BYTES=10485760; // 中文：五乘2MiB硬上限；兩JSON各64KiB另列。
           export function imageLimit(label){if(!Object.hasOwn(IMAGE_LIMITS,label))throw Error('image-name');return IMAGE_LIMITS[label];} // 中文：原型屬性不能冒圖名。
           export function validateImage(label,b){const cap=imageLimit(label);if(!Buffer.isBuffer(b)||b.length>cap||b.length<8||!b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error('image-integrity');if(label==='stop-viewport'&&(b.length<33||b.readUInt32BE(8)!==13||b.toString('ascii',12,16)!=='IHDR'||b.readUInt32BE(16)<1||b.readUInt32BE(20)<1||b.readUInt32BE(16)!==1600||b.readUInt32BE(20)!==900))throw Error('stop-image-dimensions');return b;} // 中文：停止圖需固定1600×900；只核原PNG容器界，不解碼像素或重畫圖片。
-        QA_SOURCE_16: |
+        QA_SOURCE_17: |
           import {CONTRACT} from './runtime-contract.mjs'; // 唯一產品合約由同workflow凍結，不接受執行時外部設定。
           import {createHash} from 'node:crypto'; // 只使用固定Node內建雜湊，不安裝新套件。
           import {gunzipSync} from 'node:zlib'; // 解壓設硬容量上限，不能接受無界壓縮炸彈。
@@ -606,7 +622,7 @@ jobs:
            if(state==='closed'||now()>=deadlineMs){await close();fail('deadline');}state='open';rejectStart=null; // 同一父截止自動關閉，啟動耗時不重設時限。
            return Object.freeze({url:TARGET.url,close,snapshot:()=>Object.freeze({state,requests,connections,servedBytes:served,archiveSha256:receipt.archive.sha256})}); // 不暴露server、Map、磁碟或任意導航能力。
           } // 本模組沒有下載器或任何外部HTTP請求。
-        QA_SOURCE_17: |
+        QA_SOURCE_18: |
           import {Fault,LIMITS} from '../core.mjs'; // 保留原總工作與五秒清理上限，不建立第二預算。
           import {startLoopback,verifyRuntime,TARGET as LOCAL} from './loopback.mjs'; // 共用已凍結 parser/server，產品身份由本包合約固定。
           import {readRuntimeInput} from './runtime-source.mjs'; // 只讀本 run 精確輸入，這裡不取外部網址。
@@ -632,10 +648,10 @@ jobs:
            } // close 結果固定，不因晚ACK轉成成功。
            return Object.freeze({prepare,assertOpen,assertCleanupOpen,launch,close,wasReady:()=>ready,snapshot:()=>({source:'verified-runner-memory-map-not-Sites',package:metadata,server:server?.snapshot()??{state:attempted?'not-open-handle':'not-started'},cleanup:structuredClone(cleanup),httpResourceReadback:null,allBrowserResponsesVerified:null,browserResponseVerificationSource:'not-observed-by-preview-owner'})}); // 窄新增同一清理界guard給Crown薄轉接，不暴露可重設deadline。
           } // session 不發新網路請求、沒有多context或重試能力。
-        QA_SOURCE_18: |
+        QA_SOURCE_19: |
           import {SOURCE} from '../source-contract.mjs'; // 中文：正式工作界未知不自填。
           export const CONTRACT=Object.freeze({...{"receiptSha256":"e64cd6818d5d71082713c5770404d57578bfe62c12d729eefa9ebeabfd100ad0","files":59,"servedBytes":5974955,"largestFileBytes":700038,"archiveBytes":1523333,"tarBytes":6031360,"responseBytes":67108864},workMs:SOURCE.approvedWorkMs}); // 中文：只新Aether身份合約，parser原文不改。
-        QA_SOURCE_19: |
+        QA_SOURCE_20: |
           {
             "originalRuntimeFiles": 60,
             "excludedMetadata": [
@@ -948,7 +964,7 @@ jobs:
               }
             ]
           }
-        QA_SOURCE_20: |
+        QA_SOURCE_21: |
           import {request as httpsRequest,Agent} from 'node:https'; // 固定GitHub raw匿名TLS，只供未來另審後的精確capsule來源。
           import {createHash} from 'node:crypto'; // 完整包SHA與每檔SHA雙重驗證，不產生產品修改。
           import {SOURCE} from '../source-contract.mjs'; // 路徑、容量與來源固定，正式呼叫無參數覆寫。
@@ -978,12 +994,12 @@ jobs:
            }); // 網路 Promise 結束，不輸出或執行包內程式。
           } // 有限取包函式結束。
           export async function readRuntimeInput({deadlineMs,signal,now}={}){return(await fetchRuntime(SOURCE,{deadlineMs,signal,now})).bytes;} // 同host原十五秒read預算內取包與驗包，不另加預下載步驟、不寫磁碟。
-        QA_SOURCE_21: |
+        QA_SOURCE_22: |
           import {realpath} from 'node:fs/promises'; // 中文：主入口以實體路徑辨識，支援目錄symlink而不跳過parser。
           import {resolve} from 'node:path'; // 中文：相對argv只解析到同一實體來源。
           import {fileURLToPath} from 'node:url'; // 中文：不直接比較URL編碼與檔案別名。
           export async function isMain(url,arg=process.argv[1]){if(arg===undefined)return false;if(typeof arg!=='string'||!arg.length)throw Error('entry-path');return await realpath(resolve(arg))===await realpath(fileURLToPath(url));} // 中文：不存在路徑保留錯誤，module import不自行執行main。
-        QA_SOURCE_22: |
+        QA_SOURCE_23: |
           import {PATHS} from './native/native.mjs'; // 中文：只引用原固定欄位，不新增任何OS讀取。
           const checks=[...PATHS.map(p=>p.key+'Path'),'restrictionsRetained','officialPackageMetadata','packageOwnsBinary','ubuntuPackageOwnsProfile','packageBinaryChecksum','packageProfileChecksum','nativeProfileStructure','noLocalProfileRules','noDisabledProfileMarker','noComplainProfileMarker','binaryVersion']; // 中文：拒絕任意輸入key洩漏。
           const pick=(v,list)=>list.includes(v)?v:null,num=v=>Number.isFinite(v)&&v>=0&&v<=Number.MAX_SAFE_INTEGER?v:null,bool=v=>typeof v==='boolean'?v:null; // 中文：只白名單字串/數字/布林，不輸出原錯誤。
@@ -992,7 +1008,7 @@ jobs:
           function ownerExecProjection(v){if(!v)return null;const exitCode=v.exitCode,signal=v.signal,killed=v.killed;return {exitCode:Number.isInteger(exitCode)&&exitCode>=0&&exitCode<=255?exitCode:null,signal:pick(signal,['SIGABRT','SIGTRAP','SIGSEGV','SIGKILL','SIGTERM','SIGILL']),killed:bool(killed)};} // 中文：同次先快照三欄各一次，再驗證並回傳同一值，禁止getter檢查與使用不一致。
           function ownerObservation(v){const o=v?.packageObservation??{},e=Array.isArray(v?.errors)?v.errors.slice(0,40).find(e=>e?.check==='packageOwnsBinary'):null;return {ownerStatus:pick(o.ownerStatus,['not-run','attempted','observed','unavailable']),ownerMatches:bool(o.ownerMatches),exec:ownerExecProjection(o.ownerExec),error:e?{code:pick(e.code,ownerCodes),indicators:Array.isArray(e.indicators)?[...new Set(e.indicators.slice(0,10).filter(x=>ownerCodes.includes(x)))]:[],signal:pick(e.signal,['SIGABRT','SIGTRAP','SIGSEGV','SIGKILL','SIGTERM','SIGILL']),name:pick(e.name,errorNames),errorCode:pick(e.errorCode,errorCodes),causeName:pick(e.causeName,errorNames)}:null};} // 中文：同次owner查詢已觀察/未能取得與不匹配分開；未知null，僅同次catch三個事實重驗；不由耗時或killed推論timeout。
           export function nativeObservation(v){const h=v?.binaryIntegrity?.hash??{},m=v?.binaryIntegrity?.metadataRead??{};return {status:pick(v?.status,['ready','blocked']),stage:pick(v?.stage,['image','paths','kernel','package','binary-metadata-read','binary-metadata-parse','binary-hash','binary-compare','profile-integrity','preflight-summary','binary-version','complete']),version:pick(v?.version,['156.0.8078.47']),packageOwnership:ownerObservation(v),checks:Object.fromEntries(checks.map(k=>[k,bool(v?.checks?.[k])])),binarySizeBytes:num(v?.paths?.binary?.sizeBytes),binaryIntegrity:{metadataRead:{status:pick(m.status,['not-run','read','rejected']),bytesRead:num(m.bytesRead),elapsedMs:num(m.elapsedMs)},metadataParse:pick(v?.binaryIntegrity?.metadataParse,['not-run','parsed','invalid-or-missing']),comparison:pick(v?.binaryIntegrity?.comparison,['not-run','match','mismatch']),hash:{status:pick(h.status,['not-run','failed','complete']),stage:pick(h.stage,['initialize-hash','open-stream','read-update','finalize','complete']),limitMs:num(h.limitMs),bytesProcessed:num(h.bytesProcessed),elapsedMs:num(h.elapsedMs),fullyRead:bool(h.fullyRead),abortSignaled:bool(h.abortSignaled),abortReasonName:pick(h.abortReasonName,['TimeoutError','AbortError','Error'])}}};} // 中文：只保留同一次既有檢查事實，未知null；不是新gate或完整供應鏈驗證。
-        QA_SOURCE_23: |
+        QA_SOURCE_24: |
           export const KERNEL = Object.freeze([{ key: "apparmorRestrictUnprivilegedUserns", path: "/proc/sys/kernel/apparmor_restrict_unprivileged_userns", type: "bit" }, { key: "unprivilegedUsernsClone", path: "/proc/sys/kernel/unprivileged_userns_clone", type: "bit" }, { key: "maxUserNamespaces", path: "/proc/sys/user/max_user_namespaces", type: "integer" }, { key: "apparmorEnabled", path: "/sys/module/apparmor/parameters/enabled", type: "yn" }]); // 只讀四個固定白名單檔，不呼叫sysctl寫入或讀取audit/private logs。
           export function classifyAllowed(error) { // 原始錯誤只在記憶體比對，絕不寫入JSON、console、hash或檔案。
             const text = typeof error?.message === "string" ? error.message.slice(0, 32768) : ""; // 有界字串避免不受控錯誤訊息吃資源。
@@ -1018,7 +1034,7 @@ jobs:
             if (type === "integer" && /^\d{1,10}$/.test(value) && Number(value) <= 2147483647) return { status: "read", value: Number(value) }; // namespace上限只保留有界非負整數。
             return { status: "unrecognized", value: null }; // 無法解析時不回傳原文。
           } // 不包含任何設定寫入。
-        QA_SOURCE_24: |
+        QA_SOURCE_25: |
           import { readFile, lstat, realpath } from 'node:fs/promises'; // 固定系統檔只讀，不安裝或修改原生Chrome與profile。
           import { createReadStream } from 'node:fs'; // 流式核已安裝binary，不把整個binary載入記憶體。
           import { createHash } from 'node:crypto'; // MD5僅比對原生dpkg資料庫，不冒稱新的數位簽章驗證。
@@ -1108,7 +1124,7 @@ jobs:
               noLocalRules: async () => { assertActive(); const local = '/etc/apparmor.d/local/chrome'; try { if (!pathAccepted(await path({ path: local, type: 'file' }), { type: 'file' })) return false; return (await read(local)).split('\n').every(line => !line.replace(/#.*$/, '').trim()); } catch (error) { if (error?.code === 'ENOENT') return true; throw error; } }, // 既有空白／註解檔可接受，任何實際規則不擅自解讀或修改。
             }; // 無替代binary、OS、安全旗標或browser安裝入口。
           } // 原生唯讀介面結束。
-        QA_SOURCE_25: |
+        QA_SOURCE_26: |
           import policy from '../source-policy.json' with {type:'json'}; // 中文：唯一正式固定policy，無環境參數覆寫。
           export const SOURCE=Object.freeze(policy); // 中文：未知批准仍null。
           export function assertPolicy(p){ // 中文：純函式供受控反例，正式入口只用SOURCE。
@@ -1118,7 +1134,7 @@ jobs:
            return p; // 中文：純形狀不是授權，由新正式pin交獨審後才能執行。
           } // 中文：無I/O。
           export const assertSourceReady=()=>assertPolicy(SOURCE); // 中文：必在任何caller能力getter之前呼叫。
-        QA_SOURCE_26: |
+        QA_SOURCE_27: |
           import os, sys, time, signal, ctypes, subprocess, json, errno  # 中文：Linux標準庫，不安裝代理、不改安全政策。
           from pathlib import Path  # 中文：僅存固定本輪短收據。
           def enable_subreaper():  # 中文：收回本supervisor後代，即使Chrome另建session也不能只靠舊process-group猜退出。
@@ -1232,9 +1248,9 @@ jobs:
               with open('supervisor.json','x') as handle: json.dump(result,handle)  # 中文：保留原收據語義，不含任意pid私資料。
               return 0 if result['status']=='exited-clean' else 2  # 中文：失信/晚回收不當成功。
           if __name__=='__main__': sys.exit(main())  # 中文：匯入測試不建立程序。
-        QA_SOURCE_27: |
+        QA_SOURCE_28: |
           {
-            "candidateId": "aether-route1-native-workflow.r30-camera-entry",
+            "candidateId": "aether-route1-native-workflow.r31-stage-transition",
             "repository": "KYStr/stteak-games",
             "sourceCommit": "57410f3d2dfd6e6a0a167dbe9fa8abe17f374afa",
             "commit": "d5e5bbb74690b0a40c41f998684451eb889c3183",
@@ -1248,7 +1264,7 @@ jobs:
             "approvedKillMs": 604000,
             "approvedTotalMs": 605000
           }
-        QA_FILE_INDEX: '[{"path":"LICENSE","env":"QA_SOURCE_0","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"PAYLOAD-MANIFEST.json","env":"QA_SOURCE_1","bytes":4418,"sha256":"3aaf9990da6064ce011ed601a60bdecf5f431f7d4db14a72d5a960fcb9b9af96"},{"path":"package-lock.json","env":"QA_SOURCE_2","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"path":"package.json","env":"QA_SOURCE_3","bytes":330,"sha256":"6b33739f0ea0052157a3db8b4bb7eb40c96f334ba6e95b23787345b2a52aafc1"},{"path":"scripts/check.mjs","env":"QA_SOURCE_4","bytes":1649,"sha256":"47aacfc1a51d66235f0b203dda2aaa013c7b0fdc9cc74ee5629f066271273215"},{"path":"scripts/components/adapter.mjs","env":"QA_SOURCE_5","bytes":19925,"sha256":"2cf6f59cb964cf72e46b6d0c0b83f5ee7e5662643871759f9c79a534edaab5d3"},{"path":"scripts/components/camera-entry.mjs","env":"QA_SOURCE_6","bytes":4082,"sha256":"8a1f1ee69719ad0672cbe6ecb512bd71a77a52ba816e24040ec94b439a98db33"},{"path":"scripts/components/identity.mjs","env":"QA_SOURCE_7","bytes":2799,"sha256":"aa7b1f088af555e0920b228ae8062056f7150d6137bc4faf2e889e69ef0a286b"},{"path":"scripts/components/pre-admission.mjs","env":"QA_SOURCE_8","bytes":3622,"sha256":"0bca510e35a0e8542ed6de87a4dcbd8febe4e3e88e8b946ea81d93288f2930d1"},{"path":"scripts/components/scenario.mjs","env":"QA_SOURCE_9","bytes":12767,"sha256":"728380c08d173aacdbed8f6ce8287dd97d55330bc7c4a1cecc6e240de3e7044a"},{"path":"scripts/components/visible-reader.mjs","env":"QA_SOURCE_10","bytes":8377,"sha256":"8c2ec36b5fba2848583cc6cf4833d2364f302acfffcc8c4d2653892d80254728"},{"path":"scripts/core.mjs","env":"QA_SOURCE_11","bytes":261,"sha256":"f59e40d283b881e096abe34d3097381eec92f2d762bc56bb80adbe1bf90acbcb"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_12","bytes":3589,"sha256":"482920eb5617dfdee27be0c55914d97659f654a032f3cd7cdf4165ea581fcf4c"},{"path":"scripts/entry.mjs","env":"QA_SOURCE_13","bytes":5066,"sha256":"d5860732efb458838ba842a366c493b69cb4be899e4c4766014707c33163c4b6"},{"path":"scripts/host.mjs","env":"QA_SOURCE_14","bytes":11117,"sha256":"4d1a938e1941843bbbbf1b1fcc68411bc9ec0a30ced9938b843c4add5a0c33f2"},{"path":"scripts/image-contract.mjs","env":"QA_SOURCE_15","bytes":1058,"sha256":"46f62f786ee2835a863ba34e15e6f837813d3d8546ec42107f9ed3e2b675a939"},{"path":"scripts/local/loopback.mjs","env":"QA_SOURCE_16","bytes":11528,"sha256":"0c3cdc602c2681e0f9ea220eda3cf84845bd7d0e7c17929a11706e24d57c82d3"},{"path":"scripts/local/preview-session.mjs","env":"QA_SOURCE_17","bytes":6194,"sha256":"bb76fad8666ed99302c2f2fa9597111f935f5be03313d591c5d713c3b98736df"},{"path":"scripts/local/runtime-contract.mjs","env":"QA_SOURCE_18","bytes":437,"sha256":"3f2c55ab24c3d6eca1ff1d0a341046b54cfc9712cd34f5a76e1507149d2d3bbe"},{"path":"scripts/local/runtime-receipt.json","env":"QA_SOURCE_19","bytes":9876,"sha256":"e64cd6818d5d71082713c5770404d57578bfe62c12d729eefa9ebeabfd100ad0"},{"path":"scripts/local/runtime-source.mjs","env":"QA_SOURCE_20","bytes":5355,"sha256":"d233dceae984ac35b41c7937bd48c91e015c618df28ee32d41f500f9febe96fc"},{"path":"scripts/main-entry.mjs","env":"QA_SOURCE_21","bytes":618,"sha256":"928ca80c2c15dfb76949c64798b59c19ee0439973ee510130bafe7e20ae9b8ca"},{"path":"scripts/native-observation.mjs","env":"QA_SOURCE_22","bytes":4133,"sha256":"89a81a3f3b878dafb2f31a2a14943cfd592afa3bc55c83f843f2ad025e40586b"},{"path":"scripts/native/diagnostics.mjs","env":"QA_SOURCE_23","bytes":4635,"sha256":"0d1f2988ccca9523488d0a8f12ac929071c61f6ba3b218db92eb66b0d5c8f763"},{"path":"scripts/native/native.mjs","env":"QA_SOURCE_24","bytes":23932,"sha256":"ac7858b16ab0166b01c0e75fff95abbf23e53eee6e7f5825cfbb8c5be0ba295c"},{"path":"scripts/source-contract.mjs","env":"QA_SOURCE_25","bytes":1433,"sha256":"e5d993c18c34992b42679a221b4a73624bdf02dd5373f0c0bbf66eb6ccbda524"},{"path":"scripts/supervisor.py","env":"QA_SOURCE_26","bytes":15307,"sha256":"d1e9635427b3c1ef362e2da0d9353448c6ed6051773b8d128a86fd2753eff5a7"},{"path":"source-policy.json","env":"QA_SOURCE_27","bytes":604,"sha256":"c3381b40b4502fbbe8be7c7866a98b4d2bd38a4cd69a287434162c8372817df9"}]'
+        QA_FILE_INDEX: '[{"path":"LICENSE","env":"QA_SOURCE_0","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"PAYLOAD-MANIFEST.json","env":"QA_SOURCE_1","bytes":4596,"sha256":"304f312ab1e09c865171bd1c74864391dcec2d266036f4c8868f373c2e5b2c9a"},{"path":"package-lock.json","env":"QA_SOURCE_2","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"path":"package.json","env":"QA_SOURCE_3","bytes":330,"sha256":"6b33739f0ea0052157a3db8b4bb7eb40c96f334ba6e95b23787345b2a52aafc1"},{"path":"scripts/check.mjs","env":"QA_SOURCE_4","bytes":1649,"sha256":"47aacfc1a51d66235f0b203dda2aaa013c7b0fdc9cc74ee5629f066271273215"},{"path":"scripts/components/adapter.mjs","env":"QA_SOURCE_5","bytes":19925,"sha256":"2cf6f59cb964cf72e46b6d0c0b83f5ee7e5662643871759f9c79a534edaab5d3"},{"path":"scripts/components/camera-entry.mjs","env":"QA_SOURCE_6","bytes":4386,"sha256":"e4f110031c218d2ed3d0909d53cc374602f041f511c5ec176d9f4f29300b9926"},{"path":"scripts/components/identity.mjs","env":"QA_SOURCE_7","bytes":2799,"sha256":"aa7b1f088af555e0920b228ae8062056f7150d6137bc4faf2e889e69ef0a286b"},{"path":"scripts/components/pre-admission.mjs","env":"QA_SOURCE_8","bytes":3622,"sha256":"0bca510e35a0e8542ed6de87a4dcbd8febe4e3e88e8b946ea81d93288f2930d1"},{"path":"scripts/components/scenario.mjs","env":"QA_SOURCE_9","bytes":13376,"sha256":"8420b0cc71984b20a19ae1873cd6ec72d8b9ebb15716e131fe0ef4ef56405045"},{"path":"scripts/components/stage-transition.mjs","env":"QA_SOURCE_10","bytes":2134,"sha256":"32191cc15ebd891519a2d40e6aec460cba840ea3a9dda62164e4cbec31baac41"},{"path":"scripts/components/visible-reader.mjs","env":"QA_SOURCE_11","bytes":8377,"sha256":"8c2ec36b5fba2848583cc6cf4833d2364f302acfffcc8c4d2653892d80254728"},{"path":"scripts/core.mjs","env":"QA_SOURCE_12","bytes":261,"sha256":"f59e40d283b881e096abe34d3097381eec92f2d762bc56bb80adbe1bf90acbcb"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_13","bytes":3589,"sha256":"482920eb5617dfdee27be0c55914d97659f654a032f3cd7cdf4165ea581fcf4c"},{"path":"scripts/entry.mjs","env":"QA_SOURCE_14","bytes":5066,"sha256":"d5860732efb458838ba842a366c493b69cb4be899e4c4766014707c33163c4b6"},{"path":"scripts/host.mjs","env":"QA_SOURCE_15","bytes":11117,"sha256":"4d1a938e1941843bbbbf1b1fcc68411bc9ec0a30ced9938b843c4add5a0c33f2"},{"path":"scripts/image-contract.mjs","env":"QA_SOURCE_16","bytes":1058,"sha256":"46f62f786ee2835a863ba34e15e6f837813d3d8546ec42107f9ed3e2b675a939"},{"path":"scripts/local/loopback.mjs","env":"QA_SOURCE_17","bytes":11528,"sha256":"0c3cdc602c2681e0f9ea220eda3cf84845bd7d0e7c17929a11706e24d57c82d3"},{"path":"scripts/local/preview-session.mjs","env":"QA_SOURCE_18","bytes":6194,"sha256":"bb76fad8666ed99302c2f2fa9597111f935f5be03313d591c5d713c3b98736df"},{"path":"scripts/local/runtime-contract.mjs","env":"QA_SOURCE_19","bytes":437,"sha256":"3f2c55ab24c3d6eca1ff1d0a341046b54cfc9712cd34f5a76e1507149d2d3bbe"},{"path":"scripts/local/runtime-receipt.json","env":"QA_SOURCE_20","bytes":9876,"sha256":"e64cd6818d5d71082713c5770404d57578bfe62c12d729eefa9ebeabfd100ad0"},{"path":"scripts/local/runtime-source.mjs","env":"QA_SOURCE_21","bytes":5355,"sha256":"d233dceae984ac35b41c7937bd48c91e015c618df28ee32d41f500f9febe96fc"},{"path":"scripts/main-entry.mjs","env":"QA_SOURCE_22","bytes":618,"sha256":"928ca80c2c15dfb76949c64798b59c19ee0439973ee510130bafe7e20ae9b8ca"},{"path":"scripts/native-observation.mjs","env":"QA_SOURCE_23","bytes":4133,"sha256":"89a81a3f3b878dafb2f31a2a14943cfd592afa3bc55c83f843f2ad025e40586b"},{"path":"scripts/native/diagnostics.mjs","env":"QA_SOURCE_24","bytes":4635,"sha256":"0d1f2988ccca9523488d0a8f12ac929071c61f6ba3b218db92eb66b0d5c8f763"},{"path":"scripts/native/native.mjs","env":"QA_SOURCE_25","bytes":23932,"sha256":"ac7858b16ab0166b01c0e75fff95abbf23e53eee6e7f5825cfbb8c5be0ba295c"},{"path":"scripts/source-contract.mjs","env":"QA_SOURCE_26","bytes":1433,"sha256":"e5d993c18c34992b42679a221b4a73624bdf02dd5373f0c0bbf66eb6ccbda524"},{"path":"scripts/supervisor.py","env":"QA_SOURCE_27","bytes":15307,"sha256":"d1e9635427b3c1ef362e2da0d9353448c6ed6051773b8d128a86fd2753eff5a7"},{"path":"source-policy.json","env":"QA_SOURCE_28","bytes":608,"sha256":"f3ccf2d9c33aa64c9d942f61e26ebffe4faae4e26d77a8ade7e7087f4c627777"}]'
       run: |
         timeout --signal=TERM --kill-after=1s 99s bash -euo pipefail -c 'set -euo pipefail # 中文：任一必要前置失敗即停，沒有retry。
         NODE_BIN="$RUNNER_TOOL_CACHE/node/24.22.1/x64/bin" # 中文：只用既有精確官方toolcache，缺即拒不下載替代。
@@ -1259,7 +1275,7 @@ jobs:
         python3 - <<'"'"'AETHER_MATERIALIZE'"'"' # 中文：只執行此workflow固定物化程式。
         import os,json,hashlib # 中文：只讀本workflow內嵌已固定bytes，不訪網路。
         from pathlib import Path # 中文：所有輸出限新目錄且拒覆寫。
-        raw=os.environ['"'"'QA_FILE_INDEX'"'"'];assert hashlib.sha256(raw.encode()).hexdigest()=='"'"'fc7db2fb412e0bfe5bb2a52b8ab501d19f21223bfd405b519d8f745323f5b4de'"'"' # 中文：任何換路徑或hash在落檔前拒。
+        raw=os.environ['"'"'QA_FILE_INDEX'"'"'];assert hashlib.sha256(raw.encode()).hexdigest()=='"'"'057d708c3d6a18f092fb26340bd15cfe0aea364f4b3e266076135645383510c3'"'"' # 中文：任何換路徑或hash在落檔前拒。
         entries=json.loads(raw);ready=[] # 中文：先全驗，不部分寫錯包。
         for e in entries: # 中文：索引精確固定，不由使用者提供任意path。
          b=os.environ[e['"'"'env'"'"']].encode();assert len(b)==e['"'"'bytes'"'"'] and hashlib.sha256(b).hexdigest()==e['"'"'sha256'"'"'];ready.append((e['"'"'path'"'"'],b)) # 中文：全內容先核。
