@@ -1,0 +1,805 @@
+{
+  "treeHash": "735b75306982590404652340968e24587e57fedc5e19541da213c8335e1434cf",
+  "files": [
+    {
+      "path": "DELIVERY.json",
+      "bytes": 678,
+      "sha256": "bfea11f9abbc14e41f7fb4e138156510aa3d1da89318b760675aefbbd7325a1e"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3612,
+      "sha256": "432930075f3faacd915a7b1df2f172390ee790bd496a68bb91e385c7a94deccc"
+    },
+    {
+      "path": "assets/games/aetherwake/README.md",
+      "bytes": 3809,
+      "sha256": "1ee88a5f86535741df4c33d2500af4a00d0f1ed6cddd50cc52744beecd10796d"
+    },
+    {
+      "path": "assets/games/aetherwake/generation/asset-verification.json",
+      "bytes": 7697,
+      "sha256": "842f2b26eb6e174c683faf3e179b648fe03adef8d456290ace2091f0f3b954ff"
+    },
+    {
+      "path": "assets/games/aetherwake/generation/design-record.md",
+      "bytes": 2478,
+      "sha256": "8bb66d40b9410020c9472c9c3cf7984a4d96cecde576505c9ee027d87ec77aad"
+    },
+    {
+      "path": "assets/games/aetherwake/manifest.json",
+      "bytes": 95606,
+      "sha256": "58a9da65c4df891979c75014d4bd0cc388e2a37998640d6a7647c10068494eaf"
+    },
+    {
+      "path": "assets/games/aetherwake/recipes/export-assets.mjs",
+      "bytes": 9978,
+      "sha256": "3a16455d65067754b8925c908ed08f168316ddf943c4c31822cfb42ec2d54c1b"
+    },
+    {
+      "path": "assets/games/aetherwake/recipes/verify-assets.mjs",
+      "bytes": 4562,
+      "sha256": "003ee45ab816a07f9498dd66951d56e6de1080b3e5ce5576532a36aed2f19dd4"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/audio.js",
+      "bytes": 7387,
+      "sha256": "db6d2e3d16e8ab6d863168c5f657a298026a76ae12ce60874882b4c034626e53"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/cloud-sea-loop.wav",
+      "bytes": 564524,
+      "sha256": "295ee08bc4a31ee25cf95118b7a8ff67f331693cb4ab8c9f973d2769743a26ed"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/energy.wav",
+      "bytes": 14722,
+      "sha256": "0a2307de65282752bab8173536d7b757db31391ac4b6667a1647af9fcd4f4d57"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/finish.wav",
+      "bytes": 46570,
+      "sha256": "88f86dc2bdba87a06fe9c772cabb0c4ae02621c86168af6a827a6c8df1ab4506"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/glide.wav",
+      "bytes": 32150,
+      "sha256": "6714b17eadba470bcbd76971d4e0077a69d5e26f0383dc446cf1b72e0af2877d"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/land.wav",
+      "bytes": 24530,
+      "sha256": "3e682f0d8ae87e6bd312cf7292c05eabfe5159a2e83bf26f6b5addab68df2cb3"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/models.js",
+      "bytes": 25033,
+      "sha256": "b823f90af0891441855f83d9238bd636648ac0a0321e20b9dbb61d57249ba8d7"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/relic.wav",
+      "bytes": 17862,
+      "sha256": "2ccedabbd0c42de048b7a53a06cbd9f4e8475668bcea4bf8bd711685a3a6d6f7"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/stall.wav",
+      "bytes": 22624,
+      "sha256": "60246c60f25ed62cad94b0486bc4acc800603382ac63ac17f3c048e4de000019"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/tailwind.wav",
+      "bytes": 46438,
+      "sha256": "01cda312b5e40b2488e6834e5cb710c7c25e3497de4e4aa3b0c9fe07da253852"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/ui.wav",
+      "bytes": 6660,
+      "sha256": "98ddc559cd2311684f3fcca6e68723ac3bdeaf3e411ba07b027f35d4dff01014"
+    },
+    {
+      "path": "assets/games/aetherwake/sources/unlock.wav",
+      "bytes": 31392,
+      "sha256": "74a77837309b8257afd70b8d4e0521564bab5f3581842e8bae3402f256cdecaf"
+    },
+    {
+      "path": "docs/aether-delivery-maintenance.md",
+      "bytes": 10565,
+      "sha256": "c620ebf6eadef5debef6c7a45719639407bfef8cbf0fafd5767d035312965114"
+    },
+    {
+      "path": "docs/game-production/games/aetherwake/builds/aetherwake-continuity-20261028-01.json",
+      "bytes": 9876,
+      "sha256": "eb589d0ddc3e2bfd0512bc3a42098182a484a4cd3105e41fb5e1fe707b2926c9"
+    },
+    {
+      "path": "docs/game-production/games/aetherwake/builds/aetherwake-continuity-20261028-02.json",
+      "bytes": 9876,
+      "sha256": "14b6e3bc0d4ae7b51a9893196152a6a01da231478aa07efb3f7d60e38e94dc3a"
+    },
+    {
+      "path": "docs/game-production/games/aetherwake/builds/aetherwake-input-20261028-02.json",
+      "bytes": 9858,
+      "sha256": "0a807a7050c851e388be5e41cc83bfed0c9723aed2c169736438c06f5dab8cdb"
+    },
+    {
+      "path": "docs/game-production/games/aetherwake/builds/aetherwake-route-save-20261028-01.json",
+      "bytes": 9884,
+      "sha256": "fa1d599f9a5a1dd808e7cea52e56bf1d070db6dbd5948797f04d1eb458720afc"
+    },
+    {
+      "path": "games/aetherwake/package-lock.json",
+      "bytes": 16948,
+      "sha256": "4d8271dbebcf614d08c9b5afa95877038cbdd789689e6619f27f8aea383be8fe"
+    },
+    {
+      "path": "games/aetherwake/package.json",
+      "bytes": 448,
+      "sha256": "8778296d063201b18649468e62d65bdb07b4a284c990867726d237f860440ca1"
+    },
+    {
+      "path": "games/aetherwake/scripts/build.mjs",
+      "bytes": 841,
+      "sha256": "0f5d0ddefabb1ce9e7e3fe09b7b26d67d091f5cc92d33cbd96fe4aba0b04ded8"
+    },
+    {
+      "path": "games/aetherwake/scripts/export-assets.mjs",
+      "bytes": 9978,
+      "sha256": "3a16455d65067754b8925c908ed08f168316ddf943c4c31822cfb42ec2d54c1b"
+    },
+    {
+      "path": "games/aetherwake/scripts/release.mjs",
+      "bytes": 5334,
+      "sha256": "623ef2a1da080b1aec320f4a51b7810138122b9d2d45f0aa68b12757c0be8e1c"
+    },
+    {
+      "path": "games/aetherwake/src/audio.js",
+      "bytes": 7387,
+      "sha256": "db6d2e3d16e8ab6d863168c5f657a298026a76ae12ce60874882b4c034626e53"
+    },
+    {
+      "path": "games/aetherwake/src/bridge.js",
+      "bytes": 2169,
+      "sha256": "5bba0107e080d741a9cb9511baf7bc7179e0b2b86a2475068249c8821c58dc10"
+    },
+    {
+      "path": "games/aetherwake/src/flight-plans.js",
+      "bytes": 19593,
+      "sha256": "db5168e8c1e644ccf7c41a012e30e829ee210637d27a2904d673752fc29005f4"
+    },
+    {
+      "path": "games/aetherwake/src/index.html",
+      "bytes": 7099,
+      "sha256": "c8031e3b43e505d2273e72d24a2be57f82ca5859a152711ed2e214fbf0077194"
+    },
+    {
+      "path": "games/aetherwake/src/input.js",
+      "bytes": 8907,
+      "sha256": "08dc44df6cd5c8d1995382b02a23ac7a7da706ed4146ddc26917dda13cf6d4d4"
+    },
+    {
+      "path": "games/aetherwake/src/main.js",
+      "bytes": 38176,
+      "sha256": "4f277d9872db96d7e66f999cea10b22a5fc37b8b1ef288745907ffbef8a49dc5"
+    },
+    {
+      "path": "games/aetherwake/src/models.js",
+      "bytes": 25033,
+      "sha256": "b823f90af0891441855f83d9238bd636648ac0a0321e20b9dbb61d57249ba8d7"
+    },
+    {
+      "path": "games/aetherwake/src/scene.js",
+      "bytes": 39261,
+      "sha256": "3ffa8289bb0574301a1df6eb1794803c653819be3f347574b0669e201072b61f"
+    },
+    {
+      "path": "games/aetherwake/src/simulation.js",
+      "bytes": 28498,
+      "sha256": "cdbf37ef1242bea60a74d70c2a5a8fde4a5f916083542b580a37da68bf290162"
+    },
+    {
+      "path": "games/aetherwake/src/storage.js",
+      "bytes": 10281,
+      "sha256": "b7384d6bf65381c55ac90f595f2757837cc05f8cc0e8e5979a7b514280be24b7"
+    },
+    {
+      "path": "games/aetherwake/src/style.css",
+      "bytes": 25363,
+      "sha256": "4107f5189c468b1d65619e25bd27fba036ed00da99631b6ed078c67292c8b1dd"
+    },
+    {
+      "path": "games/aetherwake/src/transit.js",
+      "bytes": 3662,
+      "sha256": "1a022864e79ccb023187d876be2cbe73b3b6552312a76dda71d5e2f6eb203bb8"
+    },
+    {
+      "path": "games/aetherwake/src/version.js",
+      "bytes": 167,
+      "sha256": "5a7958bcae298816915fd825b9afbaaaf7cdc4f2589cce233016681d54cdafaa"
+    },
+    {
+      "path": "games/aetherwake/src/world.js",
+      "bytes": 8721,
+      "sha256": "4e1d67f436e583151ee519fdd3e5aee0f88862492256b489da839ffb587560bb"
+    },
+    {
+      "path": "package.json",
+      "bytes": 595,
+      "sha256": "6e2fd686f018f13a0b014061f7aa6f64446b6e79c51225445476cb53ff92c351"
+    },
+    {
+      "path": "public/games/aetherwake/.gitattributes",
+      "bytes": 67,
+      "sha256": "21836c2c546c81bd318ead4ed4f16d431a8d3fb2d6c7b0ba9dd405973af98835"
+    },
+    {
+      "path": "public/games/aetherwake/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/cloud-sea-loop.wav",
+      "bytes": 564524,
+      "sha256": "295ee08bc4a31ee25cf95118b7a8ff67f331693cb4ab8c9f973d2769743a26ed"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/energy.wav",
+      "bytes": 14722,
+      "sha256": "0a2307de65282752bab8173536d7b757db31391ac4b6667a1647af9fcd4f4d57"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/finish.wav",
+      "bytes": 46570,
+      "sha256": "88f86dc2bdba87a06fe9c772cabb0c4ae02621c86168af6a827a6c8df1ab4506"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/glide.wav",
+      "bytes": 32150,
+      "sha256": "6714b17eadba470bcbd76971d4e0077a69d5e26f0383dc446cf1b72e0af2877d"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/land.wav",
+      "bytes": 24530,
+      "sha256": "3e682f0d8ae87e6bd312cf7292c05eabfe5159a2e83bf26f6b5addab68df2cb3"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/relic.wav",
+      "bytes": 17862,
+      "sha256": "2ccedabbd0c42de048b7a53a06cbd9f4e8475668bcea4bf8bd711685a3a6d6f7"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/stall.wav",
+      "bytes": 22624,
+      "sha256": "60246c60f25ed62cad94b0486bc4acc800603382ac63ac17f3c048e4de000019"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/tailwind.wav",
+      "bytes": 46438,
+      "sha256": "01cda312b5e40b2488e6834e5cb710c7c25e3497de4e4aa3b0c9fe07da253852"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/ui.wav",
+      "bytes": 6660,
+      "sha256": "98ddc559cd2311684f3fcca6e68723ac3bdeaf3e411ba07b027f35d4dff01014"
+    },
+    {
+      "path": "public/games/aetherwake/assets/audio/unlock.wav",
+      "bytes": 31392,
+      "sha256": "74a77837309b8257afd70b8d4e0521564bab5f3581842e8bae3402f256cdecaf"
+    },
+    {
+      "path": "public/games/aetherwake/assets/data/collision.json",
+      "bytes": 8390,
+      "sha256": "30bbeb88c2338141200dda9d972551487c005ef45692ffb2e7173f3c279c76e3"
+    },
+    {
+      "path": "public/games/aetherwake/assets/data/manifest.json",
+      "bytes": 95606,
+      "sha256": "58a9da65c4df891979c75014d4bd0cc388e2a37998640d6a7647c10068494eaf"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-01.svg",
+      "bytes": 545,
+      "sha256": "79594ba8b75754865db79bbf067069d7862021eedf7feed4813b8e7961cb9709"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-02.svg",
+      "bytes": 516,
+      "sha256": "2bff5dbcf36aba8460dfb41ce161010dc92dfe7d24e35c9c3975a00205434826"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-03.svg",
+      "bytes": 719,
+      "sha256": "2f405da5b0bb253ef71e8194ef04f316d456c7db0f303c4f3f9274e747fdf75a"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-04.svg",
+      "bytes": 734,
+      "sha256": "bf4b3728d4524531aee9b68043a19df6816e28e29908518fb86383e039775a36"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-05.svg",
+      "bytes": 545,
+      "sha256": "41a5e7979c0edee6d0aaa29c009199a33b84a24b2cd23cf7a9d38e16dbefc176"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-06.svg",
+      "bytes": 516,
+      "sha256": "c7de53fd0ea6dc1d20a08c369f4146e46fa4abecbdbeae4461767a4183b3481c"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-07.svg",
+      "bytes": 719,
+      "sha256": "f8e4fdd658db2cdc71b1ca1eac34ebdc86e569a9f7491a79edb58a208e55dbcf"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-08.svg",
+      "bytes": 734,
+      "sha256": "74ab3b4479226323b8d1500ff95075eed0e6d1bcf9a298d78191a9c463cd487c"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-09.svg",
+      "bytes": 545,
+      "sha256": "7324a501467c8ec0d260b7ff46ff99bca88dd46f1e996810510f8e0495cfbd7f"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-10.svg",
+      "bytes": 516,
+      "sha256": "bc9fa139fb2b76066a127f7fbc37ba28d1e798d5cf253784399f8188c9cdd2ac"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-11.svg",
+      "bytes": 719,
+      "sha256": "ac09d59c37f67a788db401dc136a1888f28fb6ba8d065f137ffc59deb9ea2ff5"
+    },
+    {
+      "path": "public/games/aetherwake/assets/icons/relic-12.svg",
+      "bytes": 734,
+      "sha256": "eebd1e89316bdcd93d557972b726533f898b8e344fbd37e8fff54af372238e70"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-1-low.glb",
+      "bytes": 72224,
+      "sha256": "94136d645d000ceaaa58b5e5a685b946cc818fb8ca314f8a9fc29cfaa5d7eef9"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-1.glb",
+      "bytes": 333068,
+      "sha256": "c7b8c9fa1a60a325654ee2be92592cd3feb935eb52a31ea30e810a06fe97840d"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-2-low.glb",
+      "bytes": 102024,
+      "sha256": "427983ebae29681819672093796dcad92719ae007315a4a04622bf1530391c98"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-2.glb",
+      "bytes": 361784,
+      "sha256": "b2e05206c4c1d58b87348041bdd419d1b15b27517199d3a85e9a2306e2fe0a0a"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-3-low.glb",
+      "bytes": 71084,
+      "sha256": "39fcb8b3bde4ce32cd13aa90eaf576d1570c09c59069cc7571fed9f6bf061191"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-3.glb",
+      "bytes": 322184,
+      "sha256": "1a37b74ee3aa22c15c107bf36f25b69b223d2e7c7ae7a73238beb577acb8bae4"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-4-low.glb",
+      "bytes": 155256,
+      "sha256": "deeab58dde489de8695001869b663d1919244b5f63d5cca7a3815b49c6ec8af1"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-4.glb",
+      "bytes": 425196,
+      "sha256": "8b54f97d04cc7c67de3613f7a74a357f22db923f4eec402d485ff9688becbbf9"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-5-low.glb",
+      "bytes": 126484,
+      "sha256": "6eb5e4f18de7f55ae1f735690fca12c197079886806dcc68364128c4a959f97b"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-5.glb",
+      "bytes": 381940,
+      "sha256": "7ee06c0e94ab8ee2db1596295af58d2c2a1767753a14f05a7935a84f086a2071"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-6-low.glb",
+      "bytes": 141672,
+      "sha256": "889b2642f4ccad1ae1c8a6c0840978b5b045289893b8f19600dbddea1d597277"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/island-6.glb",
+      "bytes": 457384,
+      "sha256": "b65a75f12ed417750bbdf843337a361b3a188f435594cd7ecc87d5a11648fa43"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/pilot.glb",
+      "bytes": 204772,
+      "sha256": "43ff07b262dd8eb044e2ed866547621734a54490fe1f55c75867c73ccfd26470"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-01.glb",
+      "bytes": 40800,
+      "sha256": "882a1707562afdb81bcde5e8f19e2815ed084382fb643857040425287653da31"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-02.glb",
+      "bytes": 43224,
+      "sha256": "18cbcc27ea725128f6186099f74abc8433c3b1fafe36f6cc3b6d74dfbf65865a"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-03.glb",
+      "bytes": 45908,
+      "sha256": "f01390940f757904752bf988483a43d82dff5bbee4dfe54ff654c267f1edb534"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-04.glb",
+      "bytes": 44324,
+      "sha256": "4a18210f2e05215c83e779d14392567d47c36eb4e04afd3b29a6938a8a3f0993"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-05.glb",
+      "bytes": 42076,
+      "sha256": "6556ce94d833151f45b1531d4da075cf15a33e0359f7db0e1c22b742f5223c2d"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-06.glb",
+      "bytes": 44756,
+      "sha256": "3d058507e1507af001d6e8b61ba36b809fc89c83f4ebcc045e353545db2c41a8"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-07.glb",
+      "bytes": 59476,
+      "sha256": "f38a0a6ee0cf05f2778af9a24fd3c51a7039be08d272a9888ef8725c700c9c77"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-08.glb",
+      "bytes": 61872,
+      "sha256": "70ca2323040ccb7724b74d636390f9af4b8c0531e9e8dc3d8656923275258c3a"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-09.glb",
+      "bytes": 59940,
+      "sha256": "376f68d73e5b7244ccc1a0fd2d22886e1251cf2c6167ac6c0ea1c8161f7e34c7"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-10.glb",
+      "bytes": 58364,
+      "sha256": "e7ca1bf03d0c48f18fb9566872c890856ead72a0a0556ff2fa915c9185759954"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-11.glb",
+      "bytes": 60724,
+      "sha256": "7e2de9bdce00ce159ad5f1b080bad34dc6387fc10ef2d99c40caf01c16158965"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/relic-12.glb",
+      "bytes": 63400,
+      "sha256": "1f59eaf462ac3e84c6d121bdd5bb366c5bd16eb13c20ec3e81d520df12bb6668"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/station-1.glb",
+      "bytes": 115936,
+      "sha256": "df7330ab0d85b8bfdc31e56ceef9b6c02a3cb87318e5ca38cb39f1da9b650ad7"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/station-2.glb",
+      "bytes": 188884,
+      "sha256": "16af2c3880dae59d670a50f2fb018cce4d019cb12047bf9c14e09b10a5233e47"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/station-3.glb",
+      "bytes": 175076,
+      "sha256": "959e993ec19c4a9efc0284fdb597cdb703b36d2ee0edb3a9d5364ca86cc1fd35"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/wind-crosswind.glb",
+      "bytes": 15012,
+      "sha256": "0b8e599d725943487ae24158b62206955fb711ffe82e9f53d4ecf11e256f5a3c"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/wind-tailwind.glb",
+      "bytes": 14932,
+      "sha256": "a905b00f6a26347eb456242351c14d139d7b53d9a8ce4fb6a5624074c88c0b5d"
+    },
+    {
+      "path": "public/games/aetherwake/assets/models/wind-updraft.glb",
+      "bytes": 32588,
+      "sha256": "bf4ee136eb22ae081673e80bdccaf512cef1ca5ab5cd65c58fed36024a30e995"
+    },
+    {
+      "path": "public/games/aetherwake/game.js",
+      "bytes": 700038,
+      "sha256": "e93a469b65e2379da214ef2685b8278931b08b5f205371c7a780e1a18c7edbc7"
+    },
+    {
+      "path": "public/games/aetherwake/index.html",
+      "bytes": 7099,
+      "sha256": "c8031e3b43e505d2273e72d24a2be57f82ca5859a152711ed2e214fbf0077194"
+    },
+    {
+      "path": "public/games/aetherwake/style.css",
+      "bytes": 25363,
+      "sha256": "4107f5189c468b1d65619e25bd27fba036ed00da99631b6ed078c67292c8b1dd"
+    },
+    {
+      "path": "scripts/aether-delivery/content-example.mjs",
+      "bytes": 3190,
+      "sha256": "025b7d27524f3ddd88847246cc8216111f0497cd62cd06eaf9faec35e97897ac"
+    },
+    {
+      "path": "scripts/aether-delivery/verify-assets.mjs",
+      "bytes": 5509,
+      "sha256": "7eca06b140773eff23216ba4a541079959525c2dd7e012776e1cef56009feba8"
+    },
+    {
+      "path": "scripts/game-build-hash.mjs",
+      "bytes": 1989,
+      "sha256": "680905149211a49684a828ac513bc9dad02126b5ffb87bbea2dccb791515f396"
+    },
+    {
+      "path": "src/game-development/releases/aetherwake.json",
+      "bytes": 9746,
+      "sha256": "c1cd327a086d23900201204cbd3dd48f270292f7ff5d457d5d54baec0b02cfbb"
+    },
+    {
+      "path": "tests/games/aetherwake/.gitattributes",
+      "bytes": 416,
+      "sha256": "b535e012fe665cd33303ca7c3a61ea2c03dd5ccaa8333531f07e90ff3988841c"
+    },
+    {
+      "path": "tests/games/aetherwake/audit-first-phase-windows-0008.cjs",
+      "bytes": 15553,
+      "sha256": "9a2fb1f4059c5fe521df20230175935e4941f36726db8da6c3d2c6e7f11530e6"
+    },
+    {
+      "path": "tests/games/aetherwake/audit-first-phase-windows-0008.test.cjs",
+      "bytes": 11372,
+      "sha256": "94cf050a129e5c03a3dec8141019c8a5705d321150470da9268e8e1aee907a7e"
+    },
+    {
+      "path": "tests/games/aetherwake/bridge.test.js",
+      "bytes": 10273,
+      "sha256": "94f93a51114314c60b2686279825ce4346a56c4d3418a3368f0c174ee39caaa4"
+    },
+    {
+      "path": "tests/games/aetherwake/browser-smoke.mjs",
+      "bytes": 22562,
+      "sha256": "f0ac3b8412c6079e5d72f04e0ecba33a5902719e6ecb261bbabc8bb184b04e7d"
+    },
+    {
+      "path": "tests/games/aetherwake/camera-foreground.test.js",
+      "bytes": 9636,
+      "sha256": "b58f22cb4852c7d92a3cc09815148fd73e704eb983d5e19ada69bd3ec6a1c611"
+    },
+    {
+      "path": "tests/games/aetherwake/camera-inspection.test.js",
+      "bytes": 2781,
+      "sha256": "a48e95ab070ec5a897bceae2816121f38349608a6d619d0d109f266ecd9c5426"
+    },
+    {
+      "path": "tests/games/aetherwake/camera-pointer-chord.test.js",
+      "bytes": 5931,
+      "sha256": "45913ae261bb1bc0972cdd1cea913da80896a90136daad26e89e4303481f28aa"
+    },
+    {
+      "path": "tests/games/aetherwake/camera-pointer-fixture.mjs",
+      "bytes": 3213,
+      "sha256": "d8a5c4a3a229bb0598686d3ad02ecd80b0e358804493900cafe1d916c14095f9"
+    },
+    {
+      "path": "tests/games/aetherwake/camera-reset.test.js",
+      "bytes": 12234,
+      "sha256": "1c8304348aadc782577255fae2b7ac0658de0810ae5a4fad786beeed5abc92a6"
+    },
+    {
+      "path": "tests/games/aetherwake/deduplicate-sealed-mirrors.mjs",
+      "bytes": 3673,
+      "sha256": "8d0d4f8e00733b7a7c28b6c6edba544bfd8a35fb4d07c7227ec306ca2d84a713"
+    },
+    {
+      "path": "tests/games/aetherwake/escape-modal-ui.mjs",
+      "bytes": 10207,
+      "sha256": "03cc540e6642c4e1e8aad84f96246f6578be17d5160d3f453d23791c64bce629"
+    },
+    {
+      "path": "tests/games/aetherwake/evidence-integrity.mjs",
+      "bytes": 1901,
+      "sha256": "e1996bad403a7186f99b8a5166b617f30c2aa118f814a18b1ea329bc5c37f435"
+    },
+    {
+      "path": "tests/games/aetherwake/evidence-integrity.test.js",
+      "bytes": 2607,
+      "sha256": "a5ff0acff7a9f1a0afa0c0345f9c469b99ff96f9cee03481f8aecd18ad2f1fc8"
+    },
+    {
+      "path": "tests/games/aetherwake/first-exposure-0008-config.json",
+      "bytes": 646,
+      "sha256": "11b8ce210987be7134e9c3065e960f8b4a9badc58edd4ebd38cfb3350ffef6c8"
+    },
+    {
+      "path": "tests/games/aetherwake/first-exposure-controller.cjs",
+      "bytes": 3971,
+      "sha256": "0cd45f2411ed59a9cd6a1bd0921b646729c8915e98a137f25477eebd3f665a8b"
+    },
+    {
+      "path": "tests/games/aetherwake/flight-test-pilot.mjs",
+      "bytes": 6035,
+      "sha256": "404c3865aecccf2291ea70b351aefbcfd97e9cdee35bf26b8a60885921087060"
+    },
+    {
+      "path": "tests/games/aetherwake/integrate-first-exposure-0007.mjs",
+      "bytes": 4855,
+      "sha256": "7fa122a2afa7650328d504c814bbd99e9a2d0634dca8c7b90a29ab666980c641"
+    },
+    {
+      "path": "tests/games/aetherwake/main-continuity-driver.mjs",
+      "bytes": 3225,
+      "sha256": "f3ce7b3a53cb0e19e7598fcc8cd37c3b62a2fb4c57f3e1839a8b779c73edb3fd"
+    },
+    {
+      "path": "tests/games/aetherwake/main-continuity-fixture.mjs",
+      "bytes": 5747,
+      "sha256": "eda02e5000d0cc2c4b45e737f178272c73d37913e54d43d85b5d32a8dcbc4cbc"
+    },
+    {
+      "path": "tests/games/aetherwake/main-continuity.test.js",
+      "bytes": 4826,
+      "sha256": "3cc994fdfd3de35781f4f43ee40da119d6e4f071e42674ad02b8a1c061263921"
+    },
+    {
+      "path": "tests/games/aetherwake/main-recovery.test.js",
+      "bytes": 1752,
+      "sha256": "263dd6ab5c38661592179ce0be204e65328cecfb9b0f7e68712f4fba30b43645"
+    },
+    {
+      "path": "tests/games/aetherwake/navigation-ui-transit-followup.mjs",
+      "bytes": 11891,
+      "sha256": "f0b46a8080e8dfe1ac10e915c2ac9c02bf31b3a9404745cae686e50d26dae32d"
+    },
+    {
+      "path": "tests/games/aetherwake/navigation-ui-transit.mjs",
+      "bytes": 16393,
+      "sha256": "9b738061984652c0625803c51d023d13cc09095094fdca20825856558aea55b3"
+    },
+    {
+      "path": "tests/games/aetherwake/navigation-ui.mjs",
+      "bytes": 19358,
+      "sha256": "d965a4b32b6c718cc03be19dd873711561b659002e924d4df16d5811e53bcc2a"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-first-records-0008.py",
+      "bytes": 21042,
+      "sha256": "0358e2380166f49dd1cd6333e4d6944796b11c983946c9c2ababa2e8d73a6a24"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-first-records-0008.test.py",
+      "bytes": 16796,
+      "sha256": "82b78a7e5ce414b72ac64e9da9c16de0395da8bdbbb0f9e01285677545f741d0"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-first-video-0008.py",
+      "bytes": 17636,
+      "sha256": "94a2e21750e1c7ae8cca1f770c4e8ec97c0c85122108e521ffd06fb2a4562aad"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-first-video-0008.test.py",
+      "bytes": 4640,
+      "sha256": "a05106067967d5e380b630c95acf90a20a848630a4dc9216c9b91e68d858de34"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-maker-evidence.mjs",
+      "bytes": 17432,
+      "sha256": "e18dbc70875399606d206f46803173a783c0844fda1ae68ed087f69520ee3f4a"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-repair-evidence.mjs",
+      "bytes": 6083,
+      "sha256": "2f69779a2cccb27c8148f9cda5fd0c1b9241009c2286cd0da359897e192da25e"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-sealed-review-ui.mjs",
+      "bytes": 6020,
+      "sha256": "e700da23e096d8aeb339dd18fe1e615d148ff4b47897d3f538ff18bbcb6acb6b"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-stage-video-0008.py",
+      "bytes": 7552,
+      "sha256": "9be9cf7c8dd00c3d5e1f0301016251e544b80815424a3d74bb45e7e36b006c08"
+    },
+    {
+      "path": "tests/games/aetherwake/publish-toast-source-evidence.mjs",
+      "bytes": 6885,
+      "sha256": "6f852c54d833bde4baed26c0132cc003ba80bde3379533e53dbc6c6f9511c4bc"
+    },
+    {
+      "path": "tests/games/aetherwake/relocate-first-exposure-screenshots.mjs",
+      "bytes": 4025,
+      "sha256": "f6efa501752c22037842401337388749a3faa149e7a6f61ae3d8b77980514026"
+    },
+    {
+      "path": "tests/games/aetherwake/relocate-preserved-first-video.mjs",
+      "bytes": 3885,
+      "sha256": "11890ce544cdae41f5f6d7a9d45e4a8bb0cc35541076af005c60e3e0500b13ae"
+    },
+    {
+      "path": "tests/games/aetherwake/result-status.test.js",
+      "bytes": 2709,
+      "sha256": "0468601fdd1b209caf02c22ff557f620b00f30d81d2e804f634ef75fca2353cf"
+    },
+    {
+      "path": "tests/games/aetherwake/route-clock.test.js",
+      "bytes": 8326,
+      "sha256": "1918ad9ae2ab83264c84709a7f1bd012db9852e6b5fb83db6525bb0a717c7854"
+    },
+    {
+      "path": "tests/games/aetherwake/rules.test.js",
+      "bytes": 27036,
+      "sha256": "ea02399acae725e8054325fe1d9fcb71ec2f1fac91089284cf8d269c7356ff79"
+    },
+    {
+      "path": "tests/games/aetherwake/save-v3.test.js",
+      "bytes": 15820,
+      "sha256": "e9d10f52a15d547c4b85c76ebf3307c2ed711e20da15ed181c40c03d36f1dda0"
+    },
+    {
+      "path": "tests/games/aetherwake/scene-navigation.test.js",
+      "bytes": 14098,
+      "sha256": "314415e33f027a71fa90a6e23c227c709e0d663d5347ca15d67d8f0d2fded8e7"
+    },
+    {
+      "path": "tests/games/aetherwake/storage-pending.test.js",
+      "bytes": 4592,
+      "sha256": "990746515e0fb02f5f812ea9da974a4ebb3bdcf37c759f052af8d7175ab6613d"
+    },
+    {
+      "path": "tests/games/aetherwake/storage-warning-ui.mjs",
+      "bytes": 8893,
+      "sha256": "7874a00b875a2175c87b33e42288da94f18e5d7fa37fc5cd63a6f31fe47a7acf"
+    },
+    {
+      "path": "tests/games/aetherwake/toast-readability-ui.mjs",
+      "bytes": 8543,
+      "sha256": "b611d4bff609375b0f2721345ac2a3764439bc0ab0f53aaa479759b10c2a964c"
+    },
+    {
+      "path": "tests/games/aetherwake/transit-flight.test.js",
+      "bytes": 11878,
+      "sha256": "2c87681a6dd778d8d5fdb9f40115462c5ca2bd23d74e5653bf42793be97cd1d7"
+    },
+    {
+      "path": "tests/games/aetherwake/transit.test.js",
+      "bytes": 5413,
+      "sha256": "bc5177d0cfd8b8341c157d03a51e13545da2208746af2e300d6ab6453241892c"
+    },
+    {
+      "path": "tests/games/aetherwake/verify-delivery.mjs",
+      "bytes": 6432,
+      "sha256": "734fc15239ef85a241b79857b64e3a31f704f8b93936324c120e544d057491df"
+    },
+    {
+      "path": "tests/games/aetherwake/verify-review-seal.mjs",
+      "bytes": 4431,
+      "sha256": "11d46a8242283793b0a011e32dd151a5536dd3a0c97b4b2c433de7c682ae83bd"
+    },
+    {
+      "path": "tests/games/aetherwake/verify-runtime.mjs",
+      "bytes": 3216,
+      "sha256": "c2ea08b4e342434ccfacfb03890adb861e4b6948843676cfd15caced3f767ee5"
+    },
+    {
+      "path": "tests/games/aetherwake/verify-sealed-git-bytes.mjs",
+      "bytes": 5257,
+      "sha256": "e492143d371c4b30466ab907048b6377b6a96a90b24f4c811d394b63a5170807"
+    },
+    {
+      "path": "tests/games/aetherwake/verify-stage-video-clock-0008.py",
+      "bytes": 2063,
+      "sha256": "a1378e49ecff2899674bf11da8e01211ddfcc4825f2073f0eb979f4196092d90"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# This analyzer's exact bytes are recorded in immutable timing receipts.
+audit-first-phase-windows-0008.cjs -text
+# Preserve exact validation inputs for the completed-recording publisher.
+publish-first-video-0008.py -text
+publish-first-video-0008.test.py -text
+# Preserve the selected-record publisher and its synthetic validation inputs.
+publish-first-records-0008.py -text
+publish-first-records-0008.test.py -text

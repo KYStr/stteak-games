@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#163f47" />
+    <title>風起之境 · Aetherwake</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main id="game" aria-label="風起之境 3D 浮島探索">
+      <canvas
+        id="world"
+        tabindex="0"
+        aria-label="3D 飛行場景。WASD 移動，空白鍵展帆，Shift 減速，E 互動，Esc 暫停。"
+      ></canvas>
+      <div id="world-labels" aria-hidden="true"></div>
+      <header class="topbar">
+        <div class="wordmark">
+          <span class="brand-mark">✧</span>
+          <div>風起之境<small>AETHERWAKE</small></div>
+        </div>
+        <div id="mission">
+          <span class="eyebrow">遠征目標</span
+          ><strong id="objective">讓沉睡的星圖再次發光</strong
+          ><span id="objective-sub">依序修復三座觀測台，返回營地。</span>
+        </div>
+        <nav aria-label="遊戲工具">
+          <button id="camera" title="切換俯瞰鏡頭 V">俯瞰 <kbd>V</kbd></button
+          ><button id="help" title="操作與航海誌 H">航行誌 <kbd>H</kbd></button
+          ><button id="pause" title="暫停 Escape">Ⅱ <span>暫停</span></button>
+        </nav>
+      </header>
+      <section id="flight-hud" class="hidden" aria-label="飛行資訊">
+        <div class="telemetry">
+          <span id="region">起風之域</span
+          ><strong id="flight-mode">安全地面</strong>
+          <div>
+            <span id="altitude">0 m</span><span id="speed">0 m/s</span
+            ><span id="clock">00:00</span>
+          </div>
+        </div>
+        <div id="guide">
+          <span class="eyebrow" id="guide-step">01 · 讀懂風</span
+          ><strong id="guide-text">按空白鍵起跳展帆</strong>
+          <p id="guide-detail">
+            用 WASD 朝航標前進。青色箭頭補能，螺旋熱流抬升高度。
+          </p>
+          <button id="hide-guide">收起教學</button>
+        </div>
+        <div class="map-panel">
+          <div class="map-heading">
+            <span>航線圖</span><span id="route-label">安全風道</span>
+          </div>
+          <canvas
+            id="map"
+            width="420"
+            height="320"
+            aria-label="六島航線圖"
+          ></canvas>
+          <div class="map-legend">△ 你　◇ 觀測台　· 碎片</div>
+          <button id="route-toggle">切換：技巧捷徑</button>
+        </div>
+        <div class="energy-panel">
+          <div>
+            <span>帆能量</span><strong id="energy-value">100%</strong
+            ><span id="wind-label">尋找風帶</span>
+          </div>
+          <div class="energy-track"><i id="energy-bar"></i></div>
+          <p id="flight-tip">Space 起跳／展帆　·　Shift 收帆減速　·　E 互動</p>
+        </div>
+        <div id="nav-target" aria-hidden="true"><b>◆</b><span></span></div>
+        <div id="course" class="hidden">
+          <span class="eyebrow" id="course-kicker">航線觀測</span
+          ><strong id="course-title"></strong>
+          <p id="course-detail"></p>
+          <button id="leave-course">退出並返回安全島</button>
+        </div>
+        <div class="collection">
+          <span id="station-count">觀測台 0 / 3</span
+          ><span id="relic-count">碎片 0 / 12</span
+          ><span id="challenge-count">測風 0 / 6</span>
+        </div>
+        <button id="interact" class="interact hidden">E · 啟動觀測台</button>
+        <div id="touch-controls">
+          <div id="joystick" aria-label="移動搖桿"><div id="stick"></div></div>
+          <div class="touch-actions">
+            <button id="touch-glide">展帆</button
+            ><button id="touch-brake">減速</button
+            ><button id="touch-reset">回正</button>
+          </div>
+        </div>
+      </section>
+      <div id="toast" role="status" aria-live="polite"></div>
+      <div id="storage-warning" class="hidden" role="status"></div>
+      <section id="landing" class="landing">
+        <div class="landing-title">
+          <span class="eyebrow">THE AETHERWAKE CHRONICLES · 第一章</span>
+          <h1>乘風而起。<br /><em>抵達失落的星光。</em></h1>
+          <p>
+            六座浮島，一面滑翔帆。讀懂風的方向，<br />沿著古老航標，喚醒雲海之上的天文台。
+          </p>
+          <div class="title-rule"></div>
+          <span class="edition">單人 3D 航線探索 <b>·</b> 本機進度保存</span>
+        </div>
+        <div class="expedition-panel">
+          <span class="eyebrow">01 / 準備遠征</span>
+          <h2>選一種乘風方式</h2>
+          <p>三個模組互斥。換個選擇，探索另一條航線。</p>
+          <div
+            id="modules"
+            class="modules"
+            role="group"
+            aria-label="滑翔帆模組"
+          ></div>
+          <label class="seed-label"
+            >風況種子
+            <input id="seed" type="number" min="1" max="999999" value="2718"
+          /></label>
+          <div class="seed-buttons">
+            <button id="daily-seed">今日風況</button
+            ><button id="new-seed">另一陣風</button>
+          </div>
+          <button id="start" class="primary">啟程 <span>↗</span></button
+          ><button id="continue" class="secondary hidden">
+            繼續上次安全落點
+          </button>
+          <div class="start-note">
+            WASD 移動 · Space 展帆 · E 互動<br />失速會送回安全島，已取得的碎片保留。
+          </div>
+        </div>
+        <footer>
+          <span>✧ 風會記得你的航跡</span><span id="build-label">正在載入…</span>
+        </footer>
+      </section>
+      <section
+        id="modal"
+        class="modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="modal-panel">
+          <div class="modal-head">
+            <span class="eyebrow" id="modal-kicker">AETHERWAKE</span
+            ><button id="close-modal" aria-label="關閉視窗">✕</button>
+          </div>
+          <h2 id="modal-title"></h2>
+          <div id="modal-body"></div>
+          <div id="modal-actions"></div>
+        </div>
+      </section>
+      <section id="fatal" class="modal hidden">
+        <div class="modal-panel">
+          <h2>這陣風暫時停了</h2>
+          <p id="fatal-message"></p>
+          <button onclick="location.reload()" class="primary">重新載入</button>
+        </div>
+      </section>
+    </main>
+    <script
+      type="module"
+      src="./game.js"
+      onerror="document.getElementById('fatal').classList.remove('hidden');document.getElementById('fatal-message').textContent='遊戲程式載入失敗。請檢查連線後按重新載入；已保存的進度不會被清除。';document.getElementById('start').disabled=true;"
+    ></script>
+  </body>
+</html>

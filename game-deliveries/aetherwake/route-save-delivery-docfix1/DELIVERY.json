@@ -1,0 +1,16 @@
+{
+  "candidateId": "aetherwake-public-source-docfix.1-20261029",
+  "basedOnCandidateId": "aetherwake-route-save-20261028-01-delivery-docs.1",
+  "runtimeBuildId": "aetherwake-route-save-20261028-01",
+  "runtimeVersion": "1.0.0-rc.7-input.2-continuity.2-route.1",
+  "runtimeAggregate": "9a9712e5f59e54d31acc1402e3a05ba80f8a407e454911c450313d47877a0ca9",
+  "scope": "Public source documentation correction AW-PUBLIC-DOC-001 and candidate identity/manifest only; original runtime 60 files unchanged.",
+  "maintainabilityDefectsAddressed": [
+    "AW-PUBLIC-DOC-001"
+  ],
+  "sourceCommit": null,
+  "candidateUrl": null,
+  "independentReview": null,
+  "scores": null,
+  "publication": "NOT_PERFORMED"
+}

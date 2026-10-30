@@ -1,0 +1,3160 @@
+{
+  "schemaVersion": 1,
+  "gameId": "aetherwake",
+  "kitVersion": "1.0.0",
+  "generatedAt": "2026-10-25",
+  "runtimeGeometry": "The live game imports games/aetherwake/src/models.js. GLB exports retain the equivalent reusable meshes, rigs, UVs, PBR materials and five clips; no GLB network fetch is required for gameplay.",
+  "audioRuntime": "Gesture-unlocked WebAudio loads six original WAV events with procedural fallback; environmental sound and the retained score are synthesised live.",
+  "totalRuntimeBytes": 5137378,
+  "entries": [
+    {
+      "id": "aetherwake.island-1",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-1.glb"
+      ],
+      "sha256": {
+        "models/island-1.glb": "c7b8c9fa1a60a325654ee2be92592cd3feb935eb52a31ea30e810a06fe97840d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 6362,
+        "drawCalls": 10,
+        "bones": 0,
+        "dimensions": [
+          76.129,
+          49.065,
+          79.195
+        ],
+        "materialSlots": [
+          "island-0-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "mineral-sand",
+          "weathered-turf",
+          "ochre-ceramic",
+          "aged-brass",
+          "chalk-sail",
+          "moss"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [
+          {
+            "distance": 0,
+            "model": "models/island-1.glb"
+          },
+          {
+            "distance": 145,
+            "model": "models/island-1-low.glb"
+          }
+        ],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 333068,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "cliff",
+          "terrace",
+          "region-1"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-1-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-1-low.glb"
+      ],
+      "sha256": {
+        "models/island-1-low.glb": "94136d645d000ceaaa58b5e5a685b946cc818fb8ca314f8a9fc29cfaa5d7eef9"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 678,
+        "drawCalls": 6,
+        "bones": 0,
+        "dimensions": [
+          75.716,
+          49.065,
+          77.872
+        ],
+        "materialSlots": [
+          "island-0-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "aged-brass",
+          "chalk-sail",
+          "ochre-ceramic"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 72224,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "lod"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-2",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-2.glb"
+      ],
+      "sha256": {
+        "models/island-2.glb": "b2e05206c4c1d58b87348041bdd419d1b15b27517199d3a85e9a2306e2fe0a0a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 6448,
+        "drawCalls": 10,
+        "bones": 0,
+        "dimensions": [
+          69.042,
+          47.59,
+          72.626
+        ],
+        "materialSlots": [
+          "island-1-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "mineral-sand",
+          "weathered-turf",
+          "ochre-ceramic",
+          "aged-brass",
+          "chalk-sail",
+          "moss"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [
+          {
+            "distance": 0,
+            "model": "models/island-2.glb"
+          },
+          {
+            "distance": 145,
+            "model": "models/island-2-low.glb"
+          }
+        ],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 361784,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "cliff",
+          "terrace",
+          "region-1"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-2-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-2-low.glb"
+      ],
+      "sha256": {
+        "models/island-2-low.glb": "427983ebae29681819672093796dcad92719ae007315a4a04622bf1530391c98"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1004,
+        "drawCalls": 5,
+        "bones": 0,
+        "dimensions": [
+          67.623,
+          47.59,
+          72.626
+        ],
+        "materialSlots": [
+          "island-1-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "chalk-sail",
+          "aged-brass"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 102024,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "lod"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-3",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-3.glb"
+      ],
+      "sha256": {
+        "models/island-3.glb": "1a37b74ee3aa22c15c107bf36f25b69b223d2e7c7ae7a73238beb577acb8bae4"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 6138,
+        "drawCalls": 10,
+        "bones": 0,
+        "dimensions": [
+          77.704,
+          44.015,
+          68
+        ],
+        "materialSlots": [
+          "island-2-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "mineral-sand",
+          "weathered-turf",
+          "ochre-ceramic",
+          "aged-brass",
+          "chalk-sail",
+          "moss"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [
+          {
+            "distance": 0,
+            "model": "models/island-3.glb"
+          },
+          {
+            "distance": 145,
+            "model": "models/island-3-low.glb"
+          }
+        ],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 322184,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "cliff",
+          "terrace",
+          "region-2"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-3-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-3-low.glb"
+      ],
+      "sha256": {
+        "models/island-3-low.glb": "39fcb8b3bde4ce32cd13aa90eaf576d1570c09c59069cc7571fed9f6bf061191"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 676,
+        "drawCalls": 5,
+        "bones": 0,
+        "dimensions": [
+          75.918,
+          44.015,
+          68
+        ],
+        "materialSlots": [
+          "island-2-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "chalk-sail",
+          "mineral-sand"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 71084,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "lod"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-4",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-4.glb"
+      ],
+      "sha256": {
+        "models/island-4.glb": "8b54f97d04cc7c67de3613f7a74a357f22db923f4eec402d485ff9688becbbf9"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 7858,
+        "drawCalls": 11,
+        "bones": 0,
+        "dimensions": [
+          83.558,
+          58.725,
+          92.593
+        ],
+        "materialSlots": [
+          "island-3-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "mineral-sand",
+          "weathered-turf",
+          "ochre-ceramic",
+          "aged-brass",
+          "chalk-sail",
+          "aether-glass",
+          "moss"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [
+          {
+            "distance": 0,
+            "model": "models/island-4.glb"
+          },
+          {
+            "distance": 145,
+            "model": "models/island-4-low.glb"
+          }
+        ],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 425196,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "cliff",
+          "terrace",
+          "region-3"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-4-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-4-low.glb"
+      ],
+      "sha256": {
+        "models/island-4-low.glb": "deeab58dde489de8695001869b663d1919244b5f63d5cca7a3815b49c6ec8af1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1556,
+        "drawCalls": 5,
+        "bones": 0,
+        "dimensions": [
+          81.743,
+          58.725,
+          91.848
+        ],
+        "materialSlots": [
+          "island-3-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "aged-brass",
+          "aether-glass"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 155256,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "lod"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-5",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-5.glb"
+      ],
+      "sha256": {
+        "models/island-5.glb": "7ee06c0e94ab8ee2db1596295af58d2c2a1767753a14f05a7935a84f086a2071"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 6974,
+        "drawCalls": 10,
+        "bones": 0,
+        "dimensions": [
+          80.567,
+          44.3,
+          69.189
+        ],
+        "materialSlots": [
+          "island-4-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "mineral-sand",
+          "weathered-turf",
+          "ochre-ceramic",
+          "aged-brass",
+          "chalk-sail",
+          "moss"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [
+          {
+            "distance": 0,
+            "model": "models/island-5.glb"
+          },
+          {
+            "distance": 145,
+            "model": "models/island-5-low.glb"
+          }
+        ],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 381940,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "cliff",
+          "terrace",
+          "region-2"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-5-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-5-low.glb"
+      ],
+      "sha256": {
+        "models/island-5-low.glb": "6eb5e4f18de7f55ae1f735690fca12c197079886806dcc68364128c4a959f97b"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1248,
+        "drawCalls": 5,
+        "bones": 0,
+        "dimensions": [
+          80.749,
+          44.3,
+          69.189
+        ],
+        "materialSlots": [
+          "island-4-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "chalk-sail",
+          "aged-brass"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 126484,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "lod"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-6",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-6.glb"
+      ],
+      "sha256": {
+        "models/island-6.glb": "b65a75f12ed417750bbdf843337a361b3a188f435594cd7ecc87d5a11648fa43"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 8194,
+        "drawCalls": 11,
+        "bones": 0,
+        "dimensions": [
+          77.771,
+          51.33,
+          89.057
+        ],
+        "materialSlots": [
+          "island-5-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "mineral-sand",
+          "weathered-turf",
+          "ochre-ceramic",
+          "aged-brass",
+          "chalk-sail",
+          "aether-glass",
+          "moss"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [
+          {
+            "distance": 0,
+            "model": "models/island-6.glb"
+          },
+          {
+            "distance": 145,
+            "model": "models/island-6-low.glb"
+          }
+        ],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 457384,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "cliff",
+          "terrace",
+          "region-3"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.island-6-low",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/island-6-low.glb"
+      ],
+      "sha256": {
+        "models/island-6-low.glb": "889b2642f4ccad1ae1c8a6c0840978b5b045289893b8f19600dbddea1d597277"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1404,
+        "drawCalls": 6,
+        "bones": 0,
+        "dimensions": [
+          77.186,
+          51.33,
+          87.187
+        ],
+        "materialSlots": [
+          "island-5-terrace",
+          "teal-basalt",
+          "deep-basalt",
+          "chalk-sail",
+          "aged-brass",
+          "aether-glass"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 141672,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "floating-island",
+          "lod"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.pilot",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/pilot.glb"
+      ],
+      "sha256": {
+        "models/pilot.glb": "43ff07b262dd8eb044e2ed866547621734a54490fe1f55c75867c73ccfd26470"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1310,
+        "drawCalls": 5,
+        "bones": 8,
+        "dimensions": [
+          4.64,
+          2.64,
+          1.68
+        ],
+        "materialSlots": [
+          "pilot-vertex-palette",
+          "chalk-sail",
+          "aged-brass",
+          "navy-cloth",
+          "ochre-ceramic"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": [
+          {
+            "name": "idle",
+            "duration": 2.4,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "run",
+            "duration": 0.7,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "jump",
+            "duration": 0.45,
+            "loop": false,
+            "rootMotion": false
+          },
+          {
+            "name": "glide",
+            "duration": 2,
+            "loop": true,
+            "rootMotion": false
+          },
+          {
+            "name": "land",
+            "duration": 0.4,
+            "loop": false,
+            "rootMotion": false
+          }
+        ]
+      },
+      "budget": {
+        "runtimeBytes": 204772,
+        "maxSimultaneousInstances": 1
+      },
+      "reuse": {
+        "tags": [
+          "character",
+          "skinned",
+          "glider"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.station-1",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/station-1.glb"
+      ],
+      "sha256": {
+        "models/station-1.glb": "df7330ab0d85b8bfdc31e56ceef9b6c02a3cb87318e5ca38cb39f1da9b650ad7"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1160,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          4.6,
+          4.336,
+          4.6
+        ],
+        "materialSlots": [
+          "chalk-sail",
+          "ochre-ceramic",
+          "aged-brass",
+          "aether-glass"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 115936,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "observatory",
+          "interaction"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.station-2",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/station-2.glb"
+      ],
+      "sha256": {
+        "models/station-2.glb": "16af2c3880dae59d670a50f2fb018cce4d019cb12047bf9c14e09b10a5233e47"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1920,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          4.6,
+          3.5,
+          4.6
+        ],
+        "materialSlots": [
+          "chalk-sail",
+          "ochre-ceramic",
+          "aged-brass",
+          "aether-glass"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 188884,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "observatory",
+          "interaction"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.station-3",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/station-3.glb"
+      ],
+      "sha256": {
+        "models/station-3.glb": "959e993ec19c4a9efc0284fdb597cdb703b36d2ee0edb3a9d5364ca86cc1fd35"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1776,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          4.6,
+          4.15,
+          4.6
+        ],
+        "materialSlots": [
+          "chalk-sail",
+          "ochre-ceramic",
+          "aged-brass",
+          "aether-glass"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 175076,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "observatory",
+          "interaction"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-01",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-01.glb"
+      ],
+      "sha256": {
+        "models/relic-01.glb": "882a1707562afdb81bcde5e8f19e2815ed084382fb643857040425287653da31"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 388,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          1.39,
+          1.395,
+          0.86
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 40800,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-02",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-02.glb"
+      ],
+      "sha256": {
+        "models/relic-02.glb": "18cbcc27ea725128f6186099f74abc8433c3b1fafe36f6cc3b6d74dfbf65865a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 412,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          1.356,
+          1.378,
+          1.384
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 43224,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-03",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-03.glb"
+      ],
+      "sha256": {
+        "models/relic-03.glb": "f01390940f757904752bf988483a43d82dff5bbee4dfe54ff654c267f1edb534"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 440,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          1.292,
+          1.395,
+          0.86
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 45908,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-04",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-04.glb"
+      ],
+      "sha256": {
+        "models/relic-04.glb": "4a18210f2e05215c83e779d14392567d47c36eb4e04afd3b29a6938a8a3f0993"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 424,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          1.368,
+          1.365,
+          1.39
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 44324,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-05",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-05.glb"
+      ],
+      "sha256": {
+        "models/relic-05.glb": "6556ce94d833151f45b1531d4da075cf15a33e0359f7db0e1c22b742f5223c2d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 400,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          1.215,
+          1.392,
+          1.246
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 42076,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-06",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-06.glb"
+      ],
+      "sha256": {
+        "models/relic-06.glb": "3d058507e1507af001d6e8b61ba36b809fc89c83f4ebcc045e353545db2c41a8"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 428,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          1.354,
+          1.385,
+          1.39
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 44756,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-07",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-07.glb"
+      ],
+      "sha256": {
+        "models/relic-07.glb": "f38a0a6ee0cf05f2778af9a24fd3c51a7039be08d272a9888ef8725c700c9c77"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 572,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          1.299,
+          1.395,
+          1.382
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "chalk-sail",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 59476,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-08",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-08.glb"
+      ],
+      "sha256": {
+        "models/relic-08.glb": "70ca2323040ccb7724b74d636390f9af4b8c0531e9e8dc3d8656923275258c3a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 596,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          1.364,
+          1.358,
+          1.384
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "chalk-sail",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 61872,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-09",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-09.glb"
+      ],
+      "sha256": {
+        "models/relic-09.glb": "376f68d73e5b7244ccc1a0fd2d22886e1251cf2c6167ac6c0ea1c8161f7e34c7"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 576,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          1.272,
+          1.395,
+          1.094
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "chalk-sail",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 59940,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-10",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-10.glb"
+      ],
+      "sha256": {
+        "models/relic-10.glb": "e7ca1bf03d0c48f18fb9566872c890856ead72a0a0556ff2fa915c9185759954"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 560,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          1.347,
+          1.373,
+          1.39
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "chalk-sail",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 58364,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-11",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-11.glb"
+      ],
+      "sha256": {
+        "models/relic-11.glb": "7e2de9bdce00ce159ad5f1b080bad34dc6387fc10ef2d99c40caf01c16158965"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 584,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          1.331,
+          1.392,
+          0.946
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "chalk-sail",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 60724,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.relic-12",
+      "version": "1.0.0",
+      "kind": "model",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/relic-12.glb"
+      ],
+      "sha256": {
+        "models/relic-12.glb": "1f59eaf462ac3e84c6d121bdd5bb366c5bd16eb13c20ec3e81d520df12bb6668"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 612,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          1.387,
+          1.382,
+          1.39
+        ],
+        "materialSlots": [
+          "aether-glass",
+          "aged-brass",
+          "chalk-sail",
+          "deep-basalt"
+        ],
+        "collision": "assets/data/collision.json",
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 63400,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "collectible",
+          "civilization-fragment"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.wind-tailwind",
+      "version": "1.0.0",
+      "kind": "effect",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/wind-tailwind.glb"
+      ],
+      "sha256": {
+        "models/wind-tailwind.glb": "a905b00f6a26347eb456242351c14d139d7b53d9a8ce4fb6a5624074c88c0b5d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 544,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          4.576,
+          3.315,
+          14.302
+        ],
+        "materialSlots": [
+          "wind-tailwind-light"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 14932,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "wind",
+          "direction",
+          "instanced"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.wind-updraft",
+      "version": "1.0.0",
+      "kind": "effect",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/wind-updraft.glb"
+      ],
+      "sha256": {
+        "models/wind-updraft.glb": "bf4ee136eb22ae081673e80bdccaf512cef1ca5ab5cd65c58fed36024a30e995"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 1152,
+        "drawCalls": 4,
+        "bones": 0,
+        "dimensions": [
+          6.753,
+          9.248,
+          6.753
+        ],
+        "materialSlots": [
+          "wind-updraft-light"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 32588,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "wind",
+          "direction",
+          "instanced"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.wind-crosswind",
+      "version": "1.0.0",
+      "kind": "effect",
+      "source": "sources/models.js",
+      "runtime": [
+        "models/wind-crosswind.glb"
+      ],
+      "sha256": {
+        "models/wind-crosswind.glb": "0b8e599d725943487ae24158b62206955fb711ffe82e9f53d4ecf11e256f5a3c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "unit": "meter",
+        "up": "+Y",
+        "forward": "+Z",
+        "pivot": "ground-center",
+        "triangles": 544,
+        "drawCalls": 3,
+        "bones": 0,
+        "dimensions": [
+          4.768,
+          3.315,
+          14.302
+        ],
+        "materialSlots": [
+          "wind-crosswind-light"
+        ],
+        "collision": null,
+        "lod": [],
+        "uv": "Geometry-generated UVs; solid PBR material palettes, no bitmap textures",
+        "textureColorSpace": {
+          "baseColor": "sRGB",
+          "normal": "linear"
+        },
+        "animations": []
+      },
+      "budget": {
+        "runtimeBytes": 15012,
+        "maxSimultaneousInstances": 12
+      },
+      "reuse": {
+        "tags": [
+          "wind",
+          "direction",
+          "instanced"
+        ],
+        "compatibleWith": [
+          "aetherwake-kit-v1"
+        ]
+      },
+      "dependencies": [
+        "three@0.180.0"
+      ],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.glide",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/glide.wav",
+      "runtime": [
+        "audio/glide.wav"
+      ],
+      "sha256": {
+        "audio/glide.wav": "6714b17eadba470bcbd76971d4e0077a69d5e26f0383dc446cf1b72e0af2877d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.7280272108843537,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -12.99,
+        "usage": "glide",
+        "recipe": {
+          "notes": [
+            392,
+            587.33,
+            783.99
+          ],
+          "duration": 0.3,
+          "type": "triangle",
+          "gain": 0.18
+        }
+      },
+      "budget": {
+        "runtimeBytes": 32150,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.tailwind",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/tailwind.wav",
+      "runtime": [
+        "audio/tailwind.wav"
+      ],
+      "sha256": {
+        "audio/tailwind.wav": "01cda312b5e40b2488e6834e5cb710c7c25e3497de4e4aa3b0c9fe07da253852"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 1.0520181405895692,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -14.92,
+        "usage": "tailwind",
+        "recipe": {
+          "notes": [
+            293.66,
+            440,
+            587.33
+          ],
+          "duration": 0.45,
+          "type": "sine",
+          "gain": 0.13
+        }
+      },
+      "budget": {
+        "runtimeBytes": 46438,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.energy",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/energy.wav",
+      "runtime": [
+        "audio/energy.wav"
+      ],
+      "sha256": {
+        "audio/energy.wav": "0a2307de65282752bab8173536d7b757db31391ac4b6667a1647af9fcd4f4d57"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.3328344671201814,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -18.14,
+        "usage": "energy",
+        "recipe": {
+          "notes": [
+            220,
+            196
+          ],
+          "duration": 0.16,
+          "type": "triangle",
+          "gain": 0.13
+        }
+      },
+      "budget": {
+        "runtimeBytes": 14722,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.land",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/land.wav",
+      "runtime": [
+        "audio/land.wav"
+      ],
+      "sha256": {
+        "audio/land.wav": "3e682f0d8ae87e6bd312cf7292c05eabfe5159a2e83bf26f6b5addab68df2cb3"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.5552380952380952,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -12.17,
+        "usage": "land",
+        "recipe": {
+          "notes": [
+            98,
+            146.83,
+            196
+          ],
+          "duration": 0.22,
+          "type": "sine",
+          "gain": 0.22
+        }
+      },
+      "budget": {
+        "runtimeBytes": 24530,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.stall",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/stall.wav",
+      "runtime": [
+        "audio/stall.wav"
+      ],
+      "sha256": {
+        "audio/stall.wav": "60246c60f25ed62cad94b0486bc4acc800603382ac63ac17f3c048e4de000019"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.5120181405895692,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -15.82,
+        "usage": "stall",
+        "recipe": {
+          "notes": [
+            293.66,
+            220,
+            146.83
+          ],
+          "duration": 0.2,
+          "type": "triangle",
+          "gain": 0.15
+        }
+      },
+      "budget": {
+        "runtimeBytes": 22624,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.unlock",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/unlock.wav",
+      "runtime": [
+        "audio/unlock.wav"
+      ],
+      "sha256": {
+        "audio/unlock.wav": "74a77837309b8257afd70b8d4e0521564bab5f3581842e8bae3402f256cdecaf"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.7108390022675737,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -13.5,
+        "usage": "unlock",
+        "recipe": {
+          "notes": [
+            293.66,
+            369.99,
+            440,
+            587.33,
+            739.99
+          ],
+          "duration": 0.19,
+          "type": "sine",
+          "gain": 0.2
+        }
+      },
+      "budget": {
+        "runtimeBytes": 31392,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.ui",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/ui.wav",
+      "runtime": [
+        "audio/ui.wav"
+      ],
+      "sha256": {
+        "audio/ui.wav": "98ddc559cd2311684f3fcca6e68723ac3bdeaf3e411ba07b027f35d4dff01014"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.15002267573696146,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -27.19,
+        "usage": "ui",
+        "recipe": {
+          "notes": [
+            587.33
+          ],
+          "duration": 0.07,
+          "type": "sine",
+          "gain": 0.09
+        }
+      },
+      "budget": {
+        "runtimeBytes": 6660,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.relic",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/relic.wav",
+      "runtime": [
+        "audio/relic.wav"
+      ],
+      "sha256": {
+        "audio/relic.wav": "2ccedabbd0c42de048b7a53a06cbd9f4e8475668bcea4bf8bd711685a3a6d6f7"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 0.4040362811791383,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -15.81,
+        "usage": "relic",
+        "recipe": {
+          "notes": [
+            440,
+            587.33,
+            880
+          ],
+          "duration": 0.15,
+          "type": "sine",
+          "gain": 0.17
+        }
+      },
+      "budget": {
+        "runtimeBytes": 17862,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.finish",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/finish.wav",
+      "runtime": [
+        "audio/finish.wav"
+      ],
+      "sha256": {
+        "audio/finish.wav": "88f86dc2bdba87a06fe9c772cabb0c4ae02621c86168af6a827a6c8df1ab4506"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 1.0550113378684807,
+        "loop": false,
+        "loopPoints": null,
+        "peakDbFS": -12.38,
+        "usage": "finish",
+        "recipe": {
+          "notes": [
+            293.66,
+            369.99,
+            440,
+            587.33,
+            739.99,
+            880
+          ],
+          "duration": 0.25,
+          "type": "sine",
+          "gain": 0.2
+        }
+      },
+      "budget": {
+        "runtimeBytes": 46570,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.audio.cloud-sea-loop",
+      "version": "1.0.0",
+      "kind": "audio",
+      "source": "sources/cloud-sea-loop.wav",
+      "runtime": [
+        "audio/cloud-sea-loop.wav"
+      ],
+      "sha256": {
+        "audio/cloud-sea-loop.wav": "295ee08bc4a31ee25cf95118b7a8ff67f331693cb4ab8c9f973d2769743a26ed"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "duration": 12.8,
+        "loop": true,
+        "loopPoints": [
+          0,
+          282240
+        ],
+        "peakDbFS": -20.2,
+        "usage": "cloud-sea-loop",
+        "recipe": {
+          "tempo": 75,
+          "beats": 16,
+          "scale": "D major pentatonic",
+          "voice": "sine",
+          "wrapTail": true
+        }
+      },
+      "budget": {
+        "runtimeBytes": 564524,
+        "maxSimultaneousInstances": 20
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-1",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-01.svg"
+      ],
+      "sha256": {
+        "icons/relic-01.svg": "79594ba8b75754865db79bbf067069d7862021eedf7feed4813b8e7961cb9709"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 545,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-2",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-02.svg"
+      ],
+      "sha256": {
+        "icons/relic-02.svg": "2bff5dbcf36aba8460dfb41ce161010dc92dfe7d24e35c9c3975a00205434826"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 516,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-3",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-03.svg"
+      ],
+      "sha256": {
+        "icons/relic-03.svg": "2f405da5b0bb253ef71e8194ef04f316d456c7db0f303c4f3f9274e747fdf75a"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 719,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-4",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-04.svg"
+      ],
+      "sha256": {
+        "icons/relic-04.svg": "bf4b3728d4524531aee9b68043a19df6816e28e29908518fb86383e039775a36"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 734,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-5",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-05.svg"
+      ],
+      "sha256": {
+        "icons/relic-05.svg": "41a5e7979c0edee6d0aaa29c009199a33b84a24b2cd23cf7a9d38e16dbefc176"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 545,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-6",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-06.svg"
+      ],
+      "sha256": {
+        "icons/relic-06.svg": "c7de53fd0ea6dc1d20a08c369f4146e46fa4abecbdbeae4461767a4183b3481c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 516,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-7",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-07.svg"
+      ],
+      "sha256": {
+        "icons/relic-07.svg": "f8e4fdd658db2cdc71b1ca1eac34ebdc86e569a9f7491a79edb58a208e55dbcf"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 719,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-8",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-08.svg"
+      ],
+      "sha256": {
+        "icons/relic-08.svg": "74ab3b4479226323b8d1500ff95075eed0e6d1bcf9a298d78191a9c463cd487c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 734,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-9",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-09.svg"
+      ],
+      "sha256": {
+        "icons/relic-09.svg": "7324a501467c8ec0d260b7ff46ff99bca88dd46f1e996810510f8e0495cfbd7f"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 545,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-10",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-10.svg"
+      ],
+      "sha256": {
+        "icons/relic-10.svg": "bc9fa139fb2b76066a127f7fbc37ba28d1e798d5cf253784399f8188c9cdd2ac"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 516,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-11",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-11.svg"
+      ],
+      "sha256": {
+        "icons/relic-11.svg": "ac09d59c37f67a788db401dc136a1888f28fb6ba8d065f137ffc59deb9ea2ff5"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 719,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "aetherwake.icon.relic-12",
+      "version": "1.0.0",
+      "kind": "icon",
+      "source": "recipes/export-assets.mjs",
+      "runtime": [
+        "icons/relic-12.svg"
+      ],
+      "sha256": {
+        "icons/relic-12.svg": "eebd1e89316bdcd93d557972b726533f898b8e344fbd37e8fff54af372238e70"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Aetherwake Maker asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 / original deterministic JavaScript geometry and audio recipes",
+        "promptRecord": "generation/design-record.md",
+        "referenceSources": [],
+        "rights": "Original project work created for stteak. No third-party visual/audio source material or commercial character references; Three.js runtime is MIT, recorded separately. Ownership follows the project owner’s applicable terms."
+      },
+      "spec": {
+        "dimensions": [
+          64,
+          64
+        ],
+        "viewBox": [
+          0,
+          0,
+          64,
+          64
+        ],
+        "strokeWidth": 3,
+        "minimumCssSize": 24,
+        "purpose": "collectible inventory"
+      },
+      "budget": {
+        "runtimeBytes": 734,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": [],
+      "derivatives": []
+    }
+  ]
+}
