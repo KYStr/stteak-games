@@ -55,7 +55,7 @@ jobs:
           SOFTWARE.
         QA_SOURCE_1: |
           {
-            "candidateId": "aether-route1-native-workflow.r10-owner-exec-snapshot",
+            "candidateId": "aether-route1-native-workflow.r11-owner-budget",
             "files": [
               {
                 "path": "LICENSE",
@@ -109,8 +109,8 @@ jobs:
               },
               {
                 "path": "scripts/entry.mjs",
-                "bytes": 4629,
-                "sha256": "5a46cf900a8f90484a61b65e86e3b845e4aafa8acd80f2c8e42654a7c4fc5a92"
+                "bytes": 4645,
+                "sha256": "c737552107aa12fce9da23a09ca864835784f9af69ba59de8a115b09492ac2ca"
               },
               {
                 "path": "scripts/host.mjs",
@@ -154,8 +154,8 @@ jobs:
               },
               {
                 "path": "scripts/native/native.mjs",
-                "bytes": 23649,
-                "sha256": "dcd7f37c8fb0f0dcc5078483e8c9e77726d48cf235f0bb02ac0120b521b15a8f"
+                "bytes": 23932,
+                "sha256": "ac7858b16ab0166b01c0e75fff95abbf23e53eee6e7f5825cfbb8c5be0ba295c"
               },
               {
                 "path": "scripts/native-observation.mjs",
@@ -174,8 +174,8 @@ jobs:
               },
               {
                 "path": "source-policy.json",
-                "bytes": 611,
-                "sha256": "93869e6a29f80b1bb48899976325bf33e64d74a2963236b544e9dd1a591274cb"
+                "bytes": 604,
+                "sha256": "c1b18deedcdb37efbd0e0f2f6de24d020086f04a303d9723a478331238a645b3"
               }
             ]
           }
@@ -356,7 +356,7 @@ jobs:
           export async function prepared(dependencies){assertSourceReady();const {chromium,now,startedAt,nativeCheck}=dependencies;const acquisition=new AbortController();const host=createHost({policy:SOURCE,startedAt,now,nativeCheck,launchBrowser:()=>chromium.launch({channel:'chrome',headless:true,chromiumSandbox:true,timeout:15000}),read:()=>readRuntimeInput({now,signal:acquisition.signal,deadlineMs:Math.min(startedAt+SOURCE.approvedWorkMs,now()+15000)}),verify:verifyRuntime,start:startLoopback});const stop=()=>{acquisition.abort();void host.close().catch(()=>{});};process.once('SIGTERM',stop);try{return await host.run();}finally{acquisition.abort();process.off('SIGTERM',stop);}} // 中文：正式gate先於依賴getter，唯一原生binding，TERM同owner，不增flags。
           export async function entry(){ // 中文：不接受CLI時間、來源、程式碼或browser替換。
            assertSourceReady();const now=()=>Number(process.hrtime.bigint())/1e6,raw=process.env.AETHER_PARENT_STARTED_NS;if(!raw||!/^\d{10,25}$/.test(raw))throw Error('parent-anchor');const startedAt=Number(BigInt(raw))/1e6,end=startedAt+SOURCE.approvedWorkMs;if(!Number.isFinite(startedAt)||startedAt>now()||now()>=end)throw Error('parent-anchor'); // 中文：同Linux父單調起點，import耗時不重起。
-           let revoked=false;const stop=()=>{revoked=true;};process.once('SIGTERM',stop);try{await mkdir('artifacts',{mode:0o700});const {chromium}=await import('playwright');const nativeCheck=async()=>{const limit=Math.min(end,now()+30000),guard=()=>{if(revoked||now()>=limit)throw Error('native-deadline');},io=createNativeIO(guard),restricted={...io,command:async key=>{guard();const value=await io.command(key);guard();if(key==='package'&&selectProfile(value)!==PROFILES.neon156)throw Error('native-package');return value;}};const r=await inspectNative(restricted);try{guard();return nativeBinding(r);}catch(e){e.nativeObservation=nativeObservation(r);throw e;}}; // 中文：前30秒含原15秒fullhash，排隊前後同界不安裝替代。
+           let revoked=false;const stop=()=>{revoked=true;};process.once('SIGTERM',stop);try{await mkdir('artifacts',{mode:0o700});const {chromium}=await import('playwright');const nativeCheck=async()=>{const limit=Math.min(end,now()+30000),guard=()=>{if(revoked||now()>=limit)throw Error('native-deadline');},io=createNativeIO(guard,()=>limit-now()),restricted={...io,command:async key=>{guard();const value=await io.command(key);guard();if(key==='package'&&selectProfile(value)!==PROFILES.neon156)throw Error('native-package');return value;}};const r=await inspectNative(restricted);try{guard();return nativeBinding(r);}catch(e){e.nativeObservation=nativeObservation(r);throw e;}}; // 中文：前30秒含原15秒fullhash，排隊前後同界不安裝替代。
             const result=await prepared({chromium,now,startedAt,nativeCheck});const screenshots=[];for(const item of result.images){if(now()>=startedAt+SOURCE.approvedTotalMs)throw Error('image-write-late');const file=item.label+'.png';await writeFile('artifacts/'+file,item.buffer,{flag:'wx',mode:0o600});screenshots.push({label:item.label,file,bytes:item.bytes,sha256:item.sha256});}delete result.images;const data=Buffer.from(JSON.stringify({candidateId:SOURCE.candidateId,sourceCommit:SOURCE.sourceCommit,capsuleCommit:SOURCE.commit,result,screenshots,guiEvidence:'ONLY_IF_NATIVE_RUN_OBSERVED',qualityScore:null}));if(data.length>65536||now()>=startedAt+SOURCE.approvedTotalMs)throw Error('report-late-or-large');await writeFile('artifacts/report.json',data,{flag:'wx',mode:0o600});return result.report.outcome==='VISIBLE_ROUTE1_COLLECTED_PENDING_REVIEW'&&result.cleanup.status==='close-acknowledged'?0:2; // 中文：可見旅程資料不等於品質評分；外層OS清理另證。
            }finally{process.off('SIGTERM',stop);} // 中文：不重開清理窗。
           } // 中文：import不launch。
@@ -904,7 +904,7 @@ jobs:
             const [name, version, architecture, installed, maintainer, source, homepage] = lines; const numericVersion = /^[1-9][0-9]{1,2}\.[0-9]{1,3}\.[0-9]{1,6}\.[0-9]{1,6}-[0-9]{1,3}$/.test(version); const sourceStatus = source === '' ? 'not-recorded' : ['google-chrome-stable', 'google-chrome'].includes(source) ? 'known-literal' : 'unrecognized'; // 嚴格有界數字版本與固定enum，任意字串不回傳。
             return { status: 'observed', packageMatches: name === 'google-chrome-stable', versionStatus: numericVersion ? 'observed-format-valid' : 'unrecognized', packageVersion: numericVersion ? version : null, architectureMatches: architecture === 'amd64', installedMatches: installed === 'install ok installed', maintainerMatches: maintainer === 'Chrome Linux Team <chromium-dev@chromium.org>', sourceStatus, sourcePackage: sourceStatus === 'known-literal' ? source : null, homepageMatches: ['https://www.google.com/chrome/', 'https://www.google.com/chrome'].includes(homepage), downloadSourceVerified: false }; // Source及Homepage只是metadata宣告，不證下載來源，不加入安全gate。
           } // 觀測與strict信任分離，第三版仍不得hash或執行Chrome，156另限本包Signal章節入口重載候選範圍，執行另待批准。
-          export function commandOptions(key) { const metadataOnly = ['package', 'binaryOwner'].includes(key); return { timeout: 3000, killSignal: 'SIGKILL', maxBuffer: metadataOnly ? 4096 : 262144, encoding: 'utf8', ...(metadataOnly ? { env: { PATH: '/usr/bin:/bin', LANG: 'C', LC_ALL: 'C' } } : {}) }; } // 兩個既有metadata查詢採已審3秒／4KiB與最小環境；其他原命令設定不變。
+          export function commandOptions(key, remainingMs = Infinity) { const timeout = Math.floor(Math.min(key === 'binaryOwner' ? 6000 : 3000, remainingMs)); if (!Number.isFinite(timeout) || timeout < 1) throw new Error('native-deadline'); const metadataOnly = ['package', 'binaryOwner'].includes(key); return { timeout, killSignal: 'SIGKILL', maxBuffer: metadataOnly ? 4096 : 262144, encoding: 'utf8', ...(metadataOnly ? { env: { PATH: '/usr/bin:/bin', LANG: 'C', LC_ALL: 'C' } } : {}) }; } // 只有既有一次binaryOwner上限6秒，其他3秒；每次取原父界剩餘向下取整，未足1毫秒不啟查詢，4KiB與環境不變。
           export function expectedDigest(text, kind) { // 只找固定binary或固定profile的原生套件checksum行。
             if (typeof text !== 'string' || text.length > 262144) return null; const lines = text.split('\n'); // 有界metadata，未知格式fail-closed。
             const pattern = kind === 'binary' ? /^([a-f0-9]{32})  opt\/google\/chrome\/chrome$/ : /^ \/etc\/apparmor\.d\/chrome ([a-f0-9]{32})$/; // 不接受別的檔案、obsolete設定或路徑前綴相似。
@@ -961,13 +961,13 @@ jobs:
             result.stage = 'binary-version'; await check('binaryVersion', async () => nativeVersion(await io.command('version'), selected)); if (!result.checks.binaryVersion) { result.blockedChecks.push('binaryVersion'); return result; } // 全部來源前提確認後才一次固定版本命令。
             result.version = selected.version; result.status = 'ready'; result.stage = 'complete'; return result; // 只允許外層唯一sandbox launch，不代表遊戲或完整安全審計通過。
           } // 最小原生前提結束，不增加其他工作負載。
-          export function createNativeIO(assertActive) { // 正式入口只在GitHub閘門後建立；離線僅以自建合成檔核讀取，不碰系統binary或命令。
+          export function createNativeIO(assertActive, remainingMs = () => Infinity) { // 正式入口只在GitHub閘門後建立；離線僅以自建合成檔核讀取，不碰系統binary或命令。
             const run = promisify(execFile); // 不使用shell，固定命令無插入點。
             const read = async path => { assertActive(); const value = await readFile(path, { encoding: 'utf8', signal: AbortSignal.timeout(1000) }); assertActive(); return value; }; // 所有小檔唯讀等待都有界。
             const path = async spec => { assertActive(); const value = await lstat(spec.path); assertActive(); const canonical = await realpath(spec.path) === spec.path; assertActive(); return { status: 'read', canonical, nonSymlink: !value.isSymbolicLink(), rootOwned: value.uid === 0, typeMatches: spec.type === 'file' ? value.isFile() : value.isDirectory(), groupWritable: !!(value.mode & 0o020), worldWritable: !!(value.mode & 0o002), executable: !!(value.mode & 0o111), ...(spec.key === 'binary' ? { sizeBytes: value.isFile() && Number.isSafeInteger(value.size) && value.size >= 0 ? value.size : null } : {}) }; }; // 僅既有binary的lstat追加非負size觀測，不作放行條件、不取代完整hash；不公開任意uid、mode或路徑原文。
             return { // 此介面只有讀取與已核版本查詢，沒有寫入系統或安裝方法。
               read, path, image: imageProvenance, // 固定呼叫方控制允許路徑，不接使用者參數。
-              command: async key => { assertActive(); if (!Object.hasOwn(COMMANDS, key)) throw new Error('unknown-command'); const [file, args] = COMMANDS[key]; const output = await run(file, args, commandOptions(key)); assertActive(); return output.stdout; }, // 原stdout只回記憶體parser，stderr不公開。
+              command: async key => { assertActive(); if (!Object.hasOwn(COMMANDS, key)) throw new Error('unknown-command'); const [file, args] = COMMANDS[key]; const output = await run(file, args, commandOptions(key, remainingMs())); assertActive(); return output.stdout; }, // 原stdout只回記憶體parser，stderr不公開。
               kernel: async () => { const values = {}; for (const item of KERNEL) { try { values[item.key] = parseKernelValue(await read(item.path), item.type); } catch { values[item.key] = { status: 'unreadable', value: null }; } } return values; }, // 四個固定狀態讀取，未知值就不啟動。
               hash: async path => { assertActive(); const signal = AbortSignal.timeout(HASH_LIMIT_MS); return hashOnce(() => createReadStream(path, { signal, highWaterMark: HASH_CHUNK_BYTES }), signal, assertActive); }, // 一次十五秒有界stream與一MiB讀塊；無start/end截取、不重hash、不改安全設定，內部觀測包含取消原因。
               absent: async path => { assertActive(); try { await lstat(path); return false; } catch (error) { if (error?.code === 'ENOENT') return true; throw error; } }, // 只接受確定不存在，不把權限拒絕當缺檔。
@@ -1100,7 +1100,7 @@ jobs:
           if __name__=='__main__': sys.exit(main())  # 中文：匯入測試不建立程序。
         QA_SOURCE_24: |
           {
-            "candidateId": "aether-route1-native-workflow.r10-owner-exec-snapshot",
+            "candidateId": "aether-route1-native-workflow.r11-owner-budget",
             "repository": "KYStr/stteak-games",
             "sourceCommit": "57410f3d2dfd6e6a0a167dbe9fa8abe17f374afa",
             "commit": "d5e5bbb74690b0a40c41f998684451eb889c3183",
@@ -1114,7 +1114,7 @@ jobs:
             "approvedKillMs": 604000,
             "approvedTotalMs": 605000
           }
-        QA_FILE_INDEX: '[{"path":"LICENSE","env":"QA_SOURCE_0","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"PAYLOAD-MANIFEST.json","env":"QA_SOURCE_1","bytes":3921,"sha256":"ed5a4ffb2fecb659929f02216bdea139b003317cb2e6be43ab2ad22b957b180f"},{"path":"package-lock.json","env":"QA_SOURCE_2","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"path":"package.json","env":"QA_SOURCE_3","bytes":330,"sha256":"6b33739f0ea0052157a3db8b4bb7eb40c96f334ba6e95b23787345b2a52aafc1"},{"path":"scripts/check.mjs","env":"QA_SOURCE_4","bytes":1649,"sha256":"47aacfc1a51d66235f0b203dda2aaa013c7b0fdc9cc74ee5629f066271273215"},{"path":"scripts/components/adapter.mjs","env":"QA_SOURCE_5","bytes":3301,"sha256":"b96ecf37a09f32466b42e85033be166e2f4a055adc81346de5eb968efd1e69e4"},{"path":"scripts/components/identity.mjs","env":"QA_SOURCE_6","bytes":2799,"sha256":"aa7b1f088af555e0920b228ae8062056f7150d6137bc4faf2e889e69ef0a286b"},{"path":"scripts/components/scenario.mjs","env":"QA_SOURCE_7","bytes":4857,"sha256":"3a63fbc53c0f7d50f19aa0e1de851b3f2b65e809a981536368843bd57bc8f6af"},{"path":"scripts/components/visible-reader.mjs","env":"QA_SOURCE_8","bytes":5211,"sha256":"873bd6391e486a75957ec412bd9f76c8efadfa9035182350621e302c561950c8"},{"path":"scripts/core.mjs","env":"QA_SOURCE_9","bytes":261,"sha256":"f59e40d283b881e096abe34d3097381eec92f2d762bc56bb80adbe1bf90acbcb"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_10","bytes":2911,"sha256":"6bda2fb390e8415857a43feb149de51bc8e8f3a1d70aa14fa50eae7d2752b54e"},{"path":"scripts/entry.mjs","env":"QA_SOURCE_11","bytes":4629,"sha256":"5a46cf900a8f90484a61b65e86e3b845e4aafa8acd80f2c8e42654a7c4fc5a92"},{"path":"scripts/host.mjs","env":"QA_SOURCE_12","bytes":10590,"sha256":"caaaaa5a91295359aec0e540d6f54907e14c010b2d9e43aba10c7dfa06aaea0b"},{"path":"scripts/local/loopback.mjs","env":"QA_SOURCE_13","bytes":11528,"sha256":"0c3cdc602c2681e0f9ea220eda3cf84845bd7d0e7c17929a11706e24d57c82d3"},{"path":"scripts/local/preview-session.mjs","env":"QA_SOURCE_14","bytes":6194,"sha256":"bb76fad8666ed99302c2f2fa9597111f935f5be03313d591c5d713c3b98736df"},{"path":"scripts/local/runtime-contract.mjs","env":"QA_SOURCE_15","bytes":437,"sha256":"3f2c55ab24c3d6eca1ff1d0a341046b54cfc9712cd34f5a76e1507149d2d3bbe"},{"path":"scripts/local/runtime-receipt.json","env":"QA_SOURCE_16","bytes":9876,"sha256":"e64cd6818d5d71082713c5770404d57578bfe62c12d729eefa9ebeabfd100ad0"},{"path":"scripts/local/runtime-source.mjs","env":"QA_SOURCE_17","bytes":5355,"sha256":"d233dceae984ac35b41c7937bd48c91e015c618df28ee32d41f500f9febe96fc"},{"path":"scripts/main-entry.mjs","env":"QA_SOURCE_18","bytes":618,"sha256":"928ca80c2c15dfb76949c64798b59c19ee0439973ee510130bafe7e20ae9b8ca"},{"path":"scripts/native-observation.mjs","env":"QA_SOURCE_19","bytes":4133,"sha256":"89a81a3f3b878dafb2f31a2a14943cfd592afa3bc55c83f843f2ad025e40586b"},{"path":"scripts/native/diagnostics.mjs","env":"QA_SOURCE_20","bytes":4635,"sha256":"0d1f2988ccca9523488d0a8f12ac929071c61f6ba3b218db92eb66b0d5c8f763"},{"path":"scripts/native/native.mjs","env":"QA_SOURCE_21","bytes":23649,"sha256":"dcd7f37c8fb0f0dcc5078483e8c9e77726d48cf235f0bb02ac0120b521b15a8f"},{"path":"scripts/source-contract.mjs","env":"QA_SOURCE_22","bytes":1433,"sha256":"e5d993c18c34992b42679a221b4a73624bdf02dd5373f0c0bbf66eb6ccbda524"},{"path":"scripts/supervisor.py","env":"QA_SOURCE_23","bytes":15307,"sha256":"d1e9635427b3c1ef362e2da0d9353448c6ed6051773b8d128a86fd2753eff5a7"},{"path":"source-policy.json","env":"QA_SOURCE_24","bytes":611,"sha256":"93869e6a29f80b1bb48899976325bf33e64d74a2963236b544e9dd1a591274cb"}]'
+        QA_FILE_INDEX: '[{"path":"LICENSE","env":"QA_SOURCE_0","bytes":1063,"sha256":"4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"},{"path":"PAYLOAD-MANIFEST.json","env":"QA_SOURCE_1","bytes":3914,"sha256":"e51bfa9d46fad1736768a2b38bfe93a9adf0733b795fffaf7a41d174e5257026"},{"path":"package-lock.json","env":"QA_SOURCE_2","bytes":1304,"sha256":"ad9529218d95135e68e6fee10d2da9d46be786aee53af5e59eb9d2db97b15849"},{"path":"package.json","env":"QA_SOURCE_3","bytes":330,"sha256":"6b33739f0ea0052157a3db8b4bb7eb40c96f334ba6e95b23787345b2a52aafc1"},{"path":"scripts/check.mjs","env":"QA_SOURCE_4","bytes":1649,"sha256":"47aacfc1a51d66235f0b203dda2aaa013c7b0fdc9cc74ee5629f066271273215"},{"path":"scripts/components/adapter.mjs","env":"QA_SOURCE_5","bytes":3301,"sha256":"b96ecf37a09f32466b42e85033be166e2f4a055adc81346de5eb968efd1e69e4"},{"path":"scripts/components/identity.mjs","env":"QA_SOURCE_6","bytes":2799,"sha256":"aa7b1f088af555e0920b228ae8062056f7150d6137bc4faf2e889e69ef0a286b"},{"path":"scripts/components/scenario.mjs","env":"QA_SOURCE_7","bytes":4857,"sha256":"3a63fbc53c0f7d50f19aa0e1de851b3f2b65e809a981536368843bd57bc8f6af"},{"path":"scripts/components/visible-reader.mjs","env":"QA_SOURCE_8","bytes":5211,"sha256":"873bd6391e486a75957ec412bd9f76c8efadfa9035182350621e302c561950c8"},{"path":"scripts/core.mjs","env":"QA_SOURCE_9","bytes":261,"sha256":"f59e40d283b881e096abe34d3097381eec92f2d762bc56bb80adbe1bf90acbcb"},{"path":"scripts/emit-evidence.mjs","env":"QA_SOURCE_10","bytes":2911,"sha256":"6bda2fb390e8415857a43feb149de51bc8e8f3a1d70aa14fa50eae7d2752b54e"},{"path":"scripts/entry.mjs","env":"QA_SOURCE_11","bytes":4645,"sha256":"c737552107aa12fce9da23a09ca864835784f9af69ba59de8a115b09492ac2ca"},{"path":"scripts/host.mjs","env":"QA_SOURCE_12","bytes":10590,"sha256":"caaaaa5a91295359aec0e540d6f54907e14c010b2d9e43aba10c7dfa06aaea0b"},{"path":"scripts/local/loopback.mjs","env":"QA_SOURCE_13","bytes":11528,"sha256":"0c3cdc602c2681e0f9ea220eda3cf84845bd7d0e7c17929a11706e24d57c82d3"},{"path":"scripts/local/preview-session.mjs","env":"QA_SOURCE_14","bytes":6194,"sha256":"bb76fad8666ed99302c2f2fa9597111f935f5be03313d591c5d713c3b98736df"},{"path":"scripts/local/runtime-contract.mjs","env":"QA_SOURCE_15","bytes":437,"sha256":"3f2c55ab24c3d6eca1ff1d0a341046b54cfc9712cd34f5a76e1507149d2d3bbe"},{"path":"scripts/local/runtime-receipt.json","env":"QA_SOURCE_16","bytes":9876,"sha256":"e64cd6818d5d71082713c5770404d57578bfe62c12d729eefa9ebeabfd100ad0"},{"path":"scripts/local/runtime-source.mjs","env":"QA_SOURCE_17","bytes":5355,"sha256":"d233dceae984ac35b41c7937bd48c91e015c618df28ee32d41f500f9febe96fc"},{"path":"scripts/main-entry.mjs","env":"QA_SOURCE_18","bytes":618,"sha256":"928ca80c2c15dfb76949c64798b59c19ee0439973ee510130bafe7e20ae9b8ca"},{"path":"scripts/native-observation.mjs","env":"QA_SOURCE_19","bytes":4133,"sha256":"89a81a3f3b878dafb2f31a2a14943cfd592afa3bc55c83f843f2ad025e40586b"},{"path":"scripts/native/diagnostics.mjs","env":"QA_SOURCE_20","bytes":4635,"sha256":"0d1f2988ccca9523488d0a8f12ac929071c61f6ba3b218db92eb66b0d5c8f763"},{"path":"scripts/native/native.mjs","env":"QA_SOURCE_21","bytes":23932,"sha256":"ac7858b16ab0166b01c0e75fff95abbf23e53eee6e7f5825cfbb8c5be0ba295c"},{"path":"scripts/source-contract.mjs","env":"QA_SOURCE_22","bytes":1433,"sha256":"e5d993c18c34992b42679a221b4a73624bdf02dd5373f0c0bbf66eb6ccbda524"},{"path":"scripts/supervisor.py","env":"QA_SOURCE_23","bytes":15307,"sha256":"d1e9635427b3c1ef362e2da0d9353448c6ed6051773b8d128a86fd2753eff5a7"},{"path":"source-policy.json","env":"QA_SOURCE_24","bytes":604,"sha256":"c1b18deedcdb37efbd0e0f2f6de24d020086f04a303d9723a478331238a645b3"}]'
       run: |
         timeout --signal=TERM --kill-after=1s 99s bash -euo pipefail -c 'set -euo pipefail # 中文：任一必要前置失敗即停，沒有retry。
         NODE_BIN="$RUNNER_TOOL_CACHE/node/24.22.1/x64/bin" # 中文：只用既有精確官方toolcache，缺即拒不下載替代。
@@ -1125,7 +1125,7 @@ jobs:
         python3 - <<'"'"'AETHER_MATERIALIZE'"'"' # 中文：只執行此workflow固定物化程式。
         import os,json,hashlib # 中文：只讀本workflow內嵌已固定bytes，不訪網路。
         from pathlib import Path # 中文：所有輸出限新目錄且拒覆寫。
-        raw=os.environ['"'"'QA_FILE_INDEX'"'"'];assert hashlib.sha256(raw.encode()).hexdigest()=='"'"'696353288c3cab749eae9c02d9d1e8ed92f472f01eb7396f41bf085405991bad'"'"' # 中文：任何換路徑或hash在落檔前拒。
+        raw=os.environ['"'"'QA_FILE_INDEX'"'"'];assert hashlib.sha256(raw.encode()).hexdigest()=='"'"'730cca17af1e06bb7dca08d20b2722ea3c208f7c48e3175ca18ed2361e1d80e9'"'"' # 中文：任何換路徑或hash在落檔前拒。
         entries=json.loads(raw);ready=[] # 中文：先全驗，不部分寫錯包。
         for e in entries: # 中文：索引精確固定，不由使用者提供任意path。
          b=os.environ[e['"'"'env'"'"']].encode();assert len(b)==e['"'"'bytes'"'"'] and hashlib.sha256(b).hexdigest()==e['"'"'sha256'"'"'];ready.append((e['"'"'path'"'"'],b)) # 中文：全內容先核。
