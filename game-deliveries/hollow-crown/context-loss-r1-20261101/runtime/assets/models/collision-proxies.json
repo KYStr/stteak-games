@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "unit": "meter",
+  "up": "+Y",
+  "actors": {
+    "guardian": {
+      "shape": "vertical-capsule",
+      "radius": 0.43,
+      "height": 1.75,
+      "center": [
+        0,
+        0.875,
+        0
+      ]
+    },
+    "infantry": {
+      "shape": "vertical-capsule",
+      "radius": 0.48,
+      "height": 1.75,
+      "center": [
+        0,
+        0.875,
+        0
+      ]
+    },
+    "lancer": {
+      "shape": "vertical-capsule",
+      "radius": 0.48,
+      "height": 1.75,
+      "center": [
+        0,
+        0.875,
+        0
+      ]
+    },
+    "arbalest": {
+      "shape": "vertical-capsule",
+      "radius": 0.42,
+      "height": 1.75,
+      "center": [
+        0,
+        0.875,
+        0
+      ]
+    },
+    "cinderbug": {
+      "shape": "vertical-capsule",
+      "radius": 0.4,
+      "height": 0.8,
+      "center": [
+        0,
+        0.4,
+        0
+      ]
+    },
+    "shieldguard": {
+      "shape": "vertical-capsule",
+      "radius": 0.6,
+      "height": 1.75,
+      "center": [
+        0,
+        0.875,
+        0
+      ]
+    },
+    "crown": {
+      "shape": "vertical-capsule",
+      "radius": 0.9,
+      "height": 2.65,
+      "center": [
+        0,
+        1.325,
+        0
+      ]
+    },
+    "bellwarden": {
+      "shape": "vertical-capsule",
+      "radius": 0.86,
+      "height": 2.5,
+      "center": [
+        0,
+        1.25,
+        0
+      ]
+    }
+  },
+  "environment": {
+    "pillar": {
+      "shape": "box",
+      "size": [
+        1.15,
+        3.02,
+        1.15
+      ],
+      "center": [
+        0,
+        1.51,
+        0
+      ]
+    },
+    "altar": {
+      "shape": "box",
+      "size": [
+        2.6,
+        1.1,
+        1.65
+      ],
+      "center": [
+        0,
+        0.55,
+        0
+      ]
+    },
+    "wall": {
+      "shape": "box",
+      "size": [
+        2,
+        1.1,
+        0.5
+      ],
+      "center": [
+        0,
+        0.55,
+        0
+      ]
+    }
+  },
+  "runtimeContract": "Visual colliders are reusable references. The rules module is authoritative; its room obstacle positions and attack shapes are rendered read-only."
+}

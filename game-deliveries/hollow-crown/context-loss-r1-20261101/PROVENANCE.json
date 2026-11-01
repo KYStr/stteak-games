@@ -1,0 +1,14 @@
+{
+  "candidateId": "hollow-crown-context-loss-20261101-r1",
+  "repository": "KYStr/stteak-games",
+  "baselineCommit": "1493581e6667f4cb2dd7d25029b4943f8e4a4bd6",
+  "baselineDirectory": "game-deliveries/hollow-crown/input3-delivery-docs1-public-source.1-20261029",
+  "candidateSource": "runtime/main.js",
+  "sourceSha256": "fbd5732666e32edb5bb489bba2576cf27351c6b5c9b467dfe0f96f8b508a0936",
+  "runtimeChanged": [
+    "main.js"
+  ],
+  "otherBaselineSource": "unchanged; obtain exact baseline directory before overlaying candidate source",
+  "publicationCommit": null,
+  "scope": "Reload-only fail-closed handling after graphics context loss; no physics formula/save format/asset change"
+}

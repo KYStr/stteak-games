@@ -1,0 +1,300 @@
+{
+  "candidateId": "hollow-crown-context-loss-20261101-r1",
+  "files": [
+    {
+      "path": "CHECKS.json",
+      "bytes": 637,
+      "sha256": "fc7ef82988b47e8fea20d6351e5fed64030d4719a96b116bf1f99e6fdb8f7fa6"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "bytes": 687,
+      "sha256": "df4a5a4a274709b5d691cec71e9b170685ad2347946b15e5f86fc38dc3146447"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2586,
+      "sha256": "02c588a89d94e3a653e44b0027ad32f3b9ff7261344a9a4bed1c37401d6eedf7"
+    },
+    {
+      "path": "rollback/main.js",
+      "bytes": 33115,
+      "sha256": "7d7b7afaab394e76d8dcf60609ff0bfa4555f422d227013ab7cdae6c88d87775"
+    },
+    {
+      "path": "runtime/.gitattributes",
+      "bytes": 72,
+      "sha256": "c882794754ab6adc93a3f11266d728c67c8ed67bd31d513824c1a3a24bbb4db8"
+    },
+    {
+      "path": "runtime/assets/audio/boss.wav",
+      "bytes": 705644,
+      "sha256": "95a8afbd15afe9b6b9e7ddbe3ed4f827dfaaedf8d01457791f989b9f222f284c"
+    },
+    {
+      "path": "runtime/assets/audio/camp.wav",
+      "bytes": 705644,
+      "sha256": "c72c12780f342d8768372c8e002f99d4e40b621d069eaf092857759ca3306e10"
+    },
+    {
+      "path": "runtime/assets/audio/charge.wav",
+      "bytes": 28708,
+      "sha256": "c4e582853717124ff41ffe44813917bcfb639d79a48c6919605763be492e413e"
+    },
+    {
+      "path": "runtime/assets/audio/combat.wav",
+      "bytes": 705644,
+      "sha256": "df370f14084fc91f9e883a65ee7acada4b8f723bb54524d2f5383d5602361109"
+    },
+    {
+      "path": "runtime/assets/audio/death.wav",
+      "bytes": 30912,
+      "sha256": "23252a52c9a3a944c358418792c49f83f07514212e9e6fe9aa1802f97e046e4b"
+    },
+    {
+      "path": "runtime/assets/audio/dodge.wav",
+      "bytes": 8864,
+      "sha256": "1eeebdb304162ec501798347c045d25666de9af6c73bd586fab6874a51bcc799"
+    },
+    {
+      "path": "runtime/assets/audio/hit.wav",
+      "bytes": 8864,
+      "sha256": "52f7272d92486a69a8c159812d011c4e9114900173ae1f0e6ed1b05f8a1ef085"
+    },
+    {
+      "path": "runtime/assets/audio/hurt.wav",
+      "bytes": 15478,
+      "sha256": "a978e2708145de20add3b15a149fdb17deb2e0763719d0bc703bd73dbb4f63be"
+    },
+    {
+      "path": "runtime/assets/audio/light.wav",
+      "bytes": 7100,
+      "sha256": "1d664a2f7c282800ef0618371244b1c55c76d0142e6cce7fa7bf9d559cf5558f"
+    },
+    {
+      "path": "runtime/assets/audio/loss.wav",
+      "bytes": 44144,
+      "sha256": "71766ded4ac67c68e4794b075c899fff93be98445cc8194cb98e73b5fe873d6c"
+    },
+    {
+      "path": "runtime/assets/audio/metal.wav",
+      "bytes": 14156,
+      "sha256": "c58b5063d83a3bf9d910977a1e307e67fffab4dbe5047f84644a5b34d6f19bb1"
+    },
+    {
+      "path": "runtime/assets/audio/parry.wav",
+      "bytes": 19888,
+      "sha256": "3e1c974048f48a29ebc4d21c98ae53b640edfd8aaf65d25eef935d96e3414cf8"
+    },
+    {
+      "path": "runtime/assets/audio/stone.wav",
+      "bytes": 8864,
+      "sha256": "726b6267ca7e3be368898e96c9ffa3631d889458c58230f3b8de57796d6c2d6c"
+    },
+    {
+      "path": "runtime/assets/audio/ui.wav",
+      "bytes": 4012,
+      "sha256": "ca3f02d712c14f4ffe96a34df94af753cb7099bd9e8462ee927c0d4c45d549b1"
+    },
+    {
+      "path": "runtime/assets/audio/warning.wav",
+      "bytes": 11068,
+      "sha256": "05bd421b322a36c65df393d15d1685872ad2e388967778e41880007390f3b159"
+    },
+    {
+      "path": "runtime/assets/audio/win.wav",
+      "bytes": 61782,
+      "sha256": "0bdc0a0e2940828a622a039486801397ad65173c49e83a8dbf92f92011e386b2"
+    },
+    {
+      "path": "runtime/assets/models/altar.glb",
+      "bytes": 283852,
+      "sha256": "f5e7f76641b5b86e5d0adf110798c7e15f0633f24ca82ca7f9d298a4cc5aa6a4"
+    },
+    {
+      "path": "runtime/assets/models/arbalest.glb",
+      "bytes": 44284,
+      "sha256": "939bf2a46d37cd950ea56a7b690eb0b8728484b8aebf64a54045d420982883f1"
+    },
+    {
+      "path": "runtime/assets/models/banner.glb",
+      "bytes": 5892,
+      "sha256": "c47b4ced263ba5410b8ba5c7ba31947d08f15c54b47124fc2c1bdb99b2b17372"
+    },
+    {
+      "path": "runtime/assets/models/bellwarden.glb",
+      "bytes": 44436,
+      "sha256": "37bb4e66a0bb4582d639ef3ecb999a3f9976760b3354ec141e9134b3a6510c82"
+    },
+    {
+      "path": "runtime/assets/models/brazier.glb",
+      "bytes": 13404,
+      "sha256": "b4373da620c1391fe9fb2d61250b2934d80fad81c94a7f99b786419bf8d37b21"
+    },
+    {
+      "path": "runtime/assets/models/candelabrum.glb",
+      "bytes": 10240,
+      "sha256": "ac2480d60f7dadc195b372786052a4230a38ebbfb036dad3a17177a2cf670451"
+    },
+    {
+      "path": "runtime/assets/models/cinderbug.glb",
+      "bytes": 46304,
+      "sha256": "c29dfac0f686d37108bd92f963ecff779b4b5c74d38f6d74a1324e3b24c1da2f"
+    },
+    {
+      "path": "runtime/assets/models/collision-proxies.json",
+      "bytes": 2097,
+      "sha256": "54ec3eccf7919b6aa1743b684bc6cec02fe6ebf4b754d1c55cd69446978ff01d"
+    },
+    {
+      "path": "runtime/assets/models/crown.glb",
+      "bytes": 44304,
+      "sha256": "4f6f79c1b439386197903c41889c458edeb3b98e06b51de159b2c69b0c9f8f47"
+    },
+    {
+      "path": "runtime/assets/models/floor-tile.glb",
+      "bytes": 279188,
+      "sha256": "57d64ea5b25395fc503aaef83b9207598d4a850a85d0dcce12798d55bb2ccc6a"
+    },
+    {
+      "path": "runtime/assets/models/guardian.glb",
+      "bytes": 42880,
+      "sha256": "f812f67b8b0a8a79499b4aedc6460d784be78c52fcd15fe82307663ac4ca4d3b"
+    },
+    {
+      "path": "runtime/assets/models/infantry.glb",
+      "bytes": 42148,
+      "sha256": "59ce99d98c6fb9a30fe53f756562df6c6cf45031c5f658aeb7e1e8249d1a09c3"
+    },
+    {
+      "path": "runtime/assets/models/kit.js",
+      "bytes": 18908,
+      "sha256": "62dc735b6f1f0f3594d8c9381fca92f80c84f3505f6e705c11e8d57a0f8a6f8d"
+    },
+    {
+      "path": "runtime/assets/models/lancer.glb",
+      "bytes": 42984,
+      "sha256": "c821e2839c993f12ce5bde4c02e079693fc2bf1be979ac53cfb321dba3ba09c5"
+    },
+    {
+      "path": "runtime/assets/models/pillar-low.glb",
+      "bytes": 282144,
+      "sha256": "2eabf9070669f13598750e042809f91df3811da2f8641f494b3030858be63075"
+    },
+    {
+      "path": "runtime/assets/models/pillar.glb",
+      "bytes": 283564,
+      "sha256": "a0a14d65fd7e47019a756454d1416c5e0e29933d1a6fff9eb44732c9e4a12f31"
+    },
+    {
+      "path": "runtime/assets/models/rubble.glb",
+      "bytes": 280772,
+      "sha256": "357b8b308b7b1524b2f0e90d9c26765e32901c291841c601111bc14c766b47f6"
+    },
+    {
+      "path": "runtime/assets/models/shieldguard.glb",
+      "bytes": 42908,
+      "sha256": "36d68347c9232021bc39c94f735a32be2e109c42179f8b0a694486ba3d61d597"
+    },
+    {
+      "path": "runtime/assets/models/wall.glb",
+      "bytes": 280580,
+      "sha256": "ab7bd08805cf8954d9845e360069ae7cd1f6d34e87a41262608c2d51b9f4404a"
+    },
+    {
+      "path": "runtime/assets/textures/ruin-stone-basecolor.png",
+      "bytes": 76203,
+      "sha256": "5bd50be7e08458cdc536007dae4157bc76cf5590259a5d9f122f3878ab817540"
+    },
+    {
+      "path": "runtime/assets/textures/ruin-stone-normal.png",
+      "bytes": 144979,
+      "sha256": "cca0005e6e6bdd83c2dc8698e76978c95dd0631139b8edad2dd56efd11b9f03f"
+    },
+    {
+      "path": "runtime/assets/textures/ruin-stone-roughness.png",
+      "bytes": 53448,
+      "sha256": "7b45ba6b415406dad996fa590be5fb492550794c6e4d5ee688676fcd6e57ff38"
+    },
+    {
+      "path": "runtime/audio.js",
+      "bytes": 3592,
+      "sha256": "e4ac5f9d7fa7fd8edae1256a58c9426f2889a53e0d262b07865a34638b6d512c"
+    },
+    {
+      "path": "runtime/boot.js",
+      "bytes": 1069,
+      "sha256": "312734702dce69a7c2bde808c402ff8440b2edbbcd33a79c8659e4a5a1622aae"
+    },
+    {
+      "path": "runtime/bridge.js",
+      "bytes": 2803,
+      "sha256": "9eb5da2c48ebc75c9feafe01996a951f6dc9f92a4e43bd5fa32ca2adac29a55d"
+    },
+    {
+      "path": "runtime/content.js",
+      "bytes": 9440,
+      "sha256": "1defd1959a58b0cf5d223c9da338331df89f203452851e9581005c7c55b4fd1f"
+    },
+    {
+      "path": "runtime/index.html",
+      "bytes": 3102,
+      "sha256": "6bb038b38118584801319e564918fc62fdcb04aa50af46510cad1b8346c6c353"
+    },
+    {
+      "path": "runtime/input.js",
+      "bytes": 9168,
+      "sha256": "86e97b14250cbae2de2df77b2df71922cb399fc93f44b3dc30519a77d62e9dcd"
+    },
+    {
+      "path": "runtime/main.js",
+      "bytes": 33824,
+      "sha256": "fbd5732666e32edb5bb489bba2576cf27351c6b5c9b467dfe0f96f8b508a0936"
+    },
+    {
+      "path": "runtime/rules.js",
+      "bytes": 49655,
+      "sha256": "87e6396bb0a18741066d93b9ce895be5d89678eb6bb8591ef83e01413fbf8d1d"
+    },
+    {
+      "path": "runtime/scene.js",
+      "bytes": 35088,
+      "sha256": "fad6be8665ab63dd2d4cf688396dee4bae2ed2ea216cafab2ad333cf83ff4fb0"
+    },
+    {
+      "path": "runtime/storage.js",
+      "bytes": 5066,
+      "sha256": "8532199cfb649e949778efb97fd7023cf4f0d2fddd95eb3287ea09b81ee61c20"
+    },
+    {
+      "path": "runtime/style.css",
+      "bytes": 13956,
+      "sha256": "4c68e9335e0a96361b0526becd1e36c171ae81321c23ebb91ce67480970018bd"
+    },
+    {
+      "path": "runtime/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "runtime/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "runtime/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "path": "runtime/warning-cue-ui.js",
+      "bytes": 20234,
+      "sha256": "ed1571a45165c52cd3a321681d9465d0182e435b24126d06609d845f196dc67f"
+    },
+    {
+      "path": "runtime/warning-cue-view.js",
+      "bytes": 11879,
+      "sha256": "2e33233fe175ac6e636c6f72955a957a3e24191bf21765bde2f8e0659720c14c"
+    }
+  ]
+}

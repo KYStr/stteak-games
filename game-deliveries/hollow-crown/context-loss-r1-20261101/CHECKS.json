@@ -1,0 +1,21 @@
+{
+  "candidateId": "hollow-crown-context-loss-20261101-r1",
+  "pureNodeAffected": {
+    "passed": 7,
+    "total": 7,
+    "limitations": "Exact-source function extraction with DOM/input/audio doubles; not native game behavior"
+  },
+  "moduleSyntax": "PASS",
+  "build": {
+    "state": "NOT_RUN_NOT_REQUIRED_DIRECT_ESM",
+    "newExecutions": 0,
+    "secondsLimit": null,
+    "nodeHeapMiB": null
+  },
+  "packaging": "Exact runtime manifest comparison and archive entry readback",
+  "native": "NOT_RUN",
+  "actualGpuContextLoss": "NOT_RUN",
+  "audioListening": "NOT_RUN",
+  "independentQualityScores": null,
+  "deployment": "NOT_PERFORMED"
+}
