@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "candidateId": "signal-zero-cloud-campaign-20261028-02+source-recovery.1",
   "qualityScores": null,
-  "publicCandidateUrl": null,
+  "publicCandidateUrl": "https://github.com/KYStr/stteak-games/tree/676502099169c5ac6eafe47ae036a747274983df/game-deliveries/signal-zero/source-recovery.1",
   "originalDeliveryId": "signal-zero-cloud-campaign-20261028-02+delivery-docs.1",
   "originalBytesRecovery": "PARTIAL_NEW_DELIVERY_NOT_ORIGINAL",
   "files": [
@@ -33,8 +33,8 @@
     },
     {
       "path": "LIMITATIONS.md",
-      "bytes": 1936,
-      "sha256": "e63782970bb92fece2fe8a0f53d902239412821f64615e69d7c9f2ccbfc13126"
+      "bytes": 2410,
+      "sha256": "996961b98ec2e58a15517e350f8afb3204fcf81512fc839afcddcee08ebc67b9"
     },
     {
       "path": "SOURCE-MAP.json",
@@ -342,5 +342,7 @@
       "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a"
     }
   ],
-  "manifestSelfExcluded": true
+  "manifestSelfExcluded": true,
+  "documentationRevision": "publication-status-correction.1",
+  "publicCandidateUrlScope": "Initial published package; not the commit of this documentation correction. Resolve the current manifest by its enclosing fixed commit."
 }
