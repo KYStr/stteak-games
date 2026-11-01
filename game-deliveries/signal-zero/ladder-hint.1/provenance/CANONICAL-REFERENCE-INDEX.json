@@ -1,0 +1,466 @@
+{
+  "snapshot": "833c5214d33c0f89776c81d86df118d714760c6e",
+  "entries": [
+    {
+      "path": "games/signal-zero/build.mjs",
+      "mode": "100644",
+      "size": 919,
+      "sha": "b3b0ec4dbe459e423d5897f6f3a86b863bb7c3a5",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/build.mjs",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "d31819f0fc66ce1249375410b804dd65430d5f270da478103758c23a4f3af1b8"
+    },
+    {
+      "path": "games/signal-zero/package-lock.json",
+      "mode": "100644",
+      "size": 2568,
+      "sha": "4b89ac601c77ca70a36c4992063ffd23f45a7798",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/package-lock.json",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "6360f1bd6fcbe1fae3d36b0054ef6705cf46c0b5635de5fc4d67861776d09f17"
+    },
+    {
+      "path": "games/signal-zero/package.json",
+      "mode": "100644",
+      "size": 253,
+      "sha": "06695e933ed8e5e15af7482ba5d956dad7f1cd17",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/package.json",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "67aae7e9a26ba270644fb8ac115e29671192eebb197cb80666926431ac518a71"
+    },
+    {
+      "path": "games/signal-zero/src/app.js",
+      "mode": "100644",
+      "size": 24879,
+      "sha": "657a642fef9658e82bae76990caa2a22e61f8538",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/app.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "6bd93b4aa4f608e618ecbea7156a7f413ae0e7588d456c61762c051aecf43f30"
+    },
+    {
+      "path": "games/signal-zero/src/audio.js",
+      "mode": "100644",
+      "size": 2538,
+      "sha": "a1686f3ae488d3505413da68b5c23d165280dfa9",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/audio.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+    },
+    {
+      "path": "games/signal-zero/src/bridge.js",
+      "mode": "100644",
+      "size": 1427,
+      "sha": "cf929b4e25c2e2db3410609c583f4748648d7a54",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/bridge.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5"
+    },
+    {
+      "path": "games/signal-zero/src/build.js",
+      "mode": "100644",
+      "size": 111,
+      "sha": "8976e4e8a2cfbbfd11fb7a87e7e81a44c5026e34",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/build.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "b663281aaff0ccdb61702734e28e76ca4088461980c5a71fc0349fd86daabc76"
+    },
+    {
+      "path": "games/signal-zero/src/core.js",
+      "mode": "100644",
+      "size": 23905,
+      "sha": "27385ab585fc0c2a012b3fb9b7e1fabfa825d691",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/core.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6"
+    },
+    {
+      "path": "games/signal-zero/src/index.html",
+      "mode": "100644",
+      "size": 2750,
+      "sha": "3cca5aa13c12603290cada93bf21c5bac2e59478",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/index.html",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586"
+    },
+    {
+      "path": "games/signal-zero/src/input.js",
+      "mode": "100644",
+      "size": 3672,
+      "sha": "72705d5db5f2e29d30b4b40581d50fb4c9add794",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/input.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "b8ddc85022213ecf5a8694860befeadd9bac76c7f8df9e71b630121bcf5266b5"
+    },
+    {
+      "path": "games/signal-zero/src/levels.js",
+      "mode": "100644",
+      "size": 18783,
+      "sha": "84811843dc64b5103fd83838709909b99ba66c3d",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/levels.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76"
+    },
+    {
+      "path": "games/signal-zero/src/models.js",
+      "mode": "100644",
+      "size": 34656,
+      "sha": "86316c75ad66d696fb10449364f6ffb9aff905d4",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/models.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25"
+    },
+    {
+      "path": "games/signal-zero/src/save.js",
+      "mode": "100644",
+      "size": 7389,
+      "sha": "e3b6fc4d1ddac5bf54b82f4eebb52f4a6df98f27",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/save.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "7701e4ccd67c03d46ff644c1f6ce734bb68cf45400235d25d0788e524eb15046"
+    },
+    {
+      "path": "games/signal-zero/src/static-stage.js",
+      "mode": "100644",
+      "size": 3852,
+      "sha": "d272823332446c7c2572fec3d11d7c5f56fed273",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/static-stage.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4"
+    },
+    {
+      "path": "games/signal-zero/src/style.css",
+      "mode": "100644",
+      "size": 9368,
+      "sha": "ea7d3d2a150c96e020fceaa496e1c8490a57f83a",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/style.css",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4"
+    },
+    {
+      "path": "games/signal-zero/src/view.js",
+      "mode": "100644",
+      "size": 17345,
+      "sha": "c308c6ce7080373fb157ed271132df4bf4aabe8a",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/games/signal-zero/src/view.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a"
+    },
+    {
+      "path": "assets/games/signal-zero/.gitattributes",
+      "mode": "100644",
+      "size": 107,
+      "sha": "eeefa79de672cf2607d665f0b7e58d0715d55e0d",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/.gitattributes",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/generation/audio-brief.md",
+      "mode": "100644",
+      "size": 2651,
+      "sha": "4e7aaabd74c3ce3648ffe4179acea6bb7326925e",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/generation/audio-brief.md",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "4106182f89b7f5a9283b6c68de28a9a86f6ba79e060dcc96a06c0bff1ae99df4"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/landmark-brief.md",
+      "mode": "100644",
+      "size": 2904,
+      "sha": "be4412b6adf0f59591b850bbb45ad7d99c248293",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/generation/landmark-brief.md",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "3be49cd15bdea97b57ed089a8acba4682a0c5dea1b3770c21eb2da0ea43f5c16"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/model-brief.md",
+      "mode": "100644",
+      "size": 2052,
+      "sha": "1bea507b5ff88279b89f92de744406e667be2510",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/generation/model-brief.md",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "f83c5fca3b45528b7c6434b40c77b4cce28444432de666d8c8d33fbabee01bbf"
+    },
+    {
+      "path": "assets/games/signal-zero/manifest.json",
+      "mode": "100644",
+      "size": 78298,
+      "sha": "fecc92526d0c26776e979cb4be6c335ed11e24ac",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/manifest.json",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "3a01dc8e7144069f3f379a910f349d12d1aa653e9e5b38e118b6b31098e4f5ae"
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-assets.mjs",
+      "mode": "100644",
+      "size": 14673,
+      "sha": "251d74717674f7f6b282a434c02d708f15bafc87",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/recipes/export-assets.mjs",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "d71fa7cedb472a61f3f3675d613c2e26cb35b3546055978fbb24723fa72d8803"
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-audio.mjs",
+      "mode": "100644",
+      "size": 8333,
+      "sha": "1a13c8686f3ba161423101e80d5567a584a7b06d",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/recipes/export-audio.mjs",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "04d3d95756e99e31f16b4329c09cf826fe493dd434ed9f1c7137385d9d048295"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/alert.wav",
+      "mode": "100644",
+      "size": 35324,
+      "sha": "6f21d3afa142dd4627c69fe1b6d843fda345af76",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/alert.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/audio.js",
+      "mode": "100644",
+      "size": 2538,
+      "sha": "a1686f3ae488d3505413da68b5c23d165280dfa9",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/audio.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/caught.wav",
+      "mode": "100644",
+      "size": 57374,
+      "sha": "e1e7053d93a9bd7a3b2f0bce47877f7f7fe163a0",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/caught.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/checkpoint.wav",
+      "mode": "100644",
+      "size": 39734,
+      "sha": "4a11876b1f2d894ec33779cfee6c679d73aa1d2c",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/checkpoint.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/click.wav",
+      "mode": "100644",
+      "size": 9746,
+      "sha": "96e4fbdc0cd7aeb98d74710659a0b2914221839c",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/click.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/complete.wav",
+      "mode": "100644",
+      "size": 66194,
+      "sha": "c3e5c92a0adfd6e4399e7ff7ff986a1817778308",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/complete.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/hack.wav",
+      "mode": "100644",
+      "size": 15038,
+      "sha": "e6f8a0b510dd41e349d6b2e8466280b8a0918265",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/hack.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/jump.wav",
+      "mode": "100644",
+      "size": 18566,
+      "sha": "cba23f44504183282624e3a3be02912bff4d1d9d",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/jump.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/land.wav",
+      "mode": "100644",
+      "size": 11510,
+      "sha": "95d1d2f88757290faa29496b446835a692b2893e",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/land.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/music-search.wav",
+      "mode": "100644",
+      "size": 1862828,
+      "sha": "3f633bab21a56649fab2944e98bb3e01c47f2ef0",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/music-search.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/music-stealth.wav",
+      "mode": "100644",
+      "size": 1862828,
+      "sha": "a7d2ac164c887fe083ea3b6b8cda42e5a5ebc33f",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/music-stealth.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/objective.wav",
+      "mode": "100644",
+      "size": 39734,
+      "sha": "b54c5d2cce6a44b40585b0b268d5e5c5f112ce53",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/objective.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/packet.wav",
+      "mode": "100644",
+      "size": 35324,
+      "sha": "f93398b3918df4cad3ef21da1a6f84bb64b1bffd",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/packet.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/step.wav",
+      "mode": "100644",
+      "size": 7542,
+      "sha": "caaacd8804247085e07aae2668489fcafb73b264",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/step.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/tool-fail.wav",
+      "mode": "100644",
+      "size": 15038,
+      "sha": "9d57feab113b6a3dd460eee240c0595f959f1d3b",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/tool-fail.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/tool.wav",
+      "mode": "100644",
+      "size": 27386,
+      "sha": "946960b9e5b80ce622913567adc2c0c00d76dee9",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/audio/tool.wav",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "assets/games/signal-zero/sources/colliders.json",
+      "mode": "100644",
+      "size": 5332,
+      "sha": "f9bb3364efc78c3ea71178e71435e84d61a31472",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/colliders.json",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/procedural-models.js",
+      "mode": "100644",
+      "size": 34656,
+      "sha": "86316c75ad66d696fb10449364f6ffb9aff905d4",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/assets/games/signal-zero/sources/procedural-models.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": true,
+      "newCandidateSha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25"
+    },
+    {
+      "path": "tests/games/signal-zero/core.test.js",
+      "mode": "100644",
+      "size": 24056,
+      "sha": "fe62b83e272e4a21ef2b86c1901c4ef25bf3b067",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/tests/games/signal-zero/core.test.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "tests/games/signal-zero/guard-culling.test.js",
+      "mode": "100644",
+      "size": 6959,
+      "sha": "55fc1bd250f9f7731e0164e7c2b55f4641828f2a",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/tests/games/signal-zero/guard-culling.test.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "tests/games/signal-zero/input-ownership.test.js",
+      "mode": "100644",
+      "size": 6225,
+      "sha": "6758d9e3f4d53ba7bc7445fd53528a2381018fb8",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/tests/games/signal-zero/input-ownership.test.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "tests/games/signal-zero/input.test.js",
+      "mode": "100644",
+      "size": 3383,
+      "sha": "555093cdcc2f96e98a4fbf6ca6de73dd3120e55e",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/tests/games/signal-zero/input.test.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    },
+    {
+      "path": "tests/games/signal-zero/static-stage.test.js",
+      "mode": "100644",
+      "size": 3366,
+      "sha": "133444a5ec00efd45ab756e22e88d93900c2a31e",
+      "fixedUrl": "https://github.com/KYStr/stteak-games/blob/833c5214d33c0f89776c81d86df118d714760c6e/tests/games/signal-zero/static-stage.test.js",
+      "status": "canonical-reference-not-docs1-proof",
+      "includedInNewCandidate": false,
+      "newCandidateSha256": null
+    }
+  ],
+  "limit": "Metadata and paths from official full tree; only canonical-reference/ saved text files have independently recomputed content Git hashes. No claim that these are all original docs.1 members."
+}

@@ -1,0 +1,367 @@
+{
+  "candidateId": "signal-zero-ladder-hint-20261101-r1",
+  "baselineCommit": "9486091560342cb34d519769c56fd097634ee70b",
+  "baselinePath": "game-deliveries/signal-zero/source-recovery.1/",
+  "qualityScores": null,
+  "changedProductFiles": [
+    "public/games/signal-zero/app.js",
+    "games/signal-zero/src/app.js"
+  ],
+  "files": [
+    {
+      "path": "ASSET-LICENSES.md",
+      "bytes": 2110,
+      "sha256": "63c4e52df4f181f96f1106b40ceb93694ba325abac173e0d49a3b4535d13993e"
+    },
+    {
+      "path": "ASSET-PROVENANCE.md",
+      "bytes": 2459,
+      "sha256": "e4f4ae848744199cec273bc18d8e80ed22a8c0c620d89560a305c772c10cfb40"
+    },
+    {
+      "path": "AUTHOR-CHECK.md",
+      "bytes": 1524,
+      "sha256": "c3e12b642fa15dd7b14620f8f5ea729503e2198169d8527a5ec95a7ed67cce82"
+    },
+    {
+      "path": "DELIVERY-GUIDE.md",
+      "bytes": 3858,
+      "sha256": "85f3400beb9871c12851c9273b3335e86edd4e4e6dd165a877b2d6d6eb8e1834"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1063,
+      "sha256": "4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3"
+    },
+    {
+      "path": "LICENSE-SCOPE.md",
+      "bytes": 955,
+      "sha256": "a6084d069b9f799c7d14efbf17936ccc23c2948c557801ab40ead011db30a252"
+    },
+    {
+      "path": "LIMITATIONS.md",
+      "bytes": 2410,
+      "sha256": "996961b98ec2e58a15517e350f8afb3204fcf81512fc839afcddcee08ebc67b9"
+    },
+    {
+      "path": "MANIFEST.json",
+      "bytes": 12285,
+      "sha256": "e06199d3fc3429c2ca58d884008f8393a31282007875996a3df5e7e66672b0a1"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2826,
+      "sha256": "5ba337e8703ed7d5cf7d81ab9581aefcc21adc88697d9d798876fc8bce3be1f9"
+    },
+    {
+      "path": "ROLLBACK.diff",
+      "bytes": 12158,
+      "sha256": "d5877294bb678ee5b9164766e978647133e6afee83fefbc6771c29f896d21df7"
+    },
+    {
+      "path": "SOURCE-MAP.json",
+      "bytes": 39536,
+      "sha256": "6a245732a1c2651d479b44623d53dcc67612b4c3fbedbb18ae12d9d78075e42e"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 2770,
+      "sha256": "f2943c56b8aa0fe25086a1ac97bb9faf3bd09ba6420f59d3aca57d5dbcca454a"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/audio-brief.md",
+      "bytes": 2651,
+      "sha256": "4106182f89b7f5a9283b6c68de28a9a86f6ba79e060dcc96a06c0bff1ae99df4"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/landmark-brief.md",
+      "bytes": 2904,
+      "sha256": "3be49cd15bdea97b57ed089a8acba4682a0c5dea1b3770c21eb2da0ea43f5c16"
+    },
+    {
+      "path": "assets/games/signal-zero/generation/model-brief.md",
+      "bytes": 2052,
+      "sha256": "f83c5fca3b45528b7c6434b40c77b4cce28444432de666d8c8d33fbabee01bbf"
+    },
+    {
+      "path": "assets/games/signal-zero/manifest.json",
+      "bytes": 78298,
+      "sha256": "3a01dc8e7144069f3f379a910f349d12d1aa653e9e5b38e118b6b31098e4f5ae"
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-assets.mjs",
+      "bytes": 14673,
+      "sha256": "d71fa7cedb472a61f3f3675d613c2e26cb35b3546055978fbb24723fa72d8803"
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-audio.mjs",
+      "bytes": 8333,
+      "sha256": "04d3d95756e99e31f16b4329c09cf826fe493dd434ed9f1c7137385d9d048295"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/colliders.json",
+      "bytes": 5332,
+      "sha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88"
+    },
+    {
+      "path": "assets/games/signal-zero/sources/procedural-models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25"
+    },
+    {
+      "path": "games/signal-zero/build.mjs",
+      "bytes": 919,
+      "sha256": "d31819f0fc66ce1249375410b804dd65430d5f270da478103758c23a4f3af1b8"
+    },
+    {
+      "path": "games/signal-zero/package-lock.json",
+      "bytes": 2568,
+      "sha256": "6360f1bd6fcbe1fae3d36b0054ef6705cf46c0b5635de5fc4d67861776d09f17"
+    },
+    {
+      "path": "games/signal-zero/package.json",
+      "bytes": 253,
+      "sha256": "67aae7e9a26ba270644fb8ac115e29671192eebb197cb80666926431ac518a71"
+    },
+    {
+      "path": "games/signal-zero/src/app.js",
+      "bytes": 25137,
+      "sha256": "c0eebd561148548b8f02b6536d92ade00dd630605bb6b8729abf8ec5371fcef5"
+    },
+    {
+      "path": "games/signal-zero/src/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+    },
+    {
+      "path": "games/signal-zero/src/bridge.js",
+      "bytes": 1427,
+      "sha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5"
+    },
+    {
+      "path": "games/signal-zero/src/build.js",
+      "bytes": 205,
+      "sha256": "b663281aaff0ccdb61702734e28e76ca4088461980c5a71fc0349fd86daabc76"
+    },
+    {
+      "path": "games/signal-zero/src/core.js",
+      "bytes": 23905,
+      "sha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6"
+    },
+    {
+      "path": "games/signal-zero/src/index.html",
+      "bytes": 2750,
+      "sha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586"
+    },
+    {
+      "path": "games/signal-zero/src/input.js",
+      "bytes": 3672,
+      "sha256": "b8ddc85022213ecf5a8694860befeadd9bac76c7f8df9e71b630121bcf5266b5"
+    },
+    {
+      "path": "games/signal-zero/src/levels.js",
+      "bytes": 18783,
+      "sha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76"
+    },
+    {
+      "path": "games/signal-zero/src/models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25"
+    },
+    {
+      "path": "games/signal-zero/src/save.js",
+      "bytes": 13515,
+      "sha256": "7701e4ccd67c03d46ff644c1f6ce734bb68cf45400235d25d0788e524eb15046"
+    },
+    {
+      "path": "games/signal-zero/src/static-stage.js",
+      "bytes": 3852,
+      "sha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4"
+    },
+    {
+      "path": "games/signal-zero/src/style.css",
+      "bytes": 9368,
+      "sha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4"
+    },
+    {
+      "path": "games/signal-zero/src/view.js",
+      "bytes": 17345,
+      "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a"
+    },
+    {
+      "path": "provenance/CANONICAL-REFERENCE-INDEX.json",
+      "bytes": 22467,
+      "sha256": "b2131f96555bf931cc13ad6f347c0ca22826c2a988143dfb645b6027505937be"
+    },
+    {
+      "path": "public/games/signal-zero/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": "public/games/signal-zero/app.js",
+      "bytes": 25137,
+      "sha256": "c0eebd561148548b8f02b6536d92ade00dd630605bb6b8729abf8ec5371fcef5"
+    },
+    {
+      "path": "public/games/signal-zero/assets/data/colliders.json",
+      "bytes": 5332,
+      "sha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/archive.glb",
+      "bytes": 108684,
+      "sha256": "dc7b2733942fc761a27c0cacc56cc0da6a2b8e620f5f865b21d69eb4dcc586f3"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/camera.glb",
+      "bytes": 25948,
+      "sha256": "7d2d606c591e21fdc328fc8b552d77a667e25e3fe052fb7d50af48eefef043af"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/city.glb",
+      "bytes": 127820,
+      "sha256": "e823a1d6c48cb8654281165703723a7300fa55800e3ce78ad87bd02cf77ec548"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/core.glb",
+      "bytes": 81532,
+      "sha256": "6cf66523b2fb9697cc043e8a9583fd5832ff50412a4e73c05b399d5e0c9d0b66"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/cover.glb",
+      "bytes": 25344,
+      "sha256": "e4dbcf7b6c03d38b9878b4a306c57c7e2837950155589a9b419ee655f9a01bce"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/drone.glb",
+      "bytes": 57708,
+      "sha256": "d7ec9a5b974834e3891c7e9278655ed8da47c41a9c2d9a49070b2a8f814b9b78"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/exit.glb",
+      "bytes": 14740,
+      "sha256": "215fdf90ac6f4784d1c1d55af212fe36c417b960f74e1824a9f2d5e079c093cf"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/guard.glb",
+      "bytes": 225620,
+      "sha256": "69aaa878af76b8d8c77c3e349a4016e4a24c09f8e0e8fa8fcef78cd786573843"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/ladder.glb",
+      "bytes": 26524,
+      "sha256": "8158ff8bd22d3fcadd7e3996da4edc8ff6221327afcfcedda190a4c181b871d2"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/laser.glb",
+      "bytes": 16164,
+      "sha256": "e679babfe5437910cb1418c23d278f63c0853d01cdf1f40f2fdf2bcf3e5cbd8f"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/packet.glb",
+      "bytes": 18164,
+      "sha256": "22575fa6b1b6ffb799bb8b44bec268368e363fc3d4978b0d61d2199317bd07a0"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/platform.glb",
+      "bytes": 13420,
+      "sha256": "0ce3e832d520102dcae7d084ee5a5b2d9161cf32b1238f4e6fd92ad90171072e"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/runner.glb",
+      "bytes": 191024,
+      "sha256": "9a99559b61c5af282b6529ba3b80bb0b13e9dcc49c2df9e9578a284382b8b003"
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/terminal.glb",
+      "bytes": 21968,
+      "sha256": "86e1f3c35a12a7caff832e211308fe07f5ff9e0d501de769abd5ec96613326d0"
+    },
+    {
+      "path": "public/games/signal-zero/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c"
+    },
+    {
+      "path": "public/games/signal-zero/bridge.js",
+      "bytes": 1427,
+      "sha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5"
+    },
+    {
+      "path": "public/games/signal-zero/build.js",
+      "bytes": 205,
+      "sha256": "b663281aaff0ccdb61702734e28e76ca4088461980c5a71fc0349fd86daabc76"
+    },
+    {
+      "path": "public/games/signal-zero/core.js",
+      "bytes": 23905,
+      "sha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6"
+    },
+    {
+      "path": "public/games/signal-zero/index.html",
+      "bytes": 2750,
+      "sha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586"
+    },
+    {
+      "path": "public/games/signal-zero/input.js",
+      "bytes": 3672,
+      "sha256": "b8ddc85022213ecf5a8694860befeadd9bac76c7f8df9e71b630121bcf5266b5"
+    },
+    {
+      "path": "public/games/signal-zero/levels.js",
+      "bytes": 18783,
+      "sha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76"
+    },
+    {
+      "path": "public/games/signal-zero/models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25"
+    },
+    {
+      "path": "public/games/signal-zero/save.js",
+      "bytes": 13515,
+      "sha256": "7701e4ccd67c03d46ff644c1f6ce734bb68cf45400235d25d0788e524eb15046"
+    },
+    {
+      "path": "public/games/signal-zero/static-stage.js",
+      "bytes": 3852,
+      "sha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4"
+    },
+    {
+      "path": "public/games/signal-zero/style.css",
+      "bytes": 9368,
+      "sha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/BufferGeometryUtils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "public/games/signal-zero/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "path": "public/games/signal-zero/view.js",
+      "bytes": 17345,
+      "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a"
+    }
+  ]
+}
