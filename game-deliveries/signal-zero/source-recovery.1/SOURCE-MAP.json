@@ -1,0 +1,944 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "signal-zero-cloud-campaign-20261028-02+source-recovery.1",
+  "runtimeUnchanged": true,
+  "originalDeliveryRecovered": false,
+  "files": [
+    {
+      "path": "public/games/signal-zero/app.js",
+      "bytes": 25087,
+      "sha256": "6bd93b4aa4f608e618ecbea7156a7f413ae0e7588d456c61762c051aecf43f30",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "app.js",
+        "memberGitBlob": "c8d47ca97593d1c4d02e6296eb1fbfc2d8cca779",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/app.js",
+      "bytes": 25087,
+      "sha256": "6bd93b4aa4f608e618ecbea7156a7f413ae0e7588d456c61762c051aecf43f30",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "app.js",
+        "memberGitBlob": "c8d47ca97593d1c4d02e6296eb1fbfc2d8cca779",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/app.js",
+          "sameBytes": false
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/data/colliders.json",
+      "bytes": 5332,
+      "sha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/data/colliders.json",
+        "memberGitBlob": "f9bb3364efc78c3ea71178e71435e84d61a31472",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/archive.glb",
+      "bytes": 108684,
+      "sha256": "dc7b2733942fc761a27c0cacc56cc0da6a2b8e620f5f865b21d69eb4dcc586f3",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/archive.glb",
+        "memberGitBlob": "67a4b1270037a88e2b7bfdb9bcbcaebdb65977c0",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/camera.glb",
+      "bytes": 25948,
+      "sha256": "7d2d606c591e21fdc328fc8b552d77a667e25e3fe052fb7d50af48eefef043af",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/camera.glb",
+        "memberGitBlob": "f5231b829a652c250012e3779733718469cc2cbd",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/city.glb",
+      "bytes": 127820,
+      "sha256": "e823a1d6c48cb8654281165703723a7300fa55800e3ce78ad87bd02cf77ec548",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/city.glb",
+        "memberGitBlob": "f32fcf3776d242ec497f979b3777820ab7e5cc7d",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/core.glb",
+      "bytes": 81532,
+      "sha256": "6cf66523b2fb9697cc043e8a9583fd5832ff50412a4e73c05b399d5e0c9d0b66",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/core.glb",
+        "memberGitBlob": "8ccab78099a95f7cad9d33ffff0b4c6d4b6d1ce6",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/cover.glb",
+      "bytes": 25344,
+      "sha256": "e4dbcf7b6c03d38b9878b4a306c57c7e2837950155589a9b419ee655f9a01bce",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/cover.glb",
+        "memberGitBlob": "d6056fc35684772a10d6453965ece070f5418902",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/drone.glb",
+      "bytes": 57708,
+      "sha256": "d7ec9a5b974834e3891c7e9278655ed8da47c41a9c2d9a49070b2a8f814b9b78",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/drone.glb",
+        "memberGitBlob": "e61f6dc814d45a0c569d4ddced5e1d6135b3e59d",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/exit.glb",
+      "bytes": 14740,
+      "sha256": "215fdf90ac6f4784d1c1d55af212fe36c417b960f74e1824a9f2d5e079c093cf",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/exit.glb",
+        "memberGitBlob": "66bfb8b73cc62b35376fcfa334dc154678524c1b",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/guard.glb",
+      "bytes": 225620,
+      "sha256": "69aaa878af76b8d8c77c3e349a4016e4a24c09f8e0e8fa8fcef78cd786573843",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/guard.glb",
+        "memberGitBlob": "bc3bd3a0e6476826b638fab9757dcbcc71a7fab7",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/ladder.glb",
+      "bytes": 26524,
+      "sha256": "8158ff8bd22d3fcadd7e3996da4edc8ff6221327afcfcedda190a4c181b871d2",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/ladder.glb",
+        "memberGitBlob": "25c04abc68a65e60e6ea84c350e2e801f70977f4",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/laser.glb",
+      "bytes": 16164,
+      "sha256": "e679babfe5437910cb1418c23d278f63c0853d01cdf1f40f2fdf2bcf3e5cbd8f",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/laser.glb",
+        "memberGitBlob": "23f1ba9a6990344fd4ca77618b005ee778a59f8e",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/packet.glb",
+      "bytes": 18164,
+      "sha256": "22575fa6b1b6ffb799bb8b44bec268368e363fc3d4978b0d61d2199317bd07a0",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/packet.glb",
+        "memberGitBlob": "97cdcaadae23c7c292a50428e56bd1255439edd4",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/platform.glb",
+      "bytes": 13420,
+      "sha256": "0ce3e832d520102dcae7d084ee5a5b2d9161cf32b1238f4e6fd92ad90171072e",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/platform.glb",
+        "memberGitBlob": "4709b080caa4a2bdf6c1f00f0563488d4548b425",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/runner.glb",
+      "bytes": 191024,
+      "sha256": "9a99559b61c5af282b6529ba3b80bb0b13e9dcc49c2df9e9578a284382b8b003",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/runner.glb",
+        "memberGitBlob": "454938164e3cd5b2b51765668a734a35d7aaee0a",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/assets/models/terminal.glb",
+      "bytes": 21968,
+      "sha256": "86e1f3c35a12a7caff832e211308fe07f5ff9e0d501de769abd5ec96613326d0",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "assets/models/terminal.glb",
+        "memberGitBlob": "ab4d370ca8004c888842e61fd61331b1bc9ee4bb",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "audio.js",
+        "memberGitBlob": "a1686f3ae488d3505413da68b5c23d165280dfa9",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "audio.js",
+        "memberGitBlob": "a1686f3ae488d3505413da68b5c23d165280dfa9",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/audio.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/bridge.js",
+      "bytes": 1427,
+      "sha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "bridge.js",
+        "memberGitBlob": "cf929b4e25c2e2db3410609c583f4748648d7a54",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/bridge.js",
+      "bytes": 1427,
+      "sha256": "6dd2bd73ba67fde3fb8cd1f9fbc2bd08b9ce531eb2620c2296e937c642280ee5",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "bridge.js",
+        "memberGitBlob": "cf929b4e25c2e2db3410609c583f4748648d7a54",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/bridge.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/build.js",
+      "bytes": 205,
+      "sha256": "b663281aaff0ccdb61702734e28e76ca4088461980c5a71fc0349fd86daabc76",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "build.js",
+        "memberGitBlob": "8764ec4167b5b2dceda58632b11a1a41543abc96",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/build.js",
+      "bytes": 205,
+      "sha256": "b663281aaff0ccdb61702734e28e76ca4088461980c5a71fc0349fd86daabc76",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "build.js",
+        "memberGitBlob": "8764ec4167b5b2dceda58632b11a1a41543abc96",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/build.js",
+          "sameBytes": false
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/core.js",
+      "bytes": 23905,
+      "sha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "core.js",
+        "memberGitBlob": "27385ab585fc0c2a012b3fb9b7e1fabfa825d691",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/core.js",
+      "bytes": 23905,
+      "sha256": "c4d65d2bb7631acfba72da2d74e4ab4cb37c2484e35b4f718cdf05bb1a8bfcc6",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "core.js",
+        "memberGitBlob": "27385ab585fc0c2a012b3fb9b7e1fabfa825d691",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/core.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/index.html",
+      "bytes": 2750,
+      "sha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "index.html",
+        "memberGitBlob": "3cca5aa13c12603290cada93bf21c5bac2e59478",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/index.html",
+      "bytes": 2750,
+      "sha256": "9c733da69eda3e7ae41949253a353fd34fe691fa64d911ba2b0407a6fbf10586",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "index.html",
+        "memberGitBlob": "3cca5aa13c12603290cada93bf21c5bac2e59478",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/index.html",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/input.js",
+      "bytes": 3672,
+      "sha256": "b8ddc85022213ecf5a8694860befeadd9bac76c7f8df9e71b630121bcf5266b5",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "input.js",
+        "memberGitBlob": "72705d5db5f2e29d30b4b40581d50fb4c9add794",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/input.js",
+      "bytes": 3672,
+      "sha256": "b8ddc85022213ecf5a8694860befeadd9bac76c7f8df9e71b630121bcf5266b5",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "input.js",
+        "memberGitBlob": "72705d5db5f2e29d30b4b40581d50fb4c9add794",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/input.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/levels.js",
+      "bytes": 18783,
+      "sha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "levels.js",
+        "memberGitBlob": "84811843dc64b5103fd83838709909b99ba66c3d",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/levels.js",
+      "bytes": 18783,
+      "sha256": "4db9dbc5716181724aad122f3600b18dee84c0ee5455315c425d278607f66b76",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "levels.js",
+        "memberGitBlob": "84811843dc64b5103fd83838709909b99ba66c3d",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/levels.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "models.js",
+        "memberGitBlob": "86316c75ad66d696fb10449364f6ffb9aff905d4",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "models.js",
+        "memberGitBlob": "86316c75ad66d696fb10449364f6ffb9aff905d4",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/models.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/save.js",
+      "bytes": 13515,
+      "sha256": "7701e4ccd67c03d46ff644c1f6ce734bb68cf45400235d25d0788e524eb15046",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "save.js",
+        "memberGitBlob": "789ca38da495d8fb12b9caa6eb08dda5e38252fe",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/save.js",
+      "bytes": 13515,
+      "sha256": "7701e4ccd67c03d46ff644c1f6ce734bb68cf45400235d25d0788e524eb15046",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "save.js",
+        "memberGitBlob": "789ca38da495d8fb12b9caa6eb08dda5e38252fe",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/save.js",
+          "sameBytes": false
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/static-stage.js",
+      "bytes": 3852,
+      "sha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "static-stage.js",
+        "memberGitBlob": "d272823332446c7c2572fec3d11d7c5f56fed273",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/static-stage.js",
+      "bytes": 3852,
+      "sha256": "6b58e1116147bab50eef2a833e2e5bc82028e45dab7675c02b94ae005b82a4d4",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "static-stage.js",
+        "memberGitBlob": "d272823332446c7c2572fec3d11d7c5f56fed273",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/static-stage.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/style.css",
+      "bytes": 9368,
+      "sha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "style.css",
+        "memberGitBlob": "ea7d3d2a150c96e020fceaa496e1c8490a57f83a",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/style.css",
+      "bytes": 9368,
+      "sha256": "c4904fdce2304c7a2914214b1498427adaaae98656bccf4b3b9f9a0d266fa7f4",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "style.css",
+        "memberGitBlob": "ea7d3d2a150c96e020fceaa496e1c8490a57f83a",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/style.css",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/vendor/BufferGeometryUtils.js",
+      "bytes": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "vendor/BufferGeometryUtils.js",
+        "memberGitBlob": "c84dc7b2bbc99849373e17a6efae609e326f9536",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "vendor/THREE-LICENSE.txt",
+        "memberGitBlob": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "vendor/three.core.js",
+        "memberGitBlob": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "vendor/three.module.js",
+        "memberGitBlob": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "public/games/signal-zero/view.js",
+      "bytes": 17345,
+      "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a",
+      "source": {
+        "kind": "exact-published-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "view.js",
+        "memberGitBlob": "c308c6ce7080373fb157ed271132df4bf4aabe8a",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4"
+      }
+    },
+    {
+      "path": "games/signal-zero/src/view.js",
+      "bytes": 17345,
+      "sha256": "4c9be401df6cdd4e670377e5172b5a670784a8dafaa39ebb29ec16ee7ed2c29a",
+      "source": {
+        "kind": "editable-source-from-exact-runtime",
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/signal-campaign2-served32.tar.gz",
+        "member": "view.js",
+        "memberGitBlob": "c308c6ce7080373fb157ed271132df4bf4aabe8a",
+        "capsuleSha256": "17bd29e581b2a09b4487e426c0dabdfdd979250a9e1cd2e73acb56a665c6dec4",
+        "canonicalComparison": {
+          "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+          "path": "games/signal-zero/src/view.js",
+          "sameBytes": true
+        }
+      }
+    },
+    {
+      "path": "public/games/signal-zero/.gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "source": {
+        "kind": "published-metadata",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "public/games/signal-zero/.gitattributes"
+      }
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1063,
+      "sha256": "4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3",
+      "source": {
+        "kind": "canonical-reference",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "LICENSE",
+        "gitBlob": "61b719af6baed01b7f5999c3d6559c6ab5354faa"
+      }
+    },
+    {
+      "path": "LICENSE-SCOPE.md",
+      "bytes": 955,
+      "sha256": "a6084d069b9f799c7d14efbf17936ccc23c2948c557801ab40ead011db30a252",
+      "source": {
+        "kind": "canonical-reference",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "LICENSE-SCOPE.md",
+        "gitBlob": "d05d78b3886b705d04b181ce26f836f3d54875ef"
+      }
+    },
+    {
+      "path": "games/signal-zero/build.mjs",
+      "bytes": 919,
+      "sha256": "d31819f0fc66ce1249375410b804dd65430d5f270da478103758c23a4f3af1b8",
+      "source": {
+        "kind": "canonical-reference",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/signal-zero/build.mjs",
+        "gitBlob": "b3b0ec4dbe459e423d5897f6f3a86b863bb7c3a5"
+      }
+    },
+    {
+      "path": "games/signal-zero/package-lock.json",
+      "bytes": 2568,
+      "sha256": "6360f1bd6fcbe1fae3d36b0054ef6705cf46c0b5635de5fc4d67861776d09f17",
+      "source": {
+        "kind": "canonical-reference",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/signal-zero/package-lock.json",
+        "gitBlob": "4b89ac601c77ca70a36c4992063ffd23f45a7798"
+      }
+    },
+    {
+      "path": "games/signal-zero/package.json",
+      "bytes": 253,
+      "sha256": "67aae7e9a26ba270644fb8ac115e29671192eebb197cb80666926431ac518a71",
+      "source": {
+        "kind": "canonical-reference",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/signal-zero/package.json",
+        "gitBlob": "06695e933ed8e5e15af7482ba5d956dad7f1cd17"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/manifest.json",
+      "bytes": 78298,
+      "sha256": "3a01dc8e7144069f3f379a910f349d12d1aa653e9e5b38e118b6b31098e4f5ae",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/manifest.json",
+        "gitBlob": "fecc92526d0c26776e979cb4be6c335ed11e24ac"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/generation/audio-brief.md",
+      "bytes": 2651,
+      "sha256": "4106182f89b7f5a9283b6c68de28a9a86f6ba79e060dcc96a06c0bff1ae99df4",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/generation/audio-brief.md",
+        "gitBlob": "4e7aaabd74c3ce3648ffe4179acea6bb7326925e"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/generation/landmark-brief.md",
+      "bytes": 2904,
+      "sha256": "3be49cd15bdea97b57ed089a8acba4682a0c5dea1b3770c21eb2da0ea43f5c16",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/generation/landmark-brief.md",
+        "gitBlob": "be4412b6adf0f59591b850bbb45ad7d99c248293"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/generation/model-brief.md",
+      "bytes": 2052,
+      "sha256": "f83c5fca3b45528b7c6434b40c77b4cce28444432de666d8c8d33fbabee01bbf",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/generation/model-brief.md",
+        "gitBlob": "1bea507b5ff88279b89f92de744406e667be2510"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-assets.mjs",
+      "bytes": 14673,
+      "sha256": "d71fa7cedb472a61f3f3675d613c2e26cb35b3546055978fbb24723fa72d8803",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/recipes/export-assets.mjs",
+        "gitBlob": "251d74717674f7f6b282a434c02d708f15bafc87"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/recipes/export-audio.mjs",
+      "bytes": 8333,
+      "sha256": "04d3d95756e99e31f16b4329c09cf826fe493dd434ed9f1c7137385d9d048295",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/recipes/export-audio.mjs",
+        "gitBlob": "1a13c8686f3ba161423101e80d5567a584a7b06d"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/sources/procedural-models.js",
+      "bytes": 34656,
+      "sha256": "44fb885ef80a51c555088e79f01366f40d99f199473890b08424f82be56a9f25",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/sources/procedural-models.js",
+        "gitBlob": "86316c75ad66d696fb10449364f6ffb9aff905d4"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/sources/audio/audio.js",
+      "bytes": 2538,
+      "sha256": "746b6fb0d2c2aab26d5a93f6c6dc3a35097b849fc985e070603150ddae71163c",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/sources/audio/audio.js",
+        "gitBlob": "a1686f3ae488d3505413da68b5c23d165280dfa9"
+      }
+    },
+    {
+      "path": "assets/games/signal-zero/sources/colliders.json",
+      "bytes": 5332,
+      "sha256": "85e0ffa22622b4add447bb89d1bedc8aa2f8d225c993ad4d069056e28d0c6a88",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/signal-zero/sources/colliders.json",
+        "gitBlob": "f9bb3364efc78c3ea71178e71435e84d61a31472"
+      }
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 2770,
+      "sha256": "f2943c56b8aa0fe25086a1ac97bb9faf3bd09ba6420f59d3aca57d5dbcca454a",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "THIRD_PARTY_NOTICES.md",
+        "gitBlob": "8608c6d214e1bdcc3e396d6b7a4403f8749aacc5"
+      }
+    },
+    {
+      "path": "ASSET-LICENSES.md",
+      "bytes": 2110,
+      "sha256": "63c4e52df4f181f96f1106b40ceb93694ba325abac173e0d49a3b4535d13993e",
+      "source": {
+        "kind": "canonical-reference-not-regenerated",
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "ASSET-LICENSES.md",
+        "gitBlob": "1116180637e6900ef2c289c7ca6e66de700c9b1c"
+      }
+    },
+    {
+      "path": "provenance/CANONICAL-REFERENCE-INDEX.json",
+      "bytes": 22467,
+      "sha256": "b2131f96555bf931cc13ad6f347c0ca22826c2a988143dfb645b6027505937be",
+      "source": {
+        "kind": "new-reference-index",
+        "basisCommit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "originalDocs1Membership": "UNKNOWN"
+      }
+    },
+    {
+      "path": "DELIVERY-GUIDE.md",
+      "bytes": 3858,
+      "sha256": "85f3400beb9871c12851c9273b3335e86edd4e4e6dd165a877b2d6d6eb8e1834",
+      "source": {
+        "kind": "new-recovery-document",
+        "originalDocs1Bytes": "UNKNOWN"
+      }
+    },
+    {
+      "path": "ASSET-PROVENANCE.md",
+      "bytes": 2459,
+      "sha256": "e4f4ae848744199cec273bc18d8e80ed22a8c0c620d89560a305c772c10cfb40",
+      "source": {
+        "kind": "new-recovery-document",
+        "originalDocs1Bytes": "UNKNOWN"
+      }
+    },
+    {
+      "path": "LIMITATIONS.md",
+      "bytes": 1936,
+      "sha256": "e63782970bb92fece2fe8a0f53d902239412821f64615e69d7c9f2ccbfc13126",
+      "source": {
+        "kind": "new-recovery-document",
+        "originalDocs1Bytes": "UNKNOWN"
+      }
+    }
+  ],
+  "sourceMapSelfCoverage": "SOURCE-MAP.json is covered by MANIFEST.json; it does not hash itself."
+}

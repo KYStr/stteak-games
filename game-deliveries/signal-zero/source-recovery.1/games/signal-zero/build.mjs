@@ -1,0 +1,11 @@
+import {mkdir,copyFile,readdir,readFile,writeFile} from 'node:fs/promises';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const here=dirname(fileURLToPath(import.meta.url)),out=resolve(here,'../../public/games/signal-zero');
+await mkdir(out+'/vendor',{recursive:true});
+for(const file of await readdir(here+'/src')) await writeFile(out+'/'+file,(await readFile(here+'/src/'+file,'utf8')).replace(/\r\n/g,'\n'));
+await writeFile(out+'/.gitattributes','* -text\n');
+for(const file of ['three.module.js','three.core.js']) await copyFile(here+'/node_modules/three/build/'+file,out+'/vendor/'+file);
+await copyFile(here+'/node_modules/three/LICENSE',out+'/vendor/THREE-LICENSE.txt');
+await copyFile(here+'/node_modules/three/examples/jsm/utils/BufferGeometryUtils.js',out+'/vendor/BufferGeometryUtils.js');
+console.log('signal-zero runtime copied with locally pinned Three.js 0.180.0');
