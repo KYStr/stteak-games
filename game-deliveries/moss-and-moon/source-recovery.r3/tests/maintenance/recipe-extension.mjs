@@ -1,0 +1,33 @@
+// New r3 example; not a recovered historical test, never modifies the package.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdtemp,copyFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const source=new URL('../../public/games/moss-and-moon/',import.meta.url);
+const original=await readFile(new URL('content.js',source));
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const dir=await mkdtemp(join(tmpdir(),'moss-recipe-example-'));
+await writeFile(join(dir,'package.json'),'{"type":"module"}\n');
+await copyFile(new URL('rules.js',source),join(dir,'rules.js'));
+const anchor='export const RECIPES = [';
+assert.equal(original.toString().split(anchor).length,2,'exact insertion anchor');
+const extra="\n  { id: 'make-stones-example', name: '溪石小徑（練習）', cost: { stone: 2 }, result: { stones: 1 } },";
+await writeFile(join(dir,'content.js'),original.toString().replace(anchor,anchor+extra));
+const c=await import(pathToFileURL(join(dir,'content.js')));
+const r=await import(pathToFileURL(join(dir,'rules.js')));
+assert.equal(new Set(c.RECIPES.map(x=>x.id)).size,c.RECIPES.length);
+assert.equal(c.RECIPES.length,9);
+const items=new Set([...c.PLANTS.flatMap(p=>[p.id,`seed:${p.id}`]),...c.DECORATIONS.map(d=>d.id),...Object.keys(c.RESOURCE_NAMES)]);
+for(const x of c.RECIPES)for(const map of [x.cost,x.result])for(const [id,n]of Object.entries(map)){assert.ok(items.has(id));assert.ok(Number.isSafeInteger(n)&&n>0);}
+const s=r.createState();s.inventory={stone:1};const before=JSON.stringify(s);
+const fail=r.transact(s,{type:'craft',id:'make-stones-example'});
+assert.equal(fail.ok,false);assert.strictEqual(fail.state,s);assert.equal(JSON.stringify(s),before);
+s.inventory.stone=2;
+const ok=r.transact(s,{type:'craft',id:'make-stones-example'});
+assert.equal(ok.ok,true);assert.equal(ok.state.inventory.stone,0);assert.equal(ok.state.inventory.stones,1);assert.equal(ok.state.stats.crafted,s.stats.crafted+1);assert.equal(r.validateState(ok.state).ok,true);
+assert.equal(s.inventory.stone,2,'input immutable');
+const exhausted=r.transact(ok.state,{type:'craft',id:'make-stones-example'});assert.equal(exhausted.ok,false);assert.strictEqual(exhausted.state,ok.state);
+await writeFile(join(dir,'content.js'),original);assert.equal(hash(await readFile(join(dir,'content.js'))),hash(original));assert.deepEqual(await readFile(new URL('content.js',source)),original);
+console.log(JSON.stringify({result:'PASS',scope:'CPU data-driven recipe example only',temporaryDirectory:dir,sourceSha256:hash(original),restored:true,packageUnchanged:true,native:'NOT_RUN'}));

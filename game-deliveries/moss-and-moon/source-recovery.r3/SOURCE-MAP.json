@@ -1,0 +1,1732 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "moss-and-moon-0022-maintenance-recovery-20261101-r3",
+  "runtimeUnchanged": true,
+  "originalDocs1Recovered": false,
+  "files": [
+    {
+      "path": "public/games/moss-and-moon/assets/audio/ambient-leaves.wav",
+      "bytes": 128044,
+      "sha256": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35",
+      "gitBlob": "a674cbb28c9fb43c04da2a09fc116099ee8a3f74",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/ambient-leaves.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/music-loop.wav",
+      "bytes": 705644,
+      "sha256": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02",
+      "gitBlob": "cad58c0c21dac409f740d9bc7132f90a09a77bf0",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/music-loop.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-harvest.wav",
+      "bytes": 14444,
+      "sha256": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50",
+      "gitBlob": "202f89e5dccc299e7c50062d8fd7a65efec8513c",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/sfx-harvest.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-plant.wav",
+      "bytes": 9004,
+      "sha256": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1",
+      "gitBlob": "cb2b6ed0edf7716223d5962071a9687cab0951e2",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/sfx-plant.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-success.wav",
+      "bytes": 38444,
+      "sha256": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c",
+      "gitBlob": "32257bfb59a92ec3d297bbce7a7b46245112bc35",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/sfx-success.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-ui.wav",
+      "bytes": 3244,
+      "sha256": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538",
+      "gitBlob": "ad8498df03861c3beb9463b2c978b0f9b7ca93d3",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/sfx-ui.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-water.wav",
+      "bytes": 20844,
+      "sha256": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d",
+      "gitBlob": "d25cda6708431580d63625cb793fedcfa4c93791",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/audio/sfx-water.wav",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/asset-manifest.json",
+      "bytes": 227323,
+      "sha256": "44f1af8cbb2eb6ff5aacb83618440dbf21ec97743f1275b61a72bebd1dd16720",
+      "gitBlob": "9844ee61e1dc140ad7b97969cab9f7aac1a4c36d",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/data/asset-manifest.json",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/audio-manifest.json",
+      "bytes": 19410,
+      "sha256": "77e7c42365d1acd35ee3fb9513ece509569652ebb15be29558d6602ae5df7277",
+      "gitBlob": "3838f083abf00d04e0be2e5aaa374062673352c9",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/data/audio-manifest.json",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/colliders.json",
+      "bytes": 18232,
+      "sha256": "a9b3b54833daecdeebc66e77a2c35566df2d2406099b3a2194e6f69019595001",
+      "gitBlob": "cf4aa86492d09aa5e345611ac14183b079137e1d",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/data/colliders.json",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/data/model-index.json",
+      "bytes": 21990,
+      "sha256": "0ab3fa9db60a40fdcc6b8c89c516e43ced8ff2bbe825c61ef2ced2baf13b8680",
+      "gitBlob": "de22b2e19f9b1acb1865bf1e70c6fd4ba0d50cfa",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/data/model-index.json",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-arch.glb",
+      "bytes": 112588,
+      "sha256": "e9a5b413e5ab4a7ee1fe85a12cb2e8abea07759bb5b5010d67c34017a748f132",
+      "gitBlob": "8d2fe93e2494461c5821ca3539789a7d42375a7a",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-arch.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-bench.glb",
+      "bytes": 15956,
+      "sha256": "004721d38646afb0fa77de15be566a34d1c8b7b4bd4d647712f79716cb775ed9",
+      "gitBlob": "4e9db28edcfc485b68f8a40a717feb2d5a03d8dc",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-bench.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-birdbath.glb",
+      "bytes": 25488,
+      "sha256": "f064b7d32e5404f28698d7dbcfdc8e401b780ebecc36a69fc475a096e00d5c7f",
+      "gitBlob": "cab44f34eb675b88932a45f3407e028a5eafbb61",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-birdbath.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-fence.glb",
+      "bytes": 15956,
+      "sha256": "1a3112ee1117aa5dab8a85eb9706aa1decf91ee85e7795cc28c6afbf2d2cf52b",
+      "gitBlob": "ee7a73a9b63fc72c1199b58f248afa3589df7f3b",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-fence.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-garland.glb",
+      "bytes": 57704,
+      "sha256": "ae63f49ddb2c87d6b40ed1896e3f3902747d5dc562866aeac6cd7cafbb21e6ef",
+      "gitBlob": "dfdfcdedb3438304e01d6f27bdccbf4beecbd068",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-garland.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-lantern.glb",
+      "bytes": 45328,
+      "sha256": "0de95f5a70f3083ef48184483b3bd3d0c4f26a85a2754df7193343c2d1be60b3",
+      "gitBlob": "ef60cc27cd8294456db4d8037478a0371856f989",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-lantern.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-moonstand.glb",
+      "bytes": 40808,
+      "sha256": "9bf33dc67b62a24764f6cad48b7eaa65ceaa1bccb4838110214588ca464f58b3",
+      "gitBlob": "3d8374f9af710c27668a29b74203d68af6d2c02f",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-moonstand.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-planter.glb",
+      "bytes": 95740,
+      "sha256": "c1a8dfc56653587067d3827b5c2505c810ad5057e1dffd87dcfedbf848c00819",
+      "gitBlob": "7cc69a18a33076fa8d06784102100564408e5b80",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-planter.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-pond.glb",
+      "bytes": 53468,
+      "sha256": "5f113503bf13de189136e9f999cd038665856a27e119e8c6396a44df6c3b2f8e",
+      "gitBlob": "142a46109b05f1e7b5bc00e0eb142651bceb3869",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-pond.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-stones.glb",
+      "bytes": 15072,
+      "sha256": "54934452d94cb6a7016d46d44dcb75ae1e993a2bc3c27f538405bb270ffdc232",
+      "gitBlob": "23d62126889975789db39d2c4d2e587d46c61b88",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-stones.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-table.glb",
+      "bytes": 30228,
+      "sha256": "e200c65daed16933f7bc8c76cfe56af0f715ec34727d7b4b53c086bef92c614a",
+      "gitBlob": "37d71e18497845ddf5ebe78b123e1f168149e30d",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-table.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-windchime.glb",
+      "bytes": 39736,
+      "sha256": "3653c1e0e82819d194d2a11cdca38e3327f54674d0f3e85d42b7c477d3f97a86",
+      "gitBlob": "563ac37df16663c9e980c7c1e759ae13e5875c47",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/decoration-windchime.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-dew.glb",
+      "bytes": 265808,
+      "sha256": "e23395097313865aeb83318484638d6244fe2a4cb7bb28e399c5253baa4dd3d3",
+      "gitBlob": "853bb1751995ab84edc4dfa29ab5e3dad90a2c57",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-dew.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-leafprint.glb",
+      "bytes": 168660,
+      "sha256": "c0bfeef45a4939b6906abc3beb5f6d1ec9495aa103e9bfbb6d0537813bd59f9a",
+      "gitBlob": "421220489761b230796a451aa7d6ef15e40dd122",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-leafprint.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-lichen.glb",
+      "bytes": 282720,
+      "sha256": "5d0e0de0979ae27d0aef8292ac8cb46a682abdd249f0a17f4e83593538a3643c",
+      "gitBlob": "06a45176dcf3dc5cfeb512183df2bc61101e825c",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-lichen.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-mica.glb",
+      "bytes": 44024,
+      "sha256": "e54b65a9a1c91b85b1d89e8a6a5a99d2bbc36d284697b704fd55b3b75103148d",
+      "gitBlob": "da5f9b79372e8d0f6e425a266f2a5d610191ace3",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-mica.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-moth.glb",
+      "bytes": 303812,
+      "sha256": "fe9c8882f0fbd1d5be71fb99bed8b17bd4e911163276cd8d707ed7c6bc2b6ca3",
+      "gitBlob": "fdefee48b7d6bb632fc715134f10f5fb89187c8d",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-moth.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-quartz.glb",
+      "bytes": 57184,
+      "sha256": "5209cbf85a2dbaa9bd5bb597e2eee2c1b20a3f6b66aeedaf37b49a9df0fbdb16",
+      "gitBlob": "ce2255f690573c3f6619a70abb80d9b265946555",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-quartz.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-reed.glb",
+      "bytes": 183428,
+      "sha256": "66ecb3913ede8cb06d7f8e8031a83d2fec09cb1d282d175a37454974dd53c085",
+      "gitBlob": "c613c86f42c7ef19170d1a9565c67e8bc5ab0396",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-reed.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-roundstone.glb",
+      "bytes": 39848,
+      "sha256": "ab5570c01fdfbb3d4e2d9da763d29492bc2a458ccf2dfbd1930e9ba0e8990b05",
+      "gitBlob": "d07d0570fb554d0e632a48be4a34c56869c19ec2",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-roundstone.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-seedwing.glb",
+      "bytes": 92620,
+      "sha256": "ecc32372cef9cccc213437ba6db6d1ff858031d58cbb022a437ed5662065f9b6",
+      "gitBlob": "85a8c342ad859723147d7a7a817a18c91249be2a",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-seedwing.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-shellspiral.glb",
+      "bytes": 208800,
+      "sha256": "7e4e4409f5b5c0a5a9be687e7c9aa824408b2e778cd0a45c806234b30527b993",
+      "gitBlob": "ca96017aab61da6627800b8419b99fa952783f14",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-shellspiral.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-snail.glb",
+      "bytes": 335516,
+      "sha256": "e7912e48257339fc6c0e810ee196752e15df1bdb9e88a1a8d8a491b0553c7307",
+      "gitBlob": "87c45c77eba3c69f74a36c2628d7709731358ceb",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-snail.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-waterbeetle.glb",
+      "bytes": 223588,
+      "sha256": "9633ff72b3c2b10d9dc558580dbe38e9204cfa47a182ba1af345bf368f6db35a",
+      "gitBlob": "67f82396bd6b45a2911a1d64afd1dd406a458a1e",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/discovery-waterbeetle.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/gardener.glb",
+      "bytes": 350256,
+      "sha256": "31dd5cb0cba8d7ff357530326e6fff9cce664165baf98a802f5f6fd5a0493b97",
+      "gitBlob": "fe914da7fa418d5f1b5d780fb7169b9aa7477497",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/gardener.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/moon-cottage.glb",
+      "bytes": 69752,
+      "sha256": "7492d4a6d21e8ce3fefce6ea8fd21f0461bccb83ef4fa90b5d710ad0e8264811",
+      "gitBlob": "38f6314e7b184d73f990d485e64e90c022bafdcb",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/moon-cottage.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/moss-rock.glb",
+      "bytes": 54388,
+      "sha256": "5db3e78b8f843357cf1ff1da74b4b14fdc6c0befda45f26a9975862d70858396",
+      "gitBlob": "02bdccbed295263c33c599316bcabfca593f3576",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/moss-rock.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-0.glb",
+      "bytes": 10732,
+      "sha256": "3b5c7f0dca2be0a0b2c801718cc3f255fcdabc2de4db1fb53e49cfec67c147cf",
+      "gitBlob": "e1df3dd83127da0ed302a6bd82fafa7d76cac696",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-bluebell-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-1.glb",
+      "bytes": 18636,
+      "sha256": "5fb5860a25ffea5517d974593bad0d294e7586f58af688a02df1241872d5b68f",
+      "gitBlob": "a9bac7405896776bb28f2ead2aaf6ef43300ecf7",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-bluebell-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-2.glb",
+      "bytes": 31312,
+      "sha256": "00028eaa351157eb31cabddffb17f4a435ee83c8e1e75ecaa3b329475c39e1ac",
+      "gitBlob": "e3abe847a221327c971b2f68c9330657e087b3e1",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-bluebell-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-3.glb",
+      "bytes": 67240,
+      "sha256": "70d56fc30c9c77c700e7cad7546361eb69e657730ad9b2784a74912c60fde234",
+      "gitBlob": "acac91bbd12ad75ff625092dd7fff0ecb99f1806",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-bluebell-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-0.glb",
+      "bytes": 11776,
+      "sha256": "143eaa663eb3dc282699ee6faf418a1069fc142a7ede9b2eea71907863e4450e",
+      "gitBlob": "f39bcd99384291259d6800a5ea555a34b1015fe5",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-fern-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-1.glb",
+      "bytes": 43976,
+      "sha256": "39df7ca5a3babca361a6e79b3212dd1ebb1838233b1c3eae32383b2b21346dc6",
+      "gitBlob": "4e84d846e2371f7cfdbafcddad95392bfe2399fb",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-fern-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-2.glb",
+      "bytes": 69320,
+      "sha256": "a7888e3486548e76ea40ec383e320c56b5f6141327da065537f472ea2c930c22",
+      "gitBlob": "59a28454464e6a484d3efcebcc2a7530532cf81f",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-fern-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-3.glb",
+      "bytes": 94668,
+      "sha256": "40aa33ae04538d06828db80324f8902eaa79a7fb1de9907807490f407b20b0cf",
+      "gitBlob": "b4c05970aef0b0594f03d745e000f58909312426",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-fern-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-0.glb",
+      "bytes": 11788,
+      "sha256": "86806061be9a3dac72533bef03171f00ef70cec3b9165af39fb94536f6eb495b",
+      "gitBlob": "000822a222b84b480f90d971ed3ff217eb8ce90c",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lavender-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-1.glb",
+      "bytes": 23936,
+      "sha256": "1fce06a6e808d3643d80a276307c8af2954194652ffb98b6d30b7f1e34cdc15f",
+      "gitBlob": "dde8dfdc953da3da16d04e83aecc2647d9e8f944",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lavender-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-2.glb",
+      "bytes": 52452,
+      "sha256": "c9885ee105a6fc24b687b58227515bc761debb11d7744fd7671ab3c3676b4e95",
+      "gitBlob": "d0505e05c5d24b835d153ed7cdc450671f42d867",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lavender-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-3.glb",
+      "bytes": 107372,
+      "sha256": "3323967611133a0bd8b672f56411b63e1f2e27cdec08f049965ab3b418aaa628",
+      "gitBlob": "e8f423349e935dfa87af5f6cf32506a370c95d80",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lavender-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-0.glb",
+      "bytes": 10720,
+      "sha256": "3a065f118989dd0de61030080eb75ff164c830bc0c8cbab00ca8f12b473790c3",
+      "gitBlob": "9cf4c4fecc25cca224cbefce4271be93b94ea994",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lotus-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-1.glb",
+      "bytes": 18112,
+      "sha256": "27cc7ccb3a9551a6bd3b80334f5b736f139131a81dc9f2330d747e48f42958b3",
+      "gitBlob": "c8585a44ab92575465a46c3ce53a2d4f445406d0",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lotus-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-2.glb",
+      "bytes": 20752,
+      "sha256": "e7d9483384584111b62bfe82fb9921491115a4f9ca3ab0fcc051973ef551f13f",
+      "gitBlob": "dded55bf47833be0a6ff3d3a0cca5a0625589c6e",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lotus-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-3.glb",
+      "bytes": 57724,
+      "sha256": "6beb16b0d339b089cd21215060542c0781041db9ff0d8dc1a7df5d7bfd9ac119",
+      "gitBlob": "b23cc5b38d19d119a4e36dd190979818a48832d9",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-lotus-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-0.glb",
+      "bytes": 10740,
+      "sha256": "84cbfd75d4f5e2db54e5975bdc8aa3eb53fa7f55aa0a442edbd322f880c4cdbc",
+      "gitBlob": "4c89ad38d4750a72ed84a818e7ca705bfedc613d",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moonflower-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-1.glb",
+      "bytes": 14964,
+      "sha256": "64fb96657ea8075373bc43af4b47652ed175892481f17eff511cc02f5d6cf028",
+      "gitBlob": "b2b7768b49b3c64fd902bc2bae6bfc64e48cd4e2",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moonflower-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-2.glb",
+      "bytes": 23940,
+      "sha256": "6ff3ab8d796ce4abee140ec41fee34d326dc4a4605ec5cebd4a179988d8c02d4",
+      "gitBlob": "dbeb12a9ac8689dedbfee70a2320beeb0564943e",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moonflower-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-3.glb",
+      "bytes": 80444,
+      "sha256": "daf05de7b3c5f981bba2ecc4f81507f887bf2a895a0ef44b80de5094bab2806f",
+      "gitBlob": "bc3947d933e93deb1ace25ddde2a4eee6c631f5c",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moonflower-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-0.glb",
+      "bytes": 19168,
+      "sha256": "f9bea9931caa99068cf9594784b1694b15eadb45390d961bc9e7a68d92b875dd",
+      "gitBlob": "1fe606beb864666d2a9942e3459eca906acc78fd",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moss-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-1.glb",
+      "bytes": 13904,
+      "sha256": "3751cae366037051824c16b94e1dbbcc5e1347945fd341bf145b239d557275a4",
+      "gitBlob": "4e7657ddb370d25a7937ccf4bb2016bd8f1fc0f9",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moss-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-2.glb",
+      "bytes": 32916,
+      "sha256": "2c775eef38e6e1ca7ce2056e5cdfb7e1798537527914cde9cf1b5acc93f43146",
+      "gitBlob": "4564223b904d37905ef9dd927dcbe43a064acf28",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moss-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-3.glb",
+      "bytes": 61436,
+      "sha256": "2e4fee65e9c18cb34f16f356e2f5c5010878ed436adf69d5eaae90797b7924af",
+      "gitBlob": "18ed06f09d53269e6eda9b11b7b880118170a86c",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-moss-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-0.glb",
+      "bytes": 10728,
+      "sha256": "4fcd9d35ca7a64d8cc2075820163081f013c0797b1437d6101178b2201b66bba",
+      "gitBlob": "10a3805d9ead6573eb9d01d14e756d6cfd0bee29",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-pumpkin-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-1.glb",
+      "bytes": 13352,
+      "sha256": "081c2be37eaf42cc39bcb52b6f5965b5608a22896647cd8a52712a4c12925eaf",
+      "gitBlob": "3858af1a753080764acad9fb2582ac394ffee87e",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-pumpkin-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-2.glb",
+      "bytes": 31324,
+      "sha256": "207e1982f80bfa769f4d0e9bbfcb1d7cd655dfa9d6c0d7e5f292eab4f0674ef4",
+      "gitBlob": "a0a45a3444e6459d17fe965c68d30db77cccd9b1",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-pumpkin-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-3.glb",
+      "bytes": 40852,
+      "sha256": "33aa89be3a34ed41bbfcfeedf44233b7abf4cce18e1f97f8772fa65d1c94cf74",
+      "gitBlob": "3d800724984ed55cf13be884167d7909285d4ffe",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-pumpkin-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-0.glb",
+      "bytes": 16536,
+      "sha256": "f83e8a780348e768c7197b6547b8b350a148ef848775ee848ebb3375f2801923",
+      "gitBlob": "afc9bf077ca6db4170adb933e305ec592aa0b6a8",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-starcap-0.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-1.glb",
+      "bytes": 16516,
+      "sha256": "582efa3726c0e0bb5270656c2b5e6a974e168a38aec9de088bd3dc7abb30ac10",
+      "gitBlob": "9175e9938fdb1874ebfd5966eefe2ff40f1d99d6",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-starcap-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-2.glb",
+      "bytes": 27076,
+      "sha256": "17ff47a512dfbba062027826446c5b0ec22ce3d20ca308bc8fc4188625453322",
+      "gitBlob": "2b0a1390744b93f12464dce41c60b71038065588",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-starcap-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-3.glb",
+      "bytes": 90464,
+      "sha256": "6e97e74e4b591ff2d43b914e0638a586605135cbed5f312af29d240b355cdbfe",
+      "gitBlob": "dac1bcfb5cb06afab927303013379fb2479a7b99",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/plant-starcap-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-1.glb",
+      "bytes": 329644,
+      "sha256": "0954f8d637b749692244ef36feaf6abc8651d6f27e562bcd342e69c012be711c",
+      "gitBlob": "55b133107c76725770b1258246b120a67b959457",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/resident-1.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-2.glb",
+      "bytes": 440620,
+      "sha256": "83d4ef979670fe92fb95098dffd3ccc499d21b0bf24b51a2c5ce082553485087",
+      "gitBlob": "628635e712406a6d4ff27a53b2badf932ea082d7",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/resident-2.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-3.glb",
+      "bytes": 342696,
+      "sha256": "71ba38e0c593025f6b46165294b9405a77aaab1d9125092a6107dbf55ec68fb5",
+      "gitBlob": "e08e61afd607d374c6850b7d46fba67faf6e3ab4",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/resident-3.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-4.glb",
+      "bytes": 377788,
+      "sha256": "ebd638041bb8d4dba3915b1a0cd5946c8b74c8a515bd79d3bdac80f314e57ace",
+      "gitBlob": "426893d0ff975fd25286448d29454c1c7755a0f7",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/resident-4.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-5.glb",
+      "bytes": 326380,
+      "sha256": "c6679d2668565984900ed314402cdc86277f379ba6feb8c6dfb81623125bbe69",
+      "gitBlob": "ddff0b844d972605fa239844a15260ddb2cc474e",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/resident-5.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-6.glb",
+      "bytes": 316588,
+      "sha256": "8ffc939e58d65bc1234befc99c20fa7464c62f83b734dafcc3fd750a7e8c3cc1",
+      "gitBlob": "db9489e88511c4ad79f65df543816ef1fbb78df2",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/resident-6.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-brook.glb",
+      "bytes": 77676,
+      "sha256": "2717d19d434aedd3168c148dcbfee5c3cd9e72412671137723408bee9fc7a3cf",
+      "gitBlob": "8c180e7822c3fb60c25ac9281bea0ea88deb7776",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/terrain-brook.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-forest.glb",
+      "bytes": 83492,
+      "sha256": "9d7f184bb4639972af7939025c1d904fe7ab97132932352a7093eb5e67e22c9e",
+      "gitBlob": "734f2a381867029636e18e7e4f8f616140ad8cf0",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/terrain-forest.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-hill.glb",
+      "bytes": 298908,
+      "sha256": "b62a5762cbb96e98385a6ab45b235a2af0bc861ec0784ee160d751193f20c30d",
+      "gitBlob": "359d2d8e8d077c4c644641f9bb0ca0b8e00bca62",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/terrain-hill.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-basket.glb",
+      "bytes": 40700,
+      "sha256": "e19a9185a59a8e79f95100d66ff17c4eb3416778e551597c3457e0ecb50c97c9",
+      "gitBlob": "486bc29ef14ff49208f12e6d405fa1cccc2b0724",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tool-basket.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-hoe.glb",
+      "bytes": 7432,
+      "sha256": "fe1e52d80adabcd101d9b6909c60656119378a5d781cff2158287e1111a62741",
+      "gitBlob": "9f8c3b33dc6f320f9cfb090927f9e1e78c6c3596",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tool-hoe.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-seed-pouch.glb",
+      "bytes": 27020,
+      "sha256": "9a77a0cedf925078264127439f0279721caceafa0b33faa4c029bb07a7d08659",
+      "gitBlob": "0b0e719ed4a95978d4d954831e1e88c71a3f5a06",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tool-seed-pouch.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-trowel.glb",
+      "bytes": 16444,
+      "sha256": "4cd54c199004139a7f5c30a5a0a0dc630608044e1fe333bf38f1e651cdf31d31",
+      "gitBlob": "c5917a6d311a948f92a4770944191d5f8cd819fc",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tool-trowel.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-watering-can.glb",
+      "bytes": 39684,
+      "sha256": "904dff3c2e3d467d3d389a7a1986a9249a90549c470dbc6f23f9c057a7d2f382",
+      "gitBlob": "7100f9ae360c39b3f9ec79bee831b9134684da56",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tool-watering-can.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-birch.glb",
+      "bytes": 109392,
+      "sha256": "20a96108e0dc2f578e0b1f01bd1e108e2abd83b8ddcd4d6f3ee88df4dfd941db",
+      "gitBlob": "4b88771281248f6ba0002b59e19ab32ae7c6407d",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tree-birch.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-oak.glb",
+      "bytes": 109388,
+      "sha256": "9c11d768349bb8699fbe75ceddfe0a799e470be89ca46dfcd291f5f20e6afb99",
+      "gitBlob": "c28ac45017c5e8e8327a3084bee07bf746a2ef67",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tree-oak.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-pine.glb",
+      "bytes": 31216,
+      "sha256": "ca3f99b3f9b18ea8cbb8c58a6770574c5e9fb0beddf3348b867f5a008b497840",
+      "gitBlob": "dbe4648d7ea8ecd8b36dd4fed7eab8afb4e3a816",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tree-pine.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-willow.glb",
+      "bytes": 267800,
+      "sha256": "c441282a2c949cd4def77ad1f79426190f8ebd3440f80092a0d789139aa1a1c3",
+      "gitBlob": "13b239092aa290eee686b006adeb6ca3c0066b5f",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "assets/models/tree-willow.glb",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/audio.js",
+      "bytes": 6472,
+      "sha256": "da1af1471f9419d9a4de8d660d471d582c2725b1c5d358f79c98ea545b403cb3",
+      "gitBlob": "1efc0c5410e363c3dad1c19c47e53ee21f9c4b96",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "audio.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/bridge.js",
+      "bytes": 1614,
+      "sha256": "fa9a3f0b7f11cb2e5916b2cfa4765ee8c66d0fe76cacd63f537340160f9edbb9",
+      "gitBlob": "443198855c80ce1725ad7869c9816a7632d34f38",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "bridge.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/content.js",
+      "bytes": 11562,
+      "sha256": "8184cb1f8f711d911c091231eaa0a6fcb18673343ecde9ddc5d67d31e84692cc",
+      "gitBlob": "0e6cde4b6d99653f872a13e6912a2f48bf94ce2f",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "content.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/index.html",
+      "bytes": 4200,
+      "sha256": "12ba46c36cbb5c9d331ce43453e9b0058ac1366640741002691bbcffdaa0e51f",
+      "gitBlob": "7bec96068238be2793af393494bfe126234c08a0",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "index.html",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/main.js",
+      "bytes": 34985,
+      "sha256": "aebfe033215329e77e3d33c5fb4d94b72514778da5780738507f8792ce60b67f",
+      "gitBlob": "a5402b3752f1aa447bc6a7e2b467433671b1e3a1",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "main.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/models.js",
+      "bytes": 36993,
+      "sha256": "bec312e56cfade74d120ff60b144a58b967782c6e66ae3067145c75c276f96bd",
+      "gitBlob": "46233ad672064588176080c3059cb0c5b3a4751f",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "models.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/rules.js",
+      "bytes": 22741,
+      "sha256": "55fd3c6bff6d1536394fb52a9866899e6b478e43cce1e6889ffc112c8c66023d",
+      "gitBlob": "09fc684aa28bf49a4b0a84a31134f66181f83309",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "rules.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/storage.js",
+      "bytes": 4219,
+      "sha256": "31b60f4d37e69e7f79e5416e33f0ea8d336d4d532896932b20cdd00207675682",
+      "gitBlob": "7af19236c4243aa1d2994bbe44a9f98ced8658da",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "storage.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/style.css",
+      "bytes": 12648,
+      "sha256": "7c67097e9f9f4a4c39dfb622b15d08533124192c73be85ccd861dc65e99550f0",
+      "gitBlob": "f0be572a36fca6926d97ae0f3867cf2f448678d6",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "style.css",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "public/games/moss-and-moon/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601",
+      "gitBlob": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "vendor/THREE-LICENSE.txt",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20",
+      "gitBlob": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "vendor/three.core.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+      "gitBlob": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "vendor/three.module.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": false
+    },
+    {
+      "path": "public/games/moss-and-moon/world.js",
+      "bytes": 25370,
+      "sha256": "2498f688a70a64c3f48935c27654516ca7abaf6df912c440a8d3e99d4f40ee1a",
+      "gitBlob": "979f14869988be7e2854c27ed6608c843b640e24",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "6268b406efe9df3f11e1df7d99ad19e0057d91b9",
+        "path": "qa-runtime/moss0022-served101.tar.gz",
+        "member": "world.js",
+        "archiveSha256": "18b33e63a95257bed3f8c378ca9bde5462ff62e28c83e367dde2c10a7113ca5a"
+      },
+      "relation": "exact-preserved-runtime",
+      "editable": true
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1063,
+      "sha256": "4bfd79f924dfe8db584210eaf1adff63fb41d4e3c02fceb12216118f731f86a3",
+      "gitBlob": "61b719af6baed01b7f5999c3d6559c6ab5354faa",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "LICENSE"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "assets/games/moss-and-moon/generation/original-design.md",
+      "bytes": 2771,
+      "sha256": "5391031af1451e24e84b3c6aaaae741d848e31595ffb59dfde24b561dbaf27f7",
+      "gitBlob": "5df4940b442e75d6c331f45b0665e0f0e81073eb",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/moss-and-moon/generation/original-design.md"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "bytes": 10551,
+      "sha256": "61957b5ed32b60ec0541fb486062bf7425e3759167dbae6f220b731d4d1d91db",
+      "gitBlob": "b2f2edfb6c1b1cb2b1c552805b635628f085f737",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/moss-and-moon/sources/audio-kit.mjs"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/audio-notes.md",
+      "bytes": 4880,
+      "sha256": "79bb62d9a9f637358b38570c4dee5aaf16b6306112618765de910721a5cd9627",
+      "gitBlob": "8196b5220f619f00eccfd45f804c8ab25dcd302b",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/moss-and-moon/sources/audio-notes.md"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "bytes": 37041,
+      "sha256": "04930c909bb8dddbf7975e710a830a6f27045f24b5a86b2a85083e7fc4c26eb2",
+      "gitBlob": "ac08bff0890840e1998dc05e4f8ea57f34cc7c81",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "assets/games/moss-and-moon/sources/model-kit.mjs"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "games/moss-and-moon/build.mjs",
+      "bytes": 606,
+      "sha256": "cab7bf4a68c4730d35eebd63474af24a0313fd8bbd544a5295c575118e44d330",
+      "gitBlob": "94d0af64dc5a9c3af11d4534a1e7ec45dd53f396",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/moss-and-moon/build.mjs"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "games/moss-and-moon/export-assets.mjs",
+      "bytes": 7578,
+      "sha256": "c502f358d66e38957527b38ed9f409e03ffdbc6b1c989a49354eecd353f67788",
+      "gitBlob": "6a29a27ea6653dfaf57105f93ceec5dfc63fcf23",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/moss-and-moon/export-assets.mjs"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "games/moss-and-moon/export-audio.mjs",
+      "bytes": 5421,
+      "sha256": "3c8a6e598150c0a927fb2cfe06e968f9dcaae097cc65ba113edc1555fb17273a",
+      "gitBlob": "6099d7be295b8d8fe2c94de9e37f5f8516c0bf1b",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/moss-and-moon/export-audio.mjs"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "games/moss-and-moon/package-lock.json",
+      "bytes": 2047,
+      "sha256": "60c3569dfc00e3675542f2f864c3a4ea28bac74f959441fbedfce626ab8c2e97",
+      "gitBlob": "ddc5ca29de837b5c4c0306a3c433ac7df409d630",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/moss-and-moon/package-lock.json"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "games/moss-and-moon/package.json",
+      "bytes": 330,
+      "sha256": "cb5cae4e371fd8eafb599687ade604437df3d29593b0e5fa2f691308a248f3af",
+      "gitBlob": "0da0aa26333ace06d9bbadd1b1b886382b1a4c07",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "games/moss-and-moon/package.json"
+      },
+      "relation": "exact-public-source-baseline-not-original-docs1",
+      "editable": true
+    },
+    {
+      "path": "tests/games/moss-and-moon/audio.test.js",
+      "bytes": 8258,
+      "sha256": "2c1d1e6ce6446e5be253ef40450690e31b6f2ce47a9ea4658967488d29e8ad53",
+      "gitBlob": "07130f6d2f734acc79ea3267d1c6a65d3156f920",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "tests/games/moss-and-moon/audio.test.js"
+      },
+      "relation": "exact-recovered-historical-test",
+      "editable": true
+    },
+    {
+      "path": "tests/games/moss-and-moon/bridge-session.test.js",
+      "bytes": 5233,
+      "sha256": "f40e7c4ac059d8f9553767f4d93c0895b669b9701e5889d58f691c543cd9486c",
+      "gitBlob": "dc5ba0466ae5b46ae19743bb84d7347d02560007",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "tests/games/moss-and-moon/bridge-session.test.js"
+      },
+      "relation": "exact-recovered-historical-test",
+      "editable": true
+    },
+    {
+      "path": "tests/games/moss-and-moon/bridge.test.js",
+      "bytes": 2502,
+      "sha256": "b0c5d0146a727e24b9f1198b516b7acc1ca752b5a2fac3a1366d9b06dd789b92",
+      "gitBlob": "ab1d4472c3b6dfd23af496417147e029487605ae",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "tests/games/moss-and-moon/bridge.test.js"
+      },
+      "relation": "exact-recovered-historical-test",
+      "editable": true
+    },
+    {
+      "path": "tests/games/moss-and-moon/rules.test.js",
+      "bytes": 14285,
+      "sha256": "260d9d8fa27d8d86cec210c4a3b0797c3cc288662031962426f7b71ce3962a0f",
+      "gitBlob": "5fd25cbec5195ed9532ff0f8443377d9782471c9",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "tests/games/moss-and-moon/rules.test.js"
+      },
+      "relation": "exact-recovered-historical-test",
+      "editable": true
+    },
+    {
+      "path": "tests/games/moss-and-moon/storage.test.js",
+      "bytes": 4673,
+      "sha256": "9e485a4d3f2f6ebdf0626cc717dd670b6906eb98e37d139f7749b6a86dba1fda",
+      "gitBlob": "b558c44b89fe70e23ab307d6874e330b3edef21f",
+      "origin": {
+        "repository": "KYStr/stteak-games",
+        "commit": "833c5214d33c0f89776c81d86df118d714760c6e",
+        "path": "tests/games/moss-and-moon/storage.test.js"
+      },
+      "relation": "exact-recovered-historical-test",
+      "editable": true
+    }
+  ],
+  "verifiedRelations": [
+    {
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "target": "public/games/moss-and-moon/models.js",
+      "rule": "single import path replacement used by pinned export-assets.mjs",
+      "byteExact": true
+    },
+    {
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "target": "public/games/moss-and-moon/assets/data/audio-manifest.json",
+      "rule": "source sha256 matches original manifest",
+      "byteExactSourceHash": true
+    }
+  ]
+}
