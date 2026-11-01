@@ -1,0 +1,575 @@
+{
+  "schema": 1,
+  "game": "moss-and-moon",
+  "version": "1.0.0",
+  "seed": 1297044307,
+  "assetCount": 7,
+  "totalRuntimeBytes": 919668,
+  "totalDecodedFloat32Bytes": 1838720,
+  "source": {
+    "path": "sources/audio-kit.mjs",
+    "sha256": "61957b5ed32b60ec0541fb486062bf7425e3759167dbae6f220b731d4d1d91db",
+    "bytes": 10551,
+    "notes": "sources/audio-notes.md"
+  },
+  "recipe": "games/moss-and-moon/export-audio.mjs",
+  "voicePolicy": {
+    "musicMax": 1,
+    "environmentMax": 1,
+    "combinedEventMax": 8,
+    "enforcement": "Runtime responsibility; manifest is a playback contract."
+  },
+  "validation": {
+    "structural": "PCM header, byte count, finite samples, duration, headroom and loop boundary assertions passed during this export",
+    "actualListening": "not assessed by the generator; requires device/browser listening",
+    "releaseReview": "not a Reviewer score or release approval"
+  },
+  "assets": [
+    {
+      "id": "moss-and-moon.audio.music",
+      "version": "1.0.0",
+      "kind": "audio-loop",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/music-loop.wav",
+        "bytes": 705644,
+        "sha256": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02"
+      },
+      "runtime": [
+        "assets/audio/music-loop.wav"
+      ],
+      "sha256": {
+        "assets/audio/music-loop.wav": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02",
+        "sources/audio/music-loop.wav": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 3951480076,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 22050,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 16,
+        "samples": 352800,
+        "loop": true,
+        "loopStartSeconds": 0,
+        "loopEndSeconds": 16,
+        "crossfadeSeconds": 0.12,
+        "description": "Four bars of original C-major pentatonic plucked melody and soft suspended pads.",
+        "measurements": {
+          "sampleCount": 352800,
+          "durationSeconds": 16,
+          "peak": 0.34,
+          "peakDbfs": -9.37,
+          "rms": 0.0778435,
+          "rmsDbfs": -22.18,
+          "dcOffset": -1e-9,
+          "seamStep": 0.0055222,
+          "maxAdjacentStep": 0.0555152
+        }
+      },
+      "playback": {
+        "bus": "music",
+        "recommendedGain": 0.35,
+        "maxSimultaneousVoices": 1,
+        "cooldownMs": 0,
+        "loopPolicy": "one reusable source; no stacked duplicate loops",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 705644,
+        "decodedFloat32Bytes": 1411200
+      },
+      "reuse": {
+        "tags": [
+          "music",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "moss-and-moon.audio.ambient",
+      "version": "1.0.0",
+      "kind": "audio-loop",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/ambient-leaves.wav",
+        "bytes": 128044,
+        "sha256": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35"
+      },
+      "runtime": [
+        "assets/audio/ambient-leaves.wav"
+      ],
+      "sha256": {
+        "assets/audio/ambient-leaves.wav": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35",
+        "sources/audio/ambient-leaves.wav": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 2310948549,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 16000,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 4,
+        "samples": 64000,
+        "loop": true,
+        "loopStartSeconds": 0,
+        "loopEndSeconds": 4,
+        "crossfadeSeconds": 0.15,
+        "description": "Seeded filtered wind and soft leaf brushes with a seamless overlap crossfade.",
+        "measurements": {
+          "sampleCount": 64000,
+          "durationSeconds": 4,
+          "peak": 0.18,
+          "peakDbfs": -14.89,
+          "rms": 0.0398977,
+          "rmsDbfs": -27.98,
+          "dcOffset": 1e-9,
+          "seamStep": 0.0249564,
+          "maxAdjacentStep": 0.1160324
+        }
+      },
+      "playback": {
+        "bus": "environment",
+        "recommendedGain": 0.3,
+        "maxSimultaneousVoices": 1,
+        "cooldownMs": 0,
+        "loopPolicy": "one reusable source; no stacked duplicate loops",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 128044,
+        "decodedFloat32Bytes": 256000
+      },
+      "reuse": {
+        "tags": [
+          "ambient",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "moss-and-moon.audio.plant",
+      "version": "1.0.0",
+      "kind": "audio-event",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/sfx-plant.wav",
+        "bytes": 9004,
+        "sha256": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1"
+      },
+      "runtime": [
+        "assets/audio/sfx-plant.wav"
+      ],
+      "sha256": {
+        "assets/audio/sfx-plant.wav": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1",
+        "sources/audio/sfx-plant.wav": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 670417022,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 16000,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 0.28,
+        "samples": 4480,
+        "loop": false,
+        "loopStartSeconds": null,
+        "loopEndSeconds": null,
+        "crossfadeSeconds": 0,
+        "description": "Two soft wooden/soil taps with a short rustling tail.",
+        "measurements": {
+          "sampleCount": 4480,
+          "durationSeconds": 0.28,
+          "peak": 0.38,
+          "peakDbfs": -8.4,
+          "rms": 0.1416686,
+          "rmsDbfs": -16.97,
+          "dcOffset": 0.000002707,
+          "seamStep": 0,
+          "maxAdjacentStep": 0.0359554
+        }
+      },
+      "playback": {
+        "bus": "effects",
+        "recommendedGain": 0.5,
+        "maxSimultaneousVoices": 3,
+        "cooldownMs": 80,
+        "loopPolicy": "fade or replace the oldest matching voice on cap",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 9004,
+        "decodedFloat32Bytes": 17920
+      },
+      "reuse": {
+        "tags": [
+          "plant",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "moss-and-moon.audio.water",
+      "version": "1.0.0",
+      "kind": "audio-event",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/sfx-water.wav",
+        "bytes": 20844,
+        "sha256": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d"
+      },
+      "runtime": [
+        "assets/audio/sfx-water.wav"
+      ],
+      "sha256": {
+        "assets/audio/sfx-water.wav": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d",
+        "sources/audio/sfx-water.wav": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 3324852791,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 16000,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 0.65,
+        "samples": 10400,
+        "loop": false,
+        "loopStartSeconds": null,
+        "loopEndSeconds": null,
+        "crossfadeSeconds": 0,
+        "description": "Quiet filtered pour with three descending, rounded water droplets.",
+        "measurements": {
+          "sampleCount": 10400,
+          "durationSeconds": 0.65,
+          "peak": 0.36,
+          "peakDbfs": -8.87,
+          "rms": 0.0679605,
+          "rmsDbfs": -23.35,
+          "dcOffset": 1.9e-8,
+          "seamStep": 0,
+          "maxAdjacentStep": 0.172647
+        }
+      },
+      "playback": {
+        "bus": "effects",
+        "recommendedGain": 0.45,
+        "maxSimultaneousVoices": 4,
+        "cooldownMs": 120,
+        "loopPolicy": "fade or replace the oldest matching voice on cap",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 20844,
+        "decodedFloat32Bytes": 41600
+      },
+      "reuse": {
+        "tags": [
+          "water",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "moss-and-moon.audio.harvest",
+      "version": "1.0.0",
+      "kind": "audio-event",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/sfx-harvest.wav",
+        "bytes": 14444,
+        "sha256": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50"
+      },
+      "runtime": [
+        "assets/audio/sfx-harvest.wav"
+      ],
+      "sha256": {
+        "assets/audio/sfx-harvest.wav": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50",
+        "sources/audio/sfx-harvest.wav": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 1684321264,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 16000,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 0.45,
+        "samples": 7200,
+        "loop": false,
+        "loopStartSeconds": null,
+        "loopEndSeconds": null,
+        "crossfadeSeconds": 0,
+        "description": "A rising pentatonic three-note chime and a soft leaf brush.",
+        "measurements": {
+          "sampleCount": 7200,
+          "durationSeconds": 0.45,
+          "peak": 0.42,
+          "peakDbfs": -7.54,
+          "rms": 0.118159,
+          "rmsDbfs": -18.55,
+          "dcOffset": 1e-8,
+          "seamStep": 0,
+          "maxAdjacentStep": 0.1536355
+        }
+      },
+      "playback": {
+        "bus": "effects",
+        "recommendedGain": 0.5,
+        "maxSimultaneousVoices": 3,
+        "cooldownMs": 90,
+        "loopPolicy": "fade or replace the oldest matching voice on cap",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 14444,
+        "decodedFloat32Bytes": 28800
+      },
+      "reuse": {
+        "tags": [
+          "harvest",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "moss-and-moon.audio.ui",
+      "version": "1.0.0",
+      "kind": "audio-event",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/sfx-ui.wav",
+        "bytes": 3244,
+        "sha256": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538"
+      },
+      "runtime": [
+        "assets/audio/sfx-ui.wav"
+      ],
+      "sha256": {
+        "assets/audio/sfx-ui.wav": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538",
+        "sources/audio/sfx-ui.wav": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 43789737,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 16000,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 0.1,
+        "samples": 1600,
+        "loop": false,
+        "loopStartSeconds": null,
+        "loopEndSeconds": null,
+        "crossfadeSeconds": 0,
+        "description": "A brief rounded wooden-key confirmation.",
+        "measurements": {
+          "sampleCount": 1600,
+          "durationSeconds": 0.1,
+          "peak": 0.26,
+          "peakDbfs": -11.7,
+          "rms": 0.1140292,
+          "rmsDbfs": -18.86,
+          "dcOffset": 0.000006562,
+          "seamStep": 0,
+          "maxAdjacentStep": 0.0939412
+        }
+      },
+      "playback": {
+        "bus": "effects",
+        "recommendedGain": 0.25,
+        "maxSimultaneousVoices": 2,
+        "cooldownMs": 45,
+        "loopPolicy": "fade or replace the oldest matching voice on cap",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 3244,
+        "decodedFloat32Bytes": 6400
+      },
+      "reuse": {
+        "tags": [
+          "ui",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    },
+    {
+      "id": "moss-and-moon.audio.success",
+      "version": "1.0.0",
+      "kind": "audio-event",
+      "source": "sources/audio-kit.mjs",
+      "sourceProject": "Original deterministic JavaScript synthesis and score; the PCM WAV is the lossless source render.",
+      "sourceRender": {
+        "path": "sources/audio/sfx-success.wav",
+        "bytes": 38444,
+        "sha256": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c"
+      },
+      "runtime": [
+        "assets/audio/sfx-success.wav"
+      ],
+      "sha256": {
+        "assets/audio/sfx-success.wav": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c",
+        "sources/audio/sfx-success.wav": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 2698225506,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "spec": {
+        "format": "WAV",
+        "encoding": "PCM signed 16-bit little-endian",
+        "sampleRate": 16000,
+        "channels": 1,
+        "bitDepth": 16,
+        "durationSeconds": 1.2,
+        "samples": 19200,
+        "loop": false,
+        "loopStartSeconds": null,
+        "loopEndSeconds": null,
+        "crossfadeSeconds": 0,
+        "description": "An original four-note pentatonic completion phrase.",
+        "measurements": {
+          "sampleCount": 19200,
+          "durationSeconds": 1.2,
+          "peak": 0.44,
+          "peakDbfs": -7.13,
+          "rms": 0.1094172,
+          "rmsDbfs": -19.22,
+          "dcOffset": -9e-9,
+          "seamStep": 0,
+          "maxAdjacentStep": 0.1408604
+        }
+      },
+      "playback": {
+        "bus": "effects",
+        "recommendedGain": 0.45,
+        "maxSimultaneousVoices": 1,
+        "cooldownMs": 1000,
+        "loopPolicy": "fade or replace the oldest matching voice on cap",
+        "pausePolicy": "runtime suspends audio and ramps gain; no hidden playback"
+      },
+      "budget": {
+        "runtimeBytes": 38444,
+        "decodedFloat32Bytes": 76800
+      },
+      "reuse": {
+        "tags": [
+          "success",
+          "garden",
+          "soft",
+          "original"
+        ],
+        "compatibleWith": [
+          "moss-audio-kit-v1"
+        ]
+      },
+      "dependencies": [],
+      "derivatives": []
+    }
+  ]
+}

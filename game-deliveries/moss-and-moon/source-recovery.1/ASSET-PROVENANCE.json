@@ -1,0 +1,1438 @@
+{
+  "candidateId": "moss-and-moon-0022-recovery-delivery-20261101-r2",
+  "assets": [
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-0.glb",
+      "kind": "model",
+      "sha256": "f9bea9931caa99068cf9594784b1694b15eadb45390d961bc9e7a68d92b875dd",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-1.glb",
+      "kind": "model",
+      "sha256": "3751cae366037051824c16b94e1dbbcc5e1347945fd341bf145b239d557275a4",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-2.glb",
+      "kind": "model",
+      "sha256": "2c775eef38e6e1ca7ce2056e5cdfb7e1798537527914cde9cf1b5acc93f43146",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moss-3.glb",
+      "kind": "model",
+      "sha256": "2e4fee65e9c18cb34f16f356e2f5c5010878ed436adf69d5eaae90797b7924af",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-0.glb",
+      "kind": "model",
+      "sha256": "84cbfd75d4f5e2db54e5975bdc8aa3eb53fa7f55aa0a442edbd322f880c4cdbc",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-1.glb",
+      "kind": "model",
+      "sha256": "64fb96657ea8075373bc43af4b47652ed175892481f17eff511cc02f5d6cf028",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-2.glb",
+      "kind": "model",
+      "sha256": "6ff3ab8d796ce4abee140ec41fee34d326dc4a4605ec5cebd4a179988d8c02d4",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-moonflower-3.glb",
+      "kind": "model",
+      "sha256": "daf05de7b3c5f981bba2ecc4f81507f887bf2a895a0ef44b80de5094bab2806f",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-0.glb",
+      "kind": "model",
+      "sha256": "143eaa663eb3dc282699ee6faf418a1069fc142a7ede9b2eea71907863e4450e",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-1.glb",
+      "kind": "model",
+      "sha256": "39df7ca5a3babca361a6e79b3212dd1ebb1838233b1c3eae32383b2b21346dc6",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-2.glb",
+      "kind": "model",
+      "sha256": "a7888e3486548e76ea40ec383e320c56b5f6141327da065537f472ea2c930c22",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-fern-3.glb",
+      "kind": "model",
+      "sha256": "40aa33ae04538d06828db80324f8902eaa79a7fb1de9907807490f407b20b0cf",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-0.glb",
+      "kind": "model",
+      "sha256": "3b5c7f0dca2be0a0b2c801718cc3f255fcdabc2de4db1fb53e49cfec67c147cf",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-1.glb",
+      "kind": "model",
+      "sha256": "5fb5860a25ffea5517d974593bad0d294e7586f58af688a02df1241872d5b68f",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-2.glb",
+      "kind": "model",
+      "sha256": "00028eaa351157eb31cabddffb17f4a435ee83c8e1e75ecaa3b329475c39e1ac",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-bluebell-3.glb",
+      "kind": "model",
+      "sha256": "70d56fc30c9c77c700e7cad7546361eb69e657730ad9b2784a74912c60fde234",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-0.glb",
+      "kind": "model",
+      "sha256": "4fcd9d35ca7a64d8cc2075820163081f013c0797b1437d6101178b2201b66bba",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-1.glb",
+      "kind": "model",
+      "sha256": "081c2be37eaf42cc39bcb52b6f5965b5608a22896647cd8a52712a4c12925eaf",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-2.glb",
+      "kind": "model",
+      "sha256": "207e1982f80bfa769f4d0e9bbfcb1d7cd655dfa9d6c0d7e5f292eab4f0674ef4",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-pumpkin-3.glb",
+      "kind": "model",
+      "sha256": "33aa89be3a34ed41bbfcfeedf44233b7abf4cce18e1f97f8772fa65d1c94cf74",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-0.glb",
+      "kind": "model",
+      "sha256": "f83e8a780348e768c7197b6547b8b350a148ef848775ee848ebb3375f2801923",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-1.glb",
+      "kind": "model",
+      "sha256": "582efa3726c0e0bb5270656c2b5e6a974e168a38aec9de088bd3dc7abb30ac10",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-2.glb",
+      "kind": "model",
+      "sha256": "17ff47a512dfbba062027826446c5b0ec22ce3d20ca308bc8fc4188625453322",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-starcap-3.glb",
+      "kind": "model",
+      "sha256": "6e97e74e4b591ff2d43b914e0638a586605135cbed5f312af29d240b355cdbfe",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-0.glb",
+      "kind": "model",
+      "sha256": "86806061be9a3dac72533bef03171f00ef70cec3b9165af39fb94536f6eb495b",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-1.glb",
+      "kind": "model",
+      "sha256": "1fce06a6e808d3643d80a276307c8af2954194652ffb98b6d30b7f1e34cdc15f",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-2.glb",
+      "kind": "model",
+      "sha256": "c9885ee105a6fc24b687b58227515bc761debb11d7744fd7671ab3c3676b4e95",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lavender-3.glb",
+      "kind": "model",
+      "sha256": "3323967611133a0bd8b672f56411b63e1f2e27cdec08f049965ab3b418aaa628",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-0.glb",
+      "kind": "model",
+      "sha256": "3a065f118989dd0de61030080eb75ff164c830bc0c8cbab00ca8f12b473790c3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-1.glb",
+      "kind": "model",
+      "sha256": "27cc7ccb3a9551a6bd3b80334f5b736f139131a81dc9f2330d747e48f42958b3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-2.glb",
+      "kind": "model",
+      "sha256": "e7d9483384584111b62bfe82fb9921491115a4f9ca3ab0fcc051973ef551f13f",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/plant-lotus-3.glb",
+      "kind": "model",
+      "sha256": "6beb16b0d339b089cd21215060542c0781041db9ff0d8dc1a7df5d7bfd9ac119",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-planter.glb",
+      "kind": "model",
+      "sha256": "c1a8dfc56653587067d3827b5c2505c810ad5057e1dffd87dcfedbf848c00819",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-lantern.glb",
+      "kind": "model",
+      "sha256": "0de95f5a70f3083ef48184483b3bd3d0c4f26a85a2754df7193343c2d1be60b3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-bench.glb",
+      "kind": "model",
+      "sha256": "004721d38646afb0fa77de15be566a34d1c8b7b4bd4d647712f79716cb775ed9",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-arch.glb",
+      "kind": "model",
+      "sha256": "e9a5b413e5ab4a7ee1fe85a12cb2e8abea07759bb5b5010d67c34017a748f132",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-birdbath.glb",
+      "kind": "model",
+      "sha256": "f064b7d32e5404f28698d7dbcfdc8e401b780ebecc36a69fc475a096e00d5c7f",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-windchime.glb",
+      "kind": "model",
+      "sha256": "3653c1e0e82819d194d2a11cdca38e3327f54674d0f3e85d42b7c477d3f97a86",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-pond.glb",
+      "kind": "model",
+      "sha256": "5f113503bf13de189136e9f999cd038665856a27e119e8c6396a44df6c3b2f8e",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-stones.glb",
+      "kind": "model",
+      "sha256": "54934452d94cb6a7016d46d44dcb75ae1e993a2bc3c27f538405bb270ffdc232",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-fence.glb",
+      "kind": "model",
+      "sha256": "1a3112ee1117aa5dab8a85eb9706aa1decf91ee85e7795cc28c6afbf2d2cf52b",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-table.glb",
+      "kind": "model",
+      "sha256": "e200c65daed16933f7bc8c76cfe56af0f715ec34727d7b4b53c086bef92c614a",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-moonstand.glb",
+      "kind": "model",
+      "sha256": "9bf33dc67b62a24764f6cad48b7eaa65ceaa1bccb4838110214588ca464f58b3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/decoration-garland.glb",
+      "kind": "model",
+      "sha256": "ae63f49ddb2c87d6b40ed1896e3f3902747d5dc562866aeac6cd7cafbb21e6ef",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-dew.glb",
+      "kind": "model",
+      "sha256": "e23395097313865aeb83318484638d6244fe2a4cb7bb28e399c5253baa4dd3d3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-snail.glb",
+      "kind": "model",
+      "sha256": "e7912e48257339fc6c0e810ee196752e15df1bdb9e88a1a8d8a491b0553c7307",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-seedwing.glb",
+      "kind": "model",
+      "sha256": "ecc32372cef9cccc213437ba6db6d1ff858031d58cbb022a437ed5662065f9b6",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-leafprint.glb",
+      "kind": "model",
+      "sha256": "c0bfeef45a4939b6906abc3beb5f6d1ec9495aa103e9bfbb6d0537813bd59f9a",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-shellspiral.glb",
+      "kind": "model",
+      "sha256": "7e4e4409f5b5c0a5a9be687e7c9aa824408b2e778cd0a45c806234b30527b993",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-waterbeetle.glb",
+      "kind": "model",
+      "sha256": "9633ff72b3c2b10d9dc558580dbe38e9204cfa47a182ba1af345bf368f6db35a",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-roundstone.glb",
+      "kind": "model",
+      "sha256": "ab5570c01fdfbb3d4e2d9da763d29492bc2a458ccf2dfbd1930e9ba0e8990b05",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-reed.glb",
+      "kind": "model",
+      "sha256": "66ecb3913ede8cb06d7f8e8031a83d2fec09cb1d282d175a37454974dd53c085",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-mica.glb",
+      "kind": "model",
+      "sha256": "e54b65a9a1c91b85b1d89e8a6a5a99d2bbc36d284697b704fd55b3b75103148d",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-moth.glb",
+      "kind": "model",
+      "sha256": "fe9c8882f0fbd1d5be71fb99bed8b17bd4e911163276cd8d707ed7c6bc2b6ca3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-quartz.glb",
+      "kind": "model",
+      "sha256": "5209cbf85a2dbaa9bd5bb597e2eee2c1b20a3f6b66aeedaf37b49a9df0fbdb16",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/discovery-lichen.glb",
+      "kind": "model",
+      "sha256": "5d0e0de0979ae27d0aef8292ac8cb46a682abdd249f0a17f4e83593538a3643c",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/gardener.glb",
+      "kind": "model",
+      "sha256": "31dd5cb0cba8d7ff357530326e6fff9cce664165baf98a802f5f6fd5a0493b97",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-1.glb",
+      "kind": "model",
+      "sha256": "0954f8d637b749692244ef36feaf6abc8651d6f27e562bcd342e69c012be711c",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-2.glb",
+      "kind": "model",
+      "sha256": "83d4ef979670fe92fb95098dffd3ccc499d21b0bf24b51a2c5ce082553485087",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-3.glb",
+      "kind": "model",
+      "sha256": "71ba38e0c593025f6b46165294b9405a77aaab1d9125092a6107dbf55ec68fb5",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-4.glb",
+      "kind": "model",
+      "sha256": "ebd638041bb8d4dba3915b1a0cd5946c8b74c8a515bd79d3bdac80f314e57ace",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-5.glb",
+      "kind": "model",
+      "sha256": "c6679d2668565984900ed314402cdc86277f379ba6feb8c6dfb81623125bbe69",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/resident-6.glb",
+      "kind": "model",
+      "sha256": "8ffc939e58d65bc1234befc99c20fa7464c62f83b734dafcc3fd750a7e8c3cc1",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-forest.glb",
+      "kind": "model",
+      "sha256": "9d7f184bb4639972af7939025c1d904fe7ab97132932352a7093eb5e67e22c9e",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-brook.glb",
+      "kind": "model",
+      "sha256": "2717d19d434aedd3168c148dcbfee5c3cd9e72412671137723408bee9fc7a3cf",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/terrain-hill.glb",
+      "kind": "model",
+      "sha256": "b62a5762cbb96e98385a6ab45b235a2af0bc861ec0784ee160d751193f20c30d",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-watering-can.glb",
+      "kind": "model",
+      "sha256": "904dff3c2e3d467d3d389a7a1986a9249a90549c470dbc6f23f9c057a7d2f382",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-trowel.glb",
+      "kind": "model",
+      "sha256": "4cd54c199004139a7f5c30a5a0a0dc630608044e1fe333bf38f1e651cdf31d31",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-basket.glb",
+      "kind": "model",
+      "sha256": "e19a9185a59a8e79f95100d66ff17c4eb3416778e551597c3457e0ecb50c97c9",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-hoe.glb",
+      "kind": "model",
+      "sha256": "fe1e52d80adabcd101d9b6909c60656119378a5d781cff2158287e1111a62741",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tool-seed-pouch.glb",
+      "kind": "model",
+      "sha256": "9a77a0cedf925078264127439f0279721caceafa0b33faa4c029bb07a7d08659",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-oak.glb",
+      "kind": "model",
+      "sha256": "9c11d768349bb8699fbe75ceddfe0a799e470be89ca46dfcd291f5f20e6afb99",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-willow.glb",
+      "kind": "model",
+      "sha256": "c441282a2c949cd4def77ad1f79426190f8ebd3440f80092a0d789139aa1a1c3",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-pine.glb",
+      "kind": "model",
+      "sha256": "ca3f99b3f9b18ea8cbb8c58a6770574c5e9fb0beddf3348b867f5a008b497840",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/tree-birch.glb",
+      "kind": "model",
+      "sha256": "20a96108e0dc2f578e0b1f01bd1e108e2abd83b8ddcd4d6f3ee88df4dfd941db",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/moon-cottage.glb",
+      "kind": "model",
+      "sha256": "7492d4a6d21e8ce3fefce6ea8fd21f0461bccb83ef4fa90b5d710ad0e8264811",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/models/moss-rock.glb",
+      "kind": "model",
+      "sha256": "5db3e78b8f843357cf1ff1da74b4b14fdc6c0befda45f26a9975862d70858396",
+      "source": "assets/games/moss-and-moon/sources/model-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Three.js 0.180.0 GLTFExporter; Node.js",
+        "promptRecord": "generation/original-design.md",
+        "referenceSources": [],
+        "rights": "Original project-authored procedural geometry and palette. No external model, texture, character or logo source. Three.js is a separately licensed MIT runtime dependency."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/music-loop.wav",
+      "kind": "audio",
+      "sha256": "84c992fb13f41553b553547a9f198f4088e6a6f95b22ba928c5cb137efd65a02",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 3951480076,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/ambient-leaves.wav",
+      "kind": "audio",
+      "sha256": "09c0a31c42de704b322641a336c70c9f3f1f9904a4de6d9abbb45b7198d93c35",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 2310948549,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-plant.wav",
+      "kind": "audio",
+      "sha256": "e3c406497b51d761c37ee0ccce87c727dac28a38b955dae966401bfdb37ac7d1",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 670417022,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-water.wav",
+      "kind": "audio",
+      "sha256": "ffaa9847318ef986d27437b914106a612e6c89b90e20b4ce0801675d180f335d",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 3324852791,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-harvest.wav",
+      "kind": "audio",
+      "sha256": "70f8829d7eb532f77dc5bb4de7bc2f7460b1c41817251c9e69dc06c779b45d50",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 1684321264,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-ui.wav",
+      "kind": "audio",
+      "sha256": "d313489bf61be03886c4138d9127707b9b6a5c69492e18d4abf83ab95ee4a538",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 43789737,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    },
+    {
+      "path": "public/games/moss-and-moon/assets/audio/sfx-success.wav",
+      "kind": "audio",
+      "sha256": "10c459546ab16afa7dad20484578523ce16651255ff7873eddbca66ec994b04c",
+      "source": "assets/games/moss-and-moon/sources/audio-kit.mjs",
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Moss & Moon Maker / asset assistant",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js built-in math and PCM WAV encoder; no external sample library",
+        "seed": 2698225506,
+        "referenceSources": [],
+        "rights": "Original project-authored composition and synthesis. No external audio recordings, samples or melodies. No public-domain claim."
+      },
+      "provenanceStatus": "preserved-original-declaration; not new rights certification",
+      "regeneration": "NOT_RUN"
+    }
+  ],
+  "three": {
+    "version": "0.180.0",
+    "runtimeLicense": "public/games/moss-and-moon/vendor/THREE-LICENSE.txt",
+    "fullUpstreamSourceIncluded": false
+  }
+}

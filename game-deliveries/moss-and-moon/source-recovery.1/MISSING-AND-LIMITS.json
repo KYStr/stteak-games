@@ -1,0 +1,39 @@
+{
+  "candidateId": "moss-and-moon-0022-recovery-delivery-20261101-r2",
+  "qualityScores": null,
+  "originalDocs1Recovered": false,
+  "missing": [
+    {
+      "item": "original .gitattributes",
+      "status": "UNKNOWN_BYTES",
+      "expectedBytes": 8,
+      "expectedSha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "effect": "not a 102-file original runtime archive; 101 served files preserved"
+    },
+    {
+      "item": "original docs.1 1151-source/23-mapping/1303-entry ZIP",
+      "status": "NOT_RECOVERED",
+      "effect": "this is a newly authored recovery delivery, no original score inheritance"
+    },
+    {
+      "item": "original production-only lock and complete Three source",
+      "status": "NOT_RECOVERED",
+      "effect": "pinned historical package/lock included only as provenance, full offline regeneration not established"
+    },
+    {
+      "item": "historical recipe dependencies and tests",
+      "status": "NOT_INCLUDED_OR_EXECUTED",
+      "effect": "npm test refers to absent historical suite; do not claim test/build PASS"
+    },
+    {
+      "item": "native GUI, sound, performance and quality assessment",
+      "status": "NOT_RUN",
+      "effect": "not an acceptance or release-ready verdict"
+    },
+    {
+      "item": "historical sources/audio/ WAV copies",
+      "status": "NOT_INCLUDED",
+      "effect": "audio-notes is retained historical context, not a complete inventory of this recovery package; seven runtime WAV files are preserved exactly"
+    }
+  ]
+}
