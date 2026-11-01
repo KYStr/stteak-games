@@ -4,7 +4,7 @@
 
 - [模型/碰撞 manifest](../assets/games/neon-drift/manifest.json)。
 - [音訊 manifest](../assets/games/neon-drift/audio-manifest.json)。
-- [原始 vehicle-kit 生成記錄](../assets/games/neon-drift/generation/vehicle-kit.md)，原封不改從2026-10-26 bootstrap ZIP取回，精確provenance在交付根 PROVENANCE.json。
+- [原始 vehicle-kit 生成記錄](../assets/games/neon-drift/generation/vehicle-kit.md)，原封不改從2026-10-26 bootstrap ZIP取回，原私人交付的完整 PROVENANCE.json 含私人路徑，依 [PUBLICATION-SCOPE](../PUBLICATION-SCOPE.md) 刻意未納入公開子集，不是本包可讀檔。公開可核證據為此原始生成記錄、上述兩份資產 manifest 與 [SOURCE-MANIFEST](../SOURCE-MANIFEST.json) 的檔案 bytes/SHA256；這些不冒稱完整私人 provenance。
 - [Three.js 0.170.0 MIT 原文](../public/games/neon-drift/THREE-LICENSE.txt)，runtime同檔保留；bundle法定註解不移除。
 
 上列 manifests 包含每資產 id/version/source/runtime/SHA256、provenance、spec與budget，不能只靠檔名驗。模型來源 `assets/games/neon-drift/sources/models.js`，單位米、+Y向上、+Z前進；車輛原點在道路接觸中心，環境基底中心。三車 glTF 自帶buffer，具命名輪組、材質槽與動畫；colliders三個JSON分別對應。剛體車無skinning骨架，不把它描述成缺骨架素材或用平面圖取代3D。
