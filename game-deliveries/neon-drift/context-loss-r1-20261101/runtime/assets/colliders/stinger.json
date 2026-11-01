@@ -1,0 +1,42 @@
+{
+  "id": "neon-drift.collider.stinger",
+  "version": "1.0.0",
+  "unit": "meter",
+  "up": "+Y",
+  "forward": "+Z",
+  "pivot": "road-center",
+  "shape": "box",
+  "center": [
+    0,
+    0.66,
+    0
+  ],
+  "halfExtents": [
+    0.8412999999999999,
+    0.62,
+    1.7484
+  ],
+  "wheelMounts": [
+    [
+      -0.8771,
+      0.35,
+      -1.16
+    ],
+    [
+      0.8771,
+      0.35,
+      -1.16
+    ],
+    [
+      -0.8771,
+      0.35,
+      1.16
+    ],
+    [
+      0.8771,
+      0.35,
+      1.16
+    ]
+  ],
+  "physicsNote": "Track-space corridor collision uses the independent vehicle envelope; visual triangle meshes are not collision geometry."
+}

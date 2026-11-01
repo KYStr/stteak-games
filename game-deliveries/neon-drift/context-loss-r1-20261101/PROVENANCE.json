@@ -1,0 +1,14 @@
+{
+  "candidateId": "neon-drift-context-loss-20261101-r1",
+  "repository": "KYStr/stteak-games",
+  "baselineCommit": "086b53ddb01fc130e2a8108fa1aa512a4480f7eb",
+  "baselineDirectory": "game-deliveries/neon-drift/rc3-r2-delivery-docs1",
+  "candidateSource": "source/games/neon-drift/src/main.js",
+  "sourceSha256": "b449a65ce1ea4a5339580a7ccc632b7f242916837474888d2561908d555c885b",
+  "runtimeChanged": [
+    "game.js"
+  ],
+  "otherBaselineSource": "unchanged; obtain exact baseline directory before overlaying candidate source",
+  "publicationCommit": null,
+  "scope": "Reload-only fail-closed handling after graphics context loss; no physics formula/save format/asset change"
+}

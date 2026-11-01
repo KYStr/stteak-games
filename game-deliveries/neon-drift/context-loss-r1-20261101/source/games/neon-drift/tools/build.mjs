@@ -1,0 +1,11 @@
+import { build } from 'esbuild';
+import { mkdir, copyFile, cp } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const out=fileURLToPath(new URL('../../../public/games/neon-drift/',import.meta.url));
+await mkdir(out,{recursive:true});
+await build({entryPoints:[root+'src/main.js'],bundle:true,format:'esm',target:'es2022',minify:true,outfile:out+'game.js',legalComments:'eof'});
+for(const file of ['index.html','style.css']) await copyFile(root+'src/'+file,out+file);
+await copyFile(root+'node_modules/three/LICENSE',out+'THREE-LICENSE.txt');
+await cp(root+'../../assets/games/neon-drift/generated',out+'assets',{recursive:true});
+console.log('Neon Drift runtime built with bundled Three.js 0.170.0');
