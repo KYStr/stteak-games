@@ -13,8 +13,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 2913,
-      "sha256": "e10dd368c685d11d99917484b52b001421c12440d088a6fd046c1b0f02d70323"
+      "bytes": 2998,
+      "sha256": "fabc5df27ae69b661c254466544b4eff653195238e2e429e00eebd9184261fbc"
     },
     {
       "path": "rollback/game.js",
