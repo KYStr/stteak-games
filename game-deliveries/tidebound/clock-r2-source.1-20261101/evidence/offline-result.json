@@ -1,0 +1,57 @@
+{
+  "sharedExecution": 10,
+  "totalMaximum": 10,
+  "freezeFiles": 53,
+  "patches": 16,
+  "reverse": true,
+  "actualSuGrid": 400,
+  "overshoots": 37,
+  "example": {
+    "e": 0.103,
+    "t": 0.10300000000000001,
+    "loss": 0
+  },
+  "earlyModeStops": 2,
+  "materialExcessRejected": 4,
+  "inputResetAndFutureAnchor": true,
+  "sourceDisabled": true,
+  "changedCandidate": [
+    "candidate/runner-contract.json",
+    "candidate/scripts/components/contract.mjs",
+    "candidate/scripts/components/time-ledger-schema.mjs",
+    "candidate/scripts/source-contract.mjs"
+  ],
+  "capacity": {
+    "serializer": "JSON.stringify canonical no whitespace, ASCII fixed keys/enums, finite Number max25 chars, booleans max5",
+    "recordBound": 1538,
+    "ledgerBound": 4789,
+    "components": {
+      "operations": 15618,
+      "decisions": 7052,
+      "calibrationProfile": 8192,
+      "routeSampleDiagnostic": 2048,
+      "progressChecks": 2048,
+      "timeLedger": 4789
+    },
+    "remainder": {
+      "scrollRecord": 2048,
+      "lastChartRead": 1024,
+      "lastSnapshot": 512,
+      "prefixSummaries": 2048,
+      "countsAndAdapterFlags": 1024,
+      "reportAndDiagnosticKeys": 2048
+    },
+    "bodyBound": 48451,
+    "hostBound": 8192,
+    "outerBound": 2048,
+    "streamBound": 58691,
+    "limits": {
+      "record": 3072,
+      "ledger": 10240,
+      "body": 60000,
+      "stream": 65536
+    },
+    "scope": "fixed production schema only; arbitrary injected test host/env not admitted; no native execution"
+  },
+  "scope": "bounded offline extracted code; no DOM/browser/native/public write; not quality score"
+}

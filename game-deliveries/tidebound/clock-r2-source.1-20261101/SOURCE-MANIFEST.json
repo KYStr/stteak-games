@@ -1,0 +1,37 @@
+{
+  "deliveryId": "clock-r2-source.1-20261101",
+  "algorithm": "sha256",
+  "selfExcluded": true,
+  "files": [
+    {
+      "path": "AUTHOR-CHECK.md",
+      "bytes": 1668,
+      "sha256": "8ac616856e7f99bbbd32990b1ebd6c9b0d3ed7b70b868ecc69d181e15c7272b9"
+    },
+    {
+      "path": "BASELINE.json",
+      "bytes": 1043,
+      "sha256": "6d42efd60de436c3439df77c404eb1a733e58200711f2bbe31b341c1a1e8a7b9"
+    },
+    {
+      "path": "LIMITATIONS-ROLLBACK.md",
+      "bytes": 1445,
+      "sha256": "13e656ec4c44c1f293d478c8ccef33523ff4974940a634c9dcbd359dfcb531d9"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1047,
+      "sha256": "be12d51dc6e44b81a78eeae62fa5c472ad0574ffbde49b5ef12f34047d2ccc22"
+    },
+    {
+      "path": "evidence/offline-result.json",
+      "bytes": 1604,
+      "sha256": "77f686c81d69d8279762782c1a55bcfb426d433b7fbd6f7dccd8b956edb6ad5b"
+    },
+    {
+      "path": "runtime/game.js",
+      "bytes": 700073,
+      "sha256": "9b4fbae404aad2136937c21059b001011582eb9bfb093ba1566a4fd0e58ba57f"
+    }
+  ]
+}
