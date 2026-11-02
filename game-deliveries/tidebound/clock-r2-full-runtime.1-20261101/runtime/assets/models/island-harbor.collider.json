@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.island.harbor",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "cylinder",
+      "radius": 25,
+      "height": 10,
+      "center": [
+        0,
+        2.5,
+        0
+      ]
+    }
+  ]
+}

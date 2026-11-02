@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.structure.pier",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "box",
+      "size": [
+        5.82,
+        5.8,
+        12.82
+      ],
+      "center": [
+        0,
+        0.8,
+        5.85
+      ],
+      "purpose": "interchange-only; live world collisions use world.js island/reef volumes"
+    }
+  ]
+}

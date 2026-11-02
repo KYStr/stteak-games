@@ -1,0 +1,12 @@
+{
+  "candidateId": "tidebound-clock-r2-full-assembly-20261101",
+  "runtimeEntry": "runtime/index.html",
+  "runtimeFiles": 78,
+  "executionReady": false,
+  "nativeAuthorized": false,
+  "workflowIncluded": false,
+  "nativeExecuted": false,
+  "offlineExecutionsUsed": 11,
+  "offlineExecutionsRemaining": 0,
+  "note": "File assembly only; retained old release.json is historical and not current identity. RUNTIME-MANIFEST.json binds this assembly."
+}

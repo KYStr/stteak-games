@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.navigation.survey-buoy",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "sphere",
+      "radius": 9,
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "trigger": true,
+      "purpose": "optional low-speed observation; no rigid collision"
+    }
+  ]
+}

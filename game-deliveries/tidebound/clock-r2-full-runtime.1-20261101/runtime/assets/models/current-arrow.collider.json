@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.effect.current",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "box",
+      "size": [
+        2.8644,
+        0.16,
+        4.0985
+      ],
+      "center": [
+        0,
+        0,
+        0.1008
+      ],
+      "purpose": "interchange-only; live world collisions use world.js island/reef volumes"
+    }
+  ]
+}

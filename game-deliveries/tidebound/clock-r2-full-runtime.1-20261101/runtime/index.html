@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123f49"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' fill='%23176b72'/%3E%3Cpath d='M20 5V25H6Z' fill='%23fcf5df'/%3E%3Cpath d='M5 28H35L29 35H11Z' fill='%23e87954'/%3E%3C/svg%3E"><title>逐潮之旅 · Tidebound</title><link rel="stylesheet" href="./style.css"></head>
+<body><canvas id="sea" aria-label="逐潮之旅三維海域"></canvas>
+<header class="masthead"><div class="wordmark"><span class="mark">◒</span><div><strong>逐潮之旅</strong><small>T I D E B O U N D <span id="version">1.0</span></small></div></div><nav aria-label="航海工具"><button id="map-button" title="海圖 M">海圖 <kbd>M</kbd></button><button id="journal-button">航海誌</button><button id="camera-button" title="切換鏡頭 C">視角 <kbd>C</kbd></button><button id="pause-button" title="暫停 Escape">Ⅱ</button></nav></header>
+<aside id="voyage-hud"><div class="chapter">THE SEVEN ISLES <span id="voyage-time">00:00</span></div><h1 id="objective">給海一盞燈。</h1><p id="objective-detail">七座島，十二個發現，一段回家的航程。</p><div class="meters"><label>船體 <strong id="hull-label">100%</strong><meter id="hull-meter" min="0" max="100" value="100"></meter></label><label id="oxygen-row" hidden>氧氣 <strong id="oxygen-label">100%</strong><meter id="oxygen-meter" min="0" max="100" value="100"></meter></label></div><p id="safety-warning" role="status"></p></aside>
+<aside id="tide-hud"><div class="tide-symbol">≈</div><div><small>潮汐預報 · 風向固定</small><strong id="tide-label">平潮</strong><span id="forecast"></span></div></aside>
+<div id="bearing"><span id="compass-arrow">↑</span><span id="bearing-label">N</span><small>風 ↖　流 <span id="flow-arrow">→</span></small></div>
+<aside id="survey-choice" aria-label="可選海況觀測" hidden><span class="eyebrow">SEA NOTES · 可自由略過</span><strong id="survey-title"></strong><p id="survey-detail"></p><p id="survey-tradeoff"></p><div class="actions"><button id="survey-sample">收帆準備取樣</button><button id="survey-pass">繼續直航</button></div></aside>
+<aside id="route-choice-card" aria-label="前方航路分支" hidden><span class="eyebrow">READ THE TIDE · 手動掌舵</span><strong id="route-choice-title"></strong><p id="route-choice-context"></p><div id="route-options"></div><div class="route-actions"><button id="route-cancel" hidden>取消引導</button><button id="route-branch-map">海圖比較</button></div></aside>
+<div id="toast" role="status" aria-live="polite"></div><div id="storage-warning" role="status" hidden></div>
+<div id="sailing-controls"><div class="steering" aria-label="轉舵控制"><button data-hold="left" aria-label="左轉舵">↶</button><button data-hold="right" aria-label="右轉舵">↷</button></div><div class="sail-controls"><span id="sail-label">帆力 0%</span><div><button data-sail="0">收帆</button><button data-sail="0.5">半帆</button><button data-sail="1">滿帆</button></div></div><button id="interact-button" class="primary">靠岸 / 調查 <kbd>E</kbd></button><button id="surface-button" hidden>浮出回船</button></div>
+<div id="keyboard-hint">A D 轉舵 · W S 帆力 · SPACE 收帆 · E 靠岸 · M 海圖 · C 視角</div>
+<section id="panel" class="paper-panel" aria-label="航行選單"></section>
+<div id="modal" class="modal" hidden><section id="modal-content" class="paper" role="dialog" aria-modal="true" aria-labelledby="modal-title"></section></div>
+<div id="rotate-hint">↻ 橫放裝置可獲得更寬廣的航海視野。</div>
+<div id="loading" class="loading"><span>◒</span><h1>海風正好。</h1><p>正在準備七島海域…</p></div>
+<script>
+(() => {
+  const loading = document.getElementById('loading');
+  let timer;
+  const failed = () => {
+    if (loading.hidden || loading.querySelector('button')) return;
+    clearTimeout(timer);
+    loading.setAttribute('role', 'alert');
+    loading.innerHTML = '<span>≈</span><h1>海域尚未載入。</h1><p style="max-width:34em;text-align:center;padding:0 20px;line-height:1.8">網路或檔案暫時無法取得，請重新載入。已儲存的航海日誌會保留。</p><button id="retry-load">重新載入</button>';
+    const retry = document.getElementById('retry-load');
+    retry.onclick = () => location.reload();
+    retry.focus();
+    const sessionId = new URLSearchParams(location.search).get('session');
+    if (parent !== window && sessionId) parent.postMessage({protocol:'stteak-game',version:1,sessionId,type:'game:error',payload:{message:'海域載入失敗，請重新載入。'}}, location.origin);
+  };
+  window.addEventListener('error', event => { if (event.target?.id === 'game-entry') failed(); }, true);
+  window.addEventListener('load', event => { if (event.target?.id === 'game-entry') clearTimeout(timer); }, true);
+  timer = setTimeout(failed, 20000);
+})();
+</script>
+<script type="module" src="./game.js" id="game-entry"></script>
+</body></html>

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.effect.whirlpool",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "box",
+      "size": [
+        38.8458,
+        0.5154,
+        38.8468
+      ],
+      "center": [
+        -0.0124,
+        -0.1246,
+        -0.0113
+      ],
+      "purpose": "interchange-only; live world collisions use world.js island/reef volumes"
+    }
+  ]
+}

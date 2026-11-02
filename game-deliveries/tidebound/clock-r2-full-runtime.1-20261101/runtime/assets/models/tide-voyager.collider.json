@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tidebound.character.voyager",
+  "unit": "metre",
+  "up": "+Y",
+  "forward": "-Z",
+  "shapes": [
+    {
+      "type": "capsule",
+      "radius": 0.48,
+      "height": 2.7,
+      "center": [
+        0,
+        1.35,
+        0
+      ]
+    }
+  ]
+}
