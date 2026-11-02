@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "deliveryId": "hollow-crown-context-loss-r1-source-contract.1-20261101",
+  "runtimeCandidateId": "hollow-crown-context-loss-20261101-r1",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3563,
+      "sha256": "3874819a3b4a2b6e8794a38f752f723356076a95e35982e239a1615dd19e621b"
+    },
+    {
+      "path": "assets/games/hollow-crown/manifest.json",
+      "bytes": 62382,
+      "sha256": "cd0d1a4c5c7add06cccfd1357247e1eefa63582e807cb695ee2b1e5651a67ee0"
+    },
+    {
+      "path": "assets/games/hollow-crown/recipes/export-assets.mjs",
+      "bytes": 9555,
+      "sha256": "fadf786d9216f92c67928ffd6c5ffe22e4986c7954761329d12c792c667679c7"
+    }
+  ],
+  "manifestSelfExcluded": true
+}
