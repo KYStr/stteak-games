@@ -1,0 +1,29 @@
+--- a/public/games/moss-and-moon/main.js
++++ b/public/games/moss-and-moon/main.js
+@@ -5,7 +5,7 @@
+ import { createAudio } from './audio.js';
+ import { bridge } from './bridge.js';
+ 
+-const BUILD='moss-and-moon-pointer-owner-0022-cloud-candidate-1',VERSION='1.0.17-rebuild.4'; // 自已凍結0021另建指標所有權修正候選，不沿用其GUI身分或批准。
++const BUILD='moss-and-moon-slot-save-guard-20261108-r1',VERSION='1.0.17-rebuild.5'; // 公開r3的獨立衍生修正；不繼承舊候選GUI驗收或批准。
+ const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let slot=1,loaded=loadSlot(slot),state=loaded.state||createState(slot),tool='plant',seed=PLANTS[0].id,decor='planter',rotation=0,selected=-1,movingFrom=null,started=false,paused=false,faulted=false,panelName=null,residentFilter=null,toastTimer,world,previousFocus=null;
+ const sound=createAudio(message=>notice(message));let connection;
+@@ -16,7 +16,7 @@
+ const button=(label,attr,cls='')=>`<button ${attr} class="${cls}">${label}</button>`;
+ const costs=items=>Object.entries(items).map(([id,n])=>`${esc(itemName(id))} ${count(id)}/${n}`).join(' · ');
+ function notice(message,error=false){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4400);if(error)sound.effect('error');}
+-function persist(){const r=saveSlot(state);$('#save-status').textContent=r.ok?'已保存 · 庭園 '+slot:'無法保存：'+r.error;if(!r.ok)notice('瀏覽器未能保存，請在設定匯出庭園備份。',true);}
++function persist(){const r=saveSlot(state);$('#save-status').textContent=r.ok?'已保存 · 庭園 '+slot:'無法保存：'+r.error;if(!r.ok)notice('瀏覽器未能保存，請在設定匯出庭園備份。',true);return r.ok;}
+ function action(a,{refresh=true}={}){if(['place','move'].includes(a.type)&&!world.canPlace(a.index)){notice('你正站在這附近。先走到旁邊，讓家具也有自己的空間。',true);return false;}const result=transact(state,a);if(!result.ok){notice(result.message,true);return false;}state=result.state;persist();sound.effect(a.type);if(refresh)render();notice(result.message);return true;}
+ function goalText(){if(state.festival)return'慶典已點亮。完成剩下的故事，或試試新的庭園佈置。';if(!state.completedQuests.includes('mira-1')){if(count('moss')>=2)return'兩份絨苔準備好了！打開「鄰居」，找米拉接取並交付「第一抹綠意」。';const moss=state.grid.filter(c=>c?.type==='plant'&&c.id==='moss').length;if(moss+count('moss')<2&&!(state.stats?.harvested))return`第一步：種下兩份絨苔（目前 ${moss}/2）。點空地種植，也可在手帳選格。`;}
+  if(state.grid.some((c,i)=>c?.type==='plant'&&growthPreview(state,i).mature))return'有植物成熟了！用「收成」帶回背包，再拜訪鄰居。';if(state.grid.some((c,i)=>c?.type==='plant'&&!c.watered&&!growthPreview(state,i).mature))return'選「澆水」，照顧還沒喝水的植物。今天做完了再睡覺。';if(!state.completedQuests.length)return'今天已照顧好植物。睡覺換日後記得再澆水；絨苔累計三個澆水日成熟。';const f=festivalStatus(state);return`月光慶典：已完成 ${state.completedQuests.length}/8 委託。${f.ready?'大家都準備好了，打開手帳點亮慶典。':f.missing[0]||'佈置你的庭園。'}`;}
+@@ -89,7 +89,7 @@
+  else if('puzzle'in d)action({type:'puzzle',id:d.puzzle,answer:d.answer});else if('sleep'in d){if(action({type:'sleep'}))openPanel('morning');}
+  else if('festival'in d){if(state.festival||action({type:'festival'})){world.celebrate();sound.effect('festival');openPanel('festival');}}
+  else if('resume'in d)resume();else if('export'in d)exportSave();else if('import'in d)$('#import-file').click();
+- else if('slot'in d){persist();slot=+d.slot;loaded=loadSlot(slot);state=loaded.state||createState(slot);selected=-1;closePanel();render();if(!started)start();else resume();notice('已進入庭園 '+slot+'。');}
++ else if('slot'in d){if(!persist())return;slot=+d.slot;loaded=loadSlot(slot);state=loaded.state||createState(slot);selected=-1;closePanel();render();if(!started)start();else resume();notice('已進入庭園 '+slot+'。');}
+  else if('resetConfirm'in d){state=createState(slot);selected=-1;persist();closePanel();render();resume();notice('新的庭園，新的第一天。');}
+ });
+ document.addEventListener('change',async e=>{if(e.target.dataset.setting){const k=e.target.dataset.setting,v=e.target.type==='checkbox'?e.target.checked:e.target.type==='range'||k==='textSpeed'?+e.target.value:e.target.value;action({type:'settings',values:{[k]:v}},{refresh:false});sound.update(state.settings);world.sync(state);document.body.classList.toggle('reduced',!!state.settings.reducedMotion);}

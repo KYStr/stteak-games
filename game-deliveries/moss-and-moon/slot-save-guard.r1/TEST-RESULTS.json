@@ -1,0 +1,23 @@
+{
+  "candidateId": "moss-and-moon-slot-save-guard-20261108-r1",
+  "baseline": {
+    "passed": 1,
+    "failed": 2,
+    "exitCode": 1
+  },
+  "patched": {
+    "passed": 3,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "checks": [
+    "failed save preserves exact state and prevents load/close/render",
+    "successful save permits one switch after persistence",
+    "failed same-slot selection preserves unsaved state"
+  ],
+  "syntaxCheck": "PASS",
+  "method": "Exact production persist function and slot branch, VM execution with isolated dependency doubles",
+  "nativeGUI": "NOT_RUN",
+  "qualityScore": null,
+  "historical70Tests": "NOT_RERUN"
+}
