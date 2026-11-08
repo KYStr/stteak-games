@@ -1,0 +1,23 @@
+{
+  "candidateId": "moss-and-moon-reset-save-guard-20261108-r2",
+  "parentCandidate": "moss-and-moon-slot-save-guard-20261108-r1",
+  "startedAt": "2026-11-08T05:54:17.000Z",
+  "completedAt": "2026-11-08T05:55:46.117+00:00",
+  "baselineResetTests": {
+    "pass": 0,
+    "fail": 3
+  },
+  "patchedResetTests": {
+    "pass": 3,
+    "fail": 0
+  },
+  "syntax": "PASS",
+  "slotBranchByteIdenticalToR1": true,
+  "testsNotRerun": [
+    "slot3",
+    "historical70",
+    "extension",
+    "build",
+    "nativeGUI"
+  ]
+}
