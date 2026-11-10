@@ -2,12 +2,39 @@ import * as THREE from './vendor/three.module.js';
 import {createAstronaut,animateAstronaut,createRoomKit,createDevice,setDeviceState,animateDevice} from './models.js';
 import {traceOptics} from './optics.js';
 import {arcPhase,debrisPosition} from './hazards.js';
+import {mergeGeometries} from './assets/runtime/buffer-geometry-utils.js';
 import {layoutDockingMarkers,layoutClampedDockingMarkers} from './marker-layout.js'; // 近停靠pair與分離貼邊避讓分開處理，保留既有契約。
+// Room architecture never animates. Batch by material, retaining instanced transforms.
+function batchArchitecture(group) {
+  group.updateMatrixWorld(true);
+  const buckets=new Map(), matrix=new THREE.Matrix4(), combined=new THREE.Matrix4();
+  group.traverse(object=>{
+    if(!object.isMesh||Array.isArray(object.material))return;
+    const list=buckets.get(object.material)||[];buckets.set(object.material,list);
+    for(let i=0;i<(object.isInstancedMesh?object.count:1);i++){
+      if(object.isInstancedMesh){object.getMatrixAt(i,matrix);combined.multiplyMatrices(object.matrixWorld,matrix)}else combined.copy(object.matrixWorld);
+      const geometry=object.geometry.index?object.geometry.toNonIndexed():object.geometry.clone();
+      geometry.applyMatrix4(combined);list.push(geometry);
+    }
+  });
+  const result=new THREE.Group();
+  for(const [material,list] of buckets){const geometry=mergeGeometries(list);for(const item of list)item.dispose();const mesh=new THREE.Mesh(geometry,material);mesh.castShadow=true;mesh.receiveShadow=true;result.add(mesh)}
+  return result;
+}
+const lightMaterials=new WeakMap();
+function useVertexLighting(root){
+  root.traverse(object=>{if(!object.isMesh)return;const convert=material=>{
+    if(!material.isMeshStandardMaterial)return material;
+    if(!lightMaterials.has(material))lightMaterials.set(material,new THREE.MeshLambertMaterial({name:material.name,color:material.color,emissive:material.emissive,emissiveIntensity:material.emissiveIntensity,transparent:material.transparent,opacity:material.opacity,side:material.side,depthWrite:material.depthWrite}));
+    return lightMaterials.get(material);
+  };object.material=Array.isArray(object.material)?object.material.map(convert):convert(object.material)});return root;
+}
 export class StationView {
   constructor(canvas,settings){
     this.canvas=canvas;this.settings=settings;this.scene=new THREE.Scene();this.scene.background=new THREE.Color('#06131f');this.scene.fog=new THREE.FogExp2('#071421',.014);
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.15;
-    this.renderer.shadowMap.enabled=settings.quality!=='low';this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    const gl=this.renderer.getContext(),debug=gl.getExtension('WEBGL_debug_renderer_info');this.software=/swiftshader|llvmpipe|software/i.test(debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):'');
+    this.renderer.shadowMap.enabled=settings.quality!=='low'&&!this.software;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     this.camera=new THREE.PerspectiveCamera(44,1,.1,300);this.camera.position.set(15,17,22);this.target=new THREE.Vector3(0,2,0);this.mode='fixed';this.yaw=0;
     this.scene.add(new THREE.HemisphereLight('#c6e9ee','#18304a',2));
     this.key=new THREE.DirectionalLight('#d1ebff',3.1);this.key.position.set(3,15,8);this.key.castShadow=true;this.key.shadow.mapSize.set(1024,1024);Object.assign(this.key.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:45});this.key.shadow.bias=-.001;this.scene.add(this.key);
@@ -16,14 +43,14 @@ export class StationView {
     const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(stars,3));this.scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:'#bfd3e7',size:.14,sizeAttenuation:true})));
     const planet=new THREE.Mesh(new THREE.SphereGeometry(24,40,24),new THREE.MeshStandardMaterial({color:'#253f56',roughness:.95,metalness:.1}));planet.position.set(-45,-11,-70);this.scene.add(planet);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(32,.2,8,120),new THREE.MeshBasicMaterial({color:'#7a9bab'}));ring.rotation.x=1.2;ring.position.copy(planet.position);this.scene.add(ring);
-    this.astronaut=createAstronaut();this.astronaut.scale.setScalar(.75);this.scene.add(this.astronaut);this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();this.devices=[];this.frames=[];this.cache=new Map();this.roomGroup=null;this.beam=null;this.lastFrame=performance.now();this.resize();
+    this.astronaut=createAstronaut();if(this.software)useVertexLighting(this.astronaut);this.astronaut.scale.setScalar(.75);this.scene.add(this.astronaut);this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();this.devices=[];this.frames=[];this.cache=new Map();this.roomGroup=null;this.beam=null;this.lastFrame=performance.now();this.resize();
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(canvas);
     this.markerLayer=document.createElement('div');this.markerLayer.id='world-markers';canvas.parentElement.append(this.markerLayer);
     this.playerMarker=document.createElement('span');this.playerMarker.className='player-marker';this.playerMarker.textContent='▽ 你';this.markerLayer.append(this.playerMarker);
     this.altitudeLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#8dc5d0',transparent:true,opacity:.5,depthTest:false}));this.scene.add(this.altitudeLine);this.labels=[];
   }
-  resize(){const w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.viewport={width:w,height:h};this.markerSizesDirty=true;this.renderer.setPixelRatio(Math.min(devicePixelRatio||1,this.settings.quality==='low'?1:1.6));this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.renderer.shadowMap.enabled=this.settings.quality!=='low'}
-  addDevice(kind,pos,data={},state='offline'){const mesh=createDevice(kind,state);mesh.position.fromArray(pos);this.roomGroup.add(mesh);const d={kind,mesh,pos:new THREE.Vector3(...pos),...data};mesh.userData.interaction=d;this.devices.push(d);return d}
+  resize(){const w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.viewport={width:w,height:h};this.markerSizesDirty=true;this.renderer.setPixelRatio(this.software?Math.min(1,Math.max(540,(this.settings.quality==='low'?720:900)*(this.renderScale||1))/w,Math.max(360,(this.settings.quality==='low'?450:600)*(this.renderScale||1))/h):Math.min(devicePixelRatio||1,this.settings.quality==='low'?1:1.6));this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.renderer.shadowMap.enabled=this.settings.quality!=='low'&&!this.software;this.dirty=true}
+  addDevice(kind,pos,data={},state='offline'){const mesh=createDevice(kind,state);if(this.software)useVertexLighting(mesh);mesh.position.fromArray(pos);this.roomGroup.add(mesh);const d={kind,mesh,pos:new THREE.Vector3(...pos),...data};mesh.userData.interaction=d;this.devices.push(d);return d}
   createMarkers(){for(const l of this.labels)l.remove();this.labels=[];this.dockingMarkerOrder=0;this.dockingMarkerCenter=null;this.clampedMarkerCenters={target:null,crate:null};this.markerSizesDirty=true;for(const d of this.devices){if(d.id==='oxygen'||d.id==='light-target')continue;const el=document.createElement('span');el.className='world-marker';el.textContent=d.id==='tools'?'◆ 裝備架 · F':d.id==='exit'?'↗ 艙門':d.id==='signal'?'≋ 訊號':d.id==='crate'?'▣ 電池':d.id==='target'?'▧ 停靠接點':d.id==='ending'?'◆ 能源終端':d.id==='hazard'?(this.room.hazard==='arc'?'⚡ 電弧':this.room.hazard==='debris'?'◇ 碎片':'≋ 洩漏'):d.id.startsWith('mirror')?`鏡 ${d.index+1}`:d.id.startsWith('valve')?`閥 ${d.index+1}`:d.label;if(d.id==='crate'||d.id==='target'){const line=document.createElement('span');line.className='marker-leader';line.dataset.marker=d.id;line.hidden=true;line.setAttribute('aria-hidden','true');this.markerLayer.append(line);this.labels.push(line);d.markerLeader=line}this.markerLayer.append(el);this.labels.push(el);d.marker=el}} // 換房時同時清除貼邊避讓記憶，其他文字及leader建立方式不變。
   updateMarkers(player,puzzleState){
     const {width,height}=this.viewport;
@@ -57,12 +84,13 @@ export class StationView {
     }
   }
   load(room,puzzle,run){
+    this.dirty=true;
     if(this.beam){this.beam.parent?.remove(this.beam);this.beam.geometry.dispose();this.beam.material.dispose();this.beam=null}
     if(this.roomGroup)this.scene.remove(this.roomGroup);
     // Only one room is rendered. Cached rooms bound allocation to the authored 12-room station.
     if(this.cache.has(room.id)){const cached=this.cache.get(room.id);this.roomGroup=cached.group;this.devices=cached.devices;this.scene.add(this.roomGroup);this.room=room;this.puzzle=puzzle;this.refresh(run);this.createMarkers();return}
     this.room=room;this.puzzle=puzzle;this.roomGroup=new THREE.Group();this.devices=[];this.scene.add(this.roomGroup);
-    const theme=room.type==='safe'?'airlock':room.type==='signal'?'habitat':room.deck===3?'core':'maintenance';this.roomGroup.add(createRoomKit(theme));
+    const theme=room.type==='safe'?'airlock':room.type==='signal'?'habitat':room.deck===3?'core':'maintenance';const architecture=batchArchitecture(createRoomKit(theme));if(this.software)useVertexLighting(architecture);this.roomGroup.add(architecture);
     const exit=this.addDevice('gate',[0,0,6.7],{id:'exit',label:'艙門 · 開啟航行圖',range:3.3},'powered');exit.mesh.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.28;o.material.depthWrite=false}});
     if(room.type==='safe'){
       this.addDevice('oxygen',[-5,0,-3],{id:'oxygen',label:'安全補給 · 氧氣與艙服已回復',range:3},'powered');
@@ -89,11 +117,21 @@ export class StationView {
   nearest(pos){return this.devices.filter(d=>!['hazard','target','light-target'].includes(d.id)&&d.pos.distanceTo(pos)<(d.range||3)).sort((a,b)=>a.pos.distanceToSquared(pos)-b.pos.distanceToSquared(pos))[0]}
   pick(x,y){const rect=this.canvas.getBoundingClientRect();this.pointer.set((x-rect.left)/rect.width*2-1,-(y-rect.top)/rect.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);const hits=this.raycaster.intersectObjects(this.devices.map(d=>d.mesh),true);for(const hit of hits){let p=hit.object;while(p){if(p.userData.interaction)return p.userData.interaction;p=p.parent}}return null}
   update(physics,run,puzzleState,time,dt,input){
+    const stamp=performance.now(),frameMs=Math.min(250,stamp-this.lastFrame);this.lastFrame=stamp;
+    if(run.paused)this.frameAverage=0;
+    else if(this.software){
+      this.frameAverage=this.frameAverage?this.frameAverage*.95+frameMs*.05:frameMs;
+      if(stamp-(this.lastTune||0)>5000){
+        const scale=this.renderScale||1,next=this.frameAverage>42?Math.max(.6,scale*.85):this.frameAverage<22?Math.min(1,scale*1.08):scale;
+        if(next!==scale){this.renderScale=next;this.resize()}this.lastTune=stamp;
+      }
+    }
+    if(this.contextLost||(run.paused&&!this.dirty))return;this.dirty=false;
     const p=physics.player.translation(),v=physics.player.linvel();this.astronaut.position.set(p.x,p.y,p.z);const moving=Math.hypot(v.x,v.z)>.15;if(moving)this.astronaut.rotation.y=Math.atan2(v.x,v.z);
-    animateAstronaut(this.astronaut,run.status==='failed'?'damaged':physics.anchored?'anchored':input.brake?'brake':input.thrusting?'thrust':'idle',time,run.paused?0:dt);
+    animateAstronaut(this.astronaut,run.status==='failed'?'damaged':physics.anchored?'anchored':input.brake?'brake':input.thrusting?'thrust':'idle',this.settings.reducedMotion?0:time,run.paused?0:dt);
     const crate=this.devices.find(d=>d.id==='crate');if(crate&&physics.crate){const c=physics.crate.translation();crate.mesh.position.set(c.x,c.y-.5133,c.z);crate.pos.set(c.x,c.y,c.z)}
     const optics=this.puzzle?.type==='reflection'?traceOptics(this.puzzle,puzzleState.angles):null;
-    for(const d of this.devices){if(d.id==='hazard'&&this.room.hazard==='arc')setDeviceState(d.mesh,arcPhase(time)==='active'?'danger':arcPhase(time)==='warning'?'ready':'offline');animateDevice(d.mesh,this.settings.reducedMotion?0:time);if(d.id.startsWith('mirror')){const pivot=d.mesh.getObjectByName('mirror-pivot');if(pivot&&optics?.normals[d.index]){const n=new THREE.Vector3(...optics.normals[d.index]);pivot.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);pivot.position.set(-n.x*.12,this.puzzle.mirrorPositions[d.index][1]-n.y*.12,-n.z*.12);}}if(d.id==='hazard'&&this.room.hazard==='debris')d.mesh.position.fromArray(debrisPosition(time))}
+    for(const d of this.devices){if(d.id==='hazard'&&this.room.hazard==='arc')setDeviceState(d.mesh,arcPhase(time)==='active'?'danger':arcPhase(time)==='warning'?'ready':'offline');animateDevice(d.mesh,this.settings.reducedMotion?0:time);if(d.id.startsWith('mirror')){const pivot=d.mesh.getObjectByName('mirror-pivot');if(pivot&&optics?.normals[d.index]){const n=new THREE.Vector3(...optics.normals[d.index]);pivot.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);pivot.position.set(-n.x*.12,this.puzzle.mirrorPositions[d.index][1]-n.y*.12,-n.z*.12);}}if(d.id==='hazard'&&this.room.hazard==='debris'){d.mesh.position.fromArray(debrisPosition(time));d.pos.copy(d.mesh.position)}}
     const points=[];
     if(physics.tethered&&physics.crate){const c=physics.crate.translation();points.push(new THREE.Vector3(p.x,p.y,p.z),new THREE.Vector3(c.x,c.y,c.z))}
     else if(this.puzzle?.type==='reflection'){
@@ -109,5 +147,5 @@ export class StationView {
     this.renderer.render(this.scene,this.camera);
   }
   dispose(){this.resizeObserver.disconnect();this.markerLayer.remove();const gs=new Set(),ms=new Set(),ts=new Set();const collect=g=>g.traverse(o=>{if(o.geometry)gs.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[]){ms.add(m);for(const v of Object.values(m))if(v?.isTexture)ts.add(v)}});collect(this.scene);for(const c of this.cache.values())collect(c.group);for(const t of ts)t.dispose();for(const m of ms)m.dispose();for(const g of gs)g.dispose();this.cache.clear();this.renderer.dispose()}
-  telemetry(){if(!this.gpu){const gl=this.renderer.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');this.gpu={vendor:ext?gl.getParameter(ext.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),renderer:ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)}}return {gpu:this.gpu,drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,quality:this.settings.quality,dpr:this.renderer.getPixelRatio(),camera:this.mode}}
+  telemetry(){if(!this.gpu){const gl=this.renderer.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');this.gpu={vendor:ext?gl.getParameter(ext.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),renderer:ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)}}return {gpu:this.gpu,drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,quality:this.settings.quality,software:this.software,drawingBuffer:[this.canvas.width,this.canvas.height],dpr:this.renderer.getPixelRatio(),camera:this.mode}}
 }

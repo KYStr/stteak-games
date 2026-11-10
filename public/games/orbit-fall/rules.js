@@ -190,7 +190,7 @@ export function legalizeSnapshot(snapshot, bounds = ROOM_BOUNDS) {
   if (!snapshot || typeof snapshot !== 'object') return { objects: [] };
   const objects = Array.isArray(snapshot.objects) ? snapshot.objects : [];
   const ids = new Set();
-  return { objects: objects.slice(0, 32).flatMap(object => {
+  const clean = { objects: objects.slice(0, 32).flatMap(object => {
     if (!object || typeof object.id !== 'string' || !/^(device|crate|mirror|valve)-[a-z0-9-]+$/.test(object.id) || ids.has(object.id)) return [];
     ids.add(object.id);
     const position = [0, 1, 2].map(axis => Math.max(bounds.min[axis], Math.min(bounds.max[axis], Number.isFinite(object.position?.[axis]) ? object.position[axis] : axis === 1 ? 1 : 0)));
@@ -198,6 +198,10 @@ export function legalizeSnapshot(snapshot, bounds = ROOM_BOUNDS) {
     const length = Math.hypot(...rotation);
     return [{ id: object.id, position, rotation: length > 0.0001 ? rotation.map(value => value / length) : [0, 0, 0, 1], velocity: [0, 0, 0] }];
   }) };
+  if(Array.isArray(snapshot.player)&&snapshot.player.length===3&&snapshot.player.every(Number.isFinite))clean.player=snapshot.player.map((n,i)=>Math.max(bounds.min[i],Math.min(bounds.max[i],n)));
+  if(Array.isArray(snapshot.angles))clean.angles=snapshot.angles.slice(0,3).map(n=>Number.isInteger(n)&&n>=0&&n<8?n:0);
+  if(Array.isArray(snapshot.sequence))clean.sequence=snapshot.sequence.slice(0,4).filter(n=>Number.isInteger(n)&&n>=0&&n<3);
+  return clean;
 }
 
 export function storeSnapshot(run, roomId, snapshot) {

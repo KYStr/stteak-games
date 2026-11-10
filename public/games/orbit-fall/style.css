@@ -19,3 +19,13 @@
 @media(max-height:500px){#game:has(#save-status:not([hidden])) .hud{top:42px}#game:has(#save-status:not([hidden])) .objective{top:127px;max-width:260px}#game:has(#save-status:not([hidden])) .objective h1{font-size:14px;line-height:1.35;margin:4px 0}#game:has(#save-status:not([hidden])) .objective p{font-size:11px}#game:has(#save-status:not([hidden])) #progress{margin-top:4px;font-size:10px}}
 
 .player-backup{display:grid;gap:12px;min-width:0}.player-backup p{margin:0;overflow-wrap:anywhere}.player-backup input[type=file]{width:100%;max-width:100%;padding:10px;border:1px solid #77939b88;color:inherit;background:#071520}.player-backup button{min-height:44px;white-space:normal}.player-backup [hidden]{display:none!important}.player-backup a{color:#b9e2ee;overflow-wrap:anywhere} /* 故事備份面板沿原視覺，窄螢幕可讀且明示隱藏/44px操作區。 */
+
+/* Mission typography stays crisp above the independently scaled 3D canvas. */
+.mission-strip{display:flex;gap:20px;padding:15px 0;border-top:1px solid #54747f60;border-bottom:1px solid #54747f60;font:10px ui-monospace,monospace;color:#e9b672;letter-spacing:2px}
+.start-panel h2{font-size:52px;letter-spacing:8px;margin-top:22px}.start-panel .actions{display:grid;grid-template-columns:1fr 1fr}.start-panel .actions .primary{grid-column:1/-1;padding:16px;font-size:16px}.start-panel .actions button{font-size:12px;min-height:44px}.start-panel .lead{margin-top:24px;font-size:19px}
+.overlay[data-screen=start]{justify-content:flex-start;background:linear-gradient(90deg,#03101bf5,#03101b9c 58%,#03101b15);backdrop-filter:none;padding-left:6vw}.start-panel{background:linear-gradient(130deg,#152c39ed,#071520ed);width:min(550px,90vw);padding:32px 38px;border-top:2px solid #e9b672;box-shadow:0 25px 100px #0005}
+@media(min-width:1600px){.overlay[data-screen=start]{padding-left:10vw}.start-panel{width:610px;padding:42px 48px}.start-panel h2{font-size:64px}}
+@media(max-width:700px){.overlay[data-screen=start]{justify-content:center;padding:16px;background:#03101bb8}.start-panel{padding:24px}.start-panel h2{font-size:36px}.start-panel .lead{font-size:16px}.mission-strip{gap:14px}}
+@media(max-height:740px){.start-panel{padding:24px 32px}.start-panel h2{font-size:42px;margin:12px 0}.start-panel .lead{font-size:16px;margin:16px 0}.start-panel .meta{margin-top:16px}.start-panel .actions{margin-top:16px}.mission-strip{padding:10px 0}}
+
+#game:has(.overlay[data-screen=start]:not([hidden])) :is(.hud,.objective,.controls,.telemetry,.proximity,#world-markers,#toast){visibility:hidden}

@@ -8,6 +8,7 @@ export class PhysicsRoom {
     wall(0,-.3,0,9,.3,8);wall(0,8.3,0,9,.3,8);wall(-9.3,4,0,.3,4,8);wall(9.3,4,0,.3,4,8);wall(0,4,-8.3,9,4,.3);wall(0,4,8.3,9,4,.3);
     this.player=this.world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(0,1.8,5).lockRotations().setLinearDamping(.17).setCcdEnabled(true));
     this.world.createCollider(RAPIER.ColliderDesc.capsule(.38,.36).setMass(1).setFriction(.2).setContactSkin(.06),this.player);
+    if(snapshot?.player)this.player.setTranslation({x:snapshot.player[0],y:snapshot.player[1],z:snapshot.player[2]},true);
     this.crate=null;this.tethered=false;this.anchored=false;this.target=puzzle?.target;this.steps=0;
     // Visual mesh origins are independent from these simplified static volumes.
     const fixture=(x,y,z,hx,hy,hz)=>wall(x,y,z,hx,hy,hz);
@@ -50,6 +51,6 @@ export class PhysicsRoom {
   magnet(){const p=this.player.translation();if(this.anchored){this.anchored=false;return true}if(p.y<1.4||p.y>6.7||Math.abs(p.x)>7.4||Math.abs(p.z)>6.4){this.anchored=true;return true}return false}
   tether(){if(!this.crate)return 'missing';if(this.tethered){this.tethered=false;return 'released'}const a=this.player.translation(),b=this.crate.translation();if(Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)>4.2)return 'far';this.tethered=true;return 'attached'}
   reset(puzzle){if(this.crate){this.crate.setTranslation({x:puzzle.crateStart[0],y:puzzle.crateStart[1],z:puzzle.crateStart[2]},true);this.crate.setLinvel({x:0,y:0,z:0},true)}this.tethered=false}
-  snapshot(){if(!this.crate)return {objects:[]};const p=this.crate.translation();return {objects:[{id:'crate-battery',position:[p.x,p.y,p.z],rotation:[0,0,0,1]}]}}
+  snapshot(){const a=this.player.translation(),player=[a.x,a.y,a.z];if(!this.crate)return {objects:[],player};const p=this.crate.translation();return {player,objects:[{id:'crate-battery',position:[p.x,p.y,p.z],rotation:[0,0,0,1]}]}}
   dispose(){this.world.free()}
 }
