@@ -544,7 +544,11 @@ export class AetherScene {
     WORLD.winds.forEach((data) => {
       const group = createWorldWind(data);
       this.scene.add(group);
-      this.winds.push({ data, group });
+      const halfLength = data.start ? Math.hypot(data.end.x - data.start.x, data.end.z - data.start.z) / 2 : 0;
+      // Conservative world bounds include the full corridor, not just its centre.
+      const radius = Math.hypot(halfLength, data.radius || 10, 40);
+      const bounds = new THREE.Sphere(group.position.clone(), radius);
+      this.winds.push({ data, group, halfLength, bounds, animationDt: 0 });
     });
     this.hazards = WORLD.hazards.map((data) => {
       const group = new THREE.Group();
@@ -700,6 +704,12 @@ export class AetherScene {
     this.reduced = false;
     this.menu = true;
     this.target = new V();
+    this.projection = new V();
+    this.worldPoint = new V();
+    this.playerPoint = new V();
+    this.windFrustum = new THREE.Frustum();
+    this.viewProjection = new THREE.Matrix4();
+    this.phase = { sceneUpdateMs: 0, renderCpuMs: 0 };
     this.ray = new THREE.Raycaster();
     this.frames = [];
     this.metrics = {
@@ -720,6 +730,9 @@ export class AetherScene {
     this.resize = () => {
       const w = canvas.clientWidth,
         h = canvas.clientHeight;
+      this.viewportWidth = w;
+      this.viewportHeight = h;
+      this.navTarget.style.width = `${Math.min(260, w - 24)}px`;
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
@@ -832,22 +845,34 @@ export class AetherScene {
     }
   }
   updateWorldWinds(state, dt) {
-    for (const { data, group } of this.winds) {
-      // Far corridors stay in the simulation and map, but their animated
-      // instanced arrows need no matrix uploads outside the local flight view.
-      const reach = (this.menu ? 850 : 420) + (data.start
-        ? Math.hypot(data.end.x - data.start.x, data.end.z - data.start.z) / 2
-        : data.radius);
-      const active = routeWindActive(data, state) &&
-        Math.hypot(data.x - state.player.x, data.z - state.player.z) < reach;
-      group.visible =
-        active &&
-        (data.type !== "crosswind" ||
-          Math.sin(
-            (state.elapsed / data.period) * Math.PI * 2 +
-              ((state.seed % 1009) / 1009) * Math.PI * 2,
-          ) > 0);
-      if (group.visible) group.userData.update?.(this.reduced ? 0 : dt);
+    const low = this.quality === "low" || (this.quality === "auto" && this.autoScale < .9);
+    this.viewProjection.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+    this.windFrustum.setFromProjectionMatrix(this.viewProjection);
+    let nearest = null, nearestDistance = Infinity;
+    for (const wind of this.winds) {
+      if (!wind.data.start || !routeWindActive(wind.data, state)) continue;
+      const { start, end } = wind.data;
+      const dx = end.x - start.x, dz = end.z - start.z;
+      const t = THREE.MathUtils.clamp(((state.player.x - start.x) * dx + (state.player.z - start.z) * dz) / (dx * dx + dz * dz || 1), 0, 1);
+      const distance = Math.hypot(state.player.x - start.x - t * dx, state.player.z - start.z - t * dz);
+      if (distance < nearestDistance) { nearest = wind; nearestDistance = distance; }
+    }
+    for (const wind of this.winds) {
+      const { data, group, halfLength, bounds } = wind;
+      const distance = Math.hypot(data.x - state.player.x, data.z - state.player.z);
+      const reach = (this.menu ? 850 : 420) + (halfLength || data.radius);
+      const localThermal = !data.start && distance < (data.radius || 0) + 30;
+      const inView = !low || wind === nearest || localThermal || this.windFrustum.intersectsSphere(bounds);
+      // Evaluate route membership and pulsing cues every frame, even when the
+      // decorative matrix uploads are throttled to 20 Hz on the low profile.
+      group.visible = routeWindActive(data, state) && distance < reach && inView &&
+        (data.type !== "crosswind" || Math.sin((state.elapsed / data.period) * Math.PI * 2 + ((state.seed % 1009) / 1009) * Math.PI * 2) > 0);
+      if (!group.visible || this.reduced) continue;
+      wind.animationDt += dt;
+      if (!low || wind.animationDt >= .05) {
+        group.userData.update?.(wind.animationDt);
+        wind.animationDt = 0;
+      }
     }
   }
   rotate(dx, dy) {
@@ -928,6 +953,8 @@ export class AetherScene {
     };
   }
   update(s, dt, time, objective) {
+    const updateStart = performance.now();
+    const w = this.viewportWidth, h = this.viewportHeight;
     if (this.reduced) time = 0;
     const p = s.player;
     const navigationView = navigationVisualState(s);
@@ -960,7 +987,6 @@ export class AetherScene {
         1.2 +
         (this.reduced ? 0 : Math.sin(time * 1.5 + data.x) * 0.25);
     }
-    this.updateWorldWinds(s, dt);
     for (const { data, marker } of this.challenges) {
       const visual = courseVisualState(data, s);
       marker.update(
@@ -1070,6 +1096,7 @@ export class AetherScene {
     for (const island of this.islands)
       for (const child of island.children)
         if (child.isLOD) child.update(this.camera);
+    this.updateWorldWinds(s, dt);
     this.foreground.update(this.camera, p, dt, !this.menu);
     const route = WORLD.routes.find((r) => r.id === s.objective?.routeId);
     let navigation = navigationView.target;
@@ -1090,12 +1117,11 @@ export class AetherScene {
       };
     }
     const nav = this.navTarget;
-    nav.style.display = navigation ? "" : "none";
+    const navDisplay = navigation ? "" : "none";
+    if (nav.style.display !== navDisplay) nav.style.display = navDisplay;
     if (navigation) {
-      const v = new V(navigation.x, navigation.y, navigation.z);
-      const projection = v.clone().project(this.camera),
-        w = this.canvas.clientWidth,
-        h = this.canvas.clientHeight;
+      const v = this.worldPoint.set(navigation.x, navigation.y, navigation.z);
+      const projection = this.projection.copy(v).project(this.camera);
       let x = (projection.x * 0.5 + 0.5) * w,
         y = (-projection.y * 0.5 + 0.5) * h;
       if (projection.z > 1) {
@@ -1109,15 +1135,10 @@ export class AetherScene {
         w - labelWidth / 2 - 8,
       );
       const anchorY = THREE.MathUtils.clamp(y, 100, h - 180);
-      nav.style.width = `${labelWidth}px`;
-      nav.style.left = `${anchorX}px`;
-      nav.style.top = `${anchorY}px`;
+      nav.style.transform = `translate3d(${anchorX}px, ${anchorY}px, 0) translate(-50%, -50%)`;
       const label = navigationView.label || navigation.label;
       const navText = this.navText;
-      navText.style.display = "inline-block";
-      navText.style.maxWidth = "100%";
-      navText.style.whiteSpace = "normal";
-      const navContent = `${label} · ${Math.round(v.distanceTo(new V(p.x, p.y, p.z)))}m${navigation.heading ? " · 順箭頭入環" : ""}`;
+      const navContent = `${label} · ${Math.round(v.distanceTo(this.playerPoint.set(p.x, p.y, p.z)))}m${navigation.heading ? " · 順箭頭入環" : ""}`;
       if (navText.textContent !== navContent) navText.textContent = navContent;
       this.navOcclusion.place(anchorX, anchorY);
     }
@@ -1125,11 +1146,11 @@ export class AetherScene {
     this.sun.target.position.copy(head);
     this.sun.target.updateMatrixWorld();
     for (const { label, data } of this.labels) {
-      const pos = new V(data.x, data.y + 14, data.z).project(this.camera);
+      const pos = this.projection.set(data.x, data.y + 14, data.z).project(this.camera);
       const distance = this.camera.position.distanceTo(
-        new V(data.x, data.y, data.z),
+        this.worldPoint.set(data.x, data.y, data.z),
       );
-      label.style.display =
+      const display =
         pos.z < 1 &&
         pos.z > -1 &&
         Math.abs(pos.x) < 1.1 &&
@@ -1137,14 +1158,19 @@ export class AetherScene {
         distance > 35
           ? "block"
           : "none";
-      label.style.left = `${(pos.x * 0.5 + 0.5) * this.canvas.clientWidth}px`;
-      label.style.top = `${(-pos.y * 0.5 + 0.5) * this.canvas.clientHeight}px`;
-      label.style.opacity = Math.max(
+      if (label.style.display !== display) label.style.display = display;
+      if (display === "none") continue;
+      label.style.transform = `translate3d(${(pos.x * .5 + .5) * w}px, ${(-pos.y * .5 + .5) * h}px, 0) translate(-50%, -100%)`;
+      const opacity = String(Math.max(
         0.35,
         1 - distance / (750 * this.mapScale),
-      );
+      ));
+      if (label.style.opacity !== opacity) label.style.opacity = opacity;
     }
+    const renderStart = performance.now();
+    this.phase.sceneUpdateMs = renderStart - updateStart;
     this.renderer.render(this.scene, this.camera);
+    this.phase.renderCpuMs = performance.now() - renderStart;
     const r = this.renderer.info;
     this.metrics = {
       frames: this.metrics.frames + 1,

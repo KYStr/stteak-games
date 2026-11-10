@@ -5,6 +5,7 @@ import { AetherScene } from "./scene.js";
 import { FlightInput } from "./input.js";
 import { AudioEngine } from "./audio.js";
 import { HostBridge } from "./bridge.js";
+import { TimingSamples } from "./timing.js";
 import { BUILD } from "./version.js";
 const $ = (s) => document.querySelector(s),
   show = (s, on = true) => $(s).classList.toggle("hidden", !on),
@@ -52,6 +53,7 @@ let scene,
   previous = performance.now(),
   uiClock = 0;
 const store = new SaveStore();
+const timing = new TimingSamples(["simulationMs", "sceneUpdateMs", "renderCpuMs", "hudMapMs", "rafIntervalMs"]);
 const frames = [];
 let frameCount = 0,
   elapsedSample = 0,
@@ -196,7 +198,10 @@ function dismissModal() {
     if (!started) return closeModal();
     return sim.status === "complete" ? showResults() : openPause();
   }
-  if (started && sim.status !== "complete") return resume();
+  if (started) {
+    if (sim.status === "complete") return showResults();
+    return resume();
+  }
   closeModal();
 }
 let modalFocusGeneration = 0;
@@ -231,8 +236,12 @@ function setModal(
     if (!["modal", "toast", "storage-warning", "fatal"].includes(child.id)) child.inert = true;
   requestAnimationFrame(() => {
     if (focusGeneration !== modalFocusGeneration || !modalKind) return;
-    (kind === "courses" ? $("#close-modal") : $("#modal-actions button") || $("#close-modal")).focus();
-    if (kind === "courses") $(".modal-panel").scrollTop = 0;
+    const panel = $("#modal .modal-panel");
+    const primary = $("#modal-actions button"), close = $("#close-modal");
+    const longContent = panel.scrollHeight > panel.clientHeight;
+    const readingDialog = ["help", "journal", "courses"].includes(kind);
+    panel.scrollTop = 0;
+    (readingDialog || longContent ? close : primary || close).focus({ preventScroll: true });
   });
 }
 function closeModal(restore = true) {
@@ -286,7 +295,13 @@ function bindSettings() {
     persist();
   };
 }
+function returnToSessionMenu() {
+  if (!started) return closeModal();
+  if (sim.status === "complete") return showResults();
+  return openPause();
+}
 function openPause(title = "在風停下來的地方") {
+  if (started && sim.status === "complete") return showResults();
   setModal(
     "pause",
     title,
@@ -360,10 +375,14 @@ function openCourses() {
   const canChoose = !started || sim.player.grounded;
   setModal("courses", "帶回下一份風的答案",
     `<p class="modal-note">${canChoose ? "在安全地面選擇一趟遠征，再沿安全接駁風標到指定島金環開始。" : "請先安全落島，再選擇遠征；空中可先閱讀各課程。"}完成一段後落島按 E 交付；已交付階段保存。退出會返回最後安全島，只放棄未交付段。</p><div class="journal-list">${WORLD.challenges.map(c => `<div><b>${escape(c.name)} · ${sim.state.courseStages[c.id] || 0}/${c.stages?.length || 1} 段</b><p>${escape(c.description)}<br>下一出發點：${escape(islandById(sim.courseStage(c)?.fromIslandId || c.islandId).name)}${sim.state.completedChallenges.includes(c.id) ? " · 已取得完成徽記" : ""}</p></div>`).join("")}</div>`,
-    [{ label: "自由探索（保留進度）", primary: true, action: () => {
+    [{ label: sim.state.activeChallenge || sim.state.trackedHint ? "退出遠征並自由探索（保留進度）" : "自由探索（保留進度）", primary: true, action: () => {
       if (!started) begin(loaded.elapsed > 0);
+      if (sim.state.activeChallenge || sim.state.trackedHint) {
+        sim.cancelChallenge();
+        handleEvents();
+      }
       if (sim.status === "complete") { sim.status = "paused"; guideHidden = true; }
-      resume(); updateHud();
+      resume(); persist(); updateHud();
     } }, ...WORLD.challenges.filter(c => !sim.challenges.includes(c.id)).map(c => ({ label: `標記 ${c.name}`, disabled: !canChoose, action: () => {
       if (!started) begin(loaded.elapsed > 0);
       if (!sim.trackChallenge(c.id)) return;
@@ -380,7 +399,7 @@ function openSettings() {
       {
         label: "完成",
         primary: true,
-        action: () => (started ? openPause() : closeModal()),
+        action: returnToSessionMenu,
       },
       {
         label: "重設全部進度",
@@ -777,6 +796,7 @@ function tick(now) {
   previous = now;
   if (contextLost) { raf = requestAnimationFrame(tick); return; }
   if (!document.hidden) scene.sampleFrame(rawFrameMs);
+  const simulationStart = performance.now();
   if (sim.status === "running") {
     accumulator += dt;
     let steps = 0;
@@ -786,18 +806,23 @@ function tick(now) {
     }
     handleEvents();
   }
+  const simulationMs = performance.now() - simulationStart;
   scene.update(sim.state, Math.min(dt, 0.05), now / 1000, sim.state.objective);
   audio.update({
     speed: Math.hypot(sim.player.vx, sim.player.vz),
     energy: sim.player.energy,
     wind: sim.state.wind.length > 0,
   });
+  const hudStart = performance.now();
   uiClock += dt;
   if (uiClock > 0.1) {
     updateHud();
     uiClock = 0;
   }
   if (started && sim.status === "running") {
+    timing.push({ simulationMs, sceneUpdateMs: scene.phase.sceneUpdateMs,
+      renderCpuMs: scene.phase.renderCpuMs, hudMapMs: performance.now() - hudStart,
+      rafIntervalMs: rawFrameMs });
     frameCount++;
     elapsedSample += dt;
     frames.push(rawFrameMs);
@@ -939,6 +964,7 @@ async function initialize() {
           debug = gl.getExtension("WEBGL_debug_renderer_info");
         return {
           ...scene.metrics,
+          phases: timing.summary(),
           camera: scene.inspectCamera(sim.player),
           frameCount,
           averageMs: frames.length ? frames.reduce((a, b) => a + b, 0) / frames.length : null,

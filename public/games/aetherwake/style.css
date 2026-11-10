@@ -77,6 +77,8 @@ kbd {
 }
 .island-label {
   position: absolute;
+  left: 0;
+  top: 0;
   text-align: center;
   transform: translate(-50%, -100%);
   text-shadow: 0 2px 8px #153f47;
@@ -715,6 +717,8 @@ h2 {
 }
 #nav-target {
   position: absolute;
+  left: 0;
+  top: 0;
   pointer-events: none;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -729,10 +733,12 @@ h2 {
   font-weight: 400;
 }
 #nav-target span {
+  display: inline-block;
+  max-width: 100%;
   background: #143b46bb;
   padding: 4px 7px;
   border-radius: 3px;
-  white-space: nowrap;
+  white-space: normal;
 }
 #course {
   position: absolute;
