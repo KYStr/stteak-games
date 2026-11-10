@@ -9,7 +9,7 @@ const clamp = (n, min, max) => Math.max(min, Math.min(max, n)); // 限制數值�
 const finite = (n, fallback, min = 0, max = 86400) => Number.isFinite(n) ? clamp(n, min, max) : fallback; // 只接受有限數字，否則使用安全預設。
 
 export function defaultSave() { // 每次建立獨立預設存檔。
-  return { schema: 1, unlocked: 1, bests: {}, medals: {}, packets: [], endings: [], pendingEnding: false, activeLevel: null, settings: { music: .45, sfx: .7, reducedMotion: false, quality: 'auto', touchControls: 'auto', bindings: { ...DEFAULT_BINDINGS } }, checkpoint: null }; // 新進度維持 schema 一，入口與安全點都可為空。
+  return { schema: 1, unlocked: 1, bests: {}, medals: {}, packets: [], endings: [], pendingEnding: false, activeLevel: null, settings: { music: .45, sfx: .7, muted: false, reducedMotion: globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false, quality: 'auto', touchControls: 'auto', bindings: { ...DEFAULT_BINDINGS } }, checkpoint: null }; // 新進度維持 schema 一，入口與安全點都可為空。
 } // 結束此驗證或處理區塊。
 
 /** 回傳獨立且有界的存檔；無法信任外層格式時回傳空值。 */
@@ -35,13 +35,14 @@ export function validateSave(raw) { // 驗證並正規化不可信的外部存�
   if (settings && typeof settings === 'object') { // 只處理物件格式的設定。
     data.settings.music = finite(settings.music, .45, 0, 1); // 音樂音量限制在零至一。
     data.settings.sfx = finite(settings.sfx, .7, 0, 1); // 音效音量限制在零至一。
-    data.settings.reducedMotion = settings.reducedMotion === true; // 減少動態僅接受布林真值。
+    data.settings.muted = settings.muted === true;
+    data.settings.reducedMotion = typeof settings.reducedMotion==='boolean'?settings.reducedMotion:data.settings.reducedMotion; // 減少動態僅接受布林真值。
     data.settings.quality = ['auto', 'low', 'high'].includes(settings.quality) ? settings.quality : 'auto'; // 畫質只接受既有選項。
     data.settings.touchControls = ['auto', 'on', 'off'].includes(settings.touchControls) ? settings.touchControls : 'auto'; // 觸控顯示只接受既有選項。
     const taken = new Set(); // 追蹤已使用按鍵避免重複。
     for (const [action, fallback] of Object.entries(DEFAULT_BINDINGS)) { // 每個既有動作都取得有效按鍵或預設值。
       const key = settings.bindings?.[action]; // 讀取此動作的保存按鍵。
-      const valid = typeof key === 'string' && /^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Escape|ShiftLeft|ControlLeft)$/.test(key) && !taken.has(key); // 按鍵須在白名單且未被其他動作使用。
+      const valid = (action==='pause'?key==='Escape':key!=='Escape') && typeof key === 'string' && /^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Escape|ShiftLeft|ControlLeft)$/.test(key) && !taken.has(key); // 按鍵須在白名單且未被其他動作使用。
       data.settings.bindings[action] = valid ? key : fallback; // 不合法按鍵回到已知預設。
       taken.add(data.settings.bindings[action]); // 記錄本次選定按鍵。
     } // 結束此驗證或處理區塊。

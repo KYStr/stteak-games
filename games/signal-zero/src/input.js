@@ -23,6 +23,6 @@ export class Input{
  hold(action,value){if(value){if(!this.down.has(action))this.pressed.add(action);this.down.add(action)}else this.down.delete(action)}
  read(){const d=this.down,p=this.pressed,result={axis:Number(d.has('right'))-Number(d.has('left')),jumpHeld:d.has('jump'),jumpPressed:p.has('jump'),crouch:d.has('crouch'),up:d.has('up'),interactPressed:p.has('up'),toolPressed:p.has('tool'),cyclePressed:p.has('cycle')};this.pressed.clear();return result}
  // Transitions clear actions, not ownership of physically held keys.
- clear(){this.capture=null;this.down.clear();this.pressed.clear();this.keyActions.clear();this.pointers.clear();document.querySelectorAll('.held').forEach(n=>n.classList.remove('held'))}
+ clear(){this.capture=null;if(this.pointers.size){const ids=[...this.pointers.keys()];for(const button of document.querySelectorAll('[data-input]'))for(const id of ids)if(button.hasPointerCapture?.(id))button.releasePointerCapture(id)}this.down.clear();this.pressed.clear();this.keyActions.clear();this.pointers.clear();document.querySelectorAll('.held').forEach(n=>n.classList.remove('held'))}
  dispose(){this.abort.abort();this.clear();this.claimedKeys.clear()}
 }

@@ -253,7 +253,9 @@ function patrol(run, device, dt) {
   if (device.type !== 'guard' && device.type !== 'drone') return;
   if (device.x >= device.max) device.dir = -1;
   if (device.x <= device.min) device.dir = 1;
+  const before=device.x;
   moveDevice(run, device, device.dir * device.speed * dt);
+  if(Math.abs(device.x-before)<device.speed*dt*.25)device.dir*=-1;
 }
 
 function updateDevices(run, dt) {
@@ -335,7 +337,7 @@ function updateObjectives(run, input, dt) {
   const reachedIndex = checkpoints.findIndex((point, index) => index > run.checkpointIndex && Math.abs(p.x - point.x) < 1.5 && Math.abs(p.y - point.y) < .5);
   if (reachedIndex >= 0 && run.objectives.length > 0 && run.alertState !== 'tracking' && run.alertState !== 'searching') {
     run.checkpointReached = true; run.checkpointIndex = reachedIndex; run.checkpoint = makeSnapshot(run);
-    emit(run, 'checkpoint', `安全 checkpoint ${reachedIndex + 1}/${checkpoints.length} 已保存`);
+    emit(run, 'checkpoint', `安全點 ${reachedIndex + 1}/${checkpoints.length} 已保存`);
   }
   if (Math.abs(p.x - level.exit.x) < 1.6 && Math.abs(p.y - level.exit.y) < .7) {
     if (run.objectives.length === level.terminals.length) {

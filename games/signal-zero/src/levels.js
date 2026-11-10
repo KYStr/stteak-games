@@ -111,10 +111,10 @@ const CHAPTER_SECTORS = [
 function extendedChapter(intro, index) {
   const chapter = CHAPTER_SECTORS[index];
   const end = chapter.at(-1)[0] + 139;
-  const result = { ...intro, revision: 2, length: end, timeTarget: 265 + index * 15,
+  const result = { ...intro, revision: 3, length: end, timeTarget: 265 + index * 15,
     platforms: intro.platforms.filter(p => p.id !== 'ground').map(p => ({ ...p })), covers: intro.covers.map(c => ({ ...c })), ladders: intro.ladders.map(l => ({ ...l })), devices: intro.devices.map(d => ({ ...d })),
     terminals: [{ ...intro.terminals[0] }], sectors: [{ id: 'arrival', name: '抵達 / ' + intro.name.slice(5), start: 0, end: chapter[0][0], hint: intro.brief }], gaps: [],
-    exit: { x: end - 5, y: 0 }, checkpoints: [], upperEntries: intro.ladders.filter((_, i) => i % 2 === 0).map(l => ({ ...l })), supplies: [3, 3, 3],
+    exit: { x: end - 5, y: 0 }, checkpoints: [{id:'arrival-safe',x:intro.terminals[0].x+3,y:0}], upperEntries: intro.ladders.filter((_, i) => i % 2 === 0).map(l => ({ ...l })), supplies: [3, 3, 3],
   };
   for (let i = 0; i < chapter.length; i++) {
     const [start, type, name, objective] = chapter[i];
@@ -140,7 +140,7 @@ function extendedChapter(intro, index) {
     if (layout.drone) { const [x, y, min, max] = layout.drone; result.devices.push(drone(`${prefix}-drone`, start + x, y, start + min, start + max, i % 2 ? 1 : -1)); }
     result.gaps.push({ x: start + layout.gap[0], w: layout.gap[1] });
     if (objective) result.terminals.push({ id: `${prefix}-node`, x: start + 132, y: 0, kind: i === 3 ? 'data' : 'rewrite', label: objective });
-    if (i === 1 || i === 3) result.checkpoints.push({ id: `${prefix}-safe`, x: start + 134.5, y: 0 });
+    if (i === 1 || i === 3 || i === 5) result.checkpoints.push({ id: `${prefix}-safe`, x: start + 134.5, y: 0 });
     if (i === 4) {
       const roof = roofs[Math.floor(roofs.length / 2)];
       result.packet = { x: roof.x, y: roof.y + roof.h / 2 };
