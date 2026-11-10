@@ -58,6 +58,7 @@ test('actual customization click handler retains failed writes across redraw and
     const f=fixture();f.notifications.open('customize');f.dialog.open=true;f.notifications.show('previous failure');
     let click,redraws=0,previewCount=0,patch;
     const context=vm.createContext({
+      contextLost:false,
       $:selector=>selector==='#modal-content'?{addEventListener:(event,callback)=>{click=callback;}}:null,
       audio:{unlock(){},click(){}},commitSettings:value=>{patch=value;if(ok)f.notifications.clearModal();else f.notifications.show('write failure');},
       showPreview:()=>previewCount++,customize:()=>{redraws++;f.notifications.open('customize');},

@@ -72,7 +72,8 @@ function sanitize(raw) {
 export function loadSave(storage) {
   const target=getStorage(storage);if(!target){const save=emptySave();save.notice='此瀏覽器無法使用本機儲存；本次進度僅保留至離開。';return save;}
   try {
-    const text=target.getItem(SAVE_KEY);if(!text)return emptySave();
+    const text=target.getItem(SAVE_KEY);
+    if(!text){const backup=target.getItem(BACKUP_KEY);if(!backup)return emptySave();try{const parsed=JSON.parse(backup);if(!plain(parsed))throw Error('Invalid backup');const save=sanitize(parsed);save.notice='主要存檔遺失，已恢復上次可讀備份。';return save;}catch{const save=emptySave();save.notice='本機存檔無法讀取，已安全建立新進度。';return save;}}
     try {
       const parsed=JSON.parse(text);if(!plain(parsed))throw Error('Invalid save');return sanitize(parsed);
     }catch {

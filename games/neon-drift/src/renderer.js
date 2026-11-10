@@ -1,5 +1,6 @@
 import {resolveTrackTheme,DISTRICT_LOD} from './presentation.js'; // 資料主題與資產配方共用契約，原場景佈局不變。
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TRACKS, COLORS, sampleTrack } from './content.js';
 import { makeVehicle, VEHICLE_SPECS } from '../../../assets/games/neon-drift/sources/models.js';
@@ -16,9 +17,10 @@ export function ghostVehicleId(pose){return pose&&Object.hasOwn(VEHICLE_SPECS,po
 
 export function createRenderer(canvas,initialOptions={}){
   let options={quality:'auto',speedFov:true,reducedMotion:false,...initialOptions};
-  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false,powerPreference:'high-performance'});
   const gl=renderer.getContext();
   const adapterInfo=gl.getExtension('WEBGL_debug_renderer_info');const adapter=adapterInfo?gl.getParameter(adapterInfo.UNMASKED_RENDERER_WEBGL):null;
+  const software=/swiftshader|llvmpipe|software/i.test(adapter||'');
   const gpuTimer=gl.getExtension('EXT_disjoint_timer_query_webgl2');
   const gpuMsSamples=[],gpuSamples=[],gpuQueries=[],gpuSampleLimit=5000;
   let renderedFrames=0,renderSubmitMs=null,renderSubmitMaxMs=null,gpuSampleTotal=0,gpuPollCount=0,gpuDisjointCount=0;
@@ -82,6 +84,7 @@ export function createRenderer(canvas,initialOptions={}){
   const ghostAnchor=new THREE.Group();scene.add(ghostAnchor);ghostAnchor.visible=false;
   const headlight=new THREE.SpotLight(0xa4e4ff,55,48,Math.PI*.19,.6,1.2);headlight.position.set(0,1.3,1.7);headlight.target.position.set(0,.1,20);carAnchor.add(headlight,headlight.target);
   const carLight=new THREE.PointLight(0x14ddd1,4,7,2);carLight.position.set(0,.55,0);carAnchor.add(carLight);
+  if(software){headlight.visible=false;carLight.visible=false;}
   const contactShadow=new THREE.Group();contactShadow.name='soft-vehicle-contact-shadow';carAnchor.add(contactShadow);
   for(let i=0;i<3;i++){const shade=new THREE.Mesh(new THREE.CircleGeometry(1,32),new THREE.MeshBasicMaterial({color:0x01050b,transparent:true,opacity:[.08,.12,.23][i],depthWrite:false}));shade.rotation.x=-Math.PI/2;shade.scale.set(1.35-i*.12,2.5-i*.16,1);shade.position.y=.025+i*.003;contactShadow.add(shade);}
   let carModel=null,ghostModel=null,track=null,lastRace=0,cameraReady=false,wheelAngle=0,ghostWheelAngle=0,currentColor=0x21e6ce,currentDecal='stripes';
@@ -90,13 +93,15 @@ export function createRenderer(canvas,initialOptions={}){
   const smokeGeometry=new THREE.BufferGeometry();const smokePosition=new Float32Array(240*3);smokePosition.fill(0);smokeGeometry.setAttribute('position',new THREE.BufferAttribute(smokePosition,3));
   const smoke=new THREE.Points(smokeGeometry,new THREE.PointsMaterial({color:0xa7c5d4,size:.47,transparent:true,opacity:.2,depthWrite:false,sizeAttenuation:true}));smoke.frustumCulled=false;scene.add(smoke);
   let worldGeneration=0;let loadedCarAsset=null;const materialCache=new Map();
-  const mat=(key,color,roughness=.6,metalness=.1,emissive=0,intensity=0)=>{if(!materialCache.has(key))materialCache.set(key,new THREE.MeshStandardMaterial({name:key,color,roughness,metalness,emissive,emissiveIntensity:intensity}));return materialCache.get(key);};
+  const mat=(key,color,roughness=.6,metalness=.1,emissive=0,intensity=0)=>{if(!materialCache.has(key))materialCache.set(key,software?new THREE.MeshLambertMaterial({name:key,color,emissive,emissiveIntensity:intensity}):new THREE.MeshPhongMaterial({name:key,color,shininess:Math.max(4,(1-roughness)*70),specular:new THREE.Color(0x334455).multiplyScalar(.4+metalness),emissive,emissiveIntensity:intensity}));return materialCache.get(key);};
   function quality(){return options.quality==='auto'?(canvas.clientWidth<700?'low':'medium'):options.quality;}
   let resizeWidth=0,resizeHeight=0,resizePixelRatio=0,resizeCount=0;
   const drawingBufferSize=new THREE.Vector2();
   function resize(){
     const width=Math.max(1,canvas.clientWidth||window.innerWidth||1),height=Math.max(1,canvas.clientHeight||window.innerHeight||1);
-    const pixelRatio=Math.min(window.devicePixelRatio||1,quality()==='low'?1.25:quality()==='high'?2:1.5);
+    const cap=quality()==='low'?.7:quality()==='high'?1.25:1;
+    const softwareWidth=options.quality==='high'?1080:options.quality==='medium'?800:options.quality==='low'?540:640;
+    const pixelRatio=software?Math.min(cap,softwareWidth/width,softwareWidth*.5625/height):Math.min(window.devicePixelRatio||1,quality()==='low'?1:quality()==='high'?2:1.5);
     if(width===resizeWidth&&height===resizeHeight&&pixelRatio===resizePixelRatio)return;
     // Three.js 0.170.0 setPixelRatio() calls setSize() internally. The combined
     // API sets CSS-independent dimensions, DPR and viewport in one buffer pass.
@@ -110,7 +115,7 @@ export function createRenderer(canvas,initialOptions={}){
     for(const item of geometry)item.dispose();for(const item of ownedMaterials)item.dispose();for(const item of textures)item.dispose();
   }
   function disposeTree(root,materials=false){disposeObjects([root],materials);}
-  function instance(name,geometry,material,items){if(!items.length){geometry.dispose();return;}const mesh=new THREE.InstancedMesh(geometry,material,items.length);mesh.name=name;items.forEach((p,i)=>{temp.position.set(p.x,p.y,p.z);temp.rotation.set(p.rx||0,p.heading||0,p.rz||0);temp.scale.set(p.w??1,p.h??1,p.d??1);temp.updateMatrix();mesh.setMatrixAt(i,temp.matrix);if(p.color!==undefined)mesh.setColorAt(i,new THREE.Color(p.color));});mesh.instanceMatrix.needsUpdate=true;mesh.receiveShadow=true;world.add(mesh);return mesh;}
+  function instance(name,geometry,material,items){if(!items.length){geometry.dispose();return;}const mesh=new THREE.InstancedMesh(geometry,material,items.length);mesh.name=name;items.forEach((p,i)=>{temp.position.set(p.x,p.y,p.z);temp.rotation.set(p.rx||0,p.heading||0,p.rz||0);temp.scale.set(p.w??1,p.h??1,p.d??1);temp.updateMatrix();mesh.setMatrixAt(i,temp.matrix);if(p.color!==undefined)mesh.setColorAt(i,new THREE.Color(p.color));});mesh.instanceMatrix.needsUpdate=true;mesh.receiveShadow=true;mesh.frustumCulled=false;mesh.userData.lod={items,distance:185};world.add(mesh);return mesh;}
   function ribbon(points,width,key,material,yOffset=0){const vertices=[],uvs=[],indices=[];for(let i=0;i<points.length;i++){const p=points[i],w=typeof width==='function'?width(p,i):width;const nx=Math.cos(p.heading),nz=-Math.sin(p.heading);vertices.push(p.x-nx*w/2,p.y+yOffset,p.z-nz*w/2,p.x+nx*w/2,p.y+yOffset,p.z+nz*w/2);uvs.push(0,i*.3,1,i*.3);if(i<points.length-1){const a=i*2;indices.push(a,a+2,a+1,a+1,a+2,a+3);}}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(indices);g.computeVertexNormals();const mesh=new THREE.Mesh(g,material);mesh.name=key;mesh.receiveShadow=true;world.add(mesh);return mesh;}
   function offset(p,d){return {...p,x:p.x+Math.cos(p.heading)*d,z:p.z-Math.sin(p.heading)*d};}
   function resolveTrack(t){return typeof t==='string'?(Array.isArray(TRACKS)?TRACKS.find(v=>v.id===t):TRACKS[t]):t;}
@@ -187,10 +192,23 @@ export function createRenderer(canvas,initialOptions={}){
     // Moon is a lit sphere: no sky image is required by the renderer.
     const moonOrb=new THREE.Mesh(new THREE.SphereGeometry(8,16,12),mat('moon-orb',0xb3c9da,.6,.1,0x8196b3,.5));moonOrb.position.set(cx-120,155,cz-240);world.add(moonOrb);
   }
-  function recolor(model,ghost=false){const clones=new Map();model.traverse(o=>{if(!o.isMesh)return;const original=o.material;const materials=Array.isArray(original)?original:[original];o.material=materials.map(m=>{if(clones.has(m))return clones.get(m);const c=m.clone();if(ghost){c.transparent=true;c.opacity=.28;c.depthWrite=false;c.color.setHex(0x89edff);c.emissive?.setHex(0x278caf);c.emissiveIntensity=.7;}else if(c.name==='paint')c.color.setHex(currentColor);clones.set(m,c);return c;});if(!Array.isArray(original))o.material=o.material[0];});model.traverse(o=>{if(o.name.startsWith('decal-'))o.visible=o.name===`decal-${currentDecal}`;});}
+  function recolor(model,ghost=false){const clones=new Map();model.traverse(o=>{if(!o.isMesh)return;const original=o.material;const materials=Array.isArray(original)?original:[original];o.material=materials.map(m=>{if(clones.has(m))return clones.get(m);const c=software?new THREE.MeshPhongMaterial({name:m.name,color:m.color,emissive:m.emissive,emissiveIntensity:m.emissiveIntensity,shininess:m.name==='glass'?75:25,specular:0x223344}):m.clone();if(ghost){c.transparent=true;c.opacity=.28;c.depthWrite=false;c.color.setHex(0x89edff);c.emissive?.setHex(0x278caf);c.emissiveIntensity=.7;}else if(c.name==='paint')c.color.setHex(currentColor);clones.set(m,c);return c;});if(!Array.isArray(original))o.material=o.material[0];});model.traverse(o=>{if(o.name.startsWith('decal-'))o.visible=o.name===`decal-${currentDecal}`;});}
+  function batchVehicle(model){
+    model.updateMatrixWorld(true);const groups=new Map(),remove=[];
+    const inverse=model.matrixWorld.clone().invert();
+    model.traverse(mesh=>{if(!mesh.isMesh||Array.isArray(mesh.material))return;
+      let parent=mesh,visible=true,animated=false;while(parent&&parent!==model){if(!parent.visible)visible=false;if(parent.name.startsWith('wheel-'))animated=true;parent=parent.parent;}
+      if(animated)return;
+      remove.push(mesh);if(!visible)return;
+      const geometry=mesh.geometry.clone();geometry.applyMatrix4(inverse.clone().multiply(mesh.matrixWorld));
+      if(!groups.has(mesh.material))groups.set(mesh.material,[]);groups.get(mesh.material).push(geometry);
+    });
+    for(const [material,parts] of groups){const geometry=mergeGeometries(parts,false);for(const part of parts)part.dispose();if(geometry){const mesh=new THREE.Mesh(geometry,material);mesh.name='batched-'+material.name;model.add(mesh);}}
+    const oldGeometry=new Set();for(const mesh of remove){mesh.removeFromParent();oldGeometry.add(mesh.geometry);}for(const geometry of oldGeometry)geometry.dispose();
+  }
   function prepareVehicleMaterial(model,ghost=false){
     const sourceMaterials=new Set();model.traverse(o=>{if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])sourceMaterials.add(m);});
-    recolor(model,ghost);for(const m of sourceMaterials)m.dispose();
+    recolor(model,ghost);for(const m of sourceMaterials)m.dispose();batchVehicle(model);
   }
   function installPlayerModel(model){
     if(carModel)carAnchor.remove(carModel);disposeObjects([carModel],true);
@@ -220,7 +238,7 @@ export function createRenderer(canvas,initialOptions={}){
   function setRace(nextTrack,car='comet',color='mint',decal='stripes'){
     resetRenderTiming('setRace');
     track=resolveTrack(nextTrack);if(!track)throw new Error('Unknown Neon Drift track');
-    const race=++lastRace;clearGhostModel();
+    const race=++lastRace;clearGhostModel();lastLodUpdate=-1;
     const carId=typeof car==='string'?car:car.id;const rawColor=typeof color==='object'?(color.hex??color.color??color.value):color;
     currentColor=typeof rawColor==='number'?rawColor:PALETTE[rawColor]??(COLORS.find(c=>c.id===rawColor)?new THREE.Color(COLORS.find(c=>c.id===rawColor).hex).getHex():undefined)??(typeof rawColor==='string'&&rawColor.startsWith('#')?new THREE.Color(rawColor).getHex():0x21e6ce);
     currentDecal=typeof decal==='object'?decal.id:decal;currentDecal=({dual:'stripes',stripe:'stripes',pulse:'circuit',slash:'slash',none:'none'}[currentDecal]||currentDecal);
@@ -277,6 +295,6 @@ export function createRenderer(canvas,initialOptions={}){
   function setOptions(next){const old=quality();options={...options,...next};if(old!==quality()&&track){resetRenderTiming('quality-change');buildWorld();}resize();}
   function dispose(){lastRace++;worldGeneration++;clearGhostModel();resetGpuTiming();disposeTree(world);disposeObjects([carAnchor,ghostAnchor],true);smoke.geometry.dispose();smoke.material.dispose();for(const material of materialCache.values())material.dispose();renderer.dispose();}
   resize();
-  function readStats(includeSamples=true){return {calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,quality:quality(),loadedCarAsset,ghostCarId,ghostCarAsset,pixelRatio:renderer.getPixelRatio(),drawingBufferSize:renderer.getDrawingBufferSize(drawingBufferSize).toArray(),resizeCount,renderSubmitMs,renderSubmitMaxMs,renderSubmitTiming:'Live last/max CPU wall time of synchronous renderer.render since timing reset; continues after cpuTiming capture freezes; not GPU duration.',cpuTiming:cpuTimingSnapshot(includeSamples),camera:[camera.position.x,camera.position.y,camera.position.z],lightCount:5,shadowMaps:0,textureBytes:0,gpuMsSamples:gpuTimer?(includeSamples?[...gpuMsSamples]:omittedSamples(gpuMsSamples.length)):null,gpuSamples:gpuTimer?(includeSamples?gpuSamples.map(sample=>({...sample})):omittedSamples(gpuSamples.length)):null,gpuTimingDetails:gpuTimer?{epoch:timingEpoch,resetReason:timingResetReason,epochQuality,discardedEpochCount,...captureDetails(),capturePartial:discardedEpochCount>0||gpuSampleTotal>gpuSamples.length||gpuDisjointCount>0||(timingFrozenAt!==null&&gpuQueries.length>0),sampleLimit:gpuSampleLimit,sampleTotal:gpuSampleTotal,retainedCount:gpuSamples.length,overwrittenCount:Math.max(0,gpuSampleTotal-gpuSamples.length),pendingQueries:gpuQueries.length,unresolvedQueries:gpuQueries.length,pollCount:gpuPollCount,disjointCount:gpuDisjointCount,sampling:'Sparse submit-only GPU timer every 60 renders before capture freezes; not full-frame timing. Pending queries continue resolving after result with their issuing phase. Latest 5000 valid samples. capturePartial flags discarded quality epochs, overwritten samples, disjoint, or frozen capture with unresolved queries; unresolved alone clears when results arrive. discardedEpochCount counts quality resets since setRace.'}:null,gpuTimer:gpuTimer?'EXT_disjoint_timer_query_webgl2 / render GPU elapsed ms / every 60 frames before result':null,adapter,renderer:'Three.js 0.170.0 / WebGL2'};}
+  function readStats(includeSamples=true){return {calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,quality:quality(),software,loadedCarAsset,ghostCarId,ghostCarAsset,pixelRatio:renderer.getPixelRatio(),drawingBufferSize:renderer.getDrawingBufferSize(drawingBufferSize).toArray(),resizeCount,renderSubmitMs,renderSubmitMaxMs,renderSubmitTiming:'Live last/max CPU wall time of synchronous renderer.render since timing reset; continues after cpuTiming capture freezes; not GPU duration.',cpuTiming:cpuTimingSnapshot(includeSamples),camera:[camera.position.x,camera.position.y,camera.position.z],lightCount:software?3:5,shadowMaps:0,textureBytes:0,gpuMsSamples:gpuTimer?(includeSamples?[...gpuMsSamples]:omittedSamples(gpuMsSamples.length)):null,gpuSamples:gpuTimer?(includeSamples?gpuSamples.map(sample=>({...sample})):omittedSamples(gpuSamples.length)):null,gpuTimingDetails:gpuTimer?{epoch:timingEpoch,resetReason:timingResetReason,epochQuality,discardedEpochCount,...captureDetails(),capturePartial:discardedEpochCount>0||gpuSampleTotal>gpuSamples.length||gpuDisjointCount>0||(timingFrozenAt!==null&&gpuQueries.length>0),sampleLimit:gpuSampleLimit,sampleTotal:gpuSampleTotal,retainedCount:gpuSamples.length,overwrittenCount:Math.max(0,gpuSampleTotal-gpuSamples.length),pendingQueries:gpuQueries.length,unresolvedQueries:gpuQueries.length,pollCount:gpuPollCount,disjointCount:gpuDisjointCount,sampling:'Sparse submit-only GPU timer every 60 renders before capture freezes; not full-frame timing. Pending queries continue resolving after result with their issuing phase. Latest 5000 valid samples. capturePartial flags discarded quality epochs, overwritten samples, disjoint, or frozen capture with unresolved queries; unresolved alone clears when results arrive. discardedEpochCount counts quality resets since setRace.'}:null,gpuTimer:gpuTimer?'EXT_disjoint_timer_query_webgl2 / render GPU elapsed ms / every 60 frames before result':null,adapter,renderer:'Three.js 0.170.0 / WebGL2'};}
   return {setRace,render,resize,setOptions,dispose,get stats(){return readStats();},get summary(){return readStats(false);}};
 }

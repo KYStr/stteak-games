@@ -52,6 +52,11 @@ function finish(state,success=true) {
   state.reason=state.mode==='tutorial'?(tutorialDone?'教學完成 · 準備挑戰雙圈！':'練習時間到 · 可再練習未完成項目'):success?'挑戰完成':'超時 · 下次提早煞車，保住出彎速度';
   event(state,'finish',state.reason);
 }
+/** Complete the school early only after every driving task has been earned. */
+export function finishTutorial(state){
+  if(!state||state.mode!=='tutorial'||state.finished||!Object.values(state.tutorial).every(Boolean))return false;
+  finish(state,true);return true;
+}
 function recordLap(state) {
   const time=round(state.elapsed-state.lapStart);
   if(state.lapInvalid){state.reason='漏過檢查點，本圈無效';return;}
