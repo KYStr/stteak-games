@@ -1,4 +1,4 @@
-import * as T from 'three';
+import * as T from './vendor/three.module.js';
 import {createRunner,animateRunner,createSecurity,animateSecurity,createProp,createSetpiece,disposeInstance} from './models.js';
 import {visionFor} from './core.js';
 import {StaticStage} from './static-stage.js';

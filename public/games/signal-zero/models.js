@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import * as THREE from './vendor/three.module.js';
+import { mergeGeometries } from './vendor/BufferGeometryUtils.js';
 
 /** Signal Zero original modular asset kit. Metres, Y up, +X forward.
  * All materials and primitive geometries are shared; no frame-time geometry allocation.

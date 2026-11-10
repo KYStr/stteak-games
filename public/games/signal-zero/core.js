@@ -1,4 +1,4 @@
-import { Box3, Ray, Vector3 } from 'three';
+import { Box3, Ray, Vector3 } from './vendor/three.module.js';
 import { LEVELS } from './levels.js';
 
 export const PHYSICS = Object.freeze({ speed: 4.8, crouchSpeed: 2.15, gravity: 22, jumpSpeed: 10.7, radius: .325, height: 1.65, crouchHeight: .88, coyote: .1, buffer: .12 });

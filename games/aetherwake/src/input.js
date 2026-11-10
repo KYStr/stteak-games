@@ -4,10 +4,14 @@ export class FlightInput {
     this.axes = { x: 0, z: 0 };
     this.glide = false;
     this.touchBrake = false;
+    this.brakePointer = null;
     this.enabled = false;
     this.actions = actions;
     this.listeners = [];
+    this.disposed = false;
+    this.pointerCaptures = new Map();
     this.cameraPointer = null;
+    this.cameraMousePointer = null;
     this.joyPointer = null;
     const on = (el, type, fn, opts) => {
       el.addEventListener(type, fn, opts);
@@ -66,22 +70,54 @@ export class FlightInput {
       }
     });
     on(canvas, "contextmenu", (e) => e.preventDefault());
+    const hasButtons = (e) => Number.isInteger(e.buttons) && e.buttons >= 0;
+    const endCamera = (e) => {
+      if (
+        this.cameraMousePointer !== e.pointerId &&
+        this.cameraPointer?.id !== e.pointerId
+      ) return;
+      // Forget both the active drag and its mouse session before capture loss.
+      this.cameraPointer = null;
+      this.cameraMousePointer = null;
+      this.releasePointer(canvas, e.pointerId);
+    };
     on(canvas, "pointerdown", (e) => {
+      if (this.cameraPointer !== null || this.cameraMousePointer !== null) return;
+      if (e.pointerType === "mouse" && hasButtons(e)) {
+        if (!e.buttons || !this.capturePointer(canvas, e.pointerId)) return;
+        // Intermediate mouse presses/releases arrive as buttons changes on
+        // pointermove. Remember only sessions that actually began here.
+        this.cameraMousePointer = e.pointerId;
+        if (e.buttons & 2)
+          this.cameraPointer = { id: e.pointerId, x: e.clientX, y: e.clientY };
+        return;
+      }
       if (e.button === 2 || e.pointerType === "touch") {
+        if (!this.capturePointer(canvas, e.pointerId)) return;
         this.cameraPointer = { id: e.pointerId, x: e.clientX, y: e.clientY };
-        canvas.setPointerCapture(e.pointerId);
       }
     });
     on(canvas, "pointermove", (e) => {
+      if (this.cameraMousePointer === e.pointerId) {
+        if (!hasButtons(e) || e.pointerType === "touch") return;
+        if (!e.buttons) return endCamera(e);
+        if (!(e.buttons & 2)) {
+          this.cameraPointer = null;
+          return;
+        }
+        if (!this.cameraPointer) {
+          // A newly added/re-added right button starts at this position, not
+          // at an old left-button position, so acquisition cannot jump.
+          this.cameraPointer = { id: e.pointerId, x: e.clientX, y: e.clientY };
+          return;
+        }
+      }
       const p = this.cameraPointer;
       if (!p || p.id !== e.pointerId) return;
       actions.rotate((e.clientX - p.x) * 0.005, (e.clientY - p.y) * 0.004);
       p.x = e.clientX;
       p.y = e.clientY;
     });
-    const endCamera = (e) => {
-      if (this.cameraPointer?.id === e.pointerId) this.cameraPointer = null;
-    };
     on(canvas, "pointerup", endCamera);
     on(canvas, "pointercancel", endCamera);
     on(canvas, "lostpointercapture", endCamera);
@@ -111,8 +147,8 @@ export class FlightInput {
     on(joy, "pointerdown", (e) => {
       e.preventDefault();
       if (this.joyPointer !== null) return;
+      if (!this.capturePointer(joy, e.pointerId)) return;
       this.joyPointer = e.pointerId;
-      joy.setPointerCapture(e.pointerId);
       move(e);
     });
     on(joy, "pointermove", move);
@@ -121,6 +157,7 @@ export class FlightInput {
       this.joyPointer = null;
       this.axes = { x: 0, z: 0 };
       stick.style.transform = "";
+      this.releasePointer(joy, e.pointerId);
     };
     on(joy, "pointerup", endJoy);
     on(joy, "pointercancel", endJoy);
@@ -133,14 +170,41 @@ export class FlightInput {
     const brake = document.querySelector("#touch-brake");
     on(brake, "pointerdown", (e) => {
       e.preventDefault();
-      if (this.enabled) {
+      if (this.enabled && this.brakePointer === null) {
+        if (!this.capturePointer(brake, e.pointerId)) return;
+        this.brakePointer = e.pointerId;
         this.touchBrake = true;
-        brake.setPointerCapture(e.pointerId);
       }
     });
+    const endBrake = (e) => {
+      if (this.brakePointer !== e.pointerId) return;
+      this.brakePointer = null;
+      this.touchBrake = false;
+      this.releasePointer(brake, e.pointerId);
+    };
     for (const t of ["pointerup", "pointercancel", "lostpointercapture"])
-      on(brake, t, () => (this.touchBrake = false));
+      on(brake, t, endBrake);
     on(document.querySelector("#touch-reset"), "click", actions.recenter);
+  }
+  capturePointer(element, pointerId) {
+    try {
+      element.setPointerCapture(pointerId);
+      this.pointerCaptures.set(element, pointerId);
+      return true;
+    } catch {
+      // A vanished pointer must not leave a phantom control owner.
+      return false;
+    }
+  }
+  releasePointer(element, pointerId) {
+    if (this.pointerCaptures.get(element) === pointerId)
+      this.pointerCaptures.delete(element);
+    try {
+      if (element.hasPointerCapture(pointerId))
+        element.releasePointerCapture(pointerId);
+    } catch {
+      // Teardown remains neutral if the browser already invalidated capture.
+    }
   }
   read(yaw = 0) {
     if (!this.enabled) return { x: 0, z: 0, brake: false, glide: false };
@@ -166,20 +230,30 @@ export class FlightInput {
     return result;
   }
   clear() {
+    const captures = [...this.pointerCaptures];
+    this.pointerCaptures.clear();
     this.keys.clear();
     this.glide = false;
     this.axes = { x: 0, z: 0 };
     this.touchBrake = false;
+    this.brakePointer = null;
     this.joyPointer = null;
     this.cameraPointer = null;
+    this.cameraMousePointer = null;
     document.querySelector("#stick").style.transform = "";
+    // Neutralize every owner before release can synchronously dispatch loss.
+    for (const [element, pointerId] of captures)
+      this.releasePointer(element, pointerId);
   }
   setEnabled(value) {
     this.enabled = value;
     if (!value) this.clear();
   }
   dispose() {
-    this.clear();
+    if (this.disposed) return;
+    this.disposed = true;
     this.listeners.forEach((fn) => fn());
+    this.listeners.length = 0;
+    this.clear();
   }
 }

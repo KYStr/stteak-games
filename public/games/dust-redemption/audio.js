@@ -76,6 +76,9 @@ export class FrontierAudio {
     if (!this.loadPromise)
       this.loadPromise = this.loadEffects().catch((error) => {
         this.loadErrors.push(`load: ${error?.message || "failed"}`);
+      }).finally(() => {
+        if (!this.disposed && EFFECTS.some((name) => !this.buffers.has(name)))
+          this.loadPromise = null;
       });
   }
   async loadEffects() {
@@ -83,6 +86,7 @@ export class FrontierAudio {
     if (!context) return;
     await Promise.all(
       EFFECTS.map(async (name) => {
+        if (this.buffers.has(name)) return;
         try {
           const response = await fetch(
             new URL(`./assets/audio/${name}.wav`, import.meta.url),

@@ -7,8 +7,9 @@ import { Controls } from './input.js';
 import { Soundscape } from './audio.js';
 import { getGameBridge } from './bridge.js';
 
-const BUILD='hollow-crown-render-sizing-20261027-04', VERSION='1.0.0-rc.10-render.4'; // 只消除品質與尺寸重複提交的新候選，不回填run75原因。
+const BUILD='hollow-crown-array-profile-guard-20261109-r1', VERSION='1.0.0-rc.10-render.4-input.3-context-loss.1-backup.1-array.1'; // 只消除品質與尺寸重複提交的新候選，不回填run75原因。
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let renderUnavailable=false; // Context loss is reload-only; never resume unverified graphics.
 let store;try{store=new SaveStore();}catch{store=new SaveStore({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});}
 const profile=store.load();
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)profile.settings.reducedMotion=true;
@@ -46,13 +47,14 @@ function unlockProgress(){
 }
 function panelHeader(kicker,title,close='camp'){return `<div class="panel-header"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><button data-action="${close}" class="quiet compact">返回</button></div>`;}
 function option(items,value){return items.map(t=>`<option value="${esc(t.id)}" ${t.id===value?'selected':''}>${esc(t.name)}</option>`).join('');}
-function setOverlay(name,{focus=true}={}){clearWarningCue(); // overlay改動之前先清舊警示。
+function setOverlay(name,{focus=true}={}){if(renderUnavailable)name='graphics-error';clearWarningCue(); // overlay改動之前先清舊警示。
   overlay=name;flushInput();$('overlay').className=name==='camp'?'camp':'';
   $('overlay').innerHTML=renderPanel(name);
   if(name&&focus)requestAnimationFrame(()=>{const el=$('overlay').querySelector('[autofocus],button.primary,button,input,select');el?.focus({preventScroll:true});});
   updateVisibility();updateConfigNote();updateHud();
 }
 function renderPanel(name){
+  if(name==='graphics-error')return '<section class="panel"><h2>圖形裝置暫時中斷</h2><p>遊戲已停止。請重新載入頁面，將恢復已保存的房間入口；本次未保存進度不會續跑。</p><button data-action="reload" class="primary">重新載入頁面</button></section>';
   if(!name)return '';
   if(name==='camp')return `<section class="panel camp-panel"><div class="brand-mark" aria-hidden="true"><span>♜</span></div><span class="eyebrow">STTEAK ORIGINAL · HOLLOW CROWN</span><h1>餘燼之冠</h1><p class="intro">王座早已空了，誓言仍未熄滅。<br>握緊長槍。<em>讀招、讓位，讓最後一刺回答。</em></p><div class="config"><label>王座路線<select data-config="route">${option(ROUTES,config.route)}</select></label><label>戰鬥難度<select data-config="difficulty">${option(DIFFICULTIES,config.difficulty)}</select></label><label>起始餘燼<select data-config="startTalent">${option(STARTING_TALENTS.filter(t=>profile.unlocked.includes(t.id)),config.startTalent)}</select></label><label>誓約挑戰<select data-config="challenge">${option(CHALLENGES,config.challenge)}</select></label></div><p class="subnote" id="config-note"></p><div class="menu-main">${profile.checkpoint?'<button class="primary" data-action="continue">繼續遠征</button><button data-action="new-confirm">新一輪</button>':`<button class="primary" data-action="${profile.tutorialDone?'begin':'tutorial'}">${profile.tutorialDone?'踏入灰燼':'開始 · 學習守誓'}</button>${!profile.tutorialDone?'<button data-action="begin">直接遠征</button>':''}`}</div><div class="menu-links"><button data-action="tutorial">教學練習</button><button data-action="help">操作手冊</button><button data-action="settings">設定</button><button data-action="progress">守誓紀錄</button></div><div class="camp-stat"><div><strong>${profile.wins}</strong><small>歸還王冠</small></div><div><strong>${STARTING_TALENTS.filter(t=>profile.unlocked.includes(t.id)).length} / 6</strong><small>起始餘燼</small></div><div><strong>4 + 1</strong><small>戰鬥房／王座</small></div></div><p class="subnote">本機保存。未完房重載回到同一房間入口。<br>手機可用自動瞄準搭配移動、刺擊與防禦。${profile.tutorialDone?'':'教學可反覆練習，失誤不會扣除進度。'}</p></section>`;
   if(name==='pause')return `<section class="panel" style="max-width:550px">${panelHeader('A MOMENT OF SILENCE','火尚未熄','resume')}<p class="lead">戰鬥、預備動作與音訊均已暫停。<br>離開後可從這間房的入口重新開始。</p><div class="panel-actions"><button class="primary" data-action="resume">繼續守誓</button><button data-action="help">操作手冊</button><button data-action="settings">設定</button></div><div class="panel-actions"><button data-action="restart-confirm">重開本輪</button><button data-action="leave-confirm">回到營地</button></div></section>`;
@@ -87,11 +89,13 @@ let confirmAction='begin',confirmReturn='camp';
 function flushInput(){controls?.clear();if(run){run.pendingInput=null;run.player.heldTime=0;run.player.charge=0;run.player.wasBlocking=false;run.player.blockAge=0;if(run.player.action==='block'||(run.player.action==='charge'&&!run.player.attack))run.player.action='idle';}}
 function showConfirm(action){confirmAction=action;confirmReturn=overlay||'pause';pause(false);setOverlay('confirm');}
 function begin(tutorial=false){
+  if(renderUnavailable)return;
   controls?.clear();run=tutorial?startTutorial({practiceWindow:profile.settings.practiceWindow}):createRun({...config});runId=crypto.randomUUID();credited={rooms:0,parries:0,flawless:0};
   run.settings=profile.settings;run.player.skin=profile.selectedSkin;paused=false;lastPhase='';lastRoom='';replaceReward=null;
   if(!tutorial)safeCheckpoint();setOverlay('');sound.unlock();sound.setTheme('combat');bridge.state('running');$('world').focus();syncPhase();
 }
 function resumeSave(){
+  if(renderUnavailable)return;
   try{ // 當局資料與已計入計數須一起驗證，避免壞metadata洗掉原有累積進度。
     const cp=profile.checkpoint;if(!cp?.run)throw Error();run=restoreRun(cp.run);if(!run?.player)throw Error(); // 先沿用正式run schema損壞降級。
     const savedCredit=cp.credited===undefined?{}:cp.credited, creditCaps={rooms:run.stats.rooms,parries:run.stats.parries,flawless:run.stats.flawlessRooms}; // 歷史未提供欄位仍用零預設，計數上限來自合法當局。
@@ -105,9 +109,10 @@ function pause(show=true){clearWarningCue(); // 僅新增公開提示的清除�
   if(!run||run.phase==='result')return;paused=true;flushInput();sound.pause();bridge.state('paused');if(show)setOverlay('pause');
 }
 function resume(){
+  if(renderUnavailable)return;
   if(!run)return;paused=false;controls?.clear();sound.resume();bridge.state('running');lastPhase='';setOverlay('');syncPhase();$('world').focus();
 }
-function goCamp(){if(run&&run.phase!=='result'&&!run.tutorial)safeCheckpoint();run=null;paused=false;setOverlay('camp');sound.setTheme('camp');sound.resume();bridge.state('ready');}
+function goCamp(){if(renderUnavailable)return;if(run&&run.phase!=='result'&&!run.tutorial)safeCheckpoint();run=null;paused=false;setOverlay('camp');sound.setTheme('camp');sound.resume();bridge.state('ready');}
 function syncPhase(){
   if(!run)return;
   const phase=run.phase;if(phase===lastPhase)return;lastPhase=phase;
@@ -129,7 +134,7 @@ function updateHud(){if(!run)return;const p=run.player;$('hp-text').textContent=
 }
 
 $('overlay').addEventListener('click',e=>{
-  const button=e.target.closest('[data-action]');if(!button)return;const action=button.dataset.action;if(!paused||['resume','begin','tutorial','replay','confirm','continue'].includes(action))sound.unlock();sound.cue('ui');
+  const button=e.target.closest('[data-action]');if(!button)return;const action=button.dataset.action;if(renderUnavailable){if(action==='reload')location.reload();return;}if(!paused||['resume','begin','tutorial','replay','confirm','continue'].includes(action))sound.unlock();sound.cue('ui');
   if(action==='begin')begin(false);else if(action==='tutorial'){if(run&&run.phase!=='result'){showConfirm('tutorial');}else begin(true);}
   else if(action==='continue')resumeSave();else if(action==='resume')resume();else if(action==='pause')pause();else if(action==='camp')goCamp();
   else if(action==='new-confirm')showConfirm('begin');else if(action==='restart-confirm')showConfirm('begin');else if(action==='leave-confirm')showConfirm('camp');
@@ -164,9 +169,9 @@ window.addEventListener('resize',()=>{view?.resize();updateVisibility();});
 window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&!touchActive){touchActive=true;updateVisibility();}});
 window.addEventListener('pagehide',()=>{clearWarningCue();warningCueUI.dispose();if(disposed)return;disposed=true;controls?.dispose();sound.dispose();view?.dispose();bridge.dispose();}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
-$('world').addEventListener('webglcontextlost',e=>{e.preventDefault();pause();toast('圖形裝置暫時中斷。請重新載入頁面，將恢復房間入口。');});
+$('world').addEventListener('webglcontextlost',e=>{e.preventDefault();renderUnavailable=true;paused=true;flushInput();sound.pause();bridge.state('paused');setOverlay('graphics-error');});
 let frame=0,last=performance.now(),hudTime=0;
-function tick(now){if(disposed)return;frame=requestAnimationFrame(tick);const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);if(!document.hidden){timing.frames.push(raw*1000);if(timing.frames.length>7200)timing.frames.shift();}
+function tick(now){if(disposed||renderUnavailable)return;frame=requestAnimationFrame(tick);const raw=(now-last)/1000;last=now;const dt=Math.min(.05,raw);if(!document.hidden){timing.frames.push(raw*1000);if(timing.frames.length>7200)timing.frames.shift();}
   if(run&&!paused&&!overlay&&(run.phase==='combat'||run.phase==='tutorial')){
     step(run,controls.read(run.player,profile.settings.autoAim),dt);
     for(const event of run.events?.splice(0)||[]){sound.cue(event.type,event.material==='armor'||event.material==='shield'?'metal':event.material);if(event.type==='parry')toast('精準反擊');if(event.type==='hurt')toast(`受到 ${sourceName(event.source)} 的攻擊`);if(event.type==='ui'&&event.text&&!event.source&&event.cue!=='tutorial')toast(event.text);}
@@ -177,7 +182,7 @@ function tick(now){if(disposed)return;frame=requestAnimationFrame(tick);const ra
 }
 try{
   view=new SceneView($('world'),{quality:profile.settings.quality,onCueClear:()=>warningCueUI.clear(),onAssetError:()=>{assetNotice='石材貼圖載入失敗，已使用基礎材質繼續。可於設定重新載入頁面，存檔保留。';notice();}}); // SceneView自身完成一次初始品質套用，不再立即重複。
-  controls=new Controls($('world'),view,{pause:()=>paused?resume():pause(),gesture:()=>sound.unlock(),enabled:()=>!!run&&!paused&&!overlay&&['combat','tutorial'].includes(run.phase)});
+  controls=new Controls($('world'),view,{pause:()=>paused?resume():pause(),gesture:()=>sound.unlock(),enabled:()=>!renderUnavailable&&!!run&&!paused&&!overlay&&['combat','tutorial'].includes(run.phase)});
   setOverlay('camp');notice();$('build-label').textContent=`${VERSION} · ${BUILD} · 本機存檔`;
   timing.loaded=performance.now()-timing.started;bridge.loaded();frame=requestAnimationFrame(tick);
 }catch(error){$('overlay').innerHTML=`<section class="panel"><h2>無法點亮場地</h2><p class="lead">請使用支援 WebGL 2 的瀏覽器，並確認硬體加速已開啟。存檔仍保留。</p><p>${esc(error.message)}</p><button onclick="location.reload()">重新載入</button></section>`;bridge.error('三維場景無法初始化：'+error.message);console.error(error);}

@@ -1,4 +1,4 @@
-import * as T from 'three';
+import * as T from './vendor/three.module.js';
 
 // These roots contain only authored scenery. Their scene/stage parents remain
 // identity transforms; moving actors, terminals, particles and effects stay out.

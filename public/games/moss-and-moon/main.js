@@ -5,18 +5,19 @@ import { createWorld } from './world.js';
 import { createAudio } from './audio.js';
 import { bridge } from './bridge.js';
 
-const BUILD='moss-and-moon-rebuild-0020-cloud-1',VERSION='1.0.17-rebuild.2'; // 由可靠0016原件重新製作的新候選，不冒稱找回0017／0018或沿用其評分。
+const BUILD='moss-and-moon-reset-save-guard-20261108-r2',VERSION='1.0.17-rebuild.6'; // 公開r3的獨立衍生修正；不繼承舊候選GUI驗收或批准。
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let slot=1,loaded=loadSlot(slot),state=loaded.state||createState(slot),tool='plant',seed=PLANTS[0].id,decor='planter',rotation=0,selected=-1,movingFrom=null,started=false,paused=false,faulted=false,panelName=null,residentFilter=null,toastTimer,world,previousFocus=null;
 const sound=createAudio(message=>notice(message));let connection;
 let dialogueTimers=[];
+let importSequence=0; // Only the latest file read may commit to its unchanged garden session.
 function revealDialogue(){for(const timer of dialogueTimers)clearInterval(timer);dialogueTimers=[];document.querySelectorAll('[data-full-dialogue]').forEach(p=>{p.textContent=p.dataset.fullDialogue;});document.querySelectorAll('[data-reveal-dialogue]').forEach(b=>b.remove());}
 const count=id=>state.inventory[id]||0;
 const button=(label,attr,cls='')=>`<button ${attr} class="${cls}">${label}</button>`;
 const costs=items=>Object.entries(items).map(([id,n])=>`${esc(itemName(id))} ${count(id)}/${n}`).join(' · ');
 function notice(message,error=false){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4400);if(error)sound.effect('error');}
-function persist(){const r=saveSlot(state);$('#save-status').textContent=r.ok?'已保存 · 庭園 '+slot:'無法保存：'+r.error;if(!r.ok)notice('瀏覽器未能保存，請在設定匯出庭園備份。',true);}
-function action(a,{refresh=true}={}){if(['place','move'].includes(a.type)&&!world.canPlace(a.index)){notice('你正站在這附近。先走到旁邊，讓家具也有自己的空間。',true);return false;}const result=transact(state,a);if(!result.ok){notice(result.message,true);return false;}state=result.state;persist();sound.effect(a.type);if(refresh)render();notice(result.message);return true;}
+function persist(candidate=state){const r=saveSlot(candidate);$('#save-status').textContent=r.ok?'已保存 · 庭園 '+slot:'無法保存：'+r.error;if(!r.ok)notice('瀏覽器未能保存，請在設定匯出庭園備份。',true);return r.ok;}
+function action(a,{refresh=true}={}){if(['place','move'].includes(a.type)&&!world.canPlace(a.index)){notice('你正站在這附近。先走到旁邊，讓家具也有自己的空間。',true);return false;}const result=transact(state,a);if(!result.ok){notice(result.message,true);return false;}state=result.state;const saved=persist();sound.effect(a.type);if(refresh)render();if(saved)notice(result.message);return true;}
 function goalText(){if(state.festival)return'慶典已點亮。完成剩下的故事，或試試新的庭園佈置。';if(!state.completedQuests.includes('mira-1')){if(count('moss')>=2)return'兩份絨苔準備好了！打開「鄰居」，找米拉接取並交付「第一抹綠意」。';const moss=state.grid.filter(c=>c?.type==='plant'&&c.id==='moss').length;if(moss+count('moss')<2&&!(state.stats?.harvested))return`第一步：種下兩份絨苔（目前 ${moss}/2）。點空地種植，也可在手帳選格。`;}
  if(state.grid.some((c,i)=>c?.type==='plant'&&growthPreview(state,i).mature))return'有植物成熟了！用「收成」帶回背包，再拜訪鄰居。';if(state.grid.some((c,i)=>c?.type==='plant'&&!c.watered&&!growthPreview(state,i).mature))return'選「澆水」，照顧還沒喝水的植物。今天做完了再睡覺。';if(!state.completedQuests.length)return'今天已照顧好植物。睡覺換日後記得再澆水；絨苔累計三個澆水日成熟。';const f=festivalStatus(state);return`月光慶典：已完成 ${state.completedQuests.length}/8 委託。${f.ready?'大家都準備好了，打開手帳點亮慶典。':f.missing[0]||'佈置你的庭園。'}`;}
 function render(){
@@ -42,7 +43,7 @@ function resume(){if(faulted)return;if(!started){start();return;}paused=false;cl
 function openPanel(name,fromPause=false){if(faulted)return;panelName=name;previousFocus=document.activeElement;world?.setEnabled(false);if(!fromPause)sound.effect('click');renderPanel();if(!$('#panel').open)$('#panel').showModal();}
 function closePanel(){revealDialogue();world?.endCelebration();panelName=null;world?.clearPreview();if($('#panel').open)$('#panel').close();if(started&&!paused)world?.setEnabled(true);if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});}
 function showFailure(title,message){
- if(faulted)return;faulted=true;paused=true;world?.setEnabled(false);sound.setActive(false);closePanel();
+ if(faulted)return;importSequence++;faulted=true;paused=true;world?.setEnabled(false);sound.setActive(false);closePanel();
  const fatal=$('#fatal');fatal.hidden=false;fatal.setAttribute('role','alertdialog');fatal.setAttribute('aria-modal','true');fatal.setAttribute('aria-labelledby','fatal-heading');fatal.innerHTML=`<h2 id="fatal-heading">${esc(title)}</h2><p>${esc(message)}</p><button onclick="location.reload()">恢復庭園</button>`;
  for(const child of $('#game').children)if(child!==fatal)child.inert=true;
  fatal.querySelector('button').focus({preventScroll:true});connection?.state('paused');
@@ -88,18 +89,30 @@ document.addEventListener('click',e=>{if(faulted)return;const b=e.target.closest
  else if('puzzle'in d)action({type:'puzzle',id:d.puzzle,answer:d.answer});else if('sleep'in d){if(action({type:'sleep'}))openPanel('morning');}
  else if('festival'in d){if(state.festival||action({type:'festival'})){world.celebrate();sound.effect('festival');openPanel('festival');}}
  else if('resume'in d)resume();else if('export'in d)exportSave();else if('import'in d)$('#import-file').click();
- else if('slot'in d){persist();slot=+d.slot;loaded=loadSlot(slot);state=loaded.state||createState(slot);selected=-1;closePanel();render();if(!started)start();else resume();notice('已進入庭園 '+slot+'。');}
- else if('resetConfirm'in d){state=createState(slot);selected=-1;persist();closePanel();render();resume();notice('新的庭園，新的第一天。');}
+ else if('slot'in d){if(!persist())return;slot=+d.slot;loaded=loadSlot(slot);state=loaded.state||createState(slot);selected=-1;closePanel();render();if(!started)start();else resume();notice('已進入庭園 '+slot+'。');}
+ else if('resetConfirm'in d){const fresh=createState(slot);if(!persist(fresh))return;state=fresh;selected=-1;closePanel();render();resume();notice('新的庭園，新的第一天。');}
 });
 document.addEventListener('change',async e=>{if(e.target.dataset.setting){const k=e.target.dataset.setting,v=e.target.type==='checkbox'?e.target.checked:e.target.type==='range'||k==='textSpeed'?+e.target.value:e.target.value;action({type:'settings',values:{[k]:v}},{refresh:false});sound.update(state.settings);world.sync(state);document.body.classList.toggle('reduced',!!state.settings.reducedMotion);}
  if(e.target.id==='grid-seed'){seed=e.target.value;render();}
- if(e.target.id==='import-file'&&e.target.files[0]){try{const text=await e.target.files[0].text();if(text.length>200000)throw new Error('檔案太大');const data=JSON.parse(text);if(data.game!=='moss-and-moon')throw new Error('不是庭園備份');const candidate={...data.state,slot};const saved=saveSlot(candidate);if(!saved.ok)throw new Error(saved.error);loaded=loadSlot(slot);state=loaded.state;render();notice('已匯入這座庭園。');}catch(err){notice('匯入失敗，原庭園保留：'+err.message,true);}}
+ if(e.target.id==='import-file'&&e.target.files[0]){
+  if(faulted)return;
+  const file=e.target.files[0],request=++importSequence,targetSlot=slot,targetState=state;
+  const current=()=>!faulted&&request===importSequence&&slot===targetSlot&&state===targetState;
+  try{
+   const text=await file.text();
+   if(!current()){if(!faulted&&request===importSequence)notice('匯入已取消：庭園已變更，請重新選擇備份。');return;}
+   if(text.length>200000)throw new Error('檔案太大');
+   const data=JSON.parse(text);if(data.game!=='moss-and-moon')throw new Error('不是庭園備份');
+   const candidate={...data.state,slot:targetSlot};const saved=saveSlot(candidate);if(!saved.ok)throw new Error(saved.error);
+   loaded=loadSlot(targetSlot);state=loaded.state;render();notice('已匯入這座庭園。');
+  }catch(err){if(current())notice('匯入失敗，原庭園保留：'+err.message,true);}
+ }
 });
 document.querySelectorAll('[data-move]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);world?.move(b.dataset.move,true);});for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>world?.move(b.dataset.move,false));});
 $('#panel').addEventListener('cancel',e=>{e.preventDefault();if(paused)resume();else closePanel();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#panel').open){e.preventDefault();paused?resume():pause();}});
 addEventListener('visibilitychange',()=>{if(document.hidden&&started)pause();});addEventListener('blur',()=>{if(started&&!paused)pause();});
-addEventListener('pagehide',event=>{persist();if(event.persisted){if(started&&!paused)pause();return;}sound.dispose();world?.dispose();connection?.dispose();}); // 可快取頁先保存並暫停、保留可用資源供原resume；真正離開仍完整清理，不reload或自動重開。
+addEventListener('pagehide',event=>{importSequence++;persist();if(event.persisted){if(started&&!paused)pause();return;}sound.dispose();world?.dispose();connection?.dispose();}); // 可快取頁先保存並暫停、保留可用資源供原resume；真正離開仍完整清理，不reload或自動重開。
 $('#world').addEventListener('webglcontextlost',event=>{event.preventDefault();showFailure('畫面暫時中斷','庭園進度已保留。重新載入以恢復三維畫面。');});
 try{world=createWorld($('#world'),{tile,select(i){selected=i;updateContext();},interact:interaction,tool:()=>tool,chooseTool,notice,camera:()=>notice('相機方向已旋轉，格位仍與田地對應。')});connection=bridge({start,resume,pause,restart(){pause();openPanel('reset');}});render();connection.ready();setInterval(()=>sound.tick(),200);
  Object.defineProperty(window,'mossDiagnostics',{value:()=>({buildId:BUILD,version:VERSION,world:world.metrics(),audio:sound.metrics(),day:state.day,slot,paused,region:state.region,completedQuests:state.completedQuests.length}),writable:false});

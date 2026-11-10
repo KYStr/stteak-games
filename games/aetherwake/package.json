@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "assets": "node scripts/export-assets.mjs",
-    "test": "node --test ../../tests/games/aetherwake/*.test.js"
+    "test": "node --experimental-vm-modules --test ../../tests/games/aetherwake/*.test.js"
   },
   "dependencies": {
     "three": "0.180.0"

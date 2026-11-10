@@ -4,7 +4,7 @@ export const DEFAULT_SETTINGS = Object.freeze({ music: 0.35, effects: 0.65, qual
 export const freshProfile = () => ({ schemaVersion: 1, revision: 0, settings: { ...DEFAULT_SETTINGS }, tutorialDone: false, runs: 0, wins: 0, embers: 0, totalParries: 0, totalRooms: 0, flawlessRooms: 0, unlocked: ['fleet-ash','wide-oath'], skins: ['ivory'], selectedSkin: 'ivory', completed: [], challengeWins: [], best: null, checkpoint: null });
 const finite = (n, fallback, max = 1e7) => Number.isFinite(n) ? Math.min(max, Math.max(0, n)) : fallback;
 export function validateProfile(value) {
-  if (!value || typeof value !== 'object' || ![0, 1].includes(value.schemaVersion ?? 0)) throw new Error('不支援的存檔版本');
+  if (!value || typeof value !== 'object' || Array.isArray(value) || ![0, 1].includes(value.schemaVersion ?? 0)) throw new Error('不支援的存檔版本');
   const p = freshProfile();
   for (const key of ['revision', 'runs', 'wins', 'embers', 'totalParries', 'totalRooms', 'flawlessRooms']) p[key] = Math.floor(finite(value[key], 0));
   p.tutorialDone = value.tutorialDone === true;
@@ -26,12 +26,12 @@ export class SaveStore {
   load() {
     try {
       const raw = this.storage.getItem(SAVE_KEY);
-      if (!raw) return freshProfile();
       try { return validateProfile(JSON.parse(raw)); }
       catch {
         const backup = this.storage.getItem(SAVE_KEY + '.backup');
+        if (!raw && !backup) return freshProfile(); // 新安裝沒有任何保存，不誤報損壞。
         if (backup) { // 備份讀取成功後，資料損壞與儲存API拒絕須分開處理。
-          try { const p = validateProfile(JSON.parse(backup)); this.notice = '主存檔損壞，已恢復上一份安全備份。'; return p; } // 仍優先恢復可驗證的安全備份。
+          try { const p = validateProfile(JSON.parse(backup)); this.notice = raw ? '主存檔損壞，已恢復上一份安全備份。' : '主存檔遺失，已恢復上一份安全備份。'; return p; } // 仍優先恢復可驗證的安全備份。
           catch {} // 備份內容也無效時繼續安全重建，不誤報儲存API被封鎖。
         } // 備份讀取本身若失敗，仍由外層回報儲存不可用。
         this.notice = '存檔無法讀取，已安全重建營地。'; return freshProfile();

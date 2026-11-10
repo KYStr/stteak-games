@@ -37,6 +37,7 @@ let scene,
   bridge,
   settings,
   loaded,
+  currentStorageWarning = null,
   selectedModule = "turn",
   started = false,
   modalKind = "",
@@ -60,9 +61,16 @@ function notify(message) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => $("#toast").classList.remove("visible"), 4200);
 }
+function resultStorageLabel() {
+  return currentStorageWarning
+    ? "遠征完成 / 本次保存未完成"
+    : "遠征完成 / 個人成績已保存";
+}
 function storageWarning(warning) {
+  currentStorageWarning = warning || null;
   show("#storage-warning", !!warning);
   if (warning) text("#storage-warning", warning);
+  if (modalKind === "result") text("#modal-kicker", resultStorageLabel());
 }
 function persist() {
   const result = store.save({ ...sim.saveData(), settings });
@@ -186,6 +194,7 @@ function dismissModal() {
   if (started && sim.status !== "complete") return resume();
   closeModal();
 }
+let modalFocusGeneration = 0;
 function setModal(
   kind,
   title,
@@ -193,6 +202,7 @@ function setModal(
   buttons = [],
   kicker = "AETHERWAKE / 航行誌",
 ) {
+  const focusGeneration = ++modalFocusGeneration;
   if (!modalKind) returnFocus = document.activeElement;
   modalKind = kind;
   text("#modal-kicker", kicker);
@@ -213,11 +223,13 @@ function setModal(
   }
   show("#modal");
   requestAnimationFrame(() => {
+    if (focusGeneration !== modalFocusGeneration || !modalKind) return;
     (kind === "courses" ? $("#close-modal") : $("#modal-actions button") || $("#close-modal")).focus();
     if (kind === "courses") $(".modal-panel").scrollTop = 0;
   });
 }
 function closeModal(restore = true) {
+  ++modalFocusGeneration;
   show("#modal", false);
   $("#toast").after($("#storage-warning"));
   modalKind = "";
@@ -437,7 +449,7 @@ function showResults(playCue = false) {
       { label: "換模組與風況", action: menu },
       { label: "讀文明碎片", action: openJournal },
     ],
-    "遠征完成 / 個人成績已保存",
+    resultStorageLabel(),
   );
 }
 function toggleView() {
@@ -801,7 +813,7 @@ async function initialize() {
   });
   bridge = new HostBridge({
     "host:start": () => {
-      if (!started) begin(loaded.elapsed > 0 && !loaded.completed);
+      if (!started) begin(loaded.elapsed > 0 || loaded.completed);
       else if (sim.status === "paused") resume();
     },
     "host:pause": () => pause(),

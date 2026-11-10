@@ -6,9 +6,11 @@ export class SeaAudio {
       this.ctx=new (window.AudioContext||window.webkitAudioContext)();
       this.master=this.ctx.createGain();this.master.gain.value=.75;this.master.connect(this.ctx.destination);
       this.music=this.ctx.createGain();this.effects=this.ctx.createGain();this.music.connect(this.master);this.effects.connect(this.master);
+    }
+    if(!this.pending){
       this.pending=Promise.all(['waves','music','sail','dock','discovery','danger','gull'].map(async name=>{
         const response=await fetch(new URL(`./assets/audio/${name}.wav`,location.href));if(!response.ok)throw new Error('音訊載入失敗');this.buffers[name]=await this.ctx.decodeAudioData(await response.arrayBuffer());
-      }));
+      })).catch(error=>{this.pending=null;throw error;});
     }
     await this.ctx.resume();await this.pending;this.setPrefs(this.prefs);this.setActive(this.active,this.ambient);
   }

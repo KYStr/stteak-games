@@ -416,7 +416,34 @@ function damage(state, amount, text, events) {
   }
 }
 
+// 私有零欠帳時計；事件屏障犧牲舊區間，不把新控制回溯。
+function createTideClock(){
+ let previous=null,anchor=null,mode=null,disposed=false,collecting=false,sum=0,steps=0;
+ function reset(){anchor=null;mode=null;}
+ function input(now,eligible,currentMode){
+  if(disposed||!eligible||previous===null||anchor===null||mode!==currentMode||!Number.isFinite(now)||now<previous){reset();return;}
+  anchor=now;
+ }
+ function frame(now,eligible,currentMode){
+  const old=previous,raw=old===null?NaN:(now-old)/1000;
+  if(!Number.isFinite(now)){previous=null;reset();return {raw:NaN,dt:0};}
+  previous=now;
+  if(disposed||!eligible){reset();return {raw,dt:0};}
+  if(old===null||!Number.isFinite(raw)||raw<=0||raw>.5||anchor===null||mode!==currentMode){anchor=now;mode=currentMode;return {raw,dt:0};}
+  if(now<anchor)return {raw,dt:0};
+  const elapsed=(now-anchor)/1000;anchor=now;mode=currentMode;
+  return {raw,dt:Number.isFinite(elapsed)&&elapsed>=0&&elapsed<=raw?Math.min(.4,elapsed):0};
+ }
+ function begin(){if(collecting)throw Error('clock-reentrant');collecting=true;sum=0;steps=0;}
+ function consume(dt){if(!collecting)return;if(!Number.isFinite(dt)||dt<0||dt>.05||steps>=8||sum+dt>.400000000000001)throw Error('clock-budget');sum+=dt;steps++;}
+ function end(){if(!collecting)throw Error('clock-collector');collecting=false;return sum;}
+ return Object.freeze({reset,input,frame,begin,consume,end,dispose(){disposed=true;reset();},isDisposed:()=>disposed});
+}
+
+export const __tideClock=createTideClock();
+
 export function step(state, dt, input = {}) {
+  const __initialMode=state.mode;
   const events = [];
   const duration = clamp(finite(dt), 0, 30);
   if (duration === 0) return events;
@@ -424,6 +451,8 @@ export function step(state, dt, input = {}) {
   const tideBefore = tideAt(state.time).label;
   const forecastWindowBefore = Math.floor((state.time + 30) / (TIDE_PERIOD / 4));
   for (let i = 0; i < count; i += 1) {
+    if(state.mode!==__initialMode||!["sailing","diving"].includes(state.mode))break;
+    __tideClock.consume(delta);
     state.time += delta;
     state.contactCooldown = Math.max(0, state.contactCooldown - delta);
     state.warningCooldown = Math.max(0, state.warningCooldown - delta);

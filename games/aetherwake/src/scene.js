@@ -84,19 +84,22 @@ export function navigationOverlapsCard(label, card) {
 // ResizeObserver refreshes dimensions only when layout changes. Each flight
 // frame compares cached rectangles, so moving the label needs no layout read.
 export class NavigationLabelOcclusion {
-  constructor(label, card, Observer = globalThis.ResizeObserver) {
+  constructor(label, card, Observer = globalThis.ResizeObserver, extraCards = []) {
     this.label = label;
     this.card = card;
+    this.cards = [card, ...extraCards].filter(Boolean);
     this.anchor = null;
     this.size = null;
     this.origin = { x: 0, y: 0 };
     this.cardRect = null;
+    this.cardRects = [];
     this.observer = new Observer(() => this.refresh());
     this.observer.observe(label);
-    this.observer.observe(card);
+    for (const obstacle of this.cards) this.observer.observe(obstacle);
   }
   refresh() {
-    this.cardRect = this.card.getBoundingClientRect();
+    this.cardRects = this.cards.map((card) => card.getBoundingClientRect());
+    this.cardRect = this.cardRects[0] || null;
     const bounds = this.label.getBoundingClientRect();
     if (bounds.width > 0 && bounds.height > 0) {
       this.size = { width: bounds.width, height: bounds.height };
@@ -122,9 +125,9 @@ export class NavigationLabelOcclusion {
           }
         : null;
     // Visibility retains measurable bounds and never moves the world anchor.
-    this.label.style.visibility = navigationOverlapsCard(bounds, this.cardRect)
-      ? "hidden"
-      : "";
+    this.label.style.visibility = this.cardRects.some((card) =>
+      navigationOverlapsCard(bounds, card),
+    ) ? "hidden" : "";
   }
   dispose() {
     this.observer.disconnect();
@@ -704,6 +707,8 @@ export class AetherScene {
     this.navOcclusion = new NavigationLabelOcclusion(
       this.navTarget,
       document.querySelector("#course"),
+      globalThis.ResizeObserver,
+      [document.querySelector(".telemetry")],
     );
     this.resize = () => {
       const w = canvas.clientWidth,

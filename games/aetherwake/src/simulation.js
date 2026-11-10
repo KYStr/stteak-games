@@ -30,7 +30,7 @@ export class FlightSimulation {
       status: resume && saved.completed ? 'complete' : 'ready', assist: saved.assist, usedAssist: resume ? saved.usedAssist : saved.assist,
       routeStyle: saved.routeStyle, segmentFailures: 0, distance: 0, wind: [], hazard: null, lowEnergy: false,
       lastLanding: { islandId: island.id, precise: true }, score: 0, rating: null, nearby: null,
-      objective: null, routeTimes: [], segmentStart: resume ? saved.elapsed : 0, airTime: 0,
+      objective: null, routeTimes: [], segmentStart: resume ? saved.segmentStart : 0, airTime: 0,
       challengeProgress: {}, activeChallenge: null, challengeHint: null,
       mainSamples: resume ? [...(saved.mainSamples || [0, 0, 0])] : [0, 0, 0],
       surveyHint: null, trackedHint: null, transitWaypoints: [], transitIndex: 0, courseStages: { ...(saved.courseStages || {}) },
@@ -117,7 +117,7 @@ export class FlightSimulation {
   }
   saveData() {
     const s = this.state;
-    const data = { ...this.persisted, schemaVersion: SAVE_VERSION, seed: s.seed, module: s.module, checkpoint: s.checkpoint, unlocked: [...s.unlocked], activated: [...s.activated], relics: [...s.relics], challenges: [...s.challenges], completedChallenges: [...s.completedChallenges], mainSamples: [...s.mainSamples], courseStages: { ...s.courseStages }, cargoStability: s.cargoStability, cargoDamage: s.cargoDamage, elapsed: s.elapsed, stalls: s.stalls, assist: s.assist, usedAssist: s.usedAssist, routeStyle: s.routeStyle, completed: s.status === 'complete' };
+    const data = { ...this.persisted, schemaVersion: SAVE_VERSION, seed: s.seed, module: s.module, checkpoint: s.checkpoint, unlocked: [...s.unlocked], activated: [...s.activated], relics: [...s.relics], challenges: [...s.challenges], completedChallenges: [...s.completedChallenges], mainSamples: [...s.mainSamples], courseStages: { ...s.courseStages }, cargoStability: s.cargoStability, cargoDamage: s.cargoDamage, elapsed: s.elapsed, segmentStart: s.segmentStart, stalls: s.stalls, assist: s.assist, usedAssist: s.usedAssist, routeStyle: s.routeStyle, completed: s.status === 'complete' };
     const currentCampaignComplete = STATIONS.every((_, i) => s.mainSamples[i] >= (WORLD.routes.find(r => r.mission === i + 1)?.samples?.length || Infinity));
     if (s.status === 'complete' && currentCampaignComplete) {
       const previous = data.records[s.module];
@@ -174,12 +174,15 @@ export class FlightSimulation {
       if (s.activated.length === 1) s.cargoDamage += 100 - s.cargoStability;
       s.cargoStability = 100;
       s.activated.push(target); s.segmentFailures = 0;
-      s.routeTimes.push({ mission: s.activated.length, style: s.routeStyle, seconds: s.elapsed - s.segmentStart }); s.segmentStart = s.elapsed;
+      // A legacy unknown segment cannot replace a legitimate best. This actual
+      // station delivery starts a known clock for the next route.
+      if (Number.isFinite(s.segmentStart)) s.routeTimes.push({ mission: s.activated.length, style: s.routeStyle, seconds: s.elapsed - s.segmentStart });
+      s.segmentStart = s.elapsed;
       this.emit('station', { islandId: target, index: s.activated.length, dialogue: WORLD.dialogues[s.activated.length - 1] });
       this._objective(); this._nearby(); this._score(); this.emit('save'); return true;
     }
     if (s.nearby.islandId === 'island-camp' && s.activated.length === 3) {
-      s.routeTimes.push({ mission: 4, style: s.routeStyle, seconds: s.elapsed - s.segmentStart });
+      if (Number.isFinite(s.segmentStart)) s.routeTimes.push({ mission: 4, style: s.routeStyle, seconds: s.elapsed - s.segmentStart });
       s.status = 'complete'; this._rating(); this.emit('complete', { rating: s.rating, score: s.score, ending: WORLD.ending }); this.emit('save'); return true;
     }
     this.emit('hint', { message: `下一個目標：${s.objective.name}。已點亮的觀測台不需再次啟動。` }); return false;

@@ -21,7 +21,7 @@ function cleanRecords(value, validKeys, route = false) {
   }));
 }
 export function defaultSave() {
-  return { schemaVersion: SAVE_VERSION, seed: 1, module: 'turn', checkpoint: 'island-camp', unlocked: ['island-camp'], activated: [], relics: [], mainSamples: [0, 0, 0], courseStages: Object.fromEntries(WORLD.challenges.map((challenge) => [challenge.id, 0])), challenges: [], completedChallenges: [], cargoStability: 100, cargoDamage: 0, elapsed: 0, stalls: 0, assist: false, usedAssist: false, routeStyle: 'safe', completed: false, records: {}, routeRecords: {}, legacyRecords: {}, legacyRouteRecords: {}, legacyChallenges: [], settings: { music: 0.35, sfx: 0.7, reducedMotion: false, camera: 'follow', quality: 'auto' } };
+  return { schemaVersion: SAVE_VERSION, seed: 1, module: 'turn', checkpoint: 'island-camp', unlocked: ['island-camp'], activated: [], relics: [], mainSamples: [0, 0, 0], courseStages: Object.fromEntries(WORLD.challenges.map((challenge) => [challenge.id, 0])), challenges: [], completedChallenges: [], cargoStability: 100, cargoDamage: 0, elapsed: 0, segmentStart: 0, stalls: 0, assist: false, usedAssist: false, routeStyle: 'safe', completed: false, records: {}, routeRecords: {}, legacyRecords: {}, legacyRouteRecords: {}, legacyChallenges: [], settings: { music: 0.35, sfx: 0.7, reducedMotion: false, camera: 'follow', quality: 'auto' } };
 }
 export function validateSave(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.schemaVersion !== SAVE_VERSION) return null;
@@ -44,6 +44,9 @@ export function validateSave(value) {
   result.completedChallenges = [...new Set([...ids(value.completedChallenges, WORLD.challenges.map((item) => item.id)), ...fullCourses])];
   for (const station of STATIONS) { if (value.activated.includes(station)) result.activated.push(station); else break; }
   result.elapsed = finite(value.elapsed); result.stalls = Math.trunc(finite(value.stalls));
+  // Older v3 saves did not preserve the active route clock. Unknown is not zero:
+  // retain the checkpoint and PBs, but do not invent a shortened route record.
+  result.segmentStart = Number.isFinite(value.elapsed) && value.elapsed >= 0 && value.elapsed <= 1e9 && Number.isFinite(value.segmentStart) && value.segmentStart >= 0 && value.segmentStart <= result.elapsed ? value.segmentStart : null;
   result.cargoStability = finite(value.cargoStability, 100, 100); result.cargoDamage = finite(value.cargoDamage);
   result.assist = value.assist === true; result.routeStyle = value.routeStyle === 'shortcut' ? 'shortcut' : 'safe';
   result.usedAssist = value.usedAssist === true || result.assist;
@@ -71,7 +74,7 @@ export function migrateSave(value) {
     const base = defaultSave();
     const old = v1 ? { ...base, ...value, checkpoint: value.checkpoint ?? value.island ?? base.checkpoint, relics: value.relics ?? value.fragments ?? [], activated: value.activated ?? [] } : value;
     const converted = validateSave({
-      ...old, schemaVersion: SAVE_VERSION, mainSamples: base.mainSamples, courseStages: base.courseStages, cargoStability: 100, cargoDamage: 0,
+      ...old, schemaVersion: SAVE_VERSION, segmentStart: null, mainSamples: base.mainSamples, courseStages: base.courseStages, cargoStability: 100, cargoDamage: 0,
       challenges: [], completedChallenges: [], records: {}, routeRecords: {},
       legacyRecords: { ...cleanRecords(value.legacyRecords), ...cleanRecords(value.records) },
       legacyRouteRecords: { ...cleanRecords(value.legacyRouteRecords, null, true), ...cleanRecords(value.routeRecords, null, true) },
@@ -83,10 +86,13 @@ export function migrateSave(value) {
 }
 export class SaveStore {
   constructor(storage, key = SAVE_KEY) {
-    this.key = key; this.memory = defaultSave(); this.storage = storage;
+    this.key = key; this.memory = defaultSave(); this.storage = storage; this.pendingWriteWarning = null;
     if (storage === undefined) { try { this.storage = globalThis.localStorage; } catch { this.storage = null; } }
   }
   load() {
+    // A failed atomic write leaves an older valid value on disk. Until a later
+    // save succeeds, reading that value must not erase this tab's newer memory.
+    if (this.pendingWriteWarning) return { save: clone(this.memory), warning: this.pendingWriteWarning, migrated: false };
     if (!this.storage) return { save: clone(this.memory), warning: '瀏覽器儲存不可用；本次進度僅保留在記憶體。', migrated: false };
     try {
       const raw = this.storage.getItem(this.key);
@@ -103,13 +109,20 @@ export class SaveStore {
     const valid = validateSave({ ...this.memory, ...data, schemaVersion: SAVE_VERSION, settings: { ...this.memory.settings, ...data?.settings } });
     if (!valid) return { ok: false, warning: '存檔資料不完整，已保留上一個安全存檔。' };
     this.memory = valid;
-    if (!this.storage) return { ok: false, warning: '瀏覽器儲存不可用；本次進度僅保留在記憶體。' };
+    if (!this.storage) {
+      this.pendingWriteWarning = '瀏覽器儲存不可用；本次進度僅保留在記憶體。';
+      return { ok: false, warning: this.pendingWriteWarning };
+    }
     try {
       // localStorage.setItem is atomic. One complete JSON value replaces the old
       // checkpoint; no delete-before-write or partial multi-key transaction.
       this.storage.setItem(this.key, JSON.stringify(valid));
+      this.pendingWriteWarning = null;
       return { ok: true, warning: null };
-    } catch { return { ok: false, warning: '儲存空間不足或被封鎖；目前進度仍在記憶體，離開前請保留此頁。' }; }
+    } catch {
+      this.pendingWriteWarning = '儲存空間不足或被封鎖；目前進度仍在記憶體，離開前請保留此頁。';
+      return { ok: false, warning: this.pendingWriteWarning };
+    }
   }
   clearProgress() { const settings = clone(this.memory.settings); return this.save({ ...defaultSave(), settings }); }
 }

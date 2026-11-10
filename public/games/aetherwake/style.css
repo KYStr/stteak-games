@@ -352,6 +352,9 @@ h2 {
   gap: 8px;
   color: #deebdf;
   text-shadow: 0 2px 6px #173b44;
+  /* Stable backing for fine telemetry text; no padding or position change. */
+  background: #173b44;
+  border-radius: 3px;
 }
 .telemetry > span {
   color: #ecce90;
