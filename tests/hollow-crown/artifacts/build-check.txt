@@ -1,0 +1,6 @@
+Command: npm --prefix games/hollow-crown run build
+Result: PASS; 22 model/texture/source assets and 16 original audio assets generated.
+All runtime asset and manifest SHA-256 values compared equal before and after a repeated rebuild.
+Runtime assets/models/kit.js compares byte-for-byte equal to assets/games/hollow-crown/sources/kit.mjs.
+Command: git diff --check
+Result: PASS.

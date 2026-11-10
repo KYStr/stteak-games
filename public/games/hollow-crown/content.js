@@ -19,7 +19,10 @@ export const DIFFICULTIES = [
   { id: 'pilgrim', name: '行旅', description: '傷害降低 30%，反擊窗口較寬。', enemyDamage: .7, enemyHp: .9, parryWindow: .32 },
   { id: 'standard', name: '守誓', description: '原始戰鬥節奏，靠讀招與距離取勝。', enemyDamage: 1, enemyHp: 1, parryWindow: .22 },
 ];
+export const journeyPlan = state => state?.challenge === 'long-watch' ? { rooms: 6, crowns: 2 } : { rooms: 4, crowns: 1 };
+export const crownType = state => state.challenge === 'long-watch' ? (state.roomsCleared <= 6 ? 'regent' : 'arbiter') : ROUTES.find(route => route.id === state.route).boss;
 export const CHALLENGES = [
+  { id: 'long-watch', name: '雙冠遠征 · 完整旅程', description: '走過六個不同房間，依序擊敗熾燼攝政與象牙審判者。六房＋雙王的長程守誓。' },
   { id: 'normal', name: '歸還王冠', description: '自由選擇天賦，擊敗路線的王座守衛。' },
   { id: 'unbroken', name: '無傷誓約', description: '以至少一間無傷房完成一局；受傷仍可繼續練習。' },
   { id: 'single-school', name: '一脈餘燼', description: '本局只出現你起始天賦所屬流派的獎勵。' },

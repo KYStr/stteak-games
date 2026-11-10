@@ -18,7 +18,7 @@ export class Soundscape {
     })).then(()=>{if(!this.disposed)this.playTheme();}).catch(()=>{if(this.disposed)return;this.failed=true;this.onError('部分聲音載入失敗；可在暫停選單重新載入頁面。');});
     await this.loading;if(!this.disposed)this.playTheme();
   }
-  update(settings){this.settings=settings;if(this.ctx){this.music.gain.setTargetAtTime(settings.music*.7,this.ctx.currentTime,.04);this.fx.gain.setTargetAtTime(settings.effects,this.ctx.currentTime,.02);}}
+  update(settings){this.settings=settings;if(this.ctx){this.music.gain.setTargetAtTime((settings.muted?0:settings.music)*.7,this.ctx.currentTime,.04);this.fx.gain.setTargetAtTime(settings.muted?0:settings.effects,this.ctx.currentTime,.02);}}
   setTheme(theme){if(this.theme!==theme){this.theme=theme;this.stopTrack();}this.playTheme();}
   playTheme(){if(this.disposed||!this.ctx||!this.active||this.track||!this.buffers.has(this.theme))return;const s=this.ctx.createBufferSource();s.buffer=this.buffers.get(this.theme);s.loop=true;s.connect(this.music);s.start();this.track=s;}
   stopTrack(){if(this.track){try{this.track.stop();}catch{}this.track.disconnect();this.track=null;}}

@@ -390,8 +390,8 @@ test('all twelve talents change their promised live combat or movement outcome',
 });
 
 // Rules-only bot: sees exact tell geometry and timers; it is not UI, device or human usability evidence.
-function playSimulation({ route, startTalent, seed, loadout = null }) {
-  const state = createRun({ route, startTalent, seed, difficulty: 'standard' });
+function playSimulation({ route, startTalent, seed, loadout = null, challenge = 'normal' }) {
+  const state = createRun({ route, startTalent, seed, difficulty: 'standard', challenge });
   if (loadout) { state.talents = [...loadout]; state.modifiers = combineModifiers(loadout); state.player.maxEnergy = state.modifiers.maxEnergy; }
   let held = false, heldFor = 0, path = [], pathAge = 0;
   for (let frame = 0; frame < 60 * 60 * 20 && state.phase !== 'result'; frame++) {
@@ -472,4 +472,47 @@ test('rules-only configured-loadout simulation: nine mixed builds spanning all t
     assert.ok(state.player.hp <= state.player.maxHp); assert.ok(state.stats.maxCommittedMelee <= 2);
     t.diagnostic(`${route}: ${loadout.join(' + ')}: ${state.result.time}s, ${state.stats.hits} hits`);
   });
+});
+
+test('Twin Crown expedition visits all six arenas and wins both three-move bosses through live combat', t => {
+  for (const route of ['ash', 'ivory']) {
+    const state = playSimulation({ route, startTalent: 'fleet-ash', seed: 4837, challenge: 'long-watch' });
+    assert.equal(state.result?.won, true);
+    assert.equal(state.roomHistory.length, 8);
+    assert.equal(new Set(state.roomHistory.filter(r => r.id !== 'crown-arena').map(r => r.id)).size, 6);
+    assert.equal(state.roomHistory.filter(r => r.id === 'crown-arena').length, 2);
+    assert.ok(state.stats.kills >= 45);
+    assert.ok(restoreRun(checkpoint(state)));
+    t.diagnostic(`${route}: ${state.result.time}s, ${state.stats.kills} kills, ${state.stats.hits} hits`);
+  }
+});
+
+test('Twin Crown saves restore every reward, room entry and the second throne without skipping a crown', () => {
+  let state = createRun({ seed: 200, challenge: 'long-watch' });
+  const bosses = [];
+  for (let i = 0; i < 8; i++) {
+    if (i >= 6) bosses.push(state.enemies[0].type);
+    state = restoreRun(checkpoint(state)); assert.ok(state);
+    forceClear(state);
+    state = restoreRun(checkpoint(state)); assert.ok(state);
+    if (i === 7) break;
+    assert.equal(state.phase, 'reward');
+    assert.equal(chooseReward(state, 'restore'), true);
+    state = restoreRun(checkpoint(state)); assert.ok(state);
+    const next = state.routeOptions[0];
+    assert.equal(enterRoom(state, next.roomId, next.risk), true);
+  }
+  assert.deepEqual(bosses, ['regent', 'arbiter']);
+  assert.equal(state.result.won, true);
+});
+
+test('guard cancels a held charge instead of firing a charged thrust on the release edge', () => {
+  const state = arena('shield');
+  step(state, {attackPressed:true,attackHeld:true}, .02);
+  simulate(state, .8, {attackHeld:true});
+  const attacks = state.stats.attacks;
+  step(state, {block:true,attackReleased:true}, .02);
+  assert.equal(state.stats.attacks,attacks);
+  assert.equal(state.player.action,'block');
+  assert.equal(state.player.heldTime,0);
 });

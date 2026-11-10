@@ -5,8 +5,15 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test ../../tests/games/hollow-crown/*.test.js"
+    "test": "node --test ../../tests/games/hollow-crown/*.test.js",
+    "test:acceptance": "node ../../tests/hollow-crown/acceptance.mjs",
+    "check": "npm test && npm run test:acceptance && npm run test:polish",
+    "test:polish": "node ../../tests/hollow-crown/polish.mjs"
   },
-  "dependencies": { "three": "0.180.0" },
-  "devDependencies": { "@playwright/test": "1.56.1" }
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
 }

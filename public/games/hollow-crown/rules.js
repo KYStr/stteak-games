@@ -1,4 +1,4 @@
-import { ARENA, RULE_VERSION, ROOMS, TUTORIAL_ROOM, BOSS_ROOM, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, DIFFICULTIES, STORIES, ENDINGS, ENEMIES } from './content.js';
+import { journeyPlan, crownType, ARENA, RULE_VERSION, ROOMS, TUTORIAL_ROOM, BOSS_ROOM, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, DIFFICULTIES, STORIES, ENDINGS, ENEMIES } from './content.js';
 
 const TAU = Math.PI * 2;
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -79,7 +79,8 @@ export function enterRoom(state, roomId, risk = 'steady') {
   if (state.phase === 'route' && !state.routeOptions.some(option => option.roomId === roomId && option.risk === risk)) return false;
   const boss = roomId === BOSS_ROOM.id;
   const template = boss ? BOSS_ROOM : byId(ROOMS, roomId);
-  if (!template || (boss && state.roomsCleared !== 4) || (!boss && state.roomsCleared >= 4)) return false;
+  const plan = journeyPlan(state);
+  if (!template || (boss && (state.roomsCleared < plan.rooms || state.roomsCleared >= plan.rooms + plan.crowns)) || (!boss && state.roomsCleared >= plan.rooms)) return false;
   state.room = copy(template);
   state.roomIndex = state.roomsCleared;
   state.roomRisk = risk === 'perilous' ? 'perilous' : 'steady';
@@ -88,7 +89,7 @@ export function enterRoom(state, roomId, risk = 'steady') {
   Object.assign(state.player, { x: 0, z: 6.8, angle: Math.PI, action: 'idle', actionTime: 0, attack: null, invuln: .7, charge: 0, cooldown: 0, heldTime: 0, wasBlocking: false, energy: state.player.maxEnergy });
   state.rewardOptions = []; state.rewardChoices = []; state.routeOptions = []; state.routeChoices = [];
   if (boss) {
-    state.enemies.push(enemyAt(state, byId(ROUTES, state.route).boss, 0, -4.7));
+    state.enemies.push(enemyAt(state, crownType(state), 0, -4.7));
   } else {
     spawnWave(state, template.roster);
     state.pendingWaves.push([...template.extra, ...(state.roomRisk === 'perilous' ? [template.roster[0]] : [])]);
@@ -287,7 +288,7 @@ function updatePlayer(state, input, dt) {
       if (p.heldTime > .34 && p.actionTime <= 0) { p.charge = clamp((p.heldTime - .34) / .8, 0, 1); p.action = 'charge'; }
     }
     if (input.attackReleased) {
-      if (p.heldTime >= .65 && p.action !== 'dodge') { p.cooldown = Math.max(0, p.cooldown); attackPlayer(state, true); }
+      if (!input.block && p.heldTime >= .65 && p.action !== 'dodge') { p.cooldown = Math.max(0, p.cooldown); attackPlayer(state, true); }
       p.heldTime = 0; p.charge = 0;
       if (!p.attack && p.action === 'charge') p.action = 'idle';
     }
@@ -512,14 +513,16 @@ function clearRoom(state) {
   state.roomHistory.push({ id: state.room.id, name: state.room.name, risk: state.roomRisk, hits: state.roomHits, time: Math.round(state.roomElapsed) });
   state.projectiles = []; state.player.attack = null; state.player.action = 'idle'; state.player.actionTime = 0; state.player.charge = 0;
   event(state, 'room-clear', { flawless: state.roomHits === 0 });
-  if (state.room.id === BOSS_ROOM.id) { finishRun(state, true, 'boss'); return; }
+  const plan = journeyPlan(state);
+  if (state.room.id === BOSS_ROOM.id && state.roomsCleared >= plan.rooms + plan.crowns) { finishRun(state, true, 'boss'); return; }
   state.phase = 'reward'; makeRewards(state);
-  state.story = state.roomsCleared <= STORIES.length ? copy(STORIES[state.roomsCleared - 1]) : null;
+  const storyIndex = state.challenge === 'long-watch' ? ({ 1: 0, 3: 1, 6: 2 })[state.roomsCleared] : state.roomsCleared - 1;
+  state.story = storyIndex !== undefined && storyIndex < STORIES.length ? copy(STORIES[storyIndex]) : null;
 }
 
 function makeRoutes(state) {
-  if (state.roomsCleared >= 4) {
-    state.routeOptions = [{ roomId: BOSS_ROOM.id, id: BOSS_ROOM.id, risk: 'steady', name: BOSS_ROOM.name, label: byId(ROUTES, state.route).bossName, reward: '擊敗守衛，完成誓約', description: byId(ROUTES, state.route).description }];
+  if (state.roomsCleared >= journeyPlan(state).rooms) {
+    state.routeOptions = [{ roomId: BOSS_ROOM.id, id: BOSS_ROOM.id, risk: 'steady', name: BOSS_ROOM.name, label: ENEMIES[crownType(state)].name, reward: '擊敗守衛，完成誓約', description: `${ENEMIES[crownType(state)].name} · ${state.challenge === 'long-watch' && state.roomsCleared === 6 ? '第一頂王冠。擊敗攝政後可休憩，再前往最後的審判。' : byId(ROUTES, crownType(state) === 'arbiter' ? 'ivory' : 'ash').description}` }];
   } else {
     const available = ROOMS.filter(room => !state.roomHistory.some(visit => visit.id === room.id));
     for (let i = available.length - 1; i > 0; i--) { const j = Math.floor(random(state) * (i + 1)); [available[i], available[j]] = [available[j], available[i]]; }
@@ -653,7 +656,7 @@ export function restoreRun(saved) {
         || ['range', 'width', 'angle', 'radius', 'windup', 'activeTime'].some(key => attack[key] <= 0) || ['innerRadius', 'damage', 'recovery'].some(key => attack[key] < 0) // 防止負尺寸、負傷害與無效活動窗口。
         || attack.innerRadius > attack.radius || !sources.includes(attack.source) || !projectileCounts.includes(attack.projectiles); // 外環與彈數也必須符合已定義攻擊契約。
     })) return null; // 保留main既有安全回營地、保留解鎖與偏好的恢復路徑。
-    if (!state.room || ![...ROOMS, TUTORIAL_ROOM, BOSS_ROOM].some(r => r.id === state.room.id) || !Array.isArray(state.roomHistory) || !state.stats || !Number.isInteger(state.roomsCleared) || state.roomsCleared < 0 || state.roomsCleared > 5) return null;
+    if (!state.room || ![...ROOMS, TUTORIAL_ROOM, BOSS_ROOM].some(r => r.id === state.room.id) || !Array.isArray(state.roomHistory) || !state.stats || !Number.isInteger(state.roomsCleared) || state.roomsCleared < 0 || state.roomsCleared > journeyPlan(state).rooms + journeyPlan(state).crowns) return null;
     const statNumbers = ['damageDealt', 'damageTaken', 'parries', 'blocks', 'hits', 'attacks', 'dodges', 'kills', 'rooms', 'flawlessRooms', 'maxCommittedMelee'];
     if (!statNumbers.every(key => Number.isFinite(state.stats[key]) && state.stats[key] >= 0) || state.roomHistory.length !== state.roomsCleared || !state.stats.damageSources || !state.stats.damageByAction) return null;
     if (state.roomHistory.some(visit => !record(visit) || ![...ROOMS, BOSS_ROOM].some(room => room.id === visit.id)) || !record(state.stats.damageSources) || !record(state.stats.damageByAction)) return null; // reward確認會讀visit.id，受傷與槍刺會寫damage字典，truthy primitive不能冒充record。

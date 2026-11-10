@@ -1,0 +1,152 @@
+{
+  "play": {
+    "time": 135.7529214285693,
+    "kills": 49,
+    "hits": 0,
+    "rooms": [
+      {
+        "id": "oath-court",
+        "name": "誓約庭",
+        "risk": "steady",
+        "hits": 0,
+        "time": 10
+      },
+      {
+        "id": "ember-forge",
+        "name": "餘燼鍛場",
+        "risk": "steady",
+        "hits": 0,
+        "time": 9
+      },
+      {
+        "id": "broken-archive",
+        "name": "斷頁書庫",
+        "risk": "steady",
+        "hits": 0,
+        "time": 16
+      },
+      {
+        "id": "rain-cistern",
+        "name": "雨痕蓄池",
+        "risk": "steady",
+        "hits": 0,
+        "time": 15
+      },
+      {
+        "id": "ash-garden",
+        "name": "灰燼花園",
+        "risk": "steady",
+        "hits": 0,
+        "time": 14
+      },
+      {
+        "id": "silent-cloister",
+        "name": "緘默迴廊",
+        "risk": "steady",
+        "hits": 0,
+        "time": 16
+      },
+      {
+        "id": "crown-arena",
+        "name": "無王之座",
+        "risk": "steady",
+        "hits": 0,
+        "time": 28
+      },
+      {
+        "id": "crown-arena",
+        "name": "無王之座",
+        "risk": "steady",
+        "hits": 0,
+        "time": 28
+      }
+    ]
+  },
+  "soak": {
+    "wallMs": 189470.579319,
+    "before": {
+      "heap": 7022148,
+      "documents": 1,
+      "nodes": 158,
+      "jsEventListeners": 76
+    },
+    "after": {
+      "heap": 8153492,
+      "documents": 1,
+      "nodes": 206,
+      "jsEventListeners": 77
+    },
+    "metrics": {
+      "buildId": "stteak8-hollow-crown-r1",
+      "readyMs": 57.900000005960464,
+      "samples": 1451,
+      "avgFrameMs": 127.29772570640925,
+      "recentAvgFrameMs": 123.42055555555562,
+      "p95FrameMs": 283.29999999999563,
+      "render": {
+        "engine": "three@0.180.0",
+        "kitVersion": "1.0.0",
+        "quality": "low",
+        "frameSamples": 1475,
+        "frameP95Ms": 150,
+        "frameAvgMs": 101.05,
+        "renderScale": 0.45,
+        "softwareRenderer": true,
+        "renderSubmitP95Ms": 5.5,
+        "drawCalls": 71,
+        "triangles": 12844,
+        "geometries": 53,
+        "textures": 1,
+        "textureMemoryBytes": 1048576,
+        "renderTargetColorMemoryBytes": 0,
+        "memoryIsEstimate": true,
+        "activeRigs": 2,
+        "activeBones": 32,
+        "pointLights": 1,
+        "directionalLights": 2,
+        "shadowMaps": 0,
+        "shadowResolution": 0,
+        "transparentEffects": 2,
+        "instancedMeshes": 55,
+        "contextLost": false,
+        "drawingBuffer": [
+          432,
+          243
+        ],
+        "rendererInfo": "WebKit WebGL"
+      },
+      "audio": {
+        "context": "running",
+        "musicTracks": 1,
+        "voices": 0,
+        "buffers": 16
+      },
+      "canvas": {
+        "width": 432,
+        "height": 243
+      },
+      "storageAvailable": true
+    }
+  },
+  "passed": true,
+  "checks": [
+    "fresh startup, no audio before gesture, full expedition is available",
+    "settings persist, reversible mute, dialog focus containment and Escape navigation",
+    "tutorial completes using movement, light attack, dodge, timed guard and defeat",
+    "real movement and attacks, blur pause, suspended audio resume, reload and room-entry restore",
+    "full six-room / two-boss expedition wins through keyboard input and settles once",
+    "restart and >=3 minute bounded-memory/listener run",
+    "responsive dialogs and WebGL context loss reload recovery",
+    "natural combat death, settlement and restart",
+    "corrupt primary backup recovery and malformed-array safe rebuild",
+    "system reduced-motion preference",
+    "zero uncaught errors, console errors or failed HTTP requests"
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "performanceBudget": {
+    "averageTargetMs": 33.3,
+    "p95TargetMs": 66.7,
+    "met": false
+  }
+}
