@@ -17,6 +17,9 @@ const clamp=(n,min,max)=>Math.min(max,Math.max(min,Number.isFinite(n)?n:min));
 export class AudioEngine {
   constructor(){this.context=null;this.musicVolume=.55;this.sfxVolume=.7;this.paused=false;this.active=new Set();this.lastEvent=new Map();this.musicTime=0;this.nextNote=0;this.noteIndex=0;this.windFilter=null;this.windGain=null;this.disposed=false;this.sampleBuffers=new Map();this.sampleFailed=false;this.stats={peakVoices:0,events:0,maxVoices:20};}
   async unlock(){
+    try { return await this.openContext(); } catch { return false; }
+  }
+  async openContext(){
     if(this.disposed)return false;
     const Constructor=globalThis.AudioContext||globalThis.webkitAudioContext;if(!Constructor)return false;
     if(!this.context){
@@ -32,13 +35,21 @@ export class AudioEngine {
       // Synthesis remains a complete fallback if offline loading is unavailable.
       this.loadSamples();
     }
-    if(!this.paused&&this.context.state==='suspended')await this.context.resume();return this.context.state==='running';
+    await this.syncContext();return this.context?.state==='running';
   }
   async loadSamples(){
     try{await Promise.all(['glide','land','stall','unlock','ui','relic'].map(async name=>{const response=await fetch(new URL(`./assets/audio/${name}.wav`,document.baseURI));if(!response.ok)throw new Error(`audio ${name}: ${response.status}`);const buffer=await this.context.decodeAudioData(await response.arrayBuffer());if(!this.disposed)this.sampleBuffers.set(name,buffer);}));}catch{this.sampleFailed=true;}
   }
   setVolumes({music=this.musicVolume,sfx=this.sfxVolume}={}){this.musicVolume=clamp(Number(music),0,1);this.sfxVolume=clamp(Number(sfx),0,1);if(this.context){const t=this.context.currentTime;this.musicBus.gain.setTargetAtTime(this.musicVolume,t,.035);this.sfxBus.gain.setTargetAtTime(this.sfxVolume,t,.035);}}
-  setPaused(value){this.paused=Boolean(value);if(!this.context||this.disposed)return; if(this.paused){this.context.suspend().catch(()=>{});}else if(this.context.state==='suspended'){this.nextNote=this.context.currentTime+.1;this.context.resume().catch(()=>{});}}
+  syncContext(){
+    this.transition=(this.transition||Promise.resolve()).catch(()=>{}).then(async()=>{
+      const ctx=this.context;if(!ctx||this.disposed||ctx.state==='closed')return;
+      if(this.paused&&ctx.state==='running')await ctx.suspend();
+      else if(!this.paused&&ctx.state!=='running'){this.nextNote=ctx.currentTime+.1;await ctx.resume();}
+    }).catch(()=>{});
+    return this.transition;
+  }
+  setPaused(value){this.paused=Boolean(value);this.syncContext();}
   register(source){if(this.active.size>=this.stats.maxVoices){const oldest=this.active.values().next().value;try{oldest.stop();}catch{}this.active.delete(oldest);}this.active.add(source);this.stats.peakVoices=Math.max(this.stats.peakVoices,this.active.size);source.onended=()=>{this.active.delete(source);try{source.disconnect();}catch{}};}
   tone(frequency,start,duration,type,gain,bus){const ctx=this.context,osc=ctx.createOscillator(),env=ctx.createGain();osc.type=type;osc.frequency.setValueAtTime(frequency,start);env.gain.setValueAtTime(.0001,start);env.gain.exponentialRampToValueAtTime(Math.max(.0001,gain),start+.015);env.gain.exponentialRampToValueAtTime(.0001,start+duration);osc.connect(env);env.connect(bus);this.register(osc);const oldEnd=osc.onended;osc.onended=()=>{oldEnd();env.disconnect();};osc.start(start);osc.stop(start+duration+.02);}
   play(event){if(!this.context||this.context.state!=='running'||this.paused||this.disposed)return;const name=ALIAS[event]||event,setting=EVENTS[name];if(!setting)return;const now=this.context.currentTime,last=this.lastEvent.get(name)??-Infinity,cooldown=name==='energy'?1.6:name==='tailwind'?1.0:.08;if(now-last<cooldown)return;this.lastEvent.set(name,now);this.stats.events++;

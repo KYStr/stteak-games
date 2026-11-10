@@ -1483,3 +1483,19 @@ h2 {
     transition: none !important;
   }
 }
+
+/* Instrument panels keep their contrast over bright grass, cloud and sky. */
+.telemetry { padding: 12px 14px; border: 1px solid #bdd5c640; }
+.energy-panel { background: #123b45ed; border: 1px solid #bdd5c640; border-radius: 4px; padding: 12px 16px; }
+.energy-panel p { margin: 8px -10px 0; }
+.collection { background: #123b45e8; border: 1px solid #bdd5c640; border-radius: 4px; padding: 12px 14px; }
+#gate-conditions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; font-size: 11px; line-height: 1.6; }
+#gate-conditions span { border: 1px solid #b7c9bd55; border-radius: 3px; padding: 2px 5px; }
+#gate-conditions .met { background: #1b6159; color: #efffe9; }
+#gate-conditions .unmet { background: #6b4930; color: #fff1cf; }
+@media (max-width: 600px) {
+  .telemetry { padding: 8px; }
+  .energy-panel { padding: 8px 10px; }
+  .collection { padding: 7px 9px; }
+  #gate-conditions { font-size: 10px; gap: 3px; margin-top: 6px; }
+}

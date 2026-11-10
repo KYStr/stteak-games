@@ -440,7 +440,7 @@ export class AetherScene {
     this.scene.fog = new THREE.FogExp2("#a4d2ce", 0.0012 / this.mapScale);
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: false,
       alpha: false,
       powerPreference: "high-performance",
     });
@@ -450,6 +450,13 @@ export class AetherScene {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
+    const gl = this.renderer.getContext();
+    const debug = gl.getExtension("WEBGL_debug_renderer_info");
+    const gpu = debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "";
+    this.softwareRenderer = /swiftshader|llvmpipe|software/i.test(gpu);
+    this.quality = "auto";
+    this.autoScale = this.softwareRenderer ? 0.65 : 1;
+    this.slowSamples = [];
     this.camera = new THREE.PerspectiveCamera(56, 1, 0.3, 1800 * this.mapScale);
     this.camera.position.set(100, 88, 145);
     this.scene.add(new THREE.HemisphereLight("#e9f3d4", "#277d81", 2.7));
@@ -722,12 +729,25 @@ export class AetherScene {
     this.resize();
   }
   setQuality(q) {
+    this.quality = q;
     this.renderer.setPixelRatio(
-      q === "low" ? 1 : Math.min(devicePixelRatio, 1.5),
+      q === "low" ? 0.7 : q === "auto" ? Math.min(devicePixelRatio, 1.5) * this.autoScale : Math.min(devicePixelRatio, 1.5),
     );
-    this.renderer.shadowMap.enabled = q !== "low";
+    this.renderer.shadowMap.enabled = q === "high" || (q === "auto" && !this.softwareRenderer && this.autoScale >= 0.9);
     this.clouds.visible = q !== "low";
+    this.clouds.count = q === "auto" && this.autoScale < 0.9 ? 40 : 100;
     this.resize();
+  }
+  sampleFrame(milliseconds) {
+    if (this.quality !== "auto" || this.autoScale <= 0.5) return;
+    this.slowSamples.push(milliseconds);
+    if (this.slowSamples.length < 90) return;
+    const average = this.slowSamples.reduce((a, b) => a + b, 0) / this.slowSamples.length;
+    this.slowSamples.length = 0;
+    if (average > 29) {
+      this.autoScale = Math.max(0.5, this.autoScale - 0.15);
+      this.setQuality("auto");
+    }
   }
   setRoute(route) {
     if (this.routeLine) {
@@ -813,7 +833,13 @@ export class AetherScene {
   }
   updateWorldWinds(state, dt) {
     for (const { data, group } of this.winds) {
-      const active = routeWindActive(data, state);
+      // Far corridors stay in the simulation and map, but their animated
+      // instanced arrows need no matrix uploads outside the local flight view.
+      const reach = (this.menu ? 850 : 420) + (data.start
+        ? Math.hypot(data.end.x - data.start.x, data.end.z - data.start.z) / 2
+        : data.radius);
+      const active = routeWindActive(data, state) &&
+        Math.hypot(data.x - state.player.x, data.z - state.player.z) < reach;
       group.visible =
         active &&
         (data.type !== "crosswind" ||
@@ -821,7 +847,7 @@ export class AetherScene {
             (state.elapsed / data.period) * Math.PI * 2 +
               ((state.seed % 1009) / 1009) * Math.PI * 2,
           ) > 0);
-      if (active) group.userData.update?.(this.reduced ? 0 : dt);
+      if (group.visible) group.userData.update?.(this.reduced ? 0 : dt);
     }
   }
   rotate(dx, dy) {
@@ -902,6 +928,7 @@ export class AetherScene {
     };
   }
   update(s, dt, time, objective) {
+    if (this.reduced) time = 0;
     const p = s.player;
     const navigationView = navigationVisualState(s);
     const speed = Math.hypot(p.vx || 0, p.vz || 0);

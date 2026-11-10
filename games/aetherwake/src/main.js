@@ -46,6 +46,7 @@ let scene,
   resultAudioTimer = 0,
   lastRoute = "",
   guideHidden = false,
+  contextLost = false,
   raf,
   accumulator = 0,
   previous = performance.now(),
@@ -95,6 +96,7 @@ function selectModule(id) {
   audio?.play("ui");
 }
 function begin(resume = false) {
+  if (contextLost) return;
   clearTimeout(resultAudioTimer);
   closeModal(false);
   audio.unlock();
@@ -152,10 +154,12 @@ function pause(reason = "pause") {
   else audio.setPaused(true);
   accumulator = 0;
   bridge.state("paused");
+  persist();
   if (reason === "pause" || reason === "blur")
     openPause(reason === "blur" ? "航程已安全暫停" : "在風停下來的地方");
 }
 function resume() {
+  if (contextLost) return;
   clearTimeout(resultAudioTimer);
   if (!started || sim.status === "complete") return;
   closeModal(false);
@@ -176,6 +180,7 @@ function togglePause() {
 }
 function dismissModal() {
   if (!modalKind) return;
+  if (modalKind === "context") return;
   if (modalKind === "erase") return openSettings();
   if (modalKind === "settings") return openHelp();
   if (modalKind === "courses") return started && sim.status === "complete" ? showResults() : openHelp();
@@ -222,6 +227,8 @@ function setModal(
     $("#modal-actions").append(el);
   }
   show("#modal");
+  for (const child of $("#game").children)
+    if (!["modal", "toast", "storage-warning", "fatal"].includes(child.id)) child.inert = true;
   requestAnimationFrame(() => {
     if (focusGeneration !== modalFocusGeneration || !modalKind) return;
     (kind === "courses" ? $("#close-modal") : $("#modal-actions button") || $("#close-modal")).focus();
@@ -233,6 +240,7 @@ function closeModal(restore = true) {
   show("#modal", false);
   $("#toast").after($("#storage-warning"));
   modalKind = "";
+  for (const child of $("#game").children) child.inert = false;
   if (restore) {
     const canRestore =
       returnFocus?.isConnected &&
@@ -243,7 +251,7 @@ function closeModal(restore = true) {
   returnFocus = null;
 }
 function settingsHTML() {
-  return `<div class="settings-grid"><label>環境與音樂 <input id="music-volume" type="range" min="0" max="1" step="0.05" value="${settings.music}"></label><label>動作音效 <input id="sfx-volume" type="range" min="0" max="1" step="0.05" value="${settings.sfx}"></label><label>畫質 <select id="quality"><option value="auto">標準 · 1.5× DPR</option><option value="low">節能 · 關閉即時陰影</option><option value="high">精緻 · 即時陰影</option></select></label><label>鏡頭 <select id="camera-setting"><option value="follow">受控追隨</option><option value="overhead">俯瞰航線</option></select></label><label class="check"><input id="reduced-motion" type="checkbox" ${settings.reducedMotion ? "checked" : ""}>減少動態／視差</label><label class="check"><input id="assist" type="checkbox" ${sim.assist ? "checked" : ""}>風線輔助（獨立標記成績）</label></div>`;
+  return `<div class="settings-grid"><label>環境與音樂 <input id="music-volume" type="range" min="0" max="1" step="0.05" value="${settings.music}"></label><label>動作音效 <input id="sfx-volume" type="range" min="0" max="1" step="0.05" value="${settings.sfx}"></label><label>畫質 <select id="quality"><option value="auto">自動 · 依效能調整解析度</option><option value="low">節能 · 關閉即時陰影</option><option value="high">精緻 · 即時陰影</option></select></label><label>鏡頭 <select id="camera-setting"><option value="follow">受控追隨</option><option value="overhead">俯瞰航線</option></select></label><label class="check"><input id="reduced-motion" type="checkbox" ${settings.reducedMotion ? "checked" : ""}>減少動態／視差</label><label class="check"><input id="assist" type="checkbox" ${sim.assist ? "checked" : ""}>風線輔助（獨立標記成績）</label></div><p class="modal-note">將兩個音量滑桿調至 0 可完全靜音。設定會自動保存。</p>`;
 }
 function bindSettings() {
   $("#quality").value = settings.quality;
@@ -575,8 +583,21 @@ function updateHud() {
     text("#course-title", h.transit ? `安全接駁 ${h.transitStep}/${h.transitTotal}` : `${s.challengeHint || s.trackedHint ? `${h.stageName} · ` : "航線觀測 · "}${h.entry ? "前往入口" : `${h.step}/${h.total}`}`);
     text(
       "#course-detail",
-      `${p.grounded && !h.landing ? `${glideControl} 展帆起航。` : ""}${h.transit ? `沿風標前進，目標高度 ${Math.round(h.y)}m。抵島後進金環。` : h.entry ? h.instruction : h.landing ? `落到島中央，按 ${interactControl} 交付；已完成階段保留。` : `目標高度 ${Math.round(h.y)}m；垂直速度 ${p.vy.toFixed(1)}m/s。${sampleConditions(h) || "穿過環中央"}。`}${carrying && !h.entry && !h.transit ? ` 儀器穩定 ${Math.round(s.cargoStability)}%。` : ""}`,
+      `${p.grounded && !h.landing ? `${glideControl} 展帆起航，${touch ? "左搖桿" : "WASD"} 對準金環。` : ""}${h.transit ? `沿風標前進，目標高度 ${Math.round(h.y)}m。抵島後進金環。` : h.entry ? h.instruction : h.landing ? `落到島中央，按 ${interactControl} 交付；已完成階段保留。` : `目標高度 ${Math.round(h.y)}m；${p.y < h.y - h.radius ? "保持展帆，沿青色風帶抬升。" : p.y > h.y + h.radius ? `按住 ${brakeControl} 降低高度。` : "高度已對準，穿過金環中央。"}`}${carrying && !h.entry && !h.transit ? ` 儀器穩定 ${Math.round(s.cargoStability)}%。` : ""}`,
     );
+    const speed = Math.hypot(p.vx, p.vz);
+    const checks = [];
+    if (!h.landing) checks.push([Math.abs(p.y - h.y) < (h.radius || 15), `高度 ${Math.round(p.y)} / ${Math.round(h.y)}m`]);
+    if (h.minSpeed) checks.push([speed >= h.minSpeed, `速度 ≥${h.minSpeed}m/s`]);
+    if (h.maxSpeed) checks.push([speed <= h.maxSpeed, `速度 ≤${h.maxSpeed}m/s`]);
+    if (h.minEnergy) checks.push([p.energy >= h.minEnergy, `能量 ≥${h.minEnergy}%`]);
+    if (h.maxVerticalSpeed) checks.push([Math.abs(p.vy) <= h.maxVerticalSpeed, `升降 ≤${h.maxVerticalSpeed}m/s`]);
+    if (h.heading) {
+      const dot = (p.vx * h.heading.x + p.vz * h.heading.z) / Math.max(0.001, speed * Math.hypot(h.heading.x, h.heading.z));
+      checks.push([dot >= (h.heading.minDot ?? 0.5), "順箭頭入環"]);
+    }
+    const conditionHTML = checks.map(([ok, label]) => `<span class="${ok ? "met" : "unmet"}">${ok ? "✓" : "○"} ${label}</span>`).join("");
+    if ($("#gate-conditions").innerHTML !== conditionHTML) $("#gate-conditions").innerHTML = conditionHTML;
   }
   if (!guideHidden) {
     let step, title, detail;
@@ -751,8 +772,11 @@ function handleEvents() {
   }
 }
 function tick(now) {
-  const dt = Math.min((now - previous) / 1000, 0.15);
+  const rawFrameMs = now - previous;
+  const dt = Math.min(rawFrameMs / 1000, 0.15);
   previous = now;
+  if (contextLost) { raf = requestAnimationFrame(tick); return; }
+  if (!document.hidden) scene.sampleFrame(rawFrameMs);
   if (sim.status === "running") {
     accumulator += dt;
     let steps = 0;
@@ -776,7 +800,7 @@ function tick(now) {
   if (started && sim.status === "running") {
     frameCount++;
     elapsedSample += dt;
-    frames.push(dt * 1000);
+    frames.push(rawFrameMs);
     if (frames.length > 9000) frames.shift();
     if (dt > 0.0333) longFrames++;
   }
@@ -796,9 +820,9 @@ async function initialize() {
   applySettings();
   input = new FlightInput($("#world"), {
     pause: togglePause,
-    help: openHelp,
-    view: toggleView,
-    recenter: () => scene.recenter(),
+    help: () => { if (!modalKind) openHelp(); },
+    view: () => { if (!modalKind) toggleView(); },
+    recenter: () => { if (!modalKind) scene.recenter(); },
     interact: () => {
       sim.interact();
       handleEvents();
@@ -870,7 +894,24 @@ async function initialize() {
     if (sim.status === "running") $("#world").focus();
   };
   $("#close-modal").onclick = dismissModal;
-  text("#build-label", `${BUILD.version} · ${BUILD.id} · 待獨立驗收`);
+  text("#build-label", `Aetherwake ${BUILD.version} · 原創風境探索`);
+  $("#world").addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    contextLost = true;
+    if (started && sim.status !== "complete") pause("silent");
+    input.setEnabled(false);
+    audio.setPaused(true);
+    setModal("context", "正在重新接住這陣風", "<p>繪圖裝置暫時中斷，航程已凍結。恢復後可從目前位置繼續；若需重新載入，會返回最後安全島，保留已取得的觀測與碎片。</p>", [{label: "從安全島重新載入", primary: true, action: () => location.reload()}], "繪圖裝置恢復中");
+  });
+  $("#world").addEventListener("webglcontextrestored", () => {
+    contextLost = false;
+    previous = performance.now();
+    accumulator = 0;
+    applySettings();
+    if (started && sim.status !== "complete") openPause("風已回來，準備繼續航程");
+    else if (started) showResults();
+    else { closeModal(); notify("繪圖裝置已恢復，可準備啟程。"); }
+  });
   $("#modal").addEventListener("keydown", (e) => {
     if (e.key === "Tab") {
       const items = [
@@ -900,6 +941,11 @@ async function initialize() {
           ...scene.metrics,
           camera: scene.inspectCamera(sim.player),
           frameCount,
+          averageMs: frames.length ? frames.reduce((a, b) => a + b, 0) / frames.length : null,
+          contextLost,
+          quality: scene.quality,
+          inputListeners: input.listeners.length,
+          resolutionScale: scene.renderer.getPixelRatio(),
           elapsedSample,
           p50: sorted[Math.floor(sorted.length * 0.5)] || null,
           p95: sorted[Math.floor(sorted.length * 0.95)] || null,
@@ -913,6 +959,8 @@ async function initialize() {
           audio: {
             contextState: audio.context?.state || "uninitialized",
             activeVoices: audio.active.size,
+            events: audio.stats.events,
+            musicBeats: audio.noteIndex,
             peakVoices: audio.stats.peakVoices,
             musicVolume: audio.musicVolume,
             sfxVolume: audio.sfxVolume,
