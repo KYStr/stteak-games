@@ -5,8 +5,14 @@
   "scripts": {
     "build": "node build.mjs",
     "assets": "node export-assets.mjs",
-    "test": "node --test ../../tests/games/moss-and-moon/*.test.js"
+    "test": "node ../../tests/moss-and-moon/run.mjs",
+    "test:unit": "node --test ../../tests/games/moss-and-moon/*.test.js",
+    "test:soak": "node ../../tests/moss-and-moon/stability.mjs"
   },
-  "dependencies": { "three": "0.180.0" },
-  "devDependencies": { "playwright": "1.56.1" }
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
 }
