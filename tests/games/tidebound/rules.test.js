@@ -107,7 +107,7 @@ test('phase descriptions match the continuous water level and forecasts announce
   }
   for (let transition = 60; transition <= TIDE_PERIOD * 10; transition += 60) {
     const state = createState();
-    state.time = transition - 30.01;
+    depart(state);state.time = transition - 30.01;
     const events = step(state, 0.02);
     const forecast = events.find((entry) => entry.type === 'tide-forecast');
     assert.ok(forecast);
@@ -331,48 +331,29 @@ test('all three main parts, lighthouse repair, return celebration and free repla
   assert.equal(state.storyComplete, true);
 });
 
-test('save recovery is safe, versioned, idempotent and never advances offline resources', () => {
-  for (const mode of ['harbor', 'island', 'sailing', 'diving']) {
-    let state = createState(9);
-    depart(state); moor(state, 'coral'); interact(state);
-    state.mode = mode;
-    state.time = 172.25; state.parts = ['prism']; state.completed = ['gull-watch']; state.credits = 37;
-    state.boat.hull = 1;
-    state.boat.x = 86; state.boat.z = 115;
-    for (let i = 0; i < 5; i += 1) {
-      const result = restore(serialize(state));
-      state = result.state;
-      assert.equal(state.time, 172.25);
-      assert.equal(state.boat.hull, 100);
-      assert.equal(state.credits, 37);
-      assert.deepEqual(state.parts, ['prism']);
-      assert.deepEqual(state.completed, ['gull-watch']);
-      assert.equal(state.currentIsland, 'coral');
-      assert.ok(distance(state.boat, islandById('coral').dock) < 0.01);
-      assert.ok(!['sailing', 'diving'].includes(state.mode));
+test('save recovery is versioned, idempotent and preserves valid live voyage resources', () => {
+  for(const mode of ['sailing','diving']){
+    let state=createState(9);depart(state);moor(state,'coral');interact(state);
+    if(mode==='diving'){startDive(state,'coral-dive');step(state,2,{diveX:1});}
+    else{depart(state);Object.assign(state.boat,{x:86,z:115,hull:41,sail:.5,speed:1});}
+    state.time=172.25;state.parts=['prism'];state.completed=['gull-watch'];state.credits=37;
+    const boat={...state.boat},oxygen=state.oxygen,diver={...state.diver};
+    for(let i=0;i<5;i++){
+      state=restore(serialize(state)).state;
+      assert.equal(state.time,172.25);assert.equal(state.mode,mode);assert.deepEqual(state.boat,boat);
+      assert.equal(state.oxygen,oxygen);if(mode==='diving')assert.deepEqual(state.diver,diver);
+      assert.equal(state.credits,37);assert.deepEqual(state.parts,['prism']);assert.deepEqual(state.completed,['gull-watch']);
     }
   }
 });
 
-test('interrupted cargo is halved once: rereading the same snapshot and five safe re-saves never compound loss', () => {
-  for (const mode of ['sailing', 'diving']) {
-    const original = createState();
-    depart(original); moor(original, 'coral');
-    original.mode = mode;
-    original.cargo = ['tern', 'turtle', 'fan-coral', 'mangrove-root', 'glass-coral'];
-    original.parts = ['prism']; original.credits = 123;
-    const snapshot = serialize(original);
-    const expectedCargo = ['mangrove-root', 'glass-coral'];
-    for (let i = 0; i < 5; i += 1) assert.deepEqual(restore(snapshot).state.cargo, expectedCargo);
-    let restored = restore(snapshot).state;
-    for (let i = 0; i < 5; i += 1) {
-      assert.equal(restored.mode, 'island');
-      assert.deepEqual(restored.cargo, expectedCargo);
-      assert.deepEqual(restored.parts, ['prism']);
-      assert.equal(restored.credits, 123);
-      restored = restore(serialize(restored)).state;
-    }
-    assert.deepEqual(original.cargo, ['tern', 'turtle', 'fan-coral', 'mangrove-root', 'glass-coral']);
+test('reload retains cargo without compounding loss; invalid positions recover to a safe dock', () => {
+  let state=createState();depart(state);state.cargo=['tern','turtle','fan-coral','mangrove-root','glass-coral'];
+  for(let i=0;i<5;i++)state=restore(serialize(state)).state;
+  assert.equal(state.cargo.length,5);assert.equal(state.mode,'sailing');
+  for(const bad of [NaN,Infinity,99999]){
+    const invalid={...state,boat:{...state.boat,x:bad}};const recovered=restore(serialize(invalid)).state;
+    assert.equal(recovered.mode,'harbor');assert.equal(recovered.boat.hull,100);assert.equal(recovered.cargo.length,5);
   }
 });
 
@@ -508,7 +489,7 @@ test('optional observation samples have safe locations, distinct knowledge, rang
   assert.equal(skipObservation(state, distant.id)[0].type, 'info');
 });
 
-test('skipping is saved but permits later collection; rescue loss, delivery and new-voyage reset are idempotent', () => {
+test('skipping is saved but permits later collection; retained cargo, delivery and new-voyage reset are idempotent', () => {
   let state = createState(); depart(state);
   for (const item of OBSERVATIONS.slice(0, 4)) {
     Object.assign(state.boat, item, { speed: 0 });
@@ -519,15 +500,15 @@ test('skipping is saved but permits later collection; rescue loss, delivery and 
   }
   assert.equal(state.cargo.length, 4);
   state = restore(serialize(state)).state;
-  assert.equal(state.cargo.length, 2);
+  assert.equal(state.cargo.length, 4);
   assert.equal(state.voyage.harvested.length, 4);
   assert.equal(state.voyage.skippedObservations.length, 4);
   for (let i = 0; i < 5; i += 1) state = restore(serialize(state)).state;
-  assert.equal(state.cargo.length, 2);
+  assert.equal(state.cargo.length, 4);
   const before = state.credits;
   moor(state, 'harbor');
-  assert.equal(state.credits, before + 6);
-  dock(state); assert.equal(state.credits, before + 6);
+  assert.equal(state.credits, before + 12);
+  dock(state); assert.equal(state.credits, before + 12);
   depart(state);
   assert.deepEqual(state.voyage.harvested, []);
   assert.deepEqual(state.voyage.skippedObservations, []);

@@ -588,11 +588,29 @@ export function restore(raw) {
   const safeIsland = getIsland(saved.lastSafeIsland);
   putAtDock(state, safeIsland);
   state.mode = safeIsland.id === 'harbor' ? 'harbor' : 'island';
+  // Restore a finite, physically valid live voyage without spending offline time.
+  const validPoint = point => point && Number.isFinite(point.x) && Number.isFinite(point.z) && Math.abs(point.x) <= WORLD_BOUND && Math.abs(point.z) <= WORLD_BOUND;
   const interrupted = saved.mode === 'sailing' || saved.mode === 'diving';
-  if (interrupted) {
-    state.cargo = state.cargo.slice(Math.ceil(state.cargo.length / 2));
-    state.voyage.rescued = true;
-    return { state, message: `已回到最近安全港${safeIsland.name}。中途離開保留一半普通貨物；圖鑑、主線零件與已交付獎勵完整保留，離線不消耗氧氣或潮汐。` };
+  if (interrupted && validPoint(saved.boat) && Number.isFinite(saved.boat.heading) && Number.isFinite(saved.boat.hull) && saved.boat.hull > 0
+    && ISLANDS.every(island => distance(saved.boat, island) >= island.radius + 6)) {
+    state.boat = { x: saved.boat.x, z: saved.boat.z, heading: saved.boat.heading % (Math.PI * 2), sail: clamp(finite(saved.boat.sail), 0, 1), hull: clamp(saved.boat.hull, 1, 100), speed: clamp(finite(saved.boat.speed), 0, 10) };
+    state.mode = 'sailing';state.currentIsland = null;
+    if(saved.mode === 'diving'){
+      const site=getSite(saved.activeDive);
+      // Diving is entered from a moored boat, so valid dive saves use the safe dock below.
+      if(site && site.islandId===safeIsland.id && validPoint(saved.diver) && distance(saved.diver, site.entry)<=site.radius && finite(saved.oxygen)>0){
+        state.mode='diving';state.currentIsland=safeIsland.id;state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen, .1,55);state.diveCollected=saved.diveCollected===true;
+      }
+    }
+    return {state,message:'已恢復航程。船位、調查與貨物完整保留；離線不消耗潮汐或氧氣。'};
   }
+  if(saved.mode==='diving'){
+    const site=getSite(saved.activeDive);
+    if(site&&site.islandId===safeIsland.id&&validPoint(saved.diver)&&distance(saved.diver,site.entry)<=site.radius&&finite(saved.oxygen)>0){
+      state.mode='diving';state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,55);state.diveCollected=saved.diveCollected===true;
+      return {state,message:'已恢復淺水探索，離線不扣氧氣。'};
+    }
+  }
+  if(interrupted)return {state,message:`已安全回到${safeIsland.name}。無效船位已修復，貨物與主線進度保留。`};
   return { state, message: `已恢復${safeIsland.name}的靠港紀錄。潮汐、圖鑑、零件與獎勵保持不變；船已免費修復。` };
 }

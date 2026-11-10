@@ -29,3 +29,12 @@ svg .branch-safe{fill:none;stroke:#176b72;stroke-width:4}svg .branch-current,svg
 #route-options em,#map-branch-options em{display:block;font-size:10px;font-style:normal;font-weight:600;color:#176b72;margin-top:3px}@media(max-width:600px) and (orientation:portrait){#route-branch-map{display:none}#route-options em{font-size:9px}}
 @media(max-height:500px){#route-choice-context,#route-options small{display:none}#route-options{display:grid;grid-template-columns:1fr 1fr;gap:5px}#route-options button{min-height:58px}#route-branch-map{min-height:44px}}
 .route-actions{display:flex;gap:5px}.route-actions #route-cancel,.route-actions #route-branch-map{flex:1;width:auto;min-width:0;min-height:44px}
+/* A small always-north chart keeps distant destinations legible while sailing. */
+#mini-chart{position:fixed;right:30px;bottom:250px;width:150px;height:180px;padding:9px;background:#143f48ed;color:#fcf5df;border:1px solid #d2e7cb66;border-radius:7px;z-index:1;box-shadow:0 5px 25px #143e4922}
+#mini-chart span{display:block;font-size:9px;letter-spacing:.1em;text-align:left}#mini-chart svg{width:130px;height:130px;display:block}#mini-chart small{display:block;font-size:11px;color:#ffdb9b}
+@media(max-height:650px),(max-width:900px){#mini-chart{display:none!important}}
+.paper-panel>#depart{margin-top:0;margin-bottom:2px}.paper-panel>#depart+.note{margin-bottom:20px}
+#voyage-hud{max-height:calc(100vh - 350px);overflow:auto}#objective-detail{font-size:13px}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+body.diving .sail-controls>div{display:none}body.diving #mini-chart{display:none!important}

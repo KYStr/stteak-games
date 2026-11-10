@@ -3,7 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "build": "node build.mjs", "assets": "node export-assets.mjs", "test": "node --test ../../tests/games/tidebound/*.test.js" },
-  "dependencies": { "three": "0.180.0" },
-  "devDependencies": { "esbuild": "0.25.10", "playwright": "1.56.1" }
+  "scripts": {
+    "build": "node build.mjs",
+    "assets": "node export-assets.mjs",
+    "test": "node --test ../../tests/games/tidebound/*.test.js ../../tests/tidebound/*.test.mjs",
+    "verify": "npm run build && npm test && node ../../tests/tidebound/acceptance.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "playwright": "1.56.1"
+  }
 }
