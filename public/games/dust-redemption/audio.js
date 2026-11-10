@@ -25,7 +25,9 @@ const LEVELS = {
   success: 0.27,
   ui: 0.17,
 };
-const NOTES = [110, 0, 164.81, 0, 146.83, 0, 123.47, 82.41];
+// Original D-minor frontier motif. Sparse plucked harmonics over a warm drone.
+const NOTES = [146.83, 0, 220, 174.61, 0, 164.81, 146.83, 0,
+  130.81, 0, 196, 164.81, 0, 130.81, 110, 0];
 const clamp = (value) =>
   Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
 export class FrontierAudio {
@@ -213,12 +215,19 @@ export class FrontierAudio {
       );
     } else this.tone(440, 0.08, 0.09, "sine", 1.5);
   }
-  tick(time) {
-    if (time < this.nextBeat || !this.active) return;
-    this.nextBeat = time + 1.15;
-    const f = NOTES[this.beat++ % NOTES.length];
-    if (f) this.tone(f, 1, 0.08, "triangle", 1, "music");
-    if (this.beat % 2) this.tone(47, 0.1, 0.07, "sine", 0.7, "music");
+  tick() {
+    const time = this.context?.currentTime || 0;
+    if (time < this.nextBeat || !this.canPlay("music")) return;
+    this.nextBeat = time + 0.68;
+    const beat = this.beat++, f = NOTES[beat % NOTES.length];
+    if (f) {
+      this.tone(f * 2, 1.35, 0.1, "triangle", 0.998, "music");
+      this.tone(f * 4, 0.4, 0.018, "sine", 1, "music");
+    }
+    if (beat % 4 === 0)
+      this.tone(beat % 16 < 8 ? 73.415 : 65.405, 2.3, 0.09, "sine", 1, "music");
+    if (beat % 8 === 0)
+      this.tone(beat % 16 < 8 ? 220 : 196, 4.7, 0.035, "sine", 1.001, "music");
   }
   resume() {
     if (this.disposed) return;

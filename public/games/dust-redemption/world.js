@@ -18,11 +18,24 @@ export class World {
   constructor(canvas) {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: false,
       alpha: false,
       powerPreference: "high-performance",
     });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+    const gl = this.renderer.getContext();
+    const debug = gl.getExtension("WEBGL_debug_renderer_info");
+    this.softwareRenderer = /swiftshader|llvmpipe|software/i.test(debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "");
+    // The software path uses the same colors, textures and animated geometry
+    // with diffuse lighting, avoiding a physical BRDF on every fragment.
+    const DiffuseMaterial = class extends THREE.MeshLambertMaterial {
+      constructor(options = {}) {
+        const { roughness, metalness, roughnessMap, metalnessMap, normalMap, ...diffuse } = options;
+        super(diffuse);
+      }
+    };
+    this.graphics = this.softwareRenderer ? { ...THREE, MeshStandardMaterial: DiffuseMaterial } : THREE;
+    this.lowQuality = this.softwareRenderer;
+    this.renderer.setPixelRatio(1);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -43,7 +56,7 @@ export class World {
       near: 1,
       far: 85,
     });
-    this.sun.shadow.mapSize.set(2048, 2048);
+    this.sun.shadow.mapSize.set(1024, 1024);
     this.sun.shadow.bias = -0.0004;
     this.sun.shadow.normalBias = 0.045;
     this.scene.add(this.sun);
@@ -85,11 +98,34 @@ export class World {
           for (const value of Object.values(material))
             if (value?.isTexture) this.sharedTextures.add(value);
     });
+    if (this.softwareRenderer) {
+      const converted = new Map();
+      gltf.scene.traverse(node => {
+        if (!node.material) return;
+        const convert = material => {
+          if (!material.isMeshStandardMaterial) return material;
+          if (!converted.has(material)) {
+            converted.set(material, new this.graphics.MeshStandardMaterial({
+              color: material.color, map: material.map, emissive: material.emissive,
+              emissiveMap: material.emissiveMap, emissiveIntensity: material.emissiveIntensity,
+              transparent: material.transparent, opacity: material.opacity,
+              alphaTest: material.alphaTest, side: material.side, vertexColors: material.vertexColors,
+            }));
+          }
+          return converted.get(material);
+        };
+        node.material = Array.isArray(node.material) ? node.material.map(convert) : convert(node.material);
+      });
+      for (const original of converted.keys()) original.dispose();
+    }
   }
   resize() {
     const canvas = this.renderer.domElement,
       w = Math.max(1, canvas.clientWidth),
       h = Math.max(1, canvas.clientHeight);
+    const limit = this.lowQuality ? 800 : 1440;
+    const scale = Math.min(devicePixelRatio, this.lowQuality ? 1 : 1.5, limit / w);
+    this.renderer.setPixelRatio(scale);
     this.renderer.setSize(w, h, false);
     const aspect = w / h,
       half = aspect < 1 ? 26 : 22;
@@ -111,8 +147,10 @@ export class World {
     this.orient();
   }
   quality(low) {
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, low ? 1 : 1.6));
-    this.renderer.shadowMap.enabled = !low;
+    this.lowQuality = Boolean(low || this.softwareRenderer);
+    this.renderer.shadowMap.enabled = !this.lowQuality;
+    if (this.groundShadows) this.groundShadows.visible = this.lowQuality;
+    if (this.actorShadows) this.actorShadows.visible = this.lowQuality;
     this.resize();
   }
   model(name, x = 0, z = 0, scale = 1) {
@@ -144,7 +182,7 @@ export class World {
   box(w, h, d, color, x, y, z, parent = this.level) {
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshStandardMaterial({ color, roughness: 0.94 }),
+      new this.graphics.MeshStandardMaterial({ color, roughness: 0.94 }),
     );
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
@@ -200,6 +238,8 @@ export class World {
     this.solids = [];
     this.solidBoxes = new WeakMap();
     this.renderer.renderLists.dispose();
+    this.groundShadows = null;
+    this.actorShadows = null;
   }
   dispose() {
     this.clear();
@@ -365,7 +405,7 @@ export class World {
       ]) {
         const mesh = new THREE.Mesh(
           new THREE.IcosahedronGeometry(7, detail),
-          new THREE.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
+          new this.graphics.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
         );
         mesh.scale.set(1, 1.4, 0.8);
         lod.addLevel(mesh, distance);
@@ -378,9 +418,30 @@ export class World {
       (object) => object.name === "frontier-building",
     );
     if (buildings.length) {
-      this.buildingBatches = new BuildingBatches(THREE, buildings, this.level);
+      this.buildingBatches = new BuildingBatches(this.graphics, buildings, this.level);
       this.buildingBatches.sync(new Set(), this.camera);
     }
+    this.addGroundShadows();
+  }
+  addGroundShadows() {
+    // One draw call supplies stylized contact shadows when dynamic maps are off.
+    const material = new THREE.MeshBasicMaterial({ color: 0x5b4028, transparent: true, opacity: 0.19, depthWrite: false });
+    const boxes = this.colliders.filter(b => b.h > 0.8);
+    this.groundShadows = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), material, Math.max(1, boxes.length));
+    this.groundShadows.count = boxes.length;
+    const matrix = new THREE.Matrix4(), rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI/2, 0, 0));
+    boxes.forEach((b,i) => {
+      matrix.compose(new THREE.Vector3(b.x + b.h * 0.35, 0.032, b.z - b.h * 0.2), rotation, new THREE.Vector3(b.w + b.h * 0.55, b.d + b.h * 0.35, 1));
+      this.groundShadows.setMatrixAt(i, matrix);
+    });
+    this.groundShadows.visible = this.lowQuality;
+    this.level.add(this.groundShadows);
+    this.actorShadows = new THREE.InstancedMesh(new THREE.CircleGeometry(1, 16), material.clone(), 32);
+    this.actorShadows.count = 0;
+    this.actorShadows.visible = this.lowQuality;
+    this.dynamic.add(this.actorShadows);
+    this.shadowMatrix = matrix;
+    this.shadowRotation = rotation;
   }
   dressGround(p, sceneName, points) {
     const matrix = new THREE.Matrix4(),
@@ -391,7 +452,7 @@ export class World {
     // Low raised patches, stone clusters and grass are instanced volumetric dressing.
     const patches = new THREE.InstancedMesh(
       new THREE.IcosahedronGeometry(1, 0),
-      new THREE.MeshStandardMaterial({ color: p.ground, roughness: 1 }),
+      new this.graphics.MeshStandardMaterial({ color: p.ground, roughness: 1 }),
       46,
     );
     for (let i = 0; i < 46; i++) {
@@ -412,7 +473,7 @@ export class World {
     this.level.add(patches);
     const rocks = new THREE.InstancedMesh(
       new THREE.IcosahedronGeometry(0.35, 0),
-      new THREE.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
+      new this.graphics.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
       150,
     );
     for (let i = 0; i < 150; i++) {
@@ -429,7 +490,7 @@ export class World {
     this.level.add(rocks);
     const grass = new THREE.InstancedMesh(
       new THREE.ConeGeometry(0.09, 0.5, 3),
-      new THREE.MeshStandardMaterial({
+      new this.graphics.MeshStandardMaterial({
         color: sceneName === "mine" ? 0x80765a : 0x8d8654,
         roughness: 1,
       }),
@@ -489,7 +550,7 @@ export class World {
             depth: 0.012,
             bevelEnabled: false,
           }),
-          new THREE.MeshStandardMaterial({ color: 0x424d43, roughness: 1 }),
+          new this.graphics.MeshStandardMaterial({ color: 0x424d43, roughness: 1 }),
         );
         badge.position.set(x, 1.39, z + 0.067);
         sign.add(badge);
@@ -609,7 +670,7 @@ export class World {
     group.add(ring);
     const pin = new THREE.Mesh(
       new THREE.OctahedronGeometry(0.24),
-      new THREE.MeshStandardMaterial({
+      new this.graphics.MeshStandardMaterial({
         color,
         emissive: color,
         emissiveIntensity: 0.25,
@@ -698,6 +759,14 @@ export class World {
       if (actor.poseBlend === 0)
         actor.colliderHeight = actor.state === "cover" ? 0.95 : 1.85;
     }
+    if (this.actorShadows?.visible) {
+      this.actorShadows.count = Math.min(32, this.actors.length);
+      this.actors.slice(0,32).forEach((actor,i) => {
+        this.shadowMatrix.compose(new THREE.Vector3(actor.position.x + 0.18, 0.035, actor.position.z - 0.1), this.shadowRotation, new THREE.Vector3(0.55, 0.4, 1));
+        this.actorShadows.setMatrixAt(i, this.shadowMatrix);
+      });
+      this.actorShadows.instanceMatrix.needsUpdate = true;
+    }
     this.tracerBatch?.update(dt, this.camera);
     const hits = new Set();
     if (player) {
@@ -736,6 +805,8 @@ export class World {
       characters: this.actors.length,
       shadow: this.renderer.shadowMap.enabled,
       dpr: this.renderer.getPixelRatio(),
+      software: this.softwareRenderer,
+      contextLost: this.renderer.getContext().isContextLost(),
     };
   }
 }

@@ -506,7 +506,7 @@ export class FieldSystem {
     return node;
   }
   buildTask(task) {
-    const object = createFieldProp(baseKinds[task.id], THREE);
+    const object = createFieldProp(baseKinds[task.id], this.world.graphics || THREE);
     object.name = `task-${task.id}`;
     object.position.copy(position(task.position));
     task.object = object;
@@ -811,7 +811,7 @@ export class FieldSystem {
         task.parts[step.target] = plaque;
       }
       if (step.kind === "checkpoint-operate" && !task.parts[step.target]) {
-        const relay = createFieldProp("signal", THREE);
+        const relay = createFieldProp("signal", this.world.graphics || THREE);
         relay.scale.setScalar(0.65);
         relay.position.copy(position(step.position));
         relay.name = `${task.id}-${step.target}`;

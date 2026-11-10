@@ -78,7 +78,7 @@ export class WaterSystem {
     this.reserve = field.tasks.find((task) => task.id === "water-reserve");
     if (!this.bypass || !this.allocation || !this.reserve)
       throw new Error("Water flow requires the three original field tasks");
-    this.props = createWaterProps(THREE, world, this.flow);
+    this.props = createWaterProps(world.graphics || THREE, world, this.flow);
     this.props.bindControls({
       "bypass-wheel": this.bypass.parts["bypass-wheel"],
       clinic: this.allocation.parts.clinic,

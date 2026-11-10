@@ -110,7 +110,7 @@ export class NightSystem {
           }
         : c,
     );
-    this.props = createNightProps(THREE, world, this.flow);
+    this.props = createNightProps(world.graphics || THREE, world, this.flow);
     this.props.bindField(
       { route: this.routeTask, brace: this.brace, escort: this.escort },
       player,

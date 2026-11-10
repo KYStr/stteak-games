@@ -37,7 +37,7 @@ export class SignalSystem {
     this.originalChoices = new Map([this.patch, this.relay].map(t => [t, t.choices]));
     this.originalText = new Map([this.patch, this.relay].map(t => [t, { title:t.title, description:t.description, hints:t.hints, selectedChoice:t.selectedChoice }]));
     this.originalParts = new Map();
-    this.props = createSignalProps(THREE, world, this.flow);
+    this.props = createSignalProps(world.graphics || THREE, world, this.flow);
     this.props.bindField({ earth: this.earth, patch: this.patch, relay: this.relay });
     for (const [key, node] of [['roster-sheet', this.props.parts['roster-sheet']], ['receiver-code-plate', this.props.parts['receiver-code-plate']]]) this.bindPart(this.patch, key, node);
     this.bindPart(this.relay, 'dispatch-key', this.props.keys.get(null));

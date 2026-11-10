@@ -39,7 +39,7 @@ import {
   fieldPlacementPoints,
 } from "./expansion-content.js";
 
-export const BUILD = "dust-redemption-cloud-result-save-20261028-01";
+export const BUILD = "dust-redemption-r1-20261110";
 const sceneFlowFor = (id) =>
   MISSION_FLOW[id]
     ? MissionSystem
@@ -170,12 +170,14 @@ let mouseActive = false;
 const padResets = [];
 let clearingInputs = false;
 let mouseButtons = 0;
+let mousePointerId = null;
 const firePointers = new Set();
 let aimPadActive = false;
 function syncCombatInput() {
   firing = Boolean(mouseButtons & 1) || firePointers.size > 0;
   aiming = Boolean(mouseButtons & 2) || aimPadActive || firePointers.size > 0;
 }
+let contextLost = false;
 let shuttingDown = false;
 let foreground = !document.hidden;
 let previousMode = "hub",
@@ -238,14 +240,18 @@ function button(action, label, cls = "", data = "") {
   return `<button class="${cls}" data-action="${action}" ${data}>${label}</button>`;
 }
 function panel(html, cls = "") {
+  const previousControl = cls === "field-work" && overlay.contains?.(document.activeElement)
+    ? { ...document.activeElement.dataset } : null;
   overlay.classList.toggle("field-view", cls === "field-work");
   document.body.classList.toggle("field-view", cls === "field-work");
-  overlay.innerHTML = `<section class="panel ${cls}">${html}</section>`;
+  overlay.innerHTML = `<section class="panel ${cls}" role="dialog" aria-modal="true" aria-label="荒塵之旅選單">${html}</section>`;
   overlay.classList.remove("hidden");
   clearInputs();
-  queueMicrotask(() =>
-    overlay.querySelector("button")?.focus({ preventScroll: true }),
-  );
+  queueMicrotask(() => {
+    const matching = previousControl && [...overlay.querySelectorAll("button:not(:disabled)")]
+      .find(node => Object.keys(previousControl).every(key => node.dataset[key] === previousControl[key]));
+    (matching || overlay.querySelector("button:not(:disabled), input, select, summary"))?.focus({ preventScroll: true });
+  });
 }
 function hide() {
   overlay.classList.remove("field-view");
@@ -259,6 +265,11 @@ function clearInputs() {
   try {
     mouseActive = false;
     mouseButtons = 0;
+    const pointer = mousePointerId;
+    mousePointerId = null;
+    if (pointer !== null) {
+      try { if (canvas.hasPointerCapture?.(pointer)) canvas.releasePointerCapture(pointer); } catch {}
+    }
     const releaseFire = [...firePointers];
     firePointers.clear();
     aimPadActive = false;
@@ -346,7 +357,7 @@ function title() {
   world.actor("npc-mara", 3, -1);
   world.level.add(world.model("horse", 6, 5));
   panel(
-    `<div class="title-layout"><div><p class="eyebrow">A FRONTIER IN SIX CONTRACTS</p><h1>荒塵之旅</h1><p class="lede">槍聲會散去。<br>留下來的，是你選擇守住的人。</p><p>六份邊境委託。三處荒野。<br>觀察地形、找齊證據，或從掩體後開火。<br>每次回到鎮上，聽見自己的決定帶來什麼。</p><div class="actions">${button("hub", profile.completed.length ? "繼續旅程" : "走進暮砂鎮", "primary")}${button("help", "操作指南")}</div><p class="meta">${BUILD} · Three.js 3D · 本機存檔<br>${esc(loaded.message)}</p></div><div class="side"><p class="eyebrow">BEFORE THE SUN GOES DOWN</p><h3>先看清，再決定。</h3><p>WASD 移動，滑鼠瞄準射擊。<br>E 調查／掩體，右鍵探頭，R 換彈。</p><hr><p>每份委託都有三項現場作業與實際交接。<br>和平：核對證據、交涉放行。交戰：解除守軍防線。<br>兩條策略都要完成貨物交付或護送，取得具名紀錄，再返回南側撤離。</p><p class="meta">失敗會回到任務前快照。<br>重玩只記錄挑戰成績，不改變故事。<br>手機請橫放，使用雙拇指操作。</p>${button("settings", "聲音與輔助設定", "quiet")}</div></div>`,
+    `<div class="title-layout"><div><p class="eyebrow">A FRONTIER IN SIX CONTRACTS</p><h1>荒塵之旅</h1><p class="lede">槍聲會散去。<br>留下來的，是你選擇守住的人。</p><p>六份邊境委託。三處荒野。<br>觀察地形、找齊證據，或從掩體後開火。<br>每次回到鎮上，聽見自己的決定帶來什麼。</p><div class="actions">${button("hub", profile.completed.length ? "繼續旅程" : "走進暮砂鎮", "primary")}${button("help", "操作指南")}</div><p class="meta">六章邊境故事 · 和平／交戰雙路線 · 本機存檔<br>${esc(loaded.message)}</p></div><div class="side"><p class="eyebrow">BEFORE THE SUN GOES DOWN</p><h3>先看清，再決定。</h3><p>WASD 移動，滑鼠瞄準射擊。<br>E 調查／掩體，右鍵探頭，R 換彈。</p><hr><p>每份委託都有三項現場作業與實際交接。<br>和平：核對證據、交涉放行。交戰：解除守軍防線。<br>兩條策略都要完成貨物交付或護送，取得具名紀錄，再返回南側撤離。</p><p class="meta">失敗會回到任務前快照。<br>重玩只記錄挑戰成績，不改變故事。<br>手機請橫放，使用雙拇指操作。</p>${button("settings", "聲音與輔助設定", "quiet")}</div></div>`,
   );
   bridge.state("ready");
 }
@@ -1423,7 +1434,7 @@ function help() {
   pauseReturn = returnState;
   mode = "help";
   panel(
-    `<p class="eyebrow">FIELD GUIDE</p><h2>帶著選擇回到鎮上</h2><div class="columns"><div><dl class="control-list"><dt>WASD／方向鍵</dt><dd>沿螢幕方向移動</dd><dt>滑鼠／左鍵</dt><dd>瞄準／開火（按住可連射）</dd><dt>右鍵</dt><dd>精準瞄準；掩體中探頭</dd><dt>E</dt><dd>調查、談判、進出掩體、撤離</dd><dt>R／Space</dt><dd>換彈／翻越低掩體</dd><dt>Q／C · F</dt><dd>旋轉相機 · 使用一件補給</dd><dt>Esc</dt><dd>暫停與設定</dd></dl></div><div><p><b>和平：</b>完成三項 ⚙ 現場作業，找到三個青綠 ◆ 線索，靠近按 E，首章先與查驗哨兵核對分配提案，互助方案須用原接點傳達承諾，再向藥品接收者出示回條；第二章公開最低供水保證並由伊妮絲簽收；第三章完整送達四人名單，在南側奧林處讀回覆並簽收；第四章完整核證放行、交付同一副本，帶原帳與具名保管回條南撤。第五章持有效文件放行，護送同三人到南側核對到達回條。第六章在盤點台以安全離境與公開聽證換交械，核對同車物資並領地契回條。守軍倒下後，和平路線會關閉。</p><p><b>交戰：</b>先靠近掩體按 E。右鍵探頭、左鍵射擊；鬆開右鍵縮回。完成三項 ⚙ 現場作業並擊敗守軍後，前四章向實際接收者確認具名回條；第五章六敵全倒後仍須護送同三人抵達；第六章清場後仍須完整停車與盤點交接，地契收入背包後直接南撤。</p><p><b>首章：</b>提案可在交涉前重選；接受後才開對應庭院門。診所兩份只讓查驗者讓行，雙方各一份須保線傳達才讓其他哨位停止干預。同一接點可斷開或復接，守軍接續原查驗。搬運工可命令停等或跟隨；受前方射線威脅時會靠遮蔽物等候，可換路或解除威脅，救助仍是可選項。</p><p><b>第三章：</b>公開線只接兩個既有中繼之一，或原台發停火調令後搬同一信袋。地線或中繼改動會使舊回覆失效，須修復重送；南側真回覆紙與燈不可遠端讀取。搬運時雙手占用，先放下再換彈、開火或翻越。</p><p><b>第四章：</b>原帳核證後收入可見背包，持續隨身且不占雙手。同一副本可密封親送南西奧林，或到原公告欄公示一頁並由帳房見證；密封只收一次 10 旅費。公示查驗可用完整核證停止，清場後仍須交接。只有搬副本時占雙手；原帳永久公開或封存仍在撤離時決定。</p><p><b>第五章：</b>量水選西側有遮蔽的便橋路線，或東側較直接的暴露開口。選西線時，原修橋台試重完成即連動開橋。E 可讓隊伍停等；靠近停等家屬按 E 開面板，須在全三人各 6 公尺內才能續走，安全掩體可明確安排停等。中段塔洛的一次繞行有預告，出示同一份當日文件可預防／取消。三人都到南側後領回條直接撤離，不再北返取鈴；文件隨身不占雙手。</p><p><b>第六章：</b>南側電池箱可先選熄燈或完整保留；只切軍線保留水醫供應。原車二十四發，兩名既有守軍至多各領一次六發。推同一車至完整交涉側線，或封存六發作進攻掩體；整車進白框才扣煞車。E 可放手躲避，再靠近原車續推。兩策略均在盤點台由伊妮絲核對同車、地契及具名回條，最後南撤才選議會或守望官。</p><p><b>共同目標：</b>完成後回南側 ◇ 撤離。生命歸零可立即重試，物品與選擇回到出發前。</p><p><b>觸控：</b>左搖桿移動，右圓區拖曳設定射向。開火鍵會自動探頭，其他動作各有按鍵；上方可轉相機。</p><p class="meta">警戒者就地壓制；側翼者繞行且最多一名；近攻者在近距離較危險；狙擊以瞄線預告至少一秒。換位能中斷敵方射線。</p></div></div><div class="actions">${button("close-sheet", "明白，返回", "primary")}</div>`,
+    `<p class="eyebrow">FIELD GUIDE</p><h2>帶著選擇回到鎮上</h2><div class="banner"><b>初次上路</b>　移動到 ◆ 證據或 ⚙ 作業旁，按 E。<br>① 蒐證與核驗 → ② 和平交涉或掩體交戰 → ③ 實際交付 → ④ 帶回條到 ◇ 南側撤離。<br>右上小地圖的白點是你；菱形是證據，圓點是作業，方形是出口。任務重載會回安全入口。</div><div class="columns"><div><dl class="control-list"><dt>WASD／方向鍵</dt><dd>沿螢幕方向移動</dd><dt>滑鼠／左鍵</dt><dd>瞄準／開火（按住可連射）</dd><dt>右鍵</dt><dd>精準瞄準；掩體中探頭</dd><dt>E</dt><dd>調查、談判、進出掩體、撤離</dd><dt>R／Space</dt><dd>換彈／翻越低掩體</dd><dt>Q／C · F</dt><dd>旋轉相機 · 使用一件補給</dd><dt>Esc</dt><dd>暫停與設定</dd></dl></div><div><details><summary>六章詳細路線與交接說明</summary><p><b>和平：</b>完成三項 ⚙ 現場作業，找到三個青綠 ◆ 線索，靠近按 E，首章先與查驗哨兵核對分配提案，互助方案須用原接點傳達承諾，再向藥品接收者出示回條；第二章公開最低供水保證並由伊妮絲簽收；第三章完整送達四人名單，在南側奧林處讀回覆並簽收；第四章完整核證放行、交付同一副本，帶原帳與具名保管回條南撤。第五章持有效文件放行，護送同三人到南側核對到達回條。第六章在盤點台以安全離境與公開聽證換交械，核對同車物資並領地契回條。守軍倒下後，和平路線會關閉。</p><p><b>交戰：</b>先靠近掩體按 E。右鍵探頭、左鍵射擊；鬆開右鍵縮回。完成三項 ⚙ 現場作業並擊敗守軍後，前四章向實際接收者確認具名回條；第五章六敵全倒後仍須護送同三人抵達；第六章清場後仍須完整停車與盤點交接，地契收入背包後直接南撤。</p><p><b>首章：</b>提案可在交涉前重選；接受後才開對應庭院門。診所兩份只讓查驗者讓行，雙方各一份須保線傳達才讓其他哨位停止干預。同一接點可斷開或復接，守軍接續原查驗。搬運工可命令停等或跟隨；受前方射線威脅時會靠遮蔽物等候，可換路或解除威脅，救助仍是可選項。</p><p><b>第三章：</b>公開線只接兩個既有中繼之一，或原台發停火調令後搬同一信袋。地線或中繼改動會使舊回覆失效，須修復重送；南側真回覆紙與燈不可遠端讀取。搬運時雙手占用，先放下再換彈、開火或翻越。</p><p><b>第四章：</b>原帳核證後收入可見背包，持續隨身且不占雙手。同一副本可密封親送南西奧林，或到原公告欄公示一頁並由帳房見證；密封只收一次 10 旅費。公示查驗可用完整核證停止，清場後仍須交接。只有搬副本時占雙手；原帳永久公開或封存仍在撤離時決定。</p><p><b>第五章：</b>量水選西側有遮蔽的便橋路線，或東側較直接的暴露開口。選西線時，原修橋台試重完成即連動開橋。E 可讓隊伍停等；靠近停等家屬按 E 開面板，須在全三人各 6 公尺內才能續走，安全掩體可明確安排停等。中段塔洛的一次繞行有預告，出示同一份當日文件可預防／取消。三人都到南側後領回條直接撤離，不再北返取鈴；文件隨身不占雙手。</p><p><b>第六章：</b>南側電池箱可先選熄燈或完整保留；只切軍線保留水醫供應。原車二十四發，兩名既有守軍至多各領一次六發。推同一車至完整交涉側線，或封存六發作進攻掩體；整車進白框才扣煞車。E 可放手躲避，再靠近原車續推。兩策略均在盤點台由伊妮絲核對同車、地契及具名回條，最後南撤才選議會或守望官。</p><p><b>共同目標：</b>完成後回南側 ◇ 撤離。生命歸零可立即重試，物品與選擇回到出發前。</p><p><b>觸控：</b>左搖桿移動，右圓區拖曳設定射向。開火鍵會自動探頭，其他動作各有按鍵；上方可轉相機。</p><p class="meta">警戒者就地壓制；側翼者繞行且最多一名；近攻者在近距離較危險；狙擊以瞄線預告至少一秒。換位能中斷敵方射線。</p></details></div></div><div class="actions">${button("close-sheet", "明白，返回", "primary")}</div>`,
   );
   audio.pause();
 }
@@ -1467,11 +1478,16 @@ function closeSheet() {
   document.body.classList.toggle("field-view", mode === "field");
   if (mode !== "paused") audio.resume();
   clearInputs();
+  queueMicrotask(() => {
+    if (saved.hidden) canvas.focus();
+    else overlay.querySelector("button:not(:disabled)")?.focus({ preventScroll: true });
+  });
 }
 function pause() {
   if (["loading", "title", "paused", "help", "settings"].includes(mode)) return;
   previousMode = mode;
   pauseReturn = {
+    parent: pauseReturn,
     mode,
     html: overlay.innerHTML,
     hidden: overlay.classList.contains("hidden"),
@@ -1484,7 +1500,7 @@ function pause() {
   );
 }
 function resume() {
-  if (mode !== "paused") return;
+  if (mode !== "paused" || contextLost) return;
   closeSheet();
   bridge.state("running");
   audio.resume();
@@ -2205,7 +2221,7 @@ function layoutWorldLabels(items, width, height, reserved = []) {
 // Geometry is measured only in ResizeObserver's post-layout delivery. Rendering
 // reads this cache; text, visibility and viewport changes do not read layout.
 function createHudLayoutCache(doc, win) {
-  const ids = ["hud", "objective", "combat-hud", "move-pad", "aim-pad", "touch-interact", "touch-reload", "touch-vault", "touch-item", "touch-fire", "toast", "context"],
+  const ids = ["hud", "objective", "combat-hud", "field-map", "move-pad", "aim-pad", "touch-interact", "touch-reload", "touch-vault", "touch-item", "touch-fire", "toast", "context"],
     entries = ids.map((id) => ({ id, element: doc.getElementById(id), offset: { x: 0, y: 0 }, rect: null })).filter((e) => e.element),
     canvas = doc.getElementById("world");
   const cache = { entries, revision: 0, closed: false, dirty: true };
@@ -2265,6 +2281,12 @@ function createHudLayoutCache(doc, win) {
 function hudLayoutCache() {
   if (typeof document === "undefined" || typeof window === "undefined" || !window.ResizeObserver) return null;
   return (hudLayoutCache.value ??= createHudLayoutCache(document, window));
+}
+function setHudHTML(id, html) {
+  const target = $(id);
+  if (target.innerHTML === html) return;
+  target.innerHTML = html;
+  hudLayoutCache.value?.invalidate();
 }
 function setHudText(id, text) {
   const target = $(id);
@@ -2398,7 +2420,7 @@ function updateHud() {
   if (mode === "playing") {
     $("hp").textContent = Math.ceil(hp);
     $("hp-fill").style.width = `${hp}%`;
-    $("ammo").innerHTML = `${ammo} <span>/ ${reserve}</span>`;
+    setHudHTML("ammo", `${ammo} <span>/ ${reserve}</span>`);
     $("reload-state").textContent = handsOccupied()
       ? "雙手搬運 · 先放下再換彈／開火"
       : reload > 0
@@ -2422,16 +2444,13 @@ function updateHud() {
             ? "前往北方金色 ◆ 議和；或交戰取物。"
             : "西側、西北與東側各有線索。靠近按 E 調查。";
     const departure = secured ? missionSystem?.departure?.() : null;
-    $("objective").innerHTML = secured
+    let objectiveHTML = secured
       ? departure
         ? `<b>◇ ${esc(departure.title)}</b><small>${esc(departure.detail)}</small>`
         : `<b>◇ ${PACT_FLOW[mission.id] ? "帶回地契與交接紀錄" : missionSystem ? "帶著具名回條" : "帶回物件"}，返回南側撤離</b><small>靠近出口按 E，安全提交這次決定。</small>`
       : `<b>◆ 證據 ${clueSet.size}/3　·　守軍 ${enemies.filter((e) => e.hp > 0).length}</b><small>${nextObjective}</small>`;
     if (!secured && field)
-      $("objective").insertAdjacentHTML(
-        "beforeend",
-        `<small>⚙ 現場作業 ${field.state.completed.length}/3 · ${esc(fieldObjective || "靠近 ⚙ 標記按 E")}</small>`,
-      );
+      objectiveHTML += `<small>⚙ 現場作業 ${field.state.completed.length}/3 · ${esc(fieldObjective || "靠近 ⚙ 標記按 E")}</small>`;
     const near = nearby();
     if (
       !secured &&
@@ -2514,11 +2533,9 @@ function updateHud() {
                     }
       )[missionSystem.status.response.status];
       if (responseText)
-        $("objective").insertAdjacentHTML(
-          "beforeend",
-          `<small>${responseText}</small>`,
-        );
+        objectiveHTML += `<small>${responseText}</small>`;
     }
+    setHudHTML("objective", objectiveHTML);
     setHudText("context", near
       ? `E　${near.title}${near.type === "exit" && !secured ? "（未完成，可安全撤回）" : ""}`
       : cover
@@ -2537,8 +2554,7 @@ function updateHud() {
           ? "補給已使用"
           : `F　${run.item === "medkit" ? "繃帶恢復生命" : "煙罐遮蔽警戒"} · 一次`;
   } else if (mode === "town-walk") {
-    $("objective").innerHTML =
-      "<b>暮砂鎮 · 走訪四位居民</b><small>靠近居民按 E。Esc 可回到委託簿。</small>";
+    setHudHTML("objective", "<b>暮砂鎮 · 走訪四位居民</b><small>靠近居民按 E。Esc 可回到委託簿。</small>");
     setHudText("context", sceneLabels.some(
       (n) =>
         Math.hypot(
@@ -2624,7 +2640,7 @@ function updateHud() {
 function frame(time) {
   if (shuttingDown) return;
   requestAnimationFrame(frame);
-  if (!world) return;
+  if (!world || contextLost || document.hidden) { lastTime = 0; return; }
   const raw = lastTime ? (time - lastTime) / 1000 : 1 / 60;
   lastTime = time;
   const dt = Math.min(raw, 0.05);
@@ -2671,7 +2687,7 @@ function frame(time) {
     movement(dt);
     audio.tick(time / 1000);
   } else if (mode === "transition") {
-    transitionTime -= dt;
+    transitionTime -= Math.min(raw, 0.25);
     player.position.z -= dt * 4;
     player.object.position.y = 1.1;
     world.animate(player, "idle");
@@ -2681,6 +2697,8 @@ function frame(time) {
       action?.();
     }
   }
+  if (["title", "hub", "briefing", "supplies", "journal", "result", "ending", "field", "clue", "parley", "extraction"].includes(mode))
+    audio.tick(time / 1000);
   const active = [
     "playing",
     "town-walk",
@@ -2691,7 +2709,7 @@ function frame(time) {
   ].includes(mode);
   missionSystem?.props.setInspection?.(mode === "field");
   world.update(active ? dt : 0, player, settings.reduced);
-  if (frameSamples % 4 === 0) updateHud();
+  if (frameSamples % 4 === 0) { updateHud(); updateMap(); }
 }
 
 overlay.addEventListener("click", (event) => {
@@ -2796,6 +2814,8 @@ window.addEventListener("keydown", (event) => {
     if (mode === "paused") resume();
     else if (mode === "help" || mode === "settings") closeSheet();
     else if (mode === "field") field.handle("field-close", {});
+    else if (mode === "clue" || mode === "parley") { mode = "playing"; hide(); clearInputs(); }
+    else if (mode === "town-dialogue") { mode = "town-walk"; hide(); clearInputs(); }
     else pause();
     return;
   }
@@ -2814,8 +2834,10 @@ window.addEventListener("keyup", (event) => keys.delete(event.code));
 function syncMouseButtons(event) {
   if (event.pointerType && event.pointerType !== "mouse") return;
   if (clearingInputs || !mouseActive || mode !== "playing") return;
+  const wasFiring = firing;
   mouseButtons = event.buttons;
   syncCombatInput();
+  if (firing && !wasFiring) shoot();
   if (event.buttons === 0) mouseActive = false;
 }
 canvas.addEventListener("pointermove", (event) => {
@@ -2832,6 +2854,7 @@ canvas.addEventListener("pointerdown", (event) => {
   audio.unlock();
   audio.resume();
   canvas.setPointerCapture(event.pointerId);
+  mousePointerId = event.pointerId;
   mouseActive = true;
   const p = world.aim(event.clientX, event.clientY);
   if (p) aimPoint.copy(p);
@@ -2846,6 +2869,7 @@ canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 canvas.addEventListener("pointercancel", () => {
   mouseActive = false;
   mouseButtons = 0;
+  mousePointerId = null;
   syncCombatInput();
 });
 function bindPad(element, callback) {
@@ -2862,6 +2886,7 @@ function bindPad(element, callback) {
   padResets.push(reset);
   element.addEventListener("pointerdown", (e) => {
     if (clearingInputs || id !== null || (mode !== "playing" && mode !== "town-walk")) return;
+    e.preventDefault();
     try { element.setPointerCapture(e.pointerId); } catch { return; }
     id = e.pointerId;
     audio.unlock();
@@ -2903,11 +2928,13 @@ bindPad($("aim-pad"), (x, y, end) => {
 });
 $("touch-fire").addEventListener("pointerdown", (e) => {
   if (clearingInputs || mode !== "playing" || firePointers.has(e.pointerId)) return;
+  e.preventDefault();
   try { e.currentTarget.setPointerCapture(e.pointerId); } catch { return; }
   audio.unlock();
   audio.resume();
   firePointers.add(e.pointerId);
   syncCombatInput();
+  shoot();
 });
 for (const name of ["pointerup", "pointercancel", "lostpointercapture"])
   $("touch-fire").addEventListener(name, (e) => {
@@ -2918,11 +2945,53 @@ $("touch-interact").onclick = interact;
 $("touch-reload").onclick = reloadWeapon;
 $("touch-vault").onclick = vault;
 $("touch-item").onclick = useItem;
+// All menus share one focus boundary, including fieldwork rebuilt in place.
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Tab" || overlay.classList.contains("hidden")) return;
+  const focusable = [...overlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, [tabindex="0"]')]
+    .filter(node => node.getClientRects().length);
+  if (!focusable.length) return;
+  const first = focusable[0], last = focusable.at(-1);
+  if (!overlay.contains(document.activeElement) || (event.shiftKey && document.activeElement === first)) {
+    event.preventDefault(); (event.shiftKey ? last : first).focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault(); first.focus();
+  }
+});
+canvas.addEventListener("webglcontextlost", (event) => {
+  event.preventDefault();
+  contextLost = true;
+  clearInputs();
+  pause();
+  audio.pause();
+  toast("畫面暫時中斷，正在恢復。任務與本機進度仍保留。");
+});
+canvas.addEventListener("webglcontextrestored", () => {
+  contextLost = false;
+  lastTime = 0;
+  world?.resize();
+  toast("畫面已恢復。按繼續返回旅程。");
+});
+function updateMap() {
+  const map = $("field-map");
+  if (!map) return;
+  map.hidden = mode !== "playing";
+  if (map.hidden || !player) return;
+  const xy = p => [72 + p[0] * 2.1, 72 + p[1] * 2.1];
+  const point = (p, shape, color) => {
+    const [x,y] = xy(p);
+    return shape === "square" ? `<rect x="${x-3}" y="${y-3}" width="6" height="6" fill="${color}"/>`
+      : shape === "diamond" ? `<path d="M${x},${y-4}l4,4 -4,4 -4,-4Z" fill="${color}"/>`
+      : `<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`;
+  };
+  const markup = `<svg viewBox="0 0 144 156" aria-hidden="true"><path d="M72 12v120M12 72h120" stroke="#a7b69c" stroke-opacity=".15"/><rect x="16" y="16" width="112" height="112" fill="none" stroke="#a7b69c" stroke-opacity=".3"/><text x="72" y="10" text-anchor="middle">N</text>${clues.filter(c=>!c.read).map(c=>point(c.position,"diamond","#9edaca")).join("")}${field?.tasks.filter(t=>!field.state.completed.includes(t.id)).map(t=>{const p=field.taskPoint(t);return point([p.x,p.z],"circle","#d9bb79")}).join("") || ""}${point(mission.exit,"square",secured ? "#c6f8d6" : "#91a293")}${point([player.position.x,player.position.z],"circle","#ffffff")}<text x="72" y="148" text-anchor="middle">◆ 證據　● 作業　□ 撤離</text></svg>`;
+  if (updateMap.markup !== markup) { map.innerHTML = markup; updateMap.markup = markup; }
+}
 window.addEventListener("blur", () => {
   foreground = false;
   lastTime = 0;
   clearInputs();
-  if (mode === "playing" || mode === "town-walk") pause();
+  if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition"].includes(mode)) pause();
   else audio.pause();
 });
 window.addEventListener("focus", () => {
@@ -2934,7 +3003,7 @@ document.addEventListener("visibilitychange", () => {
   lastTime = 0;
   if (document.hidden) {
     clearInputs();
-    if (mode === "playing" || mode === "town-walk") pause();
+    if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition"].includes(mode)) pause();
     else audio.pause();
   }
 });
@@ -3004,6 +3073,7 @@ window.dustDiagnostics = () => ({
               type: field.traversal.type,
               taskId: field.traversal.task.id,
               index: field.traversal.index,
+              offset: field.traversal.offset ? { x: field.traversal.offset.x, z: field.traversal.offset.z } : null,
               route: field.traversal.route.map((p) => [...p]),
               paused: Boolean(field.traversal.paused),
             }
@@ -3093,6 +3163,7 @@ window.dustDiagnostics = () => ({
     type: e.type,
     x: e.actor.position.x,
     z: e.actor.position.z,
+    screen: world.project({ ...e.actor.position, y: 1.1 }),
     hp: e.hp,
     state: e.state,
     colliderHeight: e.actor.colliderHeight,
@@ -3117,8 +3188,14 @@ window.dustDiagnostics = () => ({
   audio: {
     state: audio.context?.state || "uninitialized",
     voices: audio.voices.size,
+    active: audio.active,
+    decoded: audio.buffers.size,
+    errors: [...audio.loadErrors],
+    music: audio.settings.music,
+    sfx: audio.settings.sfx,
   },
   camera: world?.cameraIndex,
+  settings: { ...settings },
   colliders: world?.colliders.map((b) => ({ ...b })),
   geometry: world ? [...world.templates.keys()] : [],
 });

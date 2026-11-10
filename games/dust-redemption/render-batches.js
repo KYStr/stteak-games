@@ -14,9 +14,8 @@ export class BuildingBatches {
           !source.isMesh ||
           source.geometry.type !== "BoxGeometry" ||
           Array.isArray(material) ||
-          !material.isMeshStandardMaterial ||
-          material.roughness !== 0.94 ||
-          material.metalness !== 0 ||
+          !(material.isMeshLambertMaterial ||
+            (material.isMeshStandardMaterial && material.roughness === 0.94 && material.metalness === 0)) ||
           material.emissive.getHex() !== 0 ||
           material.map ||
           material.normalMap ||
@@ -25,7 +24,7 @@ export class BuildingBatches {
           material.alphaMap
         )
           throw new Error(
-            "Building batch requires the authored untextured .94/0 boxes",
+            "Building batch requires untextured authored boxes with diffuse or .94/0 physical materials",
           );
         const { width, height, depth } = source.geometry.parameters;
         this.records.push({

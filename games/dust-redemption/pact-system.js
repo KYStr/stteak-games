@@ -105,7 +105,7 @@ export class PactSystem {
       "完整交涉保留車上全部剩餘彈藥；掩體用途會封存其中六發，不能再算作整車可交涉物資。",
       "E可放手，回同車把手旁續推；沒有第二輛車或補一趟物資。",
     ];
-    this.props = createPactProps(THREE, world, this.flow, { field, player });
+    this.props = createPactProps(world.graphics || THREE, world, this.flow, { field, player });
     this.originalMethods = new Map();
     const wrap = (key, handler) => {
       const old = field[key],

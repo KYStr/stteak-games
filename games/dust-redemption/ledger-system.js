@@ -117,7 +117,7 @@ export class LedgerSystem {
         })),
       }));
     }
-    this.props = createLedgerProps(THREE, world, this.flow, { field, player });
+    this.props = createLedgerProps(world.graphics || THREE, world, this.flow, { field, player });
     this.borrowedTargets = [];
     for (const key of ["evidence-envelope", "notice-board"]) {
       const node = this.press.parts[key],

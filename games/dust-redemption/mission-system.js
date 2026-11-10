@@ -79,7 +79,7 @@ export class MissionSystem {
         { order: actor.initialOrder, index: 0 },
       ]),
     );
-    this.props = createMissionProps(THREE, world, this.flow);
+    this.props = createMissionProps(world.graphics || THREE, world, this.flow);
     this.departureGuidance = createDepartureGuidance({ moveCircle });
     this.seal = field.tasks.find((task) => task.id === "mail-seal");
     this.unload = field.tasks.find((task) => task.id === "mail-unload");

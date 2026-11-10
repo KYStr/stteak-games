@@ -302,7 +302,7 @@ button:disabled {
   align-items: center;
   justify-content: center;
   background: #11271b74;
-  backdrop-filter: blur(4px);
+  backdrop-filter: none;
   padding: 28px;
   z-index: 20;
 }
@@ -907,3 +907,17 @@ select {
 .challenge-comparison tbody th {
   font-weight: 400;
 }
+
+#field-map { position:absolute;right:28px;top:93px;width:144px;padding:7px;background:#21372fe8;border:1px solid #d0bd8266;pointer-events:none;box-shadow:0 6px 24px #15281c33; }
+#field-map[hidden] { display:none; }
+#field-map svg { display:block;width:100%; }
+#field-map text { fill:#ece3cd;font:8px system-ui,sans-serif; }
+#overlay .banner + .columns { margin-top:22px; }
+.panel details { line-height:1.8; }
+.panel summary { cursor:pointer;color:#e5ca89;padding:10px 0; }
+.panel summary:focus-visible { outline:3px solid var(--teal);outline-offset:3px; }
+@media (max-width:900px),(max-height:550px) { #field-map { right:16px;top:82px;width:110px; } }
+.field-view #field-map { visibility:hidden; }
+@media (max-width:600px) { .columns { grid-template-columns:1fr; } #field-map { display:none; } #overlay.field-view .panel { width:min(90%,420px); } }
+
+#touch-controls { user-select:none; -webkit-user-select:none; }
