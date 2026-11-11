@@ -90,3 +90,21 @@ test('dispose during delayed suspension completes and cancels future activation'
 test('late audio loading after disposal cannot start sources or revive the context',async t=>{
  const f=fixture(t,{deferFetch:true});f.sound.setActive(true);const loading=f.sound.unlock();await flush();const c=f.contexts[0],closed=f.sound.dispose();f.advance(34);await closed;f.resolveFetch();await loading;assert.equal(c.state,'closed');assert.equal(c.sources.length,0);assert.equal(f.sound.metrics().ready,false);
 });
+
+test('committed confirmations bypass optional debounce and retire voices with bounded ownership',async t=>{
+ const f=fixture(t),c=await f.start();f.sound.effect('ui');
+ for(const kind of ['buy','discover','water']){f.advance(20);f.sound.effect(kind,{confirmed:true});}
+ assert.equal(f.sound.metrics().confirmationStarts,3);assert.equal(c.sources.length,6);
+ for(let i=0;i<30;i++)f.sound.effect('water',{confirmed:true});
+ assert.equal(f.sound.metrics().voices,6);assert.equal(f.sound.metrics().confirmationStarts,33);
+ for(const s of c.sources.slice(2))s.onended?.();
+ assert.equal(f.sound.metrics().voices,0);assert.equal(f.sound.metrics().loopSources,2);
+ // Repeated end/cancel notifications may never decrement twice.
+ for(const s of c.sources.slice(2))s.onended?.();assert.equal(f.sound.metrics().voices,0);
+ f.sound.effect('water',{confirmed:true});const end=f.sound.dispose();f.advance(40);await end;assert.equal(f.sound.metrics().voices,0);
+});
+
+test('preparing nodes before Start never unlocks, fetches or starts audible sources',async t=>{
+ const f=fixture(t);f.sound.prepare();assert.equal(f.contexts.length,1);assert.equal(f.sound.metrics().state,'locked');assert.equal(f.contexts[0].sources.length,0);assert.equal(f.sound.metrics().ready,false);
+ const c=await f.start();assert.equal(f.contexts.length,1);assert.equal(c.sources.length,2);assert.equal(f.sound.metrics().state,'running');
+});

@@ -1,3 +1,4 @@
+import {createCampaign, validateCampaign} from "./campaign.js";
 import {
   PLANTS,
   DECORATIONS,
@@ -54,10 +55,12 @@ const missingItems = (state, items) =>
     );
 const fail = (state, message) => ({ ok: false, state, message });
 
-export function createState(slot = 1) {
+export function createState(slot = 1, {mode = "free", seed = 12345, difficulty = "standard"} = {}) {
   if (![1, 2].includes(slot)) throw new RangeError("存檔槽必須為 1 或 2");
   return {
-    schema: 1,
+    schema: 2,
+    mode,
+    campaign: mode === "journey" ? createCampaign(seed,difficulty) : null,
     slot,
     revision: 0,
     day: 1,
@@ -135,7 +138,8 @@ function validGrid(grid) {
 }
 export function validateState(state) {
   let error = null;
-  if (!isRecord(state) || state.schema !== 1) error = "不支援的存檔版本";
+  if (!isRecord(state) || ![1,2].includes(state.schema)) error = "不支援的存檔版本";
+  else if (state.schema === 2 && (!["free","journey"].includes(state.mode) || (state.mode === "journey" ? !validateCampaign(state.campaign) : state.campaign !== null))) error = "旅程資料損壞";
   else if (
     ![1, 2].includes(state.slot) ||
     !integer(state.revision) ||
@@ -397,6 +401,7 @@ export function transact(state, action) {
   if (!valid.ok) return fail(state, `資料無法操作：${valid.error}`);
   if (!isRecord(action) || typeof action.type !== "string")
     return fail(state, "無效操作");
+  if (state.mode === "journey" && action.type === "festival" && state.campaign.status !== "won") return fail(state,"完成四章守望後，月光慶典才會點亮。");
   const next = clone(state);
   next.undo = null;
   let message = "";

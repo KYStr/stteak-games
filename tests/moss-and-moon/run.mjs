@@ -10,3 +10,6 @@ const unit = spawnSync(process.execPath, ["--test", ...units, new URL("./server.
 });
 if (unit.status !== 0) process.exit(unit.status || 1);
 await import("./acceptance.mjs");
+
+if (!process.exitCode) await import("./regressions.mjs");
+if (!process.exitCode) await import("./campaign-bots.mjs");

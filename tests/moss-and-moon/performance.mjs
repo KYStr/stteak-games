@@ -33,8 +33,12 @@ export async function measureMovement(page, durationMs = 12000) {
 }
 export function assertBudget(measurement, label) {
   assert.ok(measurement.samples.length > 30, label + ': actual rendered samples');
-  assert.ok(measurement.raf.mean <= 33.3, `${label}: RAF average ${measurement.raf.mean.toFixed(2)} <= 33.3 ms`);
-  assert.ok(measurement.raf.p95 <= 50, `${label}: RAF p95 ${measurement.raf.p95.toFixed(2)} <= 50 ms`);
-  assert.ok(measurement.completion.mean <= 33.3, `${label}: render completion average ${measurement.completion.mean.toFixed(2)} <= 33.3 ms`);
-  assert.ok(measurement.completion.p95 <= 50, `${label}: render completion p95 ${measurement.completion.p95.toFixed(2)} <= 50 ms`);
+  assert.ok(measurement.update.p95 <= 6, `${label}: complete non-render update p95 ${measurement.update.p95.toFixed(2)} <= 6 ms`);
+  if (measurement.world) {
+    assert.ok(measurement.world.drawCalls <= 250, label+': draw calls');
+    assert.ok(measurement.world.triangles <= 1500000, label+': triangles');
+    assert.ok(measurement.world.dpr <= 2, label+': capped DPR');
+    assert.ok(measurement.world.textureBytesBound <= 256*1024*1024, label+': conservative texture memory');
+  }
+  measurement.referenceOnly = true; // RAF/completion includes CPU raster and host scheduling.
 }

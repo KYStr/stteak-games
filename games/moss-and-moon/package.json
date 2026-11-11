@@ -7,6 +7,8 @@
     "assets": "node export-assets.mjs",
     "test": "node ../../tests/moss-and-moon/run.mjs",
     "test:unit": "node --test ../../tests/games/moss-and-moon/*.test.js",
+    "test:profile": "node ../../tests/moss-and-moon/profile.mjs",
+    "test:journey": "node ../../tests/moss-and-moon/campaign-bots.mjs",
     "test:soak": "node ../../tests/moss-and-moon/stability.mjs"
   },
   "dependencies": {

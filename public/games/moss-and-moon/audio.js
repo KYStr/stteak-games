@@ -23,8 +23,9 @@ export function createAudio(onError) {
     settings = { music: 0.35, ambient: 0.45, sfx: 0.5 },
     loadPromise = null,
     ready = false,
-    lastEffect = 0,
-    voices = 0,
+    unlocked = false,
+    lastOptionalEffect = -Infinity,
+    confirmationStarts = 0,
     error = null;
   let revision = 0,
     pauseTimer = null,
@@ -33,7 +34,23 @@ export function createAudio(onError) {
     disposePromise = null;
   let ramp = { from: 0, to: 0, start: 0, end: 0 };
   const buffers = {},
-    loops = [];
+    loops = [], voices = [];
+  function retire(voice, fade = false) {
+    if (voice.retired) return;
+    voice.retired = true;
+    const i = voices.indexOf(voice);
+    if (i >= 0) voices.splice(i, 1);
+    if (fade) {
+      const now = context.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(voice.gain.gain.value, now);
+      voice.gain.gain.linearRampToValueAtTime(0, now + .005);
+      voice.source.stop(now + .005);
+    } else {
+      voice.source.disconnect();
+      voice.gain.disconnect();
+    }
+  }
   const cancelPause = () => {
     if (pauseTimer !== null) {
       clearTimeout(pauseTimer);
@@ -143,9 +160,9 @@ export function createAudio(onError) {
     startLoops();
     if (ready) fadeTo(1);
   }
-  async function unlock() {
-    if (disposed) return;
-    if (!context) {
+  function prepare() {
+    if (disposed || context) return;
+    {
       context = new (window.AudioContext || window.webkitAudioContext)();
       output = context.createGain();
       output.gain.value = AUDIO_OUTPUT_GAIN;
@@ -158,6 +175,13 @@ export function createAudio(onError) {
         buses[name].gain.value = settings[name];
         buses[name].connect(output);
       }
+    }
+  }
+  async function unlock() {
+    if (disposed) return;
+    prepare();
+    unlocked = true;
+    if (!loadPromise) {
       loadPromise = Promise.all(
         Object.entries(filenames).map(async ([id, file]) => {
           const response = await fetch(
@@ -204,41 +228,43 @@ export function createAudio(onError) {
     if (active) return resumeActive(request);
     pauseAfterFade(request);
   }
-  function effect(kind) {
+  function effect(kind, {confirmed = false} = {}) {
     if (
       disposed ||
       !context ||
       !active ||
       !ready ||
       context.state !== "running" ||
-      voices >= 6 ||
-      context.currentTime - lastEffect < 0.065
+      (!confirmed && (voices.length >= 6 || context.currentTime - lastOptionalEffect < 0.065))
     )
       return;
-    lastEffect = context.currentTime;
+    if (!confirmed) lastOptionalEffect = context.currentTime;
+    if (voices.length >= 6) retire(voices.find(v => !v.confirmed) || voices[0], true);
     const name = ["water", "waterAll"].includes(kind)
       ? "water"
       : kind === "plant"
         ? "plant"
         : ["harvest", "harvestAll"].includes(kind)
           ? "harvest"
-          : ["deliver", "festival", "discover", "craft"].includes(kind)
+          : ["deliver", "festival", "discover", "craft", "success"].includes(kind)
             ? "success"
             : "ui";
     const source = context.createBufferSource(),
       gain = context.createGain();
     source.buffer = buffers[name];
-    source.playbackRate.value = 1 + ((voices % 3) - 1) * 0.035;
+    source.playbackRate.value = 1 + ((voices.length % 3) - 1) * 0.035;
     gain.gain.value = name === "success" ? 0.65 : 0.8;
     source.connect(gain);
     gain.connect(buses.sfx);
-    source.start();
-    voices++;
+    const voice = {source, gain, startedAt:context.currentTime, confirmed, retired:false};
+    voices.push(voice);
     source.onended = () => {
-      voices--;
+      retire(voice);
       source.disconnect();
       gain.disconnect();
     };
+    source.start();
+    if (confirmed) confirmationStarts++;
   }
   function dispose() {
     if (disposePromise) return disposePromise;
@@ -249,7 +275,8 @@ export function createAudio(onError) {
     if (!context) return Promise.resolve();
     disposePromise = new Promise((resolve) => {
       const close = () => {
-        for (const source of loops) source.stop();
+        while (voices.length) { const v = voices[0]; retire(v); v.source.stop(); }
+        for (const source of loops) { source.stop(); source.disconnect(); }
         Promise.resolve(context.close()).then(resolve, resolve);
       };
       if (context.state !== "running") {
@@ -270,13 +297,15 @@ export function createAudio(onError) {
   }
   return {
     unlock,
+    prepare,
     update,
     setActive,
     effect,
     dispose,
     metrics: () => ({
-      state: context?.state || "locked",
-      voices,
+      state: unlocked ? context?.state || "locked" : "locked",
+      voices:voices.length,
+      confirmationStarts,
       loopSources: loops.length,
       ready,
       error,

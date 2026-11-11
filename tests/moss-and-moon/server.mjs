@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { readFile } from 'node:fs/promises';
 const value = process.env.MOSS_PORT ?? '8104';
 if (!/^\d+$/.test(value) || !Number.isInteger(Number(value)) || Number(value) < 1 || Number(value) > 65535)
   throw new Error('MOSS_PORT must be an integer in 1..65535');
@@ -14,6 +15,9 @@ export async function ensureServer() {
     const html = await response.text();
     if (!response.ok || !html.includes('苔蘚與月光 · Moss & Moon') || !html.includes('id="world"'))
       throw new Error(`Port ${port} is occupied by a service other than Moss & Moon`);
+    const source = await fetch(new URL('main.js',base),{signal:AbortSignal.timeout(1000)});
+    const expected = await readFile(new URL('../../public/games/moss-and-moon/main.js',import.meta.url),'utf8');
+    if(!source.ok || await source.text() !== expected) throw new Error(`Port ${port} serves a different Moss & Moon source build`);
     return true;
   };
   if (await check()) return null;

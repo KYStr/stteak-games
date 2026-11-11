@@ -19,13 +19,15 @@ import {
   festivalStatus,
   transact,
 } from "./rules.js";
-import { loadSlot, saveSlot } from "./storage.js";
+import {STAGES, STAGE_MS, taskLabel} from "./campaign-content.js";
+import {createCampaign, stepCampaign, campaignAction, campaignMetrics} from "./campaign.js";
+import { loadSlot, saveSlot, loadRecords, recordCampaign, migrateState } from "./storage.js";
 import { createWorld } from "./world.js";
 import { createAudio } from "./audio.js";
 import { bridge } from "./bridge.js";
 
-const BUILD = "moss-and-moon-stteak8-r2",
-  VERSION = "1.2.0";
+const BUILD = "moss-and-moon-stteak8-r3",
+  VERSION = "1.3.0";
 const $ = (s) => document.querySelector(s),
   esc = (v) =>
     String(v ?? "").replace(
@@ -70,6 +72,14 @@ let connection,
 const systemReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (state.revision === 0 && systemReduced) state.settings.reducedMotion = true;
 let dialogueTimers = [];
+let transitionGeneration = 0, transitioning = false;
+function invalidateTransition() {
+  transitionGeneration++; transitioning = false;
+  $("#world").removeAttribute("aria-busy");
+  $("#travel-status").hidden = true;
+  document.querySelectorAll("[data-region]").forEach(el => { el.disabled = false; });
+}
+const paintOpportunity = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 let importSequence = 0; // Only the latest file read may commit to its unchanged garden session.
 function revealDialogue() {
   for (const timer of dialogueTimers) clearInterval(timer);
@@ -109,6 +119,7 @@ function persist(candidate = state) {
   return r.ok;
 }
 function action(a, { refresh = true } = {}) {
+  if (transitioning) return false;
   if (["place", "move"].includes(a.type) && !world.canPlace(a.index)) {
     notice("你正站在這附近。先走到旁邊，讓家具也有自己的空間。", true);
     return false;
@@ -122,10 +133,76 @@ function action(a, { refresh = true } = {}) {
   if (movingFrom !== null && state.grid[movingFrom]?.type !== "decor")
     movingFrom = null;
   const saved = persist();
-  sound.effect(a.type);
-  if (refresh) render();
+  sound.effect(a.type, {confirmed:true});
   if (saved) notice(result.message);
+  if (refresh) render();
   return true;
+}
+let selectedTask = 0, campaignHudMs = 0, campaignSaveMs = 0;
+function newSeed() { return crypto.getRandomValues(new Uint32Array(1))[0] || 12345; }
+function newJourney(seed,difficulty) {
+  invalidateTransition();
+  const fresh = createState(slot,{mode:'journey',seed,difficulty});
+  campaignAction(fresh.campaign,{type:'begin'});fresh.revision=1;fresh.memo.tutorialStep=1;
+  if(!persist(fresh))return;
+  state=fresh;state.campaign.pendingMs=0;campaignSaveMs=0;selectedTask=0;
+  closePanel();paused=false;render();resume();openPanel('journey-help');
+}
+function renderCampaign() {
+  const c=state.campaign;
+  $("#journey").hidden=state.mode!=='journey';
+  document.body.classList.toggle("journey-mode",state.mode==='journey');
+  if(!c)return;
+  $("#journey-result-button").hidden = !["won","lost","stage-result"].includes(c.status);
+  const g=stageGoalText(c);
+  $("#journey-title").textContent=g;
+  $("#journey-time").textContent=`${Math.ceil((STAGE_MS-c.stageElapsedMs)/1000)} 秒 · 月光 ${Math.ceil(c.integrity)}/100 · 任務 ${c.stageTasks}/${STAGES[c.stage].tasks}`;
+  $("#journey-integrity").value=c.integrity;
+  $("#journey-resources").textContent=`庇護絨苔 ${c.resources.moss} · 淨化植物 ${c.resources.plants}${c.carried?' · 攜帶光種 → '+((c.carried)%4+1)+' 號':''}`;
+  for(let i=0;i<4;i++) {
+    const n=c.taskNodes[i],row=$("#task-"+i),attached=c.hazards.some(h=>h.node===i&&h.attached);
+    row.querySelector('span').textContent=`${i+1} ${n.done?'✓ 已恢復':taskLabel(n)}${attached?' · ◆ 陰影附著':''}${c.shieldTimers[i]>0?' · ⌂ 庇護':''}`;
+    row.classList.toggle('threatened',attached);
+  }
+}
+function stageGoalText(c) {return `${c.stage+1}/4 ${STAGES[c.stage].name} · ${c.difficulty==='standard'?'標準':'溫柔'}`;}
+function performCampaign(kind,node=selectedTask) {
+  if(state.mode!=='journey'||paused||transitioning||$("#panel").open)return;
+  selectedTask=node;
+  const c=state.campaign,n=c.taskNodes[node];
+  if(kind==='auto')kind=tool==='water'?'water':tool==='harvest'?'harvest':c.carried&&node===c.carried%4?'deliver':n.kind==='path'&&n.rotation!==n.target?'rotate':'perform';
+  const result=campaignAction(c,{type:kind,node},world.position());
+  if(!result.ok){notice(result.message,true);return;}
+  state.revision++;persist();sound.effect(kind==='rotate'?'ui':kind==='perform'?'success':kind,{confirmed:true});
+  world.animate(kind==='water'?'water':'harvest');world.campaignFeedback(node);notice(result.message);renderCampaign();
+}
+function showCampaignResult() {
+  const c=state.campaign;
+  if(['won','lost'].includes(c.status)) {
+    const result=recordCampaign(c);
+    if(result.ok)c.resultRecorded=true;
+    else notice('最佳紀錄保存失敗，庭園仍保留；請匯出備份。',true);
+    if(c.status==='won'){state.festival=true;state.festivalDay=state.day;state.region='garden';}
+    state.revision++;persist();
+  }
+  render();
+  world.setEnabled(false);
+  if(!paused){sound.setActive(true);sound.effect(c.status==='lost'?'error':'festival',{confirmed:true});}
+  openPanel('journey-result');
+  if(c.status==='won')world.celebrate();
+}
+function campaignTick(elapsedMs) {
+  if(!started||paused||faulted||transitioning||document.hidden||$("#panel").open||state.mode!=='journey'||state.campaign.status!=='playing')return;
+  const c=state.campaign;
+  if(c.pendingMs+elapsedMs>60000){pause();notice('畫面長時間中斷，守望已暫停。準備好再繼續。');return;}
+  c.pendingMs+=Math.max(0,elapsedMs);
+  // At most two seconds of simulation per frame; preserve the remaining elapsed time.
+  let budget=8;
+  while(c.pendingMs>0&&budget--&&c.status==='playing')c.pendingMs-=stepCampaign(c,c.pendingMs);
+  campaignHudMs+=elapsedMs;campaignSaveMs+=elapsedMs;
+  if(campaignHudMs>=250){renderCampaign();campaignHudMs%=250;}
+  if(state.campaign.status!=='playing'){state.campaign.pendingMs=0;state.revision++;persist();renderCampaign();showCampaignResult();}
+  else if(campaignSaveMs>=5000){persist();campaignSaveMs%=5000;}
 }
 function dailyCounts() {
   return {
@@ -139,6 +216,7 @@ function dailyCounts() {
   };
 }
 function guidance() {
+  if (state.mode === "journey") return {text:STAGES[state.campaign.stage].mechanic,label:"旅程操作說明 →",panel:"journey-help"};
   const { thirsty, mature } = dailyCounts();
   if (!state.completedQuests.includes("mira-1")) {
     if (count("moss") >= 2)
@@ -238,6 +316,7 @@ function render() {
   $("#goal").textContent = goalText();
   $("#guide-action").textContent = guidance().label;
   $("#switch-slot").textContent = `庭園 ${slot} · 切換存檔`;
+  $("#new-game-options").hidden = state.revision > 0;
   $("#start").disabled = false;
   $("#start").innerHTML =
     (state.revision > 0 ? "繼續庭園 · 第 " + state.day + " 日" : "走進庭園") +
@@ -295,6 +374,7 @@ function render() {
     .forEach((el) =>
       el.setAttribute("aria-pressed", String(el.classList.contains("active"))),
     );
+  renderCampaign();
   updateContext();
   if (panelName) renderPanel();
 }
@@ -338,6 +418,7 @@ function tile(i) {
   updateContext();
 }
 function interaction(obj) {
+  if (obj.kind === "campaign") { selectedTask = obj.id; performCampaign("auto",obj.id); return; }
   if (obj.kind === "house") openPanel("sleep");
   else if (obj.kind === "shop") openPanel("shop");
   else if (obj.kind === "resident") {
@@ -353,14 +434,34 @@ function interaction(obj) {
   } else if (obj.kind === "puzzle") openPanel("puzzle:" + obj.region);
   else if (obj.kind === "return") travel("garden");
 }
-function travel(region) {
-  if (action({ type: "travel", region })) {
-    selected = -1;
-    movingFrom = null;
-    world.select(-1);
-    returnToWorld();
-    $("#world").focus();
+async function travel(region) {
+  if (transitioning || faulted) return;
+  if (state.mode === 'journey' && state.campaign.status === 'playing' && region !== STAGES[state.campaign.stage].region) {
+    notice('本章正在守望這片月光。章節結束後可散步，或從結果繼續下一區。',true);return;
   }
+  const wasPaused = paused;
+  $("#travel-status").hidden = false;
+  $("#travel-status").textContent = "正在前往…";
+  $("#world").setAttribute("aria-busy", "true");
+  world.setEnabled(false);
+  if (!action({type:"travel", region}, {refresh:false})) { invalidateTransition(); world.setEnabled(started&&!paused&&!$("#panel").open); return; }
+  const generation = ++transitionGeneration;
+  transitioning = true;
+  document.querySelectorAll("[data-region]").forEach(el => { el.disabled = true; });
+  closePanel();
+  world.setEnabled(false);
+  await paintOpportunity();
+  if (generation !== transitionGeneration || faulted) return;
+  selected = -1; movingFrom = null;
+  world.select(-1);
+  render();
+  transitioning = false;
+  $("#travel-status").hidden = true;
+  $("#world").removeAttribute("aria-busy");
+  document.querySelectorAll("[data-region]").forEach(el => { el.disabled = false; });
+  if (wasPaused) paused = true;
+  world.setEnabled(started && !paused && !$("#panel").open);
+  if (!paused && !$("#panel").open) $("#world").focus({preventScroll:true});
 }
 function welcomeMode(value) {
   $("#welcome").hidden = !value;
@@ -375,15 +476,29 @@ function returnToWorld() {
 }
 function start() {
   if (faulted) return;
+  $("#start").disabled = true;
+  notice("正在走進月光庭園…");
+  if (state.revision === 0 && state.mode !== "journey" && $("#new-mode").value === "journey") {
+    state.mode = "journey";
+    state.campaign = createCampaign($("#new-seed").value || newSeed(),$("#new-difficulty").value);
+  }
+  if (state.mode === "journey" && state.campaign.status === "ready") campaignAction(state.campaign,{type:"begin"});
   started = true;
   paused = false;
   welcomeMode(false);
-  world.setEnabled(true);
+  world.setEnabled(!transitioning);
+  // Commit onboarding before optional UI/layout work; audio resume stays in the trusted gesture.
+  if (state.revision === 0) {
+    const next = transact(state,{type:'tutorial',step:1});
+    if (next.ok) {state=next.state;if(!loaded.error)persist();}
+  }
   sound.setActive(true);
   sound.unlock();
   connection?.state("running");
   reportLoadOutcome();
-  $("#world").focus();
+  render();
+  if (state.mode === "journey" && ["stage-result","won","lost"].includes(state.campaign.status)) showCampaignResult();
+  if (!$("#panel").open) $("#world").focus();
 }
 function reportLoadOutcome(normalMessage) {
   $("#save-warning").hidden = true;
@@ -396,7 +511,7 @@ function reportLoadOutcome(normalMessage) {
   }
   else
     notice(
-      normalMessage || (state.day > 1 || state.stats.planted > 0
+      normalMessage || (state.mode === "journey" ? "守望開始。從右側任務列「走近 1」，再按「照顧」，守住月光。" : state.day > 1 || state.stats.planted > 0
         ? "歡迎回家。接著照顧庭園，或翻開手帳看看下一步吧。"
         : "歡迎回家。種下兩份絨苔，再澆水吧。"),
     );
@@ -420,7 +535,7 @@ function resume() {
   }
   paused = false;
   closePanel();
-  world.setEnabled(true);
+  world.setEnabled(!transitioning);
   sound.setActive(true);
   connection?.state("running");
 }
@@ -442,7 +557,7 @@ function closePanel() {
   panelName = null;
   world?.clearPreview();
   if ($("#panel").open) $("#panel").close();
-  if (started && !paused) world?.setEnabled(true);
+  if (started && !paused && !transitioning) world?.setEnabled(true);
   if (previousFocus?.isConnected && !previousFocus.closest("[hidden],[inert]"))
     previousFocus.focus({ preventScroll: true });
   else (started ? $("#world") : $("#start")).focus({ preventScroll: true });
@@ -450,6 +565,8 @@ function closePanel() {
 function showFailure(title, message) {
   if (faulted) return;
   importSequence++;
+  invalidateTransition();
+  releaseEscape();
   faulted = true;
   paused = true;
   world?.setEnabled(false);
@@ -481,7 +598,21 @@ function renderPanel() {
     focusData = active?.dataset ? { ...active.dataset } : {},
     scroll = $("#panel").scrollTop;
   lastPanel = panelName;
-  if (panelName === "help") {
+  if (panelName === "journey-help" || (panelName === "help" && state.mode === "journey")) {
+    title("月光旅程 · 四章守望");
+    html = `<p><strong>每章守望 160 秒，共 10 分 40 秒的實際遊玩。</strong>完成本章任務數並守住月光，四章後點亮慶典。月光歸零，或時間到但任務不足，將失敗。選單、暫停、背景切換和旅行不計時。</p><p>${STAGES[state.campaign.stage].mechanic}</p><ol><li>右側即時任務列：選「走近」，人物會沿路走到信標；再按「照顧」。也可點地面移動，走近編號 ◇ 按 E。</li><li>水滴／工具 2 或任務列「驅散」：驅散信標 1.7 公尺內的陰影。每個附著陰影持續消耗月光。</li><li>任務每 20 秒刷新。完成 +4 月光、獲得絨苔或培育植物；用絨苔庇護 20 秒，或消耗植物淨化附著陰影。</li><li>第二章拾種→下一編號交付；第三章先旋轉到目標方向，再接通光路；第四章綜合四節光路與接力。</li></ol><p>三種策略：沿信標輪流澆水；先完成任務累積庇護；保存培育植物作緊急淨化。完成額外任務可提高評等。標準為預設；溫柔模式陰影較慢出現、傷害較低。自由庭園完全不計時。</p><p>WASD／方向鍵移動，E 照顧附近信標；2 換澆水，3 換淨化，1 換一般照顧。右側任務列支援 Tab／Enter。Esc 暫停，選單內同樣暫停旅程。</p><div class="actions">${button("開始守望", "data-close", "primary")}</div>`;
+  } else if (panelName === "journey-result") {
+    const c=state.campaign,m=campaignMetrics(c),record=loadRecords();
+    if(c.status==='stage-result'){
+      m.score=Math.max(0,c.totalTasks*100+Math.round(c.integrity)*5+c.completedStages.length*250-c.mistakes*10);
+      m.rank=m.score>=7000?'S':m.score>=6000?'A':m.score>=5000?'B':'C';
+    }
+    title(c.status === 'won' ? '月光照亮了共同的家' : c.status === 'lost' ? '這一次，月光歇息了' : '一章守望完成',`月光旅程 · 第 ${c.stage+1}/4 章`);
+    html=`<p>${c.status==='lost'?esc(c.reason):c.status==='won'?'米拉鋪好絨苔，洛恩帶來新葉，露米點亮提燈。四個月相的守望，讓大家重新聚在庭園。':'下一章將引入新的照顧方式；月光至少恢復至 70。'}</p><p>種子 ${c.seed} · ${c.difficulty==='standard'?'標準':'溫柔'} · 實際遊玩 ${(c.activeMs/1000).toFixed(1)} 秒</p><div class="split"><div><h3>${c.status==='stage-result'?'預估 ':''}${m.rank} · ${m.score} 分</h3><p>完成任務 ${c.totalTasks} ×100<br>剩餘月光 ${Math.round(c.integrity)} ×5<br>完成章節 ${c.completedStages.length} ×250<br>失誤 ${c.mistakes} ×−10</p></div><div><h3>最佳 ${record.best?.score||0}</h3><p>S ≥7000 · A ≥6000 · B ≥5000 · C<br>額外任務與保留月光能提高評等。</p></div></div><div class="actions">${c.status==='stage-result'?button('前往下一章','data-campaign-next','primary'):button('重試相同種子','data-campaign-retry','primary')}${c.status==='lost'?button('重試這一章','data-campaign-retry-stage'):''}${button('新種子旅程','data-open="journey-new"')}${button('繼續自由庭園','data-campaign-free')}${button('匯出旅程備份','data-export')}</div>`;
+  } else if (panelName === "journey-new") {
+    title("新的月光旅程");
+    html=`<p>將取代目前庭園；最佳紀錄保留，另一存檔不變。可先匯出備份。</p><label class="setting">種子 <input id="journey-seed" type="number" min="1" max="4294967295" value="${newSeed()}"></label><label class="setting">難度 <select id="journey-difficulty"><option value="standard">標準 · 正式守望</option><option value="gentle">溫柔 · 較少陰影</option></select></label><div class="actions">${button('換一個種子','data-random-journey')}${button('確認開始新旅程','data-campaign-new','primary')}${button('匯出備份','data-export')}</div>`;
+  } else if (panelName === "help") {
     title("在月光下，慢慢來");
     html = `<p>你的目標是為月光慶典準備一座庭園：<strong>完成 8 份委託、放置月光提燈／月藤拱門／慶典餐桌，達到二級園地評價。</strong>慶典後仍可自由遊玩。</p><ol><li>選「種植」及絨苔，點兩塊空地。種子不夠可免費到森林採集。</li><li>選「澆水」，點剛種下的兩株。水滴代表今天已澆水。</li><li>選「睡覺」換日；重複澆水與睡覺三晚，絨苔成熟。</li><li>選「收成」帶回背包。打開「鄰居」接取並交付米拉的第一抹綠意。</li></ol><h3>你決定一天多長</h3><p>缺水只延後生長，不會枯萎，沒有體力或真實時間倒數。月相每兩天更換；相鄰加成會顯示在選格說明。可隨時走訪三個採集區、解謎或佈置。</p><h3>鍵盤、滑鼠與觸控</h3><p>WASD／方向鍵移動；E 與身旁物件互動；1–4 換工具；Q／R 旋轉鏡頭；Esc 暫停。直接點田地即可使用工具，點地面可移動。畫面方向鍵與旋轉鍵提供觸控替代。所有格位也可在手帳的「選格面板」透過 Tab／Enter 操作。</p><p>家具：選家具 → 點空格 → 旋轉 → 確認。點已放置家具再點空格可搬動。最近一次耕地／佈置可撤銷；交易與收成無法重複領取。</p><p class="note">每次動作會在本機保存。兩個存檔獨立，沒有雲端同步。設定可匯出備份。三維空間目前未提供完整螢幕閱讀器導航，選格面板提供文字替代。</p><div class="actions">${button("開始第一步", "data-close", "primary")}${button("開啟選格面板", 'data-open="grid"')}</div>`;
   } else if (panelName === "journal") {
@@ -628,7 +759,7 @@ function renderPanel() {
       })
       .join(
         "",
-      )}<div class="actions">${button("重新開始目前庭園", 'data-open="reset"', "danger")}</div>`;
+      )}<div class="actions">${button("重新開始目前庭園", 'data-open="reset"', "danger")}${button("開始新的月光旅程", 'data-open="journey-new"')}</div>`;
   } else if (panelName === "reset") {
     title("重新開始庭園 " + slot);
     html = `<p>這會以全新第 1 日取代目前存檔。另一個存檔不受影響。建議先匯出備份。</p><div class="actions">${button("匯出備份", "data-export")}${button("確認重新開始", "data-reset-confirm", "danger")}${button("保留進度", 'data-open="settings"', "primary")}</div>`;
@@ -637,6 +768,7 @@ function renderPanel() {
     html = `<p>第 ${selected + 1} 格的${esc(itemName(state.grid[selected]?.id))}：家具會回到背包；植物會移除，最近一次可撤銷。</p><div class="actions">${button("確認清除", "data-clear-confirm", "danger")}${button("取消", 'data-open="grid"')}</div>`;
   }
   body.innerHTML = html;
+  if (transitioning) body.querySelectorAll("[data-region]").forEach(el => { el.disabled = true; });
   if (panelName === "settings") {
     const control = document.createElement("label");
     control.className = "setting";
@@ -710,6 +842,24 @@ function exportSave() {
 }
 // Capture trusted world gestures before tools or pointer handlers can open a panel.
 const gestureEvents = new AbortController();
+let escapeHeld = false;
+const releaseEscape = () => { escapeHeld = false; };
+addEventListener("keydown", event => {
+  if (event.key !== "Escape") return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  if (event.repeat || escapeHeld) return;
+  escapeHeld = true;
+  if (!started || faulted) {
+    if (!faulted && $("#panel").open) closePanel();
+    return;
+  }
+  if ($("#panel").open) paused ? resume() : closePanel();
+  else paused ? resume() : pause();
+}, {capture:true, signal:gestureEvents.signal});
+addEventListener("keyup", event => {
+  if (event.key === "Escape") releaseEscape();
+}, {capture:true, signal:gestureEvents.signal});
 function recoverAudioFromGesture(event) {
   if (!event.isTrusted || event.repeat || !started || paused || faulted) return;
   if (sound.metrics().state !== "running") void sound.unlock();
@@ -736,19 +886,33 @@ document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
   const d = b.dataset;
-  if ("dismissWarning" in d) $("#save-warning").hidden = true;
+  if ("randomSeed" in d) $("#new-seed").value = newSeed();
+  else if ("randomJourney" in d) $("#journey-seed").value = newSeed();
+  else if ("campaignNew" in d) newJourney($("#journey-seed").value,$("#journey-difficulty").value);
+  else if ("campaignRetryStage" in d) {
+    const result=campaignAction(state.campaign,{type:'retry'});
+    if(!result.ok)return;
+    state.campaign.pendingMs=0;state.revision++;persist();closePanel();paused=false;render();resume();openPanel('journey-help');
+  }
+  else if ("campaignRetry" in d) newJourney(state.campaign.seed,state.campaign.difficulty);
+  else if ("campaignNext" in d) {
+    const result=campaignAction(state.campaign,{type:"continue"});
+    if (!result.ok) return;
+    notice("正在前往下一章…");
+    state.region=STAGES[state.campaign.stage].region; state.revision++; persist();
+    closePanel(); paused=false; render(); world.setEnabled(true); sound.setActive(true); openPanel("journey-help");
+  }
+  else if ("campaignFree" in d) {
+    state.mode='free';state.campaign=null;state.revision++;persist();closePanel();paused=false;render();resume();
+  }
+  else if ("taskWalk" in d) { selectedTask=+d.taskWalk; world.walkToTask(selectedTask); notice('沿小路走近信標 '+(selectedTask+1)+'，到達後按照顧。'); }
+  else if ("taskAction" in d) performCampaign(d.taskAction,+d.node);
+  else if ("dismissWarning" in d) $("#save-warning").hidden = true;
   else if ("revealDialogue" in d) revealDialogue();
   else if (b.id === "start") {
     const first = state.revision === 0;
     start();
-    if (first) {
-      const next = transact(state, { type: "tutorial", step: 1 });
-      if (next.ok) {
-        state = next.state;
-        if (!loaded.error) persist();
-      }
-      openPanel("help");
-    }
+    if (first) openPanel("help");
   } else if (b.id === "switch-slot") openPanel("slots");
   else if (b.id === "close-panel" || "close" in d) {
     if (paused) resume();
@@ -828,15 +992,17 @@ document.addEventListener("click", (e) => {
   else if ("sleep" in d) {
     if (action({ type: "sleep" })) openPanel("morning");
   } else if ("festival" in d) {
-    if (state.festival || action({ type: "festival" })) {
+    const replay = state.festival;
+    if (replay || action({ type: "festival" })) {
       world.celebrate();
-      sound.effect("festival");
+      if (replay) sound.effect("festival", {confirmed:true});
       openPanel("festival");
     }
   } else if ("resume" in d) resume();
   else if ("export" in d) exportSave();
   else if ("import" in d) $("#import-file").click();
   else if ("slot" in d) {
+    invalidateTransition();
     if (started && !protectFallback && !persist()) return;
     slot = +d.slot;
     try {
@@ -856,6 +1022,7 @@ document.addEventListener("click", (e) => {
       reportLoadOutcome("已進入庭園 " + slot + "。");
     }
   } else if ("resetConfirm" in d) {
+    invalidateTransition();
     const fresh = createState(slot);
     if (!persist(fresh)) return;
     state = fresh;
@@ -888,6 +1055,7 @@ document.addEventListener("change", async (e) => {
   }
   if (e.target.id === "import-file" && e.target.files[0]) {
     if (faulted) return;
+    invalidateTransition();
     const file = e.target.files[0],
       request = ++importSequence,
       targetSlot = slot,
@@ -908,7 +1076,7 @@ document.addEventListener("change", async (e) => {
       if (text.length > 200000) throw new Error("檔案太大");
       const data = JSON.parse(text);
       if (data.game !== "moss-and-moon") throw new Error("不是庭園備份");
-      const candidate = { ...data.state, slot: targetSlot };
+      const candidate = migrateState({ ...data.state, slot: targetSlot });
       const saved = saveSlot(candidate);
       if (!saved.ok) throw new Error(saved.error);
       loaded = loadSlot(targetSlot);
@@ -921,7 +1089,7 @@ document.addEventListener("change", async (e) => {
       render();
       notice("已匯入這座庭園。");
     } catch (err) {
-      if (current()) notice("匯入失敗，原庭園保留：" + err.message, true);
+      if (current()) { render(); notice("匯入失敗，原庭園保留：" + err.message, true); }
     } finally {
       e.target.value = "";
     }
@@ -980,24 +1148,24 @@ $("#panel-body").addEventListener("keydown", (e) => {
 });
 addEventListener("keydown", (e) => {
   if (!started && !$("#panel").open && e.key === "Tab") {
-    const list = [$("#start"), $("#switch-slot")],
+    const list = [...$("#welcome").querySelectorAll("button,input,select")].filter(el => !el.disabled && !el.closest("[hidden]") && el.getClientRects().length),
       i = list.indexOf(document.activeElement);
     e.preventDefault();
     list[(i + (e.shiftKey ? -1 : 1) + list.length) % list.length].focus();
     return;
   }
-  if (e.key === "Escape" && !$("#panel").open) {
-    e.preventDefault();
-    paused ? resume() : pause();
-  }
+
 });
 addEventListener("visibilitychange", () => {
-  if (document.hidden && started) pause();
+  if (document.hidden) { releaseEscape(); if (started) pause(); }
 });
 addEventListener("blur", () => {
+  releaseEscape();
   if (started && !paused) pause();
 });
 addEventListener("pagehide", (event) => {
+  releaseEscape();
+  invalidateTransition();
   importSequence++;
   if (!protectFallback) persist();
   if (event.persisted) {
@@ -1016,6 +1184,7 @@ $("#world").addEventListener("webglcontextlost", (event) => {
 try {
   world = createWorld($("#world"), {
     tile,
+    tick: campaignTick,
     select(i) {
       selected = i;
       updateContext();
@@ -1035,6 +1204,7 @@ try {
       openPanel("reset");
     },
   });
+  sound.prepare();
   render();
   welcomeMode(true);
   $("#start").focus({ preventScroll: true });
@@ -1045,6 +1215,9 @@ try {
       version: VERSION,
       world: world.metrics(options.since),
       audio: sound.metrics(),
+      campaign: state.campaign ? structuredClone(campaignMetrics(state.campaign)) : null,
+      record: loadRecords().best,
+      transitioning,
       day: state.day,
       slot,
       started,

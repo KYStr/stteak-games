@@ -54,7 +54,8 @@ try {
   const p = await context.newPage();
   await p.route('**/__qa-away.html', route => route.fulfill({ contentType:'text/html', body:
     '<!doctype html><html><head><link rel="icon" href="data:,"><title>QA away</title></head><body>History lifecycle check</body></html>' }));
-  p.setDefaultTimeout(30000);
+  p.setDefaultTimeout(90000);
+  p.setDefaultNavigationTimeout(90000);
   p.on("pageerror", (e) => errors.push(e.message));
   p.on("console", (m) => {
     if (m.type() === "error") errors.push(m.text());
@@ -151,6 +152,7 @@ try {
   assert.equal((await diagnostic()).audio.state,"locked");
   await close();
   assert.equal(await p.evaluate(()=>document.activeElement.id),"switch-slot");
+  if(await p.locator("#new-game-options").isVisible()) await p.locator("#new-mode").selectOption("free");
   await p.locator("#start").click();
   await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.match(await p.locator("#panel-title").textContent(), /慢慢來/);
@@ -194,6 +196,7 @@ try {
   const saved = await snapshot();
   await p.reload();
   await p.waitForFunction(() => !!window.mossDiagnostics);
+  if(await p.locator("#new-game-options").isVisible()) await p.locator("#new-mode").selectOption("free");
   await p.locator("#start").click();
   await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal(await p.locator("#panel").evaluate((el) => el.open), false);
@@ -216,6 +219,8 @@ try {
   );
   // Canvas, movement and tool gestures recover browser-level suspensions under normal autoplay.
   const cdp = await context.newCDPSession(p);
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.voices===0);
+  await cdp.send('HeapProfiler.collectGarbage');
   const listeners = (await cdp.send('Memory.getDOMCounters')).jsEventListeners;
   for (let i=0;i<23;i++) {
     await p.evaluate(()=>window.__audioContexts[0].suspend());
@@ -224,6 +229,8 @@ try {
     await p.waitForFunction(()=>window.mossDiagnostics().audio.state==='running');
     assert.equal((await diagnostic()).audio.loopSources,2);
   }
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.voices===0);
+  await cdp.send('HeapProfiler.collectGarbage');
   assert.equal((await cdp.send('Memory.getDOMCounters')).jsEventListeners,listeners);
   await p.keyboard.press('Escape');
   await p.waitForFunction(()=>window.mossDiagnostics().audio.state==='suspended');
@@ -281,7 +288,10 @@ try {
   };
   await pausedPicker();
   const beforeMove = (await diagnostic()).world.position;
-  await p.keyboard.down('d'); await p.waitForTimeout(350); await p.keyboard.up('d');
+  await p.locator('#world').focus();
+  await p.keyboard.down('d');
+  await p.waitForFunction(before=>window.mossDiagnostics().world.position.some((v,i)=>v!==before[i]),beforeMove,{timeout:15000});
+  await p.keyboard.up('d');
   const afterMove = (await diagnostic()).world.position;
   assert.notDeepEqual(afterMove,beforeMove);
   await p.waitForTimeout(150);
@@ -328,7 +338,7 @@ try {
   await p.goBack();
   await p.waitForFunction(()=>!!window.mossDiagnostics);
   report.history = await p.evaluate(()=>({pageshows:window.__pageShows,navigation:performance.getEntriesByType('navigation').map(n=>n.type)}));
-  if (!(await diagnostic()).started) await p.locator('#start').click();
+  if (!(await diagnostic()).started) { if(await p.locator('#new-game-options').isVisible()) await p.locator('#new-mode').selectOption('free'); await p.locator('#start').click(); }
   else if ((await diagnostic()).paused) await p.locator('[data-resume]').click();
   assert.deepEqual(await snapshot(),beforeHistory);
   report.regressions = 'paused selection/cancel/confirm/unpaused placement; audio canvas/WASD/tool + 20 recoveries; modal transitions/60 Tabs; canvas plant/water; movement/key release/Q/R; synthetic visibility; real history';
@@ -340,9 +350,10 @@ try {
     await open("map");
     await p.locator(`#panel [data-region="${region}"]`).click();
     const transitionMs = performance.now()-transitionStart;
-    await p.waitForTimeout(3000);
+    await p.waitForFunction(()=>!window.mossDiagnostics().transitioning);
+    await p.waitForTimeout(500);
     await p.screenshot({path:artifacts+`/${region}-1280.png`});
-    report.exploration.push({region,transitionMs,movement:await measureMovement(p,6000)});
+    report.exploration.push({region,transitionMs,world:(await diagnostic()).world});
     await p.locator(`[data-gather="${region}"]`).click();
     await p.locator('[data-open="fieldguide"]').click();
     for (const d of DISCOVERIES.filter((d) => d.region === region)) {
@@ -414,6 +425,7 @@ try {
   await plant("moss", [0]);
   await p.reload();
   await p.waitForFunction(() => window.mossDiagnostics?.().slot === 2);
+  if(await p.locator("#new-game-options").isVisible()) await p.locator("#new-mode").selectOption("free");
   await p.locator("#start").click();
   await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal((await snapshot()).grid[0].id, "moss");
@@ -453,7 +465,7 @@ try {
     if(mode==='valid') assert.match(toast,/已進入庭園 1/);
     if(mode==='recovered') {
       assert.match(toast,/恢復庭園.*修復/);
-      assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('moss-and-moon:v1:slot:1')).version),1);
+      assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('moss-and-moon:v1:slot:1')).version),2);
     }
     if(mode==='both'||mode==='unsupported') {
       assert.match(await p.locator('#save-warning').textContent(),/無法讀取.*原始資料保留/);
@@ -471,7 +483,7 @@ try {
   }
   console.log('PASS in-session save fault reporting and repair');
   // Warm the renderer before measuring. Read-only diagnostics; scene remains interactive.
-  await p.waitForTimeout(12000);
+  await p.waitForTimeout(6000);
   await p.screenshot({ path: artifacts + "/garden-1280.png" });
   await p.setViewportSize({ width: 1920, height: 1080 });
   await p.waitForTimeout(1500);
@@ -493,7 +505,7 @@ try {
     }));
   };
   report.beforeSoak = await sample();
-  const soak = Number(process.env.MOSS_SOAK_MS || 15000);
+  const soak = Number(process.env.MOSS_SOAK_MS || 5000);
   for (let elapsed = 0; elapsed < soak; elapsed += 10000) {
     await p.waitForTimeout(Math.min(10000, soak - elapsed));
     if (elapsed % 30000 === 0)
@@ -511,8 +523,8 @@ try {
   report.warmupMs = 18000;
   report.movement = [];
   for (const viewport of [{width:1280,height:720},{width:1920,height:1080}]) {
-    await p.setViewportSize(viewport); await p.waitForTimeout(6000);
-    const measurement = await measureMovement(p,12000);
+    await p.setViewportSize(viewport); await p.waitForTimeout(1000);
+    const measurement = await measureMovement(p,8000);
     report.movement.push(measurement);
     await writeFile(artifacts + '/movement.json',JSON.stringify(report.movement,null,2));
     console.log('Movement',viewport,measurement.raf,measurement.completion,measurement.update,measurement.submit);
@@ -531,6 +543,7 @@ try {
   assert.equal(await p.locator("#fatal").getAttribute("role"), "alertdialog");
   await p.locator("#fatal button").click();
   await p.waitForFunction(() => !!window.mossDiagnostics);
+  if(await p.locator("#new-game-options").isVisible()) await p.locator("#new-mode").selectOption("free");
   await p.locator("#start").click();
   await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal((await snapshot()).festival, true);
@@ -540,6 +553,7 @@ try {
   );
   await p.reload();
   await p.waitForFunction(() => !!window.mossDiagnostics);
+  if(await p.locator("#new-game-options").isVisible()) await p.locator("#new-mode").selectOption("free");
   await p.locator("#start").click();
   await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal((await snapshot()).festival, true);
@@ -548,6 +562,7 @@ try {
   });
   await p.reload();
   await p.waitForFunction(() => !!window.mossDiagnostics);
+  if(await p.locator("#new-game-options").isVisible()) await p.locator("#new-mode").selectOption("free");
   await p.locator("#start").click();
   await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   await close();

@@ -111,6 +111,7 @@ export function createWorld(canvas, callbacks) {
   for (const clip of player.animations || [])
     playerActions[clip.name] = playerMixer.clipAction(clip);
   playerActions.idle?.play();
+  const playerActionList=Object.values(playerActions);
   const contactMaterial = new THREE.MeshBasicMaterial({
     color: "#243f35",
     transparent: true,
@@ -144,9 +145,76 @@ export function createWorld(canvas, callbacks) {
     submissions = new Float64Array(2048), completions = new Float64Array(2048);
   let frameCount = 0, renderCount = 0, lastCompletion = 0, updateMs = 0, submissionMs = 0;
   let totalUpdateMs = 0, totalSubmissionMs = 0, gridSignature = "", plantRebuilds = 0;
-  const moveVector = new THREE.Vector3(), upAxis = new THREE.Vector3(0,1,0);
+  const moveVector = new THREE.Vector3();
+  let movementSin = Math.SQRT1_2, movementCos = Math.SQRT1_2;
   const residents = [];
   let qualityMode = "", lightweight = true;
+  // Original procedural journey markers. Fixed pools survive region/save changes.
+  const journeyRoot = new THREE.Group(); scene.add(journeyRoot);
+  const socketGeometry = new THREE.TorusGeometry(.48,.055,5,20);
+  const crystalGeometry = new THREE.OctahedronGeometry(.23,0);
+  const shadeGeometry = new THREE.ConeGeometry(.3,.7,5);
+  const socketMaterial = new THREE.MeshBasicMaterial({color:'#f0d897'});
+  const shadeMaterial = new THREE.MeshBasicMaterial({color:'#563763'});
+  const markers=[], shades=[], links=[];
+  const linkGeometry=new THREE.CylinderGeometry(.035,.035,1,5);
+  const linkMaterial=new THREE.MeshBasicMaterial({color:'#92d0d1'});
+  const linkDirection=new THREE.Vector3(),linkUp=new THREE.Vector3(0,1,0);
+  for(let i=0;i<4;i++){const link=new THREE.Mesh(linkGeometry,linkMaterial);journeyRoot.add(link);links.push(link);}
+  let feedbackNode=-1,feedbackSeconds=0;
+  for(let i=0;i<4;i++) {
+    const root=new THREE.Group(),ring=new THREE.Mesh(socketGeometry,socketMaterial),crystal=new THREE.Mesh(crystalGeometry,socketMaterial.clone());
+    ring.rotation.x=-Math.PI/2;ring.position.y=.11;crystal.position.y=.8;
+    const arrow=new THREE.Mesh(shadeGeometry,socketMaterial);
+    arrow.scale.set(.35,.65,.35);arrow.position.set(0,.22,.3);arrow.rotation.x=Math.PI/2;
+    const direction=new THREE.Group();direction.add(arrow);root.add(direction);
+    root.userData.direction=direction;
+    root.add(ring,crystal);root.userData.interaction={kind:'campaign',id:i};
+    root.traverse(m=>{if(m.isMesh)m.userData.root=root;});journeyRoot.add(root);markers.push(root);
+    const el=document.createElement('div');el.className='journey-marker';el.textContent='◇ '+(i+1);document.getElementById('labels').append(el);
+    el.hidden=true;
+    root.userData.label=el;root.userData.crystal=crystal;
+  }
+  for(let i=0;i<7;i++){const mesh=new THREE.Mesh(shadeGeometry,shadeMaterial);journeyRoot.add(mesh);shades.push(mesh);}
+  let campaignVisible=false;
+  function updateCampaignModels(dt) {
+    const c=state?.mode==='journey'?state.campaign:null;
+    journeyRoot.visible=!!c;
+    if(!c){
+      if(campaignVisible)for(let i=0;i<4;i++)markers[i].userData.label.hidden=true;
+      campaignVisible=false;return;
+    }
+    campaignVisible=true;
+    if(feedbackSeconds>0)feedbackSeconds=Math.max(0,feedbackSeconds-dt);
+    for(let i=0;i<4;i++) {
+      const root=markers[i],el=root.userData.label;
+      if(!c){el.hidden=true;continue;}
+      const n=c.taskNodes[i];root.position.set(n.x,0,n.z);
+      root.userData.crystal.material.color.setHex(feedbackSeconds>0&&feedbackNode===i?0xffffff:c.shieldTimers[i]>0?0xa4d2ad:n.done?0x86b0a1:0xf0d897);
+      root.userData.crystal.rotation.y = n.rotation*Math.PI/2;
+      root.userData.direction.visible=n.kind==='path';
+      root.userData.direction.rotation.y=n.rotation*Math.PI/2;
+      if(root.userData.labelKind!==n.kind||root.userData.labelDone!==n.done||root.userData.labelRotation!==n.rotation){
+        el.textContent=(n.done?'✓ ':n.kind==='path'?'↻ ':n.kind==='deliver'?'♧ ':'◇ ')+(i+1);
+        root.userData.labelKind=n.kind;root.userData.labelDone=n.done;root.userData.labelRotation=n.rotation;
+      }
+      root.userData.crystal.scale.setScalar(feedbackSeconds>0&&feedbackNode===i&&!reduced?1.5:1);
+      if(invalidated || labelCameraRevision!==root.userData.revision) {
+        labelPoint.set(n.x,1.35,n.z).project(camera);
+        el.style.left=(labelPoint.x*.5+.5)*canvas.clientWidth+'px';
+        el.style.top=(-labelPoint.y*.5+.5)*canvas.clientHeight+'px';root.userData.revision=labelCameraRevision;
+      }
+      el.hidden=false;
+    }
+    for(let i=0;i<4;i++) {
+      const link=links[i];link.visible=!!c&&c.stage>=2&&(c.stage===3||i<2);
+      if(link.visible){const a=c.taskNodes[i],b=c.taskNodes[(i+1)%4];link.position.set((a.x+b.x)/2,.15,(a.z+b.z)/2);linkDirection.set(b.x-a.x,0,b.z-a.z);const length=linkDirection.length();link.scale.y=length;linkDirection.normalize();link.quaternion.setFromUnitVectors(linkUp,linkDirection);}
+    }
+    for(let i=0;i<7;i++) {
+      const h=c?.hazards[i],mesh=shades[i];mesh.visible=!!h;
+      if(h){mesh.position.set(h.x,.5,h.z);mesh.rotation.z=h.attached?Math.PI:0;}
+    }
+  }
   function qualityMesh(mesh) {
     if (!mesh.isMesh || mesh.isSkinnedMesh || mesh === selectionMesh) return;
     if (!mesh.userData.authored) mesh.userData.authored = { geometry:mesh.geometry, material:mesh.material };
@@ -173,52 +241,71 @@ export function createWorld(canvas, callbacks) {
   scene.add(staticStage);
   const stageSources = [];
   const stageMatrix = new THREE.Matrix4(), instanceMatrix = new THREE.Matrix4(), stagePoint = new THREE.Vector3();
+  let staticStageRebuilds = 0, staticVertexCapacity = 0;
+  let stagePositions = new Float32Array(0), stageColors = new Float32Array(0), stageCursor = 0;
   function clearStaticStage() {
     for (const mesh of stageSources) mesh.visible = true;
     stageSources.length = 0;
     staticStage.visible = false;
-    staticStage.geometry.dispose();
+  }
+  function appendStage(mesh, matrix) {
+    const g = mesh.geometry, p = g.attributes.position, c = g.attributes.color, indices = g.index;
+    const count = indices ? indices.count : p.count;
+    for (let i=0;i<count;i++) {
+      const v = indices ? indices.getX(i) : i;
+      stagePoint.fromBufferAttribute(p,v).applyMatrix4(matrix);
+      stagePositions[stageCursor] = stagePoint.x;
+      stagePositions[stageCursor+1] = stagePoint.y;
+      stagePositions[stageCursor+2] = stagePoint.z;
+      stageColors[stageCursor] = c ? c.getX(v) : mesh.material.color.r;
+      stageColors[stageCursor+1] = c ? c.getY(v) : mesh.material.color.g;
+      stageColors[stageCursor+2] = c ? c.getZ(v) : mesh.material.color.b;
+      stageCursor += 3;
+    }
+  }
+  function collectStage(node) {
+    if (!node.visible || node.userData.interaction?.kind === "resident") return;
+    if (node.isMesh && !node.isSkinnedMesh && !node.material.transparent) stageSources.push(node);
+    for (const child of node.children) collectStage(child);
   }
   function rebuildStaticStage() {
     clearStaticStage();
     if (!lightweight) return;
-    const positions = [], colors = [];
-    function append(mesh, matrix) {
-      const g = mesh.geometry, p = g.attributes.position, c = g.attributes.color, indices = g.index;
-      const count = indices ? indices.count : p.count;
-      for (let i=0;i<count;i++) {
-        const v = indices ? indices.getX(i) : i;
-        stagePoint.fromBufferAttribute(p,v).applyMatrix4(matrix);
-        positions.push(stagePoint.x,stagePoint.y,stagePoint.z);
-        colors.push(c ? c.getX(v) : mesh.material.color.r,
-          c ? c.getY(v) : mesh.material.color.g,c ? c.getZ(v) : mesh.material.color.b);
-      }
-    }
-    function visit(node) {
-      if (!node.visible || node.userData.interaction?.kind === "resident") return;
-      if (node.isMesh && !node.isSkinnedMesh && !node.material.transparent) {
-        if (node.isInstancedMesh) {
-          for (let i=0;i<node.count;i++) {
-            node.getMatrixAt(i,instanceMatrix);
-            stageMatrix.multiplyMatrices(node.matrixWorld,instanceMatrix);
-            append(node,stageMatrix);
-          }
-        } else append(node,node.matrixWorld);
-        stageSources.push(node);
-        node.visible = false;
-      }
-      for (const child of node.children) visit(child);
-    }
+    staticStageRebuilds++;
     for (const root of [environment,objects,flora]) {
       root.updateMatrixWorld(true);
-      visit(root);
+      collectStage(root);
     }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
-    geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
-    geometry.computeBoundingSphere();
-    staticStage.geometry = geometry;
-    staticStage.visible = positions.length > 0;
+    let required = 0;
+    for (const mesh of stageSources) required += (mesh.geometry.index?.count || mesh.geometry.attributes.position.count) * (mesh.isInstancedMesh ? mesh.count : 1);
+    if (required > staticVertexCapacity) {
+      staticVertexCapacity = Math.min(524288, Math.max(65536, 2 ** Math.ceil(Math.log2(required))));
+      if (required > staticVertexCapacity) throw new Error("Static scene exceeds supported garden capacity");
+      stagePositions = new Float32Array(staticVertexCapacity * 3);
+      stageColors = new Float32Array(staticVertexCapacity * 3);
+      staticStage.geometry.dispose();
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position",new THREE.BufferAttribute(stagePositions,3));
+      geometry.setAttribute("color",new THREE.BufferAttribute(stageColors,3));
+      staticStage.geometry = geometry;
+    }
+    stageCursor = 0;
+    for (const mesh of stageSources) {
+      if (mesh.isInstancedMesh) {
+        for (let i=0;i<mesh.count;i++) {
+          mesh.getMatrixAt(i,instanceMatrix);
+          stageMatrix.multiplyMatrices(mesh.matrixWorld,instanceMatrix);
+          appendStage(mesh,stageMatrix);
+        }
+      } else appendStage(mesh,mesh.matrixWorld);
+      mesh.visible = false;
+    }
+    const g = staticStage.geometry;
+    g.setDrawRange(0,required);
+    g.attributes.position.needsUpdate = true;
+    g.attributes.color.needsUpdate = true;
+    staticStage.frustumCulled = false;
+    staticStage.visible = required > 0;
   }
   function qualityScene() {
     // Restore authored visibility before collecting a new cached stage.
@@ -553,7 +640,8 @@ export function createWorld(canvas, callbacks) {
       clickable(gate, { kind: "return" });
       label("回到庭園", gate, 2);
     }
-    updateCamera();
+    updateProjection();
+    updateCutaways();
   }
   function sync(next) {
     const region = next.region || "garden";
@@ -645,8 +733,10 @@ export function createWorld(canvas, callbacks) {
   }
   function blocked(x, z) {
     if (Math.hypot(x, z) > 8.7) return true;
-    for (const o of obstacles)
+    for (let obstacleIndex=0;obstacleIndex<obstacles.length;obstacleIndex++) {
+      const o=obstacles[obstacleIndex];
       if (Math.hypot(x - o.x, z - o.z) < o.r + 0.18) return true;
+    }
     if (view === "garden" && state)
       for (let i = 0; i < 64; i++) {
         if (state.grid[i]?.type !== "decor") continue;
@@ -747,7 +837,8 @@ export function createWorld(canvas, callbacks) {
     labelHeight = 0;
   function updateLabels() {
     if (labelWidth <= 0 || labelHeight <= 0) return;
-    for (const label of labels) {
+    for (let labelIndex=0;labelIndex<labels.length;labelIndex++) {
+      const label=labels[labelIndex];
       const { obj, el, height } = label,
         p = obj.position,
         previous = label.projection;
@@ -824,6 +915,10 @@ export function createWorld(canvas, callbacks) {
       (-(e.clientY - rect.top) / rect.height) * 2 + 1,
     );
     raycaster.setFromCamera(pointer, camera);
+    if(state?.mode==='journey') {
+      const taskHits=raycaster.intersectObjects(markers,true);
+      if(taskHits.length){const root=taskHits[0].object.userData.root;moveTo(root.position.x,root.position.z);callbacks.notice?.("走近信標後按 E，或用右側任務列照顧。");return;}
+    }
     const hits = raycaster.intersectObjects(interactables, true); // 具名處理函式保持原本命中判定。
     if (hits.length) {
       const tileHit = hits.find((h) => h.object === tileInstances),
@@ -863,6 +958,11 @@ export function createWorld(canvas, callbacks) {
   addEventListener("pointercancel", cancelPointer); // 冒泡階段在正常canvas處理之後撤銷；畫布外放開也不能殘留同mouse owner。
   function interact() {
     if (!enabled) return;
+    if(state?.mode==='journey') {
+      let closest=-1,distance=1.7;
+      for(let i=0;i<4;i++){const n=state.campaign.taskNodes[i],d=Math.hypot(player.position.x-n.x,player.position.z-n.z);if(d<distance){distance=d;closest=i;}}
+      if(closest>=0){callbacks.interact?.({kind:'campaign',id:closest});return;}
+    }
     if (view === "garden") {
       let nearest = -1,
         distance = Infinity;
@@ -936,7 +1036,10 @@ export function createWorld(canvas, callbacks) {
   addEventListener("keydown", keydown);
   addEventListener("keyup", keyup);
   addEventListener("blur", blur); // 所有全域輸入皆能在銷毀時成對解除。
-  function updateCamera() {
+  let projectionWidth = -1, projectionHeight = -1, projectionZoom = -1, projectionTurn = -1;
+  function updateProjection() {
+    if (projectionWidth === canvas.clientWidth && projectionHeight === canvas.clientHeight && projectionZoom === zoom && projectionTurn === cameraTurn) return;
+    projectionWidth = canvas.clientWidth; projectionHeight = canvas.clientHeight; projectionZoom = zoom; projectionTurn = cameraTurn;
     invalidated = true;
     renderer.shadowMap.needsUpdate = true;
     const width = canvas.clientWidth,
@@ -959,6 +1062,10 @@ export function createWorld(canvas, callbacks) {
     labelWidth = width;
     labelHeight = height;
     labelCameraRevision++;
+  }
+  function updateCutaways() {
+    const angle = Math.PI / 4 + (cameraTurn * Math.PI) / 2;
+    movementSin = Math.sin(angle); movementCos = Math.cos(angle);
     for (const tree of foliage) {
       const foreground =
         tree.position.x * Math.sin(angle) + tree.position.z * Math.cos(angle) >
@@ -979,12 +1086,13 @@ export function createWorld(canvas, callbacks) {
         }
       });
     }
-    if (state && qualityMode) qualityScene();
   }
 
   function rotate(direction) {
     cameraTurn = (cameraTurn + direction + 4) % 4;
-    updateCamera();
+    updateProjection();
+    updateCutaways();
+    if (state && qualityMode) qualityScene();
     callbacks.camera?.(cameraTurn);
   }
   function endCelebration() {
@@ -1040,15 +1148,21 @@ export function createWorld(canvas, callbacks) {
     renderer.shadowMap.needsUpdate = true;
     qualityScene();
     invalidated = true;
-    if (state) resize();
+    if (state) resizeFramebuffer();
   }
-  function resize() {
-    const budget = qualityMode === "high" ? 1 : Math.min(1, Math.sqrt(1500000 / (canvas.clientWidth * canvas.clientHeight)));
+  let framebufferWidth = -1, framebufferHeight = -1, framebufferDpr = -1;
+  function resizeFramebuffer() {
+    const width = canvas.clientWidth, height = canvas.clientHeight;
+    const budget = qualityMode === "high" ? 1 : Math.min(1, Math.sqrt(1500000 / (width * height)));
     const scale = qualityMode === "high" ? 1 : renderScale;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25) * budget * scale);
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    updateCamera();
+    const dpr = Math.min(devicePixelRatio, 1.25) * budget * scale;
+    if (width === framebufferWidth && height === framebufferHeight && dpr === framebufferDpr) return;
+    framebufferWidth = width; framebufferHeight = height; framebufferDpr = dpr;
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(width,height,false);
+    invalidated = true;
   }
+  function resize() { resizeFramebuffer(); updateProjection(); }
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
   resize();
@@ -1056,6 +1170,7 @@ export function createWorld(canvas, callbacks) {
     if (!running) return;
     frameRequest = requestAnimationFrame(frame);
     const updateStart = performance.now();
+    callbacks.tick?.(Math.max(0,now-last));
     const lastFrameTime = last,
       dt = Math.min((now - last) / 1000, 0.1);
     last = now; // 保存下一畫面排程，其餘動畫更新規則不變。
@@ -1075,9 +1190,7 @@ export function createWorld(canvas, callbacks) {
         target = null;
         path.length = 0;
         arrival = null;
-        const angle = Math.PI / 4 + (cameraTurn * Math.PI) / 2,
-          v = moveVector.set(dx, 0, dz).normalize();
-        v.applyAxisAngle(upAxis, angle);
+        const v = moveVector.set(dx * movementCos + dz * movementSin, 0, dz * movementCos - dx * movementSin).normalize();
         const nx = player.position.x + v.x * dt * 3,
           nz = player.position.z + v.z * dt * 3;
         if (!blocked(nx, player.position.z)) player.position.x = nx;
@@ -1112,7 +1225,7 @@ export function createWorld(canvas, callbacks) {
         tool.visible = false;
         const name = moving ? "walk" : "idle";
         if (actionName !== name) {
-          for (const a of Object.values(playerActions)) a.stop();
+          for (let a=0;a<playerActionList.length;a++) playerActionList[a].stop();
           playerActions[name]?.reset().play();
           actionName = name;
         }
@@ -1130,7 +1243,21 @@ export function createWorld(canvas, callbacks) {
         fireflies.material.opacity = 0.5 + Math.sin(now * 0.0007) * 0.15;
       }
     }
+    updateCampaignModels(dt);
     updateLabels();
+      if (enabled) {
+        renderSampleTotal += now - lastFrameTime;
+        renderSampleCount++;
+        if (qualityMode === "auto" && renderSampleCount >= 90 && now - lastScaleChange > 8000) {
+          const avg = renderSampleTotal / renderSampleCount;
+          const next = avg > 38 ? Math.max(0.75, renderScale - 0.05)
+            : avg < 24 ? Math.min(1, renderScale + 0.05) : renderScale;
+          if (next !== renderScale) { renderScale = next; resizeFramebuffer(); }
+          lastScaleChange = now;
+          renderSampleTotal = 0;
+          renderSampleCount = 0;
+        }
+      }
     updateMs = performance.now() - updateStart;
     if (enabled || celebrating > 0 || invalidated) {
       const renderStart = performance.now();
@@ -1151,23 +1278,19 @@ export function createWorld(canvas, callbacks) {
       renderedFrames++;
       invalidated = false;
       if (enabled) {
-        renderSampleTotal += now - lastFrameTime;
-        renderSampleCount++;
-        if (qualityMode === "auto" && renderSampleCount >= 90 && now - lastScaleChange > 8000) {
-          const avg = renderSampleTotal / renderSampleCount;
-          const next = avg > 38 ? Math.max(0.75, renderScale - 0.05)
-            : avg < 24 ? Math.min(1, renderScale + 0.05) : renderScale;
-          if (next !== renderScale) { renderScale = next; resize(); }
-          lastScaleChange = now;
-          renderSampleTotal = 0;
-          renderSampleCount = 0;
-        }
+        const tail = performance.now() - complete;
+        updates[(renderCount-1)%updates.length] += tail;
+        totalUpdateMs += tail;
       }
+
     }
   }
   frameRequest = requestAnimationFrame(frame); // 保存第一個排程，避免尚未繪製就銷毀時保留閉包。
   return {
     sync,
+    position() {return {x:player.position.x,z:player.position.z};},
+    walkToTask(index) {if(!enabled||state?.mode!=='journey')return;const n=state.campaign.taskNodes[index];if(n)moveTo(n.x,n.z);},
+    campaignFeedback(index) {feedbackNode=index;feedbackSeconds=.3;invalidated=true;},
     select,
     canPlace,
     interact,
@@ -1194,7 +1317,7 @@ export function createWorld(canvas, callbacks) {
     },
     zoom(delta) {
       zoom = THREE.MathUtils.clamp(zoom + delta * 0.12, 0.45, 1.5);
-      updateCamera();
+      updateProjection();
     },
     setEnabled(value) {
       invalidated = true;
@@ -1228,7 +1351,9 @@ export function createWorld(canvas, callbacks) {
         }) : undefined,
         frames: frameCount,
         avg: recent.reduce((a,b)=>a+b,0)/(recent.length||1),
-        plantRebuilds,
+        plantRebuilds, staticStageRebuilds, staticVertexCapacity,
+        staticBufferBytes: stagePositions.byteLength + stageColors.byteLength,
+        textureBytesBound: 16 * 1024 * 1024,
         update:stats(updates), submission:stats(submissions), completion:stats(completions),
         totalUpdateMs, totalSubmissionMs, activeRenderedFrames:renderCount,
         framebuffer: { width:canvas.width, height:canvas.height },
@@ -1244,6 +1369,7 @@ export function createWorld(canvas, callbacks) {
         geometries: renderer.info.memory.geometries,
         textures: renderer.info.memory.textures,
         cameraTurn,
+        sceneRegion:view,
         position: player.position.toArray(),
         dpr: renderer.getPixelRatio(),
         renderer: renderer
@@ -1279,7 +1405,10 @@ export function createWorld(canvas, callbacks) {
       removeEventListener("pointerup", cancelPointer);
       removeEventListener("pointercancel", cancelPointer);
       clearStaticStage();
+      staticStage.geometry.dispose();
       stageMaterial.dispose();
+      socketGeometry.dispose();crystalGeometry.dispose();shadeGeometry.dispose();socketMaterial.dispose();shadeMaterial.dispose();linkGeometry.dispose();linkMaterial.dispose();
+      for(const root of markers){root.userData.label.remove();root.userData.crystal.material.dispose();}
       renderer.dispose();
     },
     get region() {

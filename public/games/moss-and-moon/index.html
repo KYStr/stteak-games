@@ -42,6 +42,7 @@
           開始種植 →</button
         ><button data-open="journal">翻開庭園手帳 <span>↗</span></button>
       </aside>
+      <aside id="journey" aria-label="即時旅程任務" hidden><h2 id="journey-title"></h2><p id="journey-time" role="timer"></p><progress id="journey-integrity" max="100" value="100" aria-label="月光完整度"></progress><p id="journey-resources"></p><div id="task-0" class="journey-task"><span></span><div><button data-task-walk="0">走近 1</button><button data-task-action="auto" data-node="0">照顧</button><button data-task-action="water" data-node="0">驅散</button><button data-task-action="shelter" data-node="0" aria-label="信標 1 建立庇護">⌂</button></div></div><div id="task-1" class="journey-task"><span></span><div><button data-task-walk="1">走近 2</button><button data-task-action="auto" data-node="1">照顧</button><button data-task-action="water" data-node="1">驅散</button><button data-task-action="shelter" data-node="1" aria-label="信標 2 建立庇護">⌂</button></div></div><div id="task-2" class="journey-task"><span></span><div><button data-task-walk="2">走近 3</button><button data-task-action="auto" data-node="2">照顧</button><button data-task-action="water" data-node="2">驅散</button><button data-task-action="shelter" data-node="2" aria-label="信標 3 建立庇護">⌂</button></div></div><div id="task-3" class="journey-task"><span></span><div><button data-task-walk="3">走近 4</button><button data-task-action="auto" data-node="3">照顧</button><button data-task-action="water" data-node="3">驅散</button><button data-task-action="shelter" data-node="3" aria-label="信標 4 建立庇護">⌂</button></div></div><small>走近後照顧 · 2 澆水驅散 · 3 淨化<br>光路：照顧可旋轉，再次照顧接通<br>接力：拾取後到下一編號照顧交付</small><button data-open="journey-help">旅程說明／暫停</button><button id="journey-result-button" data-open="journey-result" hidden>本章結果／繼續</button></aside>
       <nav class="world-nav" aria-label="目的地">
         <button data-region="garden" class="active">⌂ 庭園</button
         ><button data-open="map">♧ 散步採集</button
@@ -49,6 +50,7 @@
         ><button data-open="shop">◈ 小舖</button>
       </nav>
       <div id="context" class="context" aria-live="polite"></div>
+      <div id="travel-status" role="status" hidden>正在前往…</div>
       <div id="toast" class="toast" role="status"></div>
       <aside id="save-warning" class="save-warning" role="alert" hidden>
         <span id="save-warning-text"></span><button data-dismiss-warning aria-label="關閉存檔提醒">知道了</button>
@@ -95,10 +97,15 @@
           <p>
             種下一小片綠意，聽鄰居說說心事。<br />等月亮走過四個模樣，為大家點亮一場慶典。
           </p>
+          <div id="new-game-options">
+            <label>遊玩方式 <select id="new-mode"><option value="journey">月光旅程 · 四章限時守望</option><option value="free">自由庭園 · 不計時</option></select></label>
+            <label>難度 <select id="new-difficulty"><option value="standard">標準</option><option value="gentle">溫柔</option></select></label>
+            <label>種子 <input id="new-seed" type="number" min="1" max="4294967295" placeholder="隨機種子"><button data-random-seed>換種子</button></label>
+          </div>
           <button id="start" class="primary" disabled>
             準備庭園… <span>→</span></button
           ><button id="switch-slot">存檔 1 · 切換庭園</button
-          ><small>沒有倒數，沒有枯萎。準備好了，再讓今天結束。</small
+          ><small>旅程：守住月光並完成任務，四章各 160 秒。<br>自由庭園：沒有倒數，準備好再換日。</small
           ><small class="welcome-controls"
             >WASD 移動 · 點選田地 · Esc 暫停<br />鍵盤也可透過手帳選格操作</small
           ><small id="build-label"></small>

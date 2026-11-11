@@ -20,7 +20,7 @@ function encode(state) {
   const payload = JSON.stringify(state);
   return JSON.stringify({
     format: "moss-and-moon",
-    version: 1,
+    version: 2,
     checksum: checksum(payload),
     payload,
   });
@@ -31,7 +31,7 @@ function decode(raw, slot) {
     const envelope = JSON.parse(raw);
     if (
       envelope?.format !== "moss-and-moon" ||
-      envelope.version !== 1 ||
+      ![1,2].includes(envelope.version) ||
       typeof envelope.payload !== "string" ||
       checksum(envelope.payload) !== envelope.checksum
     )
@@ -39,7 +39,7 @@ function decode(raw, slot) {
     const state = JSON.parse(envelope.payload);
     if (!validateState(state).ok || (slot !== undefined && state.slot !== slot))
       return null;
-    return state;
+    return migrateState(state);
   } catch {
     return null;
   }
@@ -144,4 +144,35 @@ export function importSlot(slot, text, suppliedStorage) {
   decoded.slot = slot;
   const result = saveSlot(decoded, suppliedStorage);
   return { ...result, state: result.ok ? decoded : null };
+}
+
+// Legacy saves keep all garden fields and remain untimed.
+export function migrateState(state) {
+  if (state?.schema === 1 && validateState(state).ok) return {...state,schema:2,mode:'free',campaign:null};
+  return state;
+}
+export const RECORDS_KEY = 'moss-and-moon:records:v1';
+const validRecord = r => r && Number.isInteger(r.seed) && r.seed>0 && r.seed<=4294967295 && ['standard','gentle'].includes(r.difficulty) && Number.isInteger(r.score) && r.score>=0 && r.score<=10000000 && Number.isFinite(r.activeMs) && r.activeMs>=0 && r.activeMs<=640000 && ['won','lost'].includes(r.outcome);
+export function loadRecords(suppliedStorage) {
+  try {
+    const raw = getStorage(suppliedStorage).getItem(RECORDS_KEY);
+    if (!raw) return {version:1,best:null,standard:null,gentle:null,seeds:[]};
+    const r=JSON.parse(raw);
+    if(r.version!==1 || ![r.best,r.standard,r.gentle].every(v=>v===null||validRecord(v)) || (r.standard&&r.standard.difficulty!=='standard') || (r.gentle&&r.gentle.difficulty!=='gentle') || !Array.isArray(r.seeds) || r.seeds.length>20 || !r.seeds.every(validRecord) || new Set(r.seeds.map(v=>v.seed+':'+v.difficulty)).size!==r.seeds.length) throw new Error('紀錄損壞');
+    return r;
+  } catch {return {version:1,best:null,standard:null,gentle:null,seeds:[]};}
+}
+export function recordCampaign(c,suppliedStorage) {
+  const record={seed:c.seed,difficulty:c.difficulty,score:c.score,activeMs:c.activeMs,outcome:c.status};
+  if(!validRecord(record))return {ok:false,error:'無效旅程紀錄'};
+  try {
+    const storage=getStorage(suppliedStorage),r=loadRecords(storage);
+    const previous=r.seeds.find(v=>v.seed===record.seed&&v.difficulty===record.difficulty);
+    if(previous && previous.score>=record.score)return {ok:true,records:r};
+    if(!r.best||record.score>r.best.score)r.best=record;
+    if(!r[record.difficulty]||record.score>r[record.difficulty].score)r[record.difficulty]=record;
+    r.seeds=r.seeds.filter(v=>v.seed!==record.seed||v.difficulty!==record.difficulty);
+    r.seeds.unshift(record);r.seeds.length=Math.min(20,r.seeds.length);
+    storage.setItem(RECORDS_KEY,JSON.stringify(r));return {ok:true,records:r};
+  }catch(error){return {ok:false,error:error.message};}
 }
