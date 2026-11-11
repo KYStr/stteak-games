@@ -39,7 +39,7 @@ import {
   fieldPlacementPoints,
 } from "./expansion-content.js";
 
-export const BUILD = "dust-redemption-r1-20261110";
+export const BUILD = "dust-redemption-r2-20261110";
 const sceneFlowFor = (id) =>
   MISSION_FLOW[id]
     ? MissionSystem
@@ -192,6 +192,10 @@ let previousMode = "hub",
   frameSamples = 0,
   frameSum = 0,
   lastTime = 0;
+let lastHudTime = 0, updateTimeIndex = 0, purchaseReadyAt = 0, deathAnimationUntil = 0;
+const updateTimes = new Float32Array(1800);
+const updateHistogram = new Float64Array(256);
+let updateTotalMs = 0;
 let clueSet = new Set(),
   transitionTime = 0,
   transitionAction = null,
@@ -240,6 +244,7 @@ function button(action, label, cls = "", data = "") {
   return `<button class="${cls}" data-action="${action}" ${data}>${label}</button>`;
 }
 function panel(html, cls = "") {
+  world?.invalidate();
   const previousControl = cls === "field-work" && overlay.contains?.(document.activeElement)
     ? { ...document.activeElement.dataset } : null;
   overlay.classList.toggle("field-view", cls === "field-work");
@@ -254,6 +259,7 @@ function panel(html, cls = "") {
   });
 }
 function hide() {
+  world?.invalidate();
   overlay.classList.remove("field-view");
   document.body.classList.remove("field-view");
   overlay.classList.add("hidden");
@@ -305,6 +311,11 @@ function saveNotice() {
 function save() {
   const previousFailure = lastSaveResult?.ok === false;
   const saved = storage.save(profile);
+  showSaveResult(saved);
+  if (!saved.ok || previousFailure) toast(saved.message);
+  return saved;
+}
+function showSaveResult(saved) {
   lastSaveResult = saved;
   for (const node of overlay.querySelectorAll("[data-save-status]"))
     node.textContent = saved.message;
@@ -313,8 +324,6 @@ function save() {
     node.disabled = saved.ok;
   if (saved.ok && retryHadFocus)
     overlay.querySelector("[data-save-status]")?.focus();
-  if (!saved.ok || previousFailure) toast(saved.message);
-  return saved;
 }
 function persistSettings() {
   audio.configure(settings);
@@ -340,7 +349,7 @@ function persistSettings() {
 function notifyRunning() {
   lastTime = 0;
   bridge.state("running");
-  audio.resume();
+  syncAudioForMode();
 }
 function dialogueRows(rows) {
   return rows
@@ -407,7 +416,7 @@ function showHub() {
 function suppliesPanel() {
   mode = "supplies";
   panel(
-    `<p class="eyebrow">DUSTFALL · OUTFITTER</p><h2>讓旅費帶來下一段餘裕</h2><p>旅費 ${profile.wallet}。基本裝備與每次出發的免費補給已足夠完成委託，升級會持續保留。</p><div class="choice-list">${Object.values(
+    `${saveNotice()}<p class="eyebrow">DUSTFALL · OUTFITTER</p><h2>讓旅費帶來下一段餘裕</h2><p>旅費 ${profile.wallet}。基本裝備與每次出發的免費補給已足夠完成委託，升級會持續保留。</p><div class="choice-list">${Object.values(
       SUPPLIES,
     )
       .map((item) => {
@@ -1424,13 +1433,63 @@ function journal() {
         `<h3>現場作業的具體後果</h3>${records.map((row) => `<p>${esc(row.title)}</p>${fieldResultRows(row)}${missionResultRows(row)}`).join("")}`,
       );
 }
-function help() {
-  const returnState = {
-    parent: pauseReturn,
-    mode,
-    html: overlay.innerHTML,
+function controlSelector(node) {
+  if (!node) return null;
+  if (node.id) return `#${CSS.escape(node.id)}`;
+  if (!overlay.contains(node)) return null;
+  const attributes = [...node.attributes].filter(a => a.name.startsWith("data-"));
+  if (attributes.length) return node.tagName.toLowerCase() + attributes.map(a => `[${a.name}="${CSS.escape(a.value)}"]`).join("");
+  return null;
+}
+function captureOverlayState() {
+  return {
+    parent: pauseReturn, mode, html: overlay.innerHTML,
     hidden: overlay.classList.contains("hidden"),
+    focus: controlSelector(document.activeElement),
+    scroll: overlay.querySelector(".panel")?.scrollTop || 0,
+    forms: [...overlay.querySelectorAll("input, select, textarea")].map((node, index) => ({
+      index, selector: controlSelector(node), value: node.value, checked: node.checked,
+      selected: node.multiple ? [...node.selectedOptions].map(o => o.value) : null,
+    })),
+    details: [...overlay.querySelectorAll("details")].map(node => node.open),
   };
+}
+function restoreOverlayState(saved) {
+  overlay.innerHTML = saved.html;
+  const forms = overlay.querySelectorAll("input, select, textarea");
+  for (const state of saved.forms || []) {
+    const node = (state.selector && overlay.querySelector(state.selector)) || forms[state.index];
+    if (!node) continue;
+    node.value = state.value;
+    if (typeof state.checked === "boolean") node.checked = state.checked;
+    if (state.selected) for (const option of node.options) option.selected = state.selected.includes(option.value);
+  }
+  overlay.querySelectorAll("details").forEach((node, i) => { node.open = saved.details?.[i] || false; });
+  overlay.classList.toggle("hidden", saved.hidden);
+  overlay.classList.toggle("field-view", mode === "field");
+  document.body.classList.toggle("field-view", mode === "field");
+  clearInputs();
+  queueMicrotask(() => {
+    const invoking = saved.focus && document.querySelector(saved.focus);
+    const target = saved.hidden ? canvas : invoking && !invoking.disabled ? invoking : overlay.querySelector("button:not(:disabled), input, select, summary");
+    target?.focus({ preventScroll: true });
+    const panel = overlay.querySelector(".panel");
+    if (panel) panel.scrollTop = saved.scroll || 0;
+  });
+  world?.invalidate();
+}
+let audioPolicyMode = null;
+const audibleModes = new Set(["title", "hub", "briefing", "supplies", "journal", "result", "ending", "playing", "town-walk", "town-dialogue", "transition", "field", "clue", "parley", "extraction"]);
+function syncAudioForMode() {
+  audioPolicyMode = mode;
+  const active = Boolean(audio.context) && (audibleModes.has(mode) || (mode === "dead" && performance.now() < deathAnimationUntil)) && foreground && !document.hidden && !contextLost;
+  if (active) {
+    if (!audio.active || audio.context?.state === "suspended") audio.resume();
+  } else audio.pause();
+  return active;
+}
+function help() {
+  const returnState = captureOverlayState();
   pauseReturn = returnState;
   mode = "help";
   panel(
@@ -1439,19 +1498,14 @@ function help() {
   audio.pause();
 }
 function settingsPanel() {
-  pauseReturn = {
-    parent: pauseReturn,
-    mode,
-    html: overlay.innerHTML,
-    hidden: overlay.classList.contains("hidden"),
-  };
+  pauseReturn = captureOverlayState();
   mode = "settings";
   panel(
     `<p class="eyebrow">OPTIONS</p><h2>聲音與操作</h2><div class="settings columns"><div><label>配樂 <input type="range" min="0" max="1" step=".05" value="${settings.music}" data-setting="music"></label><label>音效 <input type="range" min="0" max="1" step=".05" value="${settings.sfx}" data-setting="sfx"></label><p class="meta">設為 0 即靜音，偏好保存在此瀏覽器。</p></div><div>${[
       ["assist", "瞄準輔助"],
       ["slowAim", "瞄準時放慢世界"],
       ["reduced", "減少動態"],
-      ["low", "低畫質（關閉動態陰影）"],
+      ["low", "低畫質（精簡陰影與遠景解析度）"],
     ]
       .map(
         ([key, label]) =>
@@ -1472,26 +1526,13 @@ function closeSheet() {
     return;
   }
   mode = saved.mode;
-  overlay.innerHTML = saved.html;
-  overlay.classList.toggle("hidden", saved.hidden);
-  overlay.classList.toggle("field-view", mode === "field");
-  document.body.classList.toggle("field-view", mode === "field");
-  if (mode !== "paused") audio.resume();
-  clearInputs();
-  queueMicrotask(() => {
-    if (saved.hidden) canvas.focus();
-    else overlay.querySelector("button:not(:disabled)")?.focus({ preventScroll: true });
-  });
+  restoreOverlayState(saved);
+  syncAudioForMode();
 }
 function pause() {
   if (["loading", "title", "paused", "help", "settings"].includes(mode)) return;
   previousMode = mode;
-  pauseReturn = {
-    parent: pauseReturn,
-    mode,
-    html: overlay.innerHTML,
-    hidden: overlay.classList.contains("hidden"),
-  };
+  pauseReturn = captureOverlayState();
   mode = "paused";
   audio.pause();
   bridge.state("paused");
@@ -1503,11 +1544,12 @@ function resume() {
   if (mode !== "paused" || contextLost) return;
   closeSheet();
   bridge.state("running");
-  audio.resume();
+  syncAudioForMode();
 }
 function failure(reason) {
   if (done || mode !== "playing") return;
   mode = "dead";
+  deathAnimationUntil = performance.now() + 900;
   $("hp").textContent = "0";
   $("hp-fill").style.width = "0%";
   audio.play("hurt");
@@ -2290,6 +2332,7 @@ function setHudHTML(id, html) {
 }
 function setHudText(id, text) {
   const target = $(id);
+  text = String(text);
   if (target.textContent === text) return;
   target.textContent = text;
   hudLayoutCache.value?.invalidate();
@@ -2418,19 +2461,20 @@ function renderWorldLabels(labels) {
 }
 function updateHud() {
   if (mode === "playing") {
-    $("hp").textContent = Math.ceil(hp);
-    $("hp-fill").style.width = `${hp}%`;
+    setHudText("hp", Math.ceil(hp));
+    const hpWidth = `${hp}%`;
+    if ($("hp-fill").style.width !== hpWidth) $("hp-fill").style.width = hpWidth;
     setHudHTML("ammo", `${ammo} <span>/ ${reserve}</span>`);
-    $("reload-state").textContent = handsOccupied()
+    setHudText("reload-state", handsOccupied()
       ? "雙手搬運 · 先放下再換彈／開火"
       : reload > 0
         ? `換彈 ${reload.toFixed(1)}s`
-        : "R 換彈";
-    $("cover-state").textContent = cover
+        : "R 換彈");
+    setHudText("cover-state", cover
       ? aiming || firing
         ? "探頭 · 暴露中"
         : "掩體 · 已縮回"
-      : "自由移動";
+      : "自由移動");
     const workRemaining = field && !field.complete;
     const nextObjective = missionSystem
       ? missionSystem.objective()
@@ -2643,6 +2687,7 @@ function frame(time) {
   if (!world || contextLost || document.hidden) { lastTime = 0; return; }
   const raw = lastTime ? (time - lastTime) / 1000 : 1 / 60;
   lastTime = time;
+  const updateStart = performance.now();
   const dt = Math.min(raw, 0.05);
   frameSamples++;
   frameSum += raw;
@@ -2687,7 +2732,7 @@ function frame(time) {
     movement(dt);
     audio.tick(time / 1000);
   } else if (mode === "transition") {
-    transitionTime -= Math.min(raw, 0.25);
+    transitionTime -= raw; // Cosmetic travel finishes on elapsed active time, even after a stalled frame.
     player.position.z -= dt * 4;
     player.object.position.y = 1.1;
     world.animate(player, "idle");
@@ -2697,27 +2742,28 @@ function frame(time) {
       action?.();
     }
   }
+  if (audioPolicyMode !== mode || (mode === "dead" && audio.active && time >= deathAnimationUntil)) syncAudioForMode();
   if (["title", "hub", "briefing", "supplies", "journal", "result", "ending", "field", "clue", "parley", "extraction"].includes(mode))
     audio.tick(time / 1000);
   const active = [
     "playing",
     "town-walk",
     "transition",
-    "hub",
-    "title",
-    "dead",
-  ].includes(mode);
+  ].includes(mode) || (mode === "dead" && time < deathAnimationUntil);
   missionSystem?.props.setInspection?.(mode === "field");
+  if (time - lastHudTime >= 100) { updateHud(); updateMap(); lastHudTime = time; }
+  const gameUpdateMs = performance.now() - updateStart;
   world.update(active ? dt : 0, player, settings.reduced);
-  if (frameSamples % 4 === 0) { updateHud(); updateMap(); }
+  const updateCost = gameUpdateMs + world.updateMs;
+  updateTimes[updateTimeIndex++ % updateTimes.length] = updateCost;
+  updateTotalMs += updateCost;
+  updateHistogram[Math.min(255, Math.floor(updateCost * 10))]++;
 }
 
 overlay.addEventListener("click", (event) => {
   const b = event.target.closest("[data-action]");
   if (!b || b.disabled) return;
   audio.unlock();
-  audio.resume();
-  audio.play("ui");
   const action = b.dataset.action;
   try {
     if (
@@ -2739,14 +2785,19 @@ overlay.addEventListener("click", (event) => {
       return;
     }
     if (action === "retry-save") {
-      if (["result", "ending", "journal", "hub"].includes(mode)) save();
+      if (["result", "ending", "journal", "hub", "supplies"].includes(mode)) save();
     } else if (action === "supplies") suppliesPanel();
     else if (action === "buy-supply") {
+      if (performance.now() < purchaseReadyAt) return;
+      purchaseReadyAt = performance.now() + 500;
       const purchase = buySupply(profile, b.dataset.id, { mode: "hub" });
-      profile = purchase.profile;
-      save();
+      if (purchase.profile === profile) { toast(purchase.message); return; }
+      b.disabled = true;
+      const saved = storage.save(purchase.profile);
+      showSaveResult(saved);
+      if (saved.ok) profile = purchase.profile;
       suppliesPanel();
-      toast(purchase.message);
+      toast(saved.ok ? purchase.message : "升級未完成，旅費未扣除。" + saved.message);
     } else if (action === "hub") showHub();
     else if (action === "brief") briefing(b.dataset.id);
     else if (action === "deploy") deploy();
@@ -2785,6 +2836,9 @@ overlay.addEventListener("click", (event) => {
   } catch (error) {
     toast(error.message);
     console.error(error);
+  } finally {
+    if (syncAudioForMode()) audio.play("ui");
+    world?.invalidate();
   }
 });
 overlay.addEventListener("input", (event) => {
@@ -2801,13 +2855,6 @@ $("help-button").onclick = help;
 $("rotate-left").onclick = () => world?.rotate(-1);
 $("rotate-right").onclick = () => world?.rotate(1);
 window.addEventListener("keydown", (event) => {
-  if (["INPUT", "SELECT"].includes(event.target.tagName)) return;
-  if (
-    ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
-      event.code,
-    )
-  )
-    event.preventDefault();
   if (event.code === "Escape") {
     event.preventDefault();
     if (event.repeat) return;
@@ -2817,12 +2864,16 @@ window.addEventListener("keydown", (event) => {
     else if (mode === "clue" || mode === "parley") { mode = "playing"; hide(); clearInputs(); }
     else if (mode === "town-dialogue") { mode = "town-walk"; hide(); clearInputs(); }
     else pause();
+    syncAudioForMode();
     return;
   }
+  if (event.target?.closest?.('input, select, textarea, button, summary, [contenteditable="true"]')) return;
   if (!["playing", "town-walk"].includes(mode)) return;
+  if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
   keys.add(event.code);
   if (event.repeat) return;
   audio.unlock();
+  syncAudioForMode();
   if (event.code === "KeyE") interact();
   if (event.code === "KeyR") reloadWeapon();
   if (event.code === "Space") vault();
@@ -2968,6 +3019,7 @@ canvas.addEventListener("webglcontextlost", (event) => {
 });
 canvas.addEventListener("webglcontextrestored", () => {
   contextLost = false;
+  world?.invalidate();
   lastTime = 0;
   world?.resize();
   toast("畫面已恢復。按繼續返回旅程。");
@@ -2984,14 +3036,14 @@ function updateMap() {
       : shape === "diamond" ? `<path d="M${x},${y-4}l4,4 -4,4 -4,-4Z" fill="${color}"/>`
       : `<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`;
   };
-  const markup = `<svg viewBox="0 0 144 156" aria-hidden="true"><path d="M72 12v120M12 72h120" stroke="#a7b69c" stroke-opacity=".15"/><rect x="16" y="16" width="112" height="112" fill="none" stroke="#a7b69c" stroke-opacity=".3"/><text x="72" y="10" text-anchor="middle">N</text>${clues.filter(c=>!c.read).map(c=>point(c.position,"diamond","#9edaca")).join("")}${field?.tasks.filter(t=>!field.state.completed.includes(t.id)).map(t=>{const p=field.taskPoint(t);return point([p.x,p.z],"circle","#d9bb79")}).join("") || ""}${point(mission.exit,"square",secured ? "#c6f8d6" : "#91a293")}${point([player.position.x,player.position.z],"circle","#ffffff")}<text x="72" y="148" text-anchor="middle">◆ 證據　● 作業　□ 撤離</text></svg>`;
+  const markup = `<svg viewBox="0 0 144 156" aria-hidden="true"><path d="M72 12v120M12 72h120" stroke="#a7b69c" stroke-opacity=".15"/><rect x="16" y="16" width="112" height="112" fill="none" stroke="#a7b69c" stroke-opacity=".3"/><text x="72" y="10" text-anchor="middle">N</text>${clues.filter(c=>!c.read).map(c=>point(c.position,"diamond","#9edaca")).join("")}${field?.tasks.filter(t=>!field.state.completed.includes(t.id)).map(t=>{const p=field.taskPoint(t);return point([p.x,p.z],"circle","#d9bb79")}).join("") || ""}${point(mission.exit,"square",secured ? "#c6f8d6" : "#91a293")}${point([Math.round(player.position.x*20)/20,Math.round(player.position.z*20)/20],"circle","#ffffff")}<text x="72" y="148" text-anchor="middle">◆ 證據　● 作業　□ 撤離</text></svg>`;
   if (updateMap.markup !== markup) { map.innerHTML = markup; updateMap.markup = markup; }
 }
 window.addEventListener("blur", () => {
   foreground = false;
   lastTime = 0;
   clearInputs();
-  if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition"].includes(mode)) pause();
+  if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition", "briefing"].includes(mode)) pause();
   else audio.pause();
 });
 window.addEventListener("focus", () => {
@@ -3003,7 +3055,7 @@ document.addEventListener("visibilitychange", () => {
   lastTime = 0;
   if (document.hidden) {
     clearInputs();
-    if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition"].includes(mode)) pause();
+    if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition", "briefing"].includes(mode)) pause();
     else audio.pause();
   }
 });
@@ -3178,6 +3230,8 @@ window.dustDiagnostics = () => ({
   profile: JSON.parse(JSON.stringify(profile)),
   render: world?.stats(),
   performance: {
+    updateTotals: { count: updateTimeIndex, totalMs: updateTotalMs, histogram: Array.from(updateHistogram), binMs: 0.1 },
+    updateMs: Array.from(updateTimes.subarray(0, Math.min(updateTimeIndex, updateTimes.length))),
     samples: frameTimes.length,
     p95:
       [...frameTimes].sort((a, b) => a - b)[

@@ -35,6 +35,23 @@ export class World {
     };
     this.graphics = this.softwareRenderer ? { ...THREE, MeshStandardMaterial: DiffuseMaterial } : THREE;
     this.lowQuality = this.softwareRenderer;
+    this.lowSetting = false;
+    this.inspection = false;
+    this.dirty = true;
+    this.occlusionKey = null;
+    this.cameraState = new Float64Array(32);
+    this.cameraRevision = 0;
+    this.fadeState = { x: NaN, y: NaN, z: NaN, revision: -1 };
+    this.updateMs = 0;
+    this.renderedFrames = 0;
+    this.skippedFrames = 0;
+    this.fadeRaycasts = 0;
+    this.shadowWrites = 0;
+    this.shadowPosition = new THREE.Vector3();
+    this.shadowScale = new THREE.Vector3(0.55, 0.4, 1);
+    this.fadeDirection = new THREE.Vector3();
+    this.fadeOrigin = new THREE.Vector3();
+    this.shadowTransforms = [];
     this.renderer.setPixelRatio(1);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -43,6 +60,7 @@ export class World {
     this.renderer.toneMappingExposure = 1.22;
     this.scene = new THREE.Scene();
     this.camera = new THREE.OrthographicCamera(-24, 24, 20, -20, 0.1, 160);
+    this.camera.layers.enable(1);
     this.cameraIndex = 0;
     this.scene.add(new THREE.HemisphereLight(0xf3ddbd, 0x78624c, 2.5));
     this.sun = new THREE.DirectionalLight(0xffdfad, 3.4);
@@ -123,10 +141,7 @@ export class World {
     const canvas = this.renderer.domElement,
       w = Math.max(1, canvas.clientWidth),
       h = Math.max(1, canvas.clientHeight);
-    const limit = this.lowQuality ? 800 : 1440;
-    const scale = Math.min(devicePixelRatio, this.lowQuality ? 1 : 1.5, limit / w);
-    this.renderer.setPixelRatio(scale);
-    this.renderer.setSize(w, h, false);
+    this.resizeBuffer(w, h);
     const aspect = w / h,
       half = aspect < 1 ? 26 : 22;
     this.camera.left = -half * aspect;
@@ -136,7 +151,30 @@ export class World {
     this.camera.updateProjectionMatrix();
     this.orient();
   }
+  invalidate() {
+    this.dirty = true;
+    this.occlusionKey = null;
+  }
+  resizeBuffer(w = this.renderer.domElement.clientWidth, h = this.renderer.domElement.clientHeight) {
+    // Inspection always preserves the symbols, including on the software path.
+    const limit = this.inspection ? 1600 : this.lowSetting ? 960 : this.softwareRenderer ? 1120 : 1440;
+    const scale = Math.min(devicePixelRatio, this.softwareRenderer ? 1 : 1.5, limit / Math.max(1, w));
+    this.renderer.setPixelRatio(scale);
+    this.renderer.setSize(w, h, false);
+    this.invalidate();
+  }
+  setInspection(value) {
+    // A close camera sees the mechanism through the player's render layer.
+    // Keep object.visible and all collision/evidence geometry authoritative.
+    for (const actor of this.actors) if (actor.name === "hero") actor.object.traverse(node => node.layers.set(1));
+    if (value) this.camera.layers.disable(1);
+    else this.camera.layers.enable(1);
+    if (this.inspection === value) return;
+    this.inspection = value;
+    this.resizeBuffer();
+  }
   orient() {
+    this.invalidate();
     const a = Math.PI / 4 + (this.cameraIndex * Math.PI) / 2;
     this.camera.position.set(Math.sin(a) * 42, 48, Math.cos(a) * 42);
     this.camera.lookAt(0, 0, 0);
@@ -147,6 +185,7 @@ export class World {
     this.orient();
   }
   quality(low) {
+    this.lowSetting = Boolean(low);
     this.lowQuality = Boolean(low || this.softwareRenderer);
     this.renderer.shadowMap.enabled = !this.lowQuality;
     if (this.groundShadows) this.groundShadows.visible = this.lowQuality;
@@ -218,6 +257,9 @@ export class World {
     for (const texture of maps) texture.dispose();
   }
   clear() {
+    this.invalidate();
+    this.shadowTransforms.length = 0;
+    this.textureEstimate = null;
     // Helpers own and detach their GPU resources before the generic scene sweep.
     // Building sources are restored, then disposed exactly once with the level.
     this.buildingBatches?.dispose();
@@ -439,6 +481,7 @@ export class World {
     this.actorShadows = new THREE.InstancedMesh(new THREE.CircleGeometry(1, 16), material.clone(), 32);
     this.actorShadows.count = 0;
     this.actorShadows.visible = this.lowQuality;
+    this.shadowTransforms.length = 0;
     this.dynamic.add(this.actorShadows);
     this.shadowMatrix = matrix;
     this.shadowRotation = rotation;
@@ -753,52 +796,98 @@ export class World {
     this.tracerBatch.add(a, b, color);
   }
   update(dt, player, reduced) {
-    for (const actor of this.actors) {
+    const start = performance.now();
+    let cameraChanged = false;
+    for (let i = 0; i < 32; i++) {
+      const value = i < 16 ? this.camera.matrixWorld.elements[i] : this.camera.projectionMatrix.elements[i - 16];
+      if (this.cameraState[i] !== value) { this.cameraState[i] = value; cameraChanged = true; }
+    }
+    if (cameraChanged) { this.cameraRevision++; this.invalidate(); }
+    if (!dt && !this.dirty) { this.updateMs = performance.now() - start; this.skippedFrames++; return; }
+    if (dt) for (const actor of this.actors) {
       actor.mixer.update(dt);
       actor.poseBlend = Math.max(0, actor.poseBlend - dt);
       if (actor.poseBlend === 0)
         actor.colliderHeight = actor.state === "cover" ? 0.95 : 1.85;
     }
     if (this.actorShadows?.visible) {
+      let changed = this.actorShadows.count !== Math.min(32, this.actors.length);
       this.actorShadows.count = Math.min(32, this.actors.length);
-      this.actors.slice(0,32).forEach((actor,i) => {
-        this.shadowMatrix.compose(new THREE.Vector3(actor.position.x + 0.18, 0.035, actor.position.z - 0.1), this.shadowRotation, new THREE.Vector3(0.55, 0.4, 1));
+      for (let i = 0; i < this.actorShadows.count; i++) {
+        const actor = this.actors[i], previous = this.shadowTransforms[i];
+        if (previous && previous.x === actor.position.x && previous.z === actor.position.z) continue;
+        const record = previous || (this.shadowTransforms[i] = { x: 0, z: 0 });
+        record.x = actor.position.x; record.z = actor.position.z;
+        this.shadowPosition.set(actor.position.x + 0.18, 0.035, actor.position.z - 0.1);
+        this.shadowMatrix.compose(this.shadowPosition, this.shadowRotation, this.shadowScale);
         this.actorShadows.setMatrixAt(i, this.shadowMatrix);
-      });
-      this.actorShadows.instanceMatrix.needsUpdate = true;
+        this.shadowWrites++;
+        changed = true;
+      }
+      if (changed) this.actorShadows.instanceMatrix.needsUpdate = true;
     }
     this.tracerBatch?.update(dt, this.camera);
-    const hits = new Set();
-    if (player) {
-      this.level.updateWorldMatrix(true, true);
-      const direction = new THREE.Vector3()
-        .subVectors(this.camera.position, player.position)
-        .normalize();
-      this.raycaster.set(
-        player.position.clone().add(new THREE.Vector3(0, 1, 0)),
-        direction,
-      );
-      this.raycaster.near = 0;
-      this.raycaster.far = this.camera.position.distanceTo(player.position);
-      for (const hit of this.raycaster.intersectObjects(this.occluders, true))
-        hits.add(hit.object);
-    }
-    for (const root of this.occluders)
-      root.traverse((node) => {
-        if (node.isMesh)
-          for (const material of materialList(node)) {
-            material.transparent = true;
-            material.opacity = hits.has(node) ? 0.22 : 1;
-            material.depthWrite = !hits.has(node);
-          }
+    const position = player?.position || this.target, previous = this.fadeState;
+    if (this.occlusionKey === null || position.x !== previous.x || position.y !== previous.y || position.z !== previous.z || previous.revision !== this.cameraRevision) {
+      this.occlusionKey = true;
+      previous.x = position.x; previous.y = position.y; previous.z = position.z; previous.revision = this.cameraRevision;
+      const hits = new Set();
+      if (player && !this.inspection) {
+        this.level.updateWorldMatrix(true, true);
+        this.fadeDirection.subVectors(this.camera.position, player.position).normalize();
+        this.fadeOrigin.copy(player.position); this.fadeOrigin.y += 1;
+        this.raycaster.set(this.fadeOrigin, this.fadeDirection);
+        this.raycaster.near = 0;
+        this.raycaster.far = this.camera.position.distanceTo(player.position);
+        for (const hit of this.raycaster.intersectObjects(this.occluders, true)) hits.add(hit.object);
+        this.fadeRaycasts++;
+      }
+      for (const root of this.occluders) root.traverse(node => {
+        if (!node.isMesh) return;
+        const faded = hits.has(node);
+        for (const material of materialList(node)) {
+          material.transparent = true;
+          material.opacity = faded ? 0.22 : 1;
+          material.depthWrite = !faded;
+        }
       });
-    this.buildingBatches?.sync(hits, this.camera);
+      this.buildingBatches?.sync(hits, this.camera);
+    }
+    this.updateMs = performance.now() - start;
     this.renderer.render(this.scene, this.camera);
+    this.renderedFrames++;
+    this.dirty = false;
   }
   stats() {
     const r = this.renderer.info;
+    let visibleInstances = 0;
+    this.scene.traverseVisible(node => { if (node.isInstancedMesh) visibleInstances += node.count; });
+    if (!this.textureEstimate || this.textureEstimate.count !== r.memory.textures) {
+      const textures = new Set();
+      this.scene.traverse(node => {
+        if (!node.material) return;
+        for (const material of materialList(node)) for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
+      });
+      let bytes = 0;
+      for (const texture of textures) {
+        const image = texture.image;
+        bytes += (image?.width || 0) * (image?.height || 0) * 4 * (texture.generateMipmaps ? 4 / 3 : 1);
+      }
+      this.textureEstimate = { count: r.memory.textures, bytes: Math.ceil(bytes) };
+    }
     return {
       drawCalls: r.render.calls,
+      textureBytesEstimate: this.textureEstimate.bytes,
+      visibleInstances,
+      buildingInstances: this.buildingBatches?.records.length || 0,
+      renderedFrames: this.renderedFrames,
+      skippedFrames: this.skippedFrames,
+      fadeRaycasts: this.fadeRaycasts,
+      shadowWrites: this.shadowWrites,
+      bufferWidth: this.renderer.domElement.width,
+      bufferHeight: this.renderer.domElement.height,
+      inspection: this.inspection,
+      lowSetting: this.lowSetting,
       triangles: r.render.triangles,
       geometries: r.memory.geometries,
       textures: r.memory.textures,

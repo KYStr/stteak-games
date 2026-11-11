@@ -78,7 +78,7 @@ export class BuildingBatches {
     mesh.name = name;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);
+    mesh.instanceMatrix.setUsage(material.transparent ? T.DynamicDrawUsage : T.StaticDrawUsage);
     mesh.count = 0;
     mesh.visible = false;
     // A faded batch sorts near its own building, not at the world origin.

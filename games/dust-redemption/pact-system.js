@@ -461,6 +461,14 @@ export class PactSystem {
           !this.status.localChoices.siding
         )
           throw Error("先選這一趟礦車的停靠用途。");
+        if (task === this.cart && step?.id === "push-cart") {
+          // A grip inside the cart's swept footprint traps the player against
+          // its conservative movement proxy on the first steering change.
+          // Reserve real turning clearance; keep the original collider solid.
+          const clearance = Math.max(...this.props.localCorners.map(([x, z]) => Math.hypot(x, z))) + 0.46;
+          if (gap(this.player.position, this.cart.cargo.position) < clearance)
+            throw Error("先沿雙把手向後退半步，留出車身轉向空間，再握住推車。煞車與所選側線均已保留。");
+        }
         if (task === this.cart && step?.id === "park-cart") {
           const bay = this.flow.bays[this.status.localChoices.siding];
           if (

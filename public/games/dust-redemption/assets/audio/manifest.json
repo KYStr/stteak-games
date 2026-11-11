@@ -7,32 +7,88 @@
   "project": "assets/games/dust-redemption/audio/sound-project.json",
   "reproduction": "node assets/games/dust-redemption/audio/generate.mjs",
   "music": {
-    "title": "Dustfall: open-road ostinato",
+    "title": "Dustfall: D-minor frontier ostinato",
     "origin": "Newly authored numerical note sequence for this game; no recording, sample library or reference melody.",
-    "beatSeconds": 1.15,
+    "beatSeconds": 0.68,
     "notesHz": [
-      110,
-      0,
-      164.81,
-      0,
       146.83,
       0,
-      123.47,
-      82.41
+      220,
+      174.61,
+      0,
+      164.81,
+      146.83,
+      0,
+      130.81,
+      0,
+      196,
+      164.81,
+      0,
+      130.81,
+      110,
+      0
     ],
     "noteNames": [
-      "A2",
-      "rest",
-      "E3",
-      "rest",
       "D3",
       "rest",
-      "B2",
-      "E2"
+      "A3",
+      "F3",
+      "rest",
+      "E3",
+      "D3",
+      "rest",
+      "C3",
+      "rest",
+      "G3",
+      "E3",
+      "rest",
+      "C3",
+      "A2",
+      "rest"
     ],
-    "voice": "One decaying triangle pluck; 1 second duration and low amplitude.",
-    "percussion": "47 Hz decaying sine on alternating beats, 0.1 seconds, falling to 70% pitch.",
-    "arrangement": "Sparse eight-beat loop with three rests. No vocals or sampled instruments. Playback suspended with the game."
+    "voice": "Two plucked voices: triangle at 2x motif frequency, 1.35s, pitch slide .998; sine at 4x, .4s.",
+    "percussion": "No percussion layer. Every fourth beat: 73.415 or 65.405 Hz sine, 2.3s. Every eighth beat: 220 or 196 Hz sine drone, 4.7s, pitch slide 1.001.",
+    "arrangement": "Sixteen steps with six rests, D-minor pitch set. Two plucks over alternating low and drone layers. No vocals or sampled instruments. Playback suspended with the game.",
+    "voices": [
+      {
+        "multiplier": 2,
+        "durationSeconds": 1.35,
+        "volume": 0.1,
+        "wave": "triangle",
+        "pitchSlide": 0.998
+      },
+      {
+        "multiplier": 4,
+        "durationSeconds": 0.4,
+        "volume": 0.018,
+        "wave": "sine",
+        "pitchSlide": 1
+      }
+    ],
+    "layers": [
+      {
+        "everyBeats": 4,
+        "frequenciesHz": [
+          73.415,
+          65.405
+        ],
+        "durationSeconds": 2.3,
+        "volume": 0.09,
+        "wave": "sine",
+        "pitchSlide": 1
+      },
+      {
+        "everyBeats": 8,
+        "frequenciesHz": [
+          220,
+          196
+        ],
+        "durationSeconds": 4.7,
+        "volume": 0.035,
+        "wave": "sine",
+        "pitchSlide": 1.001
+      }
+    ]
   },
   "effects": [
     {

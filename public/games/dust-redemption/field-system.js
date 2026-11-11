@@ -446,6 +446,12 @@ export class FieldSystem {
             : step.slot === "two-pins"
               ? ["偏左", "兩孔重合", "偏右"]
               : ["橫撐", "對角插座", "反對角"];
+    const labels = {
+      "battery-socket": "⚡ 電池端子", "earth-socket": "≡ 接地端子", "service-socket": "□ 維修端子",
+      "company-square": "□ 公司線", "triangle-public": "△ 公開驛線", "circle-families": "○ 家屬線",
+      "left-offset": "偏左插座", "two-pins": "兩孔重合", "right-offset": "偏右插座",
+      horizontal: "水平橫撐", "upper-left-lower-right": "左上至右下斜撐", "reverse-diagonal": "反向斜撐",
+    };
     const height = 1.08 + index * 0.42;
     this.box(task.object, "patch-board", [1.45, 0.34, 0.07], 0x397d7a, [
       0,
@@ -464,7 +470,7 @@ export class FieldSystem {
         0xc3a35d,
       );
       this.label(node, glyphs[i], [0, 0.12, 0.018], [0.32, 0.12]);
-      return { id, node };
+      return { id, node, label: labels[id] || (/^A[0-9]+-[0-9]+$/.test(id) ? id : "未對位") };
     });
     const node = this.control(
       task,
@@ -953,6 +959,7 @@ export class FieldSystem {
   }
   focus(task, node = task.anchor || task.object, angle = 0) {
     this.saveCamera();
+    this.world.setInspection(true);
     task.focus = node;
     task.viewAngle = angle;
     const center = node.getWorldPosition(new THREE.Vector3());
@@ -992,8 +999,10 @@ export class FieldSystem {
     camera.updateProjectionMatrix();
     camera.updateMatrixWorld(true);
     this.cameraSnapshot = null;
+    this.world.setInspection(false);
   }
   renderWorld() {
+    this.world.invalidate();
     this.group.updateMatrixWorld(true);
     this.world.renderer.render(this.world.scene, this.world.camera);
   }
@@ -1056,7 +1065,7 @@ export class FieldSystem {
         )
           ui = `<span class="field-value">目前 ${value ?? 0} ${step.kind === "set-meter" ? "格" : "檔"}</span>${this.button("adjust", "−", `data-step="${step.id}" data-delta="-1"`)}${this.button("adjust", "＋", `data-step="${step.id}" data-delta="1"`)}`;
         else if (["socket-match", "align-parts"].includes(step.kind))
-          ui = `<span class="field-value">${escape(control?.slots?.[value]?.id || "未對位")}</span>${this.button("adjust", "移左", `data-step="${step.id}" data-delta="-1"`)}${this.button("adjust", "移右", `data-step="${step.id}" data-delta="1"`)}${this.button("seat", step.kind === "socket-match" ? "推入插頭" : "扣入插座", `data-step="${step.id}"`)}`;
+          ui = `<span class="field-value">${escape(control?.slots?.[value]?.label || "未對位")}</span>${this.button("adjust", "移左", `data-step="${step.id}" data-delta="-1"`)}${this.button("adjust", "移右", `data-step="${step.id}" data-delta="1"`)}${this.button("seat", step.kind === "socket-match" ? "推入插頭" : "扣入插座", `data-step="${step.id}"`)}`;
         else if (step.kind === "inspect-part")
           ui =
             this.button("focus", "拉近觀看", `data-step="${step.id}"`) +
@@ -1982,7 +1991,9 @@ export class FieldSystem {
         : new THREE.Vector3(),
       lastPlayer: this.playerPosition.clone(),
     };
-    if (this.traversal.offset.length() > 2.3)
+    // Pushing permits a 2.6m handle reach. Preserve that measured offset;
+    // the hand-carried fallback would pull this same cart back onto the player.
+    if (type === "carry" && this.traversal.offset.length() > 2.3)
       this.traversal.offset.set(0, 0, -0.75);
     this.traversal.offset.y = 0;
     if (type === "carry" && this.traversal.offset.length() > 0.75)
@@ -2045,7 +2056,7 @@ export class FieldSystem {
       this.renderPanel("請從尚未完成的搬運或護送步驟繼續。");
       return;
     }
-    if (task.cargo && !this.near(task.cargo.position, 2.3)) {
+    if (task.cargo && !this.near(task.cargo.position, traversal.type === "push" ? 2.6 : 2.3)) {
       this.renderPanel("走近留在原地的貨物再拿起。");
       return;
     }
@@ -2080,7 +2091,7 @@ export class FieldSystem {
     if (this.traversal) {
       const task = this.traversal.task;
       if (this.traversal.paused) {
-        if (!this.near(this.taskPoint(task), 2.5)) return false;
+        if (!this.near(this.taskPoint(task), this.traversal.type === "push" ? 2.6 : 2.5)) return false;
         this.resume(task);
       } else this.release();
       return true;
