@@ -50,6 +50,9 @@
       </nav>
       <div id="context" class="context" aria-live="polite"></div>
       <div id="toast" class="toast" role="status"></div>
+      <aside id="save-warning" class="save-warning" role="alert" hidden>
+        <span id="save-warning-text"></span><button data-dismiss-warning aria-label="關閉存檔提醒">知道了</button>
+      </aside>
       <div class="view-tools">
         <button data-camera="-1" aria-label="向左旋轉相機 Q">↶</button
         ><button data-camera="1" aria-label="向右旋轉相機 R">↷</button
@@ -105,7 +108,7 @@
         <header>
           <div>
             <span class="eyebrow" id="panel-kicker">庭園手帳</span>
-            <h2 id="panel-title"></h2>
+            <h2 id="panel-title" tabindex="-1"></h2>
           </div>
           <button id="close-panel" aria-label="關閉面板">×</button>
         </header>

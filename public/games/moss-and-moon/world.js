@@ -9,6 +9,7 @@ import {
   createTool,
   createTerrain,
   createDiscovery,
+  lightweightVariant,
 } from "./models.js";
 import { RESIDENTS, DISCOVERIES, REGIONS, PUZZLES } from "./content.js"; // 場景入口依真內容存在性判斷，不以所有非garden區都可採集／解謎。
 import { growthPreview } from "./rules.js";
@@ -138,9 +139,97 @@ export function createWorld(canvas, callbacks) {
     celebrating = 0,
     celebrationPositions = [];
   const keys = new Set();
-  const frames = [];
-  let renderScale = 0.8,
-    renderSamples = [],
+  // Fixed storage avoids shift/copy churn in the drawing path. Full runs are collected by tests.
+  const frames = new Float64Array(2048), updates = new Float64Array(2048),
+    submissions = new Float64Array(2048), completions = new Float64Array(2048);
+  let frameCount = 0, renderCount = 0, lastCompletion = 0, updateMs = 0, submissionMs = 0;
+  let totalUpdateMs = 0, totalSubmissionMs = 0, gridSignature = "", plantRebuilds = 0;
+  const moveVector = new THREE.Vector3(), upAxis = new THREE.Vector3(0,1,0);
+  const residents = [];
+  let qualityMode = "", lightweight = true;
+  function qualityMesh(mesh) {
+    if (!mesh.isMesh || mesh.isSkinnedMesh || mesh === selectionMesh) return;
+    if (!mesh.userData.authored) mesh.userData.authored = { geometry:mesh.geometry, material:mesh.material };
+    const original = mesh.userData.authored;
+    if (lightweight && !original.material.transparent) {
+      const variant = lightweightVariant(original.geometry, original.material);
+      mesh.geometry = variant.geometry;
+      if (mesh.userData.uniqueMaterial) {
+        if (!mesh.userData.bakedMaterial) {
+          mesh.userData.bakedMaterial = variant.material.clone();
+          cutawayMaterials.push(mesh.userData.bakedMaterial);
+        }
+        mesh.material = mesh.userData.bakedMaterial;
+      } else mesh.material = variant.material;
+    } else {
+      mesh.geometry = original.geometry;
+      mesh.material = original.material;
+    }
+  }
+  const stageMaterial = new THREE.MeshBasicMaterial({vertexColors:true,toneMapped:false,name:"baked-static-stage"});
+  const staticStage = new THREE.Mesh(new THREE.BufferGeometry(),stageMaterial);
+  staticStage.name = "static-garden-stage";
+  staticStage.visible = false;
+  scene.add(staticStage);
+  const stageSources = [];
+  const stageMatrix = new THREE.Matrix4(), instanceMatrix = new THREE.Matrix4(), stagePoint = new THREE.Vector3();
+  function clearStaticStage() {
+    for (const mesh of stageSources) mesh.visible = true;
+    stageSources.length = 0;
+    staticStage.visible = false;
+    staticStage.geometry.dispose();
+  }
+  function rebuildStaticStage() {
+    clearStaticStage();
+    if (!lightweight) return;
+    const positions = [], colors = [];
+    function append(mesh, matrix) {
+      const g = mesh.geometry, p = g.attributes.position, c = g.attributes.color, indices = g.index;
+      const count = indices ? indices.count : p.count;
+      for (let i=0;i<count;i++) {
+        const v = indices ? indices.getX(i) : i;
+        stagePoint.fromBufferAttribute(p,v).applyMatrix4(matrix);
+        positions.push(stagePoint.x,stagePoint.y,stagePoint.z);
+        colors.push(c ? c.getX(v) : mesh.material.color.r,
+          c ? c.getY(v) : mesh.material.color.g,c ? c.getZ(v) : mesh.material.color.b);
+      }
+    }
+    function visit(node) {
+      if (!node.visible || node.userData.interaction?.kind === "resident") return;
+      if (node.isMesh && !node.isSkinnedMesh && !node.material.transparent) {
+        if (node.isInstancedMesh) {
+          for (let i=0;i<node.count;i++) {
+            node.getMatrixAt(i,instanceMatrix);
+            stageMatrix.multiplyMatrices(node.matrixWorld,instanceMatrix);
+            append(node,stageMatrix);
+          }
+        } else append(node,node.matrixWorld);
+        stageSources.push(node);
+        node.visible = false;
+      }
+      for (const child of node.children) visit(child);
+    }
+    for (const root of [environment,objects,flora]) {
+      root.updateMatrixWorld(true);
+      visit(root);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));
+    geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));
+    geometry.computeBoundingSphere();
+    staticStage.geometry = geometry;
+    staticStage.visible = positions.length > 0;
+  }
+  function qualityScene() {
+    // Restore authored visibility before collecting a new cached stage.
+    clearStaticStage();
+    environment.traverse(qualityMesh);
+    objects.traverse(qualityMesh);
+    flora.traverse(qualityMesh);
+    rebuildStaticStage();
+  }
+  let renderScale = 0.85,
+    renderSampleTotal = 0, renderSampleCount = 0,
     lastScaleChange = 0,
     renderedFrames = 0,
     invalidated = true;
@@ -304,6 +393,7 @@ export function createWorld(canvas, callbacks) {
     preview = null;
   }
   function clearRegion() {
+    clearStaticStage();
     cancelPointer();
     clearPreview();
     for (const l of labels) l.el.remove();
@@ -315,6 +405,7 @@ export function createWorld(canvas, callbacks) {
       m.uncacheRoot(m.getRoot());
     }
     mixers.length = 0;
+    residents.length = 0;
     objects.traverse((c) => {
       if (c.isSkinnedMesh) c.skeleton.dispose();
     });
@@ -372,6 +463,7 @@ export function createWorld(canvas, callbacks) {
       house.rotation.y = 0.28;
       house.traverse((c) => {
         if (c.isMesh) {
+          c.userData.uniqueMaterial = true;
           c.material = c.material.clone();
           cutawayMaterials.push(c.material);
         }
@@ -398,6 +490,13 @@ export function createWorld(canvas, callbacks) {
         person.position.set(positions[i][0], 0, positions[i][1]);
         person.rotation.y = Math.atan2(-positions[i][0], -positions[i][1]);
         clickable(person, { kind: "resident", id: r.id });
+        const skin = person.children.find((c) => c.isSkinnedMesh);
+        const distant = new THREE.Mesh(skin.geometry, skin.material);
+        distant.name = person.name + "-distant";
+        distant.visible = false;
+        distant.userData.root = person;
+        person.add(distant);
+        residents.push({person, skin, distant});
         const m = new THREE.AnimationMixer(person);
         m.clipAction(
           person.animations?.find((c) => c.name === "idle") ||
@@ -457,15 +556,21 @@ export function createWorld(canvas, callbacks) {
     updateCamera();
   }
   function sync(next) {
-    state = next;
     const region = next.region || "garden";
-    if (view !== region || objects.children.length === 0) makeRegion(region);
+    const regionChanged = view !== region || objects.children.length === 0;
+    const signature = region === "garden" ? next.grid.map((cell,i) => !cell ? "-" :
+      [cell.type,cell.id,cell.type === "plant" ? growthPreview(next,i).stage : 0,
+       !!cell.watered,cell.rotation || 0].join(":")).join("|") : region;
+    const changed = regionChanged || signature !== gridSignature;
+    state = next;
+    if (regionChanged) makeRegion(region);
     reduced = !!next.settings?.reducedMotion;
     fireflies.visible = !reduced;
     applyQuality();
-    renderer.shadowMap.needsUpdate = true;
-    invalidated = true; // Update light-state shader variants as well as shadow submissions.
-    if (view === "garden") {
+    if (changed) renderer.shadowMap.needsUpdate = true;
+    invalidated = true;
+    if (view === "garden" && changed) {
+      plantRebuilds++;
       clearBatches();
       const groups = new Map();
       let wet = 0;
@@ -518,6 +623,8 @@ export function createWorld(canvas, callbacks) {
       wetInstances.count = wet;
       wetInstances.instanceMatrix.needsUpdate = true;
     }
+    gridSignature = signature;
+    if (changed) qualityScene();
   }
   function select(i) {
     invalidated = true;
@@ -543,8 +650,8 @@ export function createWorld(canvas, callbacks) {
     if (view === "garden" && state)
       for (let i = 0; i < 64; i++) {
         if (state.grid[i]?.type !== "decor") continue;
-        const p = tilePosition(i);
-        if (Math.abs(x - p.x) < 0.58 && Math.abs(z - p.z) < 0.58) return true;
+        const px = ((i % 8) - 3.5) * TILE, pz = (Math.floor(i / 8) - 3.5) * TILE;
+        if (Math.abs(x - px) < 0.58 && Math.abs(z - pz) < 0.58) return true;
       }
     return false;
   }
@@ -872,7 +979,9 @@ export function createWorld(canvas, callbacks) {
         }
       });
     }
+    if (state && qualityMode) qualityScene();
   }
+
   function rotate(direction) {
     cameraTurn = (cameraTurn + direction + 4) % 4;
     updateCamera();
@@ -896,8 +1005,8 @@ export function createWorld(canvas, callbacks) {
   }
   function celebrate() {
     endCelebration();
-    celebrating = 16;
-    animate("celebrate", 16);
+    celebrating = reduced ? 0 : 16;
+    if (!reduced) animate("celebrate", 16);
     const crowd = [player, ...mixers.map((m) => m.getRoot())];
     crowd.forEach((obj, i) => {
       celebrationPositions.push({
@@ -911,30 +1020,32 @@ export function createWorld(canvas, callbacks) {
     for (const m of mixers) {
       m.stopAllAction();
       const clip = m.getRoot().animations?.find((c) => c.name === "interact");
-      if (clip) m.clipAction(clip).reset().play();
+      if (clip && !reduced) m.clipAction(clip).reset().play();
     }
     sun.intensity = 1.5;
     moon.intensity = 3;
     fireflies.material.size = 0.09;
   }
-  let autoShadows = true;
   function applyQuality() {
-    if (renderScale <= 0.65) autoShadows = false;
-    if (renderScale >= 0.85) autoShadows = true;
     const mode = state?.settings?.quality || "auto";
-    const shadows = mode === "high" || (mode === "auto" && autoShadows);
-    renderer.shadowMap.enabled = shadows;
-    sun.castShadow = shadows;
+    if (mode === qualityMode) return;
+    qualityMode = mode;
+    renderSampleTotal = 0;
+    renderSampleCount = 0;
+    lastScaleChange = performance.now();
+    lightweight = mode !== "high";
+    renderer.shadowMap.enabled = mode === "high";
+    sun.castShadow = mode === "high";
+    renderScale = mode === "high" ? 1 : mode === "low" ? 0.75 : 0.85;
+    renderer.shadowMap.needsUpdate = true;
+    qualityScene();
+    invalidated = true;
+    if (state) resize();
   }
   function resize() {
-    applyQuality();
-    const budget = Math.min(
-      1,
-      Math.sqrt(1100000 / (canvas.clientWidth * canvas.clientHeight)),
-    );
-    renderer.setPixelRatio(
-      Math.min(devicePixelRatio, 1.25) * budget * renderScale,
-    );
+    const budget = qualityMode === "high" ? 1 : Math.min(1, Math.sqrt(1500000 / (canvas.clientWidth * canvas.clientHeight)));
+    const scale = qualityMode === "high" ? 1 : renderScale;
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25) * budget * scale);
     renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
     updateCamera();
   }
@@ -944,12 +1055,9 @@ export function createWorld(canvas, callbacks) {
   function frame(now) {
     if (!running) return;
     frameRequest = requestAnimationFrame(frame);
+    const updateStart = performance.now();
     const lastFrameTime = last,
       dt = Math.min((now - last) / 1000, 0.1);
-    if (enabled && now - last < 1000) {
-      frames.push(now - last);
-      if (frames.length > 600) frames.shift();
-    }
     last = now; // 保存下一畫面排程，其餘動畫更新規則不變。
     if (enabled || celebrating > 0) {
       if (celebrating > 0) {
@@ -965,11 +1073,11 @@ export function createWorld(canvas, callbacks) {
       let moving = false;
       if (dx || dz) {
         target = null;
-        path = [];
+        path.length = 0;
         arrival = null;
         const angle = Math.PI / 4 + (cameraTurn * Math.PI) / 2,
-          v = new THREE.Vector3(dx, 0, dz).normalize();
-        v.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+          v = moveVector.set(dx, 0, dz).normalize();
+        v.applyAxisAngle(upAxis, angle);
         const nx = player.position.x + v.x * dt * 3,
           nz = player.position.z + v.z * dt * 3;
         if (!blocked(nx, player.position.z)) player.position.x = nx;
@@ -977,7 +1085,7 @@ export function createWorld(canvas, callbacks) {
         player.rotation.y = Math.atan2(v.x, v.z);
         moving = true;
       } else if (target) {
-        const v = target.clone().sub(player.position);
+        const v = moveVector.copy(target).sub(player.position);
         if (v.length() < 0.12) {
           target = path.shift() || null;
           if (!target) {
@@ -1009,35 +1117,50 @@ export function createWorld(canvas, callbacks) {
           actionName = name;
         }
       }
-      playerMixer.update(dt);
-      for (const m of mixers) m.update(dt);
+      if (!reduced || moving || actionTime > 0) playerMixer.update(dt);
+      for (let i = 0; i < residents.length; i++) {
+        const {person,skin,distant} = residents[i];
+        const near = !lightweight || celebrating > 0 || person.position.distanceToSquared(player.position) < 9;
+        skin.visible = near;
+        distant.visible = !near;
+        if (near && (!reduced || celebrating > 0)) mixers[i]?.update(dt);
+      }
       if (!reduced) {
         fireflies.rotation.y += dt * 0.025;
         fireflies.material.opacity = 0.5 + Math.sin(now * 0.0007) * 0.15;
       }
     }
     updateLabels();
+    updateMs = performance.now() - updateStart;
     if (enabled || celebrating > 0 || invalidated) {
+      const renderStart = performance.now();
       renderer.render(scene, camera);
+      const complete = performance.now();
+      submissionMs = complete - renderStart;
+      if (enabled) {
+        const i = renderCount++ % updates.length;
+        frames[i] = now - lastFrameTime;
+        frameCount++;
+        updates[i] = updateMs;
+        submissions[i] = submissionMs;
+        completions[i] = lastCompletion ? complete - lastCompletion : 0;
+        totalUpdateMs += updateMs;
+        totalSubmissionMs += submissionMs;
+      }
+      lastCompletion = complete;
       renderedFrames++;
       invalidated = false;
       if (enabled) {
-        renderSamples.push(now - lastFrameTime);
-        if (renderSamples.length > 45) renderSamples.shift();
-        if (renderSamples.length === 45 && now - lastScaleChange > 6000) {
-          const avg = renderSamples.reduce((a, b) => a + b, 0) / 45;
-          const next =
-            avg > 38
-              ? Math.max(0.5, renderScale - 0.1)
-              : avg < 24
-                ? Math.min(1, renderScale + 0.05)
-                : renderScale;
-          if (next !== renderScale) {
-            renderScale = next;
-            resize();
-          }
+        renderSampleTotal += now - lastFrameTime;
+        renderSampleCount++;
+        if (qualityMode === "auto" && renderSampleCount >= 90 && now - lastScaleChange > 8000) {
+          const avg = renderSampleTotal / renderSampleCount;
+          const next = avg > 38 ? Math.max(0.75, renderScale - 0.05)
+            : avg < 24 ? Math.min(1, renderScale + 0.05) : renderScale;
+          if (next !== renderScale) { renderScale = next; resize(); }
           lastScaleChange = now;
-          renderSamples = [];
+          renderSampleTotal = 0;
+          renderSampleCount = 0;
         }
       }
     }
@@ -1060,6 +1183,7 @@ export function createWorld(canvas, callbacks) {
       preview.rotation.y = (rotation * Math.PI) / 2;
       preview.traverse((c) => {
         if (c.isMesh) {
+          c.userData.uniqueMaterial = true;
           c.material = c.material.clone();
           c.material.transparent = true;
           c.material.opacity = 0.65;
@@ -1075,6 +1199,7 @@ export function createWorld(canvas, callbacks) {
     setEnabled(value) {
       invalidated = true;
       cancelPointer();
+      if (enabled !== value) lastCompletion = 0;
       enabled = value;
       keys.clear();
       if (!value) {
@@ -1088,11 +1213,26 @@ export function createWorld(canvas, callbacks) {
       down ? keys.add(key) : keys.delete(key);
     },
     animate,
-    metrics() {
-      const sorted = [...frames].sort((a, b) => a - b);
+    metrics(since) {
+      const recent = Array.from(frames.subarray(0, Math.min(frameCount, frames.length)));
+      const sorted = [...recent].sort((a, b) => a - b);
+      const stats = (buffer) => {
+        const values = Array.from(buffer.subarray(0, Math.min(renderCount, buffer.length))).sort((a,b)=>a-b);
+        return { mean:values.reduce((a,b)=>a+b,0)/(values.length||1), p95:values[Math.floor(values.length*.95)]||0, max:values.at(-1)||0 };
+      };
       return {
-        frames: frames.length,
-        avg: frames.reduce((a, b) => a + b, 0) / (frames.length || 1),
+        samples: Number.isInteger(since) ? Array.from({length: Math.min(renderCount - since, updates.length)}, (_,offset) => {
+          const sequence = Math.max(since, renderCount - updates.length) + offset;
+          const i = sequence % updates.length;
+          return { sequence:sequence+1, rafMs:frames[i], updateMs:updates[i], submitMs:submissions[i], completionMs:completions[i] };
+        }) : undefined,
+        frames: frameCount,
+        avg: recent.reduce((a,b)=>a+b,0)/(recent.length||1),
+        plantRebuilds,
+        update:stats(updates), submission:stats(submissions), completion:stats(completions),
+        totalUpdateMs, totalSubmissionMs, activeRenderedFrames:renderCount,
+        framebuffer: { width:canvas.width, height:canvas.height },
+        lightweight,
         renderedFrames,
         renderScale,
         shadows: renderer.shadowMap.enabled,
@@ -1138,6 +1278,8 @@ export function createWorld(canvas, callbacks) {
       canvas.removeEventListener("pointerleave", cancelPointer);
       removeEventListener("pointerup", cancelPointer);
       removeEventListener("pointercancel", cancelPointer);
+      clearStaticStage();
+      stageMaterial.dispose();
       renderer.dispose();
     },
     get region() {

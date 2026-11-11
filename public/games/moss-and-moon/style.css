@@ -1062,3 +1062,9 @@ button small {
     scroll-behavior: auto !important;
   }
 }
+
+/* The welcome garden is scenery; onboarding owns visual and keyboard attention. */
+.welcome-mode > :is(.hud,.goal,.world-nav,#labels,#context,#toast,.view-tools,.dock,#seedbar,.touch-pad,.caption,#save-warning) { visibility: hidden; }
+.save-warning { position:absolute; z-index:12; left:50%; top:100px; transform:translateX(-50%); width:min(620px,85vw); padding:14px 18px; background:#233d36; border:1px solid #e8c782; border-radius:14px; color:#fff1cc; box-shadow:0 8px 32px #10292388; }
+.save-warning button { margin:8px 0 0 12px; }
+#panel-title:focus-visible { outline:2px solid #e8d99d; outline-offset:6px; border-radius:3px; }

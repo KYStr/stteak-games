@@ -24,8 +24,8 @@ import { createWorld } from "./world.js";
 import { createAudio } from "./audio.js";
 import { bridge } from "./bridge.js";
 
-const BUILD = "moss-and-moon-stteak8-r1",
-  VERSION = "1.1.0";
+const BUILD = "moss-and-moon-stteak8-r2",
+  VERSION = "1.2.0";
 const $ = (s) => document.querySelector(s),
   esc = (v) =>
     String(v ?? "").replace(
@@ -63,6 +63,7 @@ let slot = preferredSlot(),
   toastTimer,
   world,
   previousFocus = null;
+let protectFallback = !!loaded.error && !loaded.recovered;
 const sound = createAudio((message) => notice(message));
 let connection,
   lastPanel = null;
@@ -99,6 +100,11 @@ function persist(candidate = state) {
   $("#save-status").textContent = r.ok
     ? "已保存 · 庭園 " + slot
     : "無法保存：" + r.error;
+  if (r.ok) {
+    protectFallback = false;
+    loaded = { state:candidate, recovered:false, error:null };
+    $("#save-warning").hidden = true;
+  }
   if (!r.ok) notice("瀏覽器未能保存，請在設定匯出庭園備份。", true);
   return r.ok;
 }
@@ -352,14 +358,20 @@ function travel(region) {
     selected = -1;
     movingFrom = null;
     world.select(-1);
-    closePanel();
+    returnToWorld();
     $("#world").focus();
   }
 }
 function welcomeMode(value) {
   $("#welcome").hidden = !value;
+  $("#game").classList.toggle("welcome-mode", value);
   for (const el of $("#game").children)
     if (!["welcome", "panel", "fatal"].includes(el.id)) el.inert = value;
+}
+function returnToWorld() {
+  if (started && !faulted) resume();
+  else closePanel();
+  if (started && !faulted) $("#world").focus({ preventScroll: true });
 }
 function start() {
   if (faulted) return;
@@ -370,16 +382,24 @@ function start() {
   sound.setActive(true);
   sound.unlock();
   connection?.state("running");
+  reportLoadOutcome();
+  $("#world").focus();
+}
+function reportLoadOutcome(normalMessage) {
+  $("#save-warning").hidden = true;
   if (loaded.recovered) {
     if (persist()) notice("已從上一份有效快照恢復庭園，並修復主要存檔。");
-  } else if (loaded.error) notice(loaded.error, true);
+  } else if (loaded.error) {
+    $("#save-warning-text").textContent = loaded.error;
+    $("#save-warning").hidden = false;
+    notice(loaded.error, true);
+  }
   else
     notice(
-      state.day > 1 || state.stats.planted > 0
+      normalMessage || (state.day > 1 || state.stats.planted > 0
         ? "歡迎回家。接著照顧庭園，或翻開手帳看看下一步吧。"
-        : "歡迎回家。種下兩份絨苔，再澆水吧。",
+        : "歡迎回家。種下兩份絨苔，再澆水吧。"),
     );
-  $("#world").focus();
 }
 function pause() {
   if (!started || faulted) return;
@@ -411,7 +431,10 @@ function openPanel(name, fromPause = false) {
   world?.setEnabled(false);
   if (!fromPause) sound.effect("click");
   renderPanel();
-  if (!$("#panel").open) $("#panel").showModal();
+  if (!$("#panel").open) {
+    $("#panel").showModal();
+    $("#panel-title").focus({ preventScroll: true });
+  }
 }
 function closePanel() {
   revealDialogue();
@@ -420,9 +443,9 @@ function closePanel() {
   world?.clearPreview();
   if ($("#panel").open) $("#panel").close();
   if (started && !paused) world?.setEnabled(true);
-  if (previousFocus?.isConnected && !previousFocus.closest("[hidden]"))
+  if (previousFocus?.isConnected && !previousFocus.closest("[hidden],[inert]"))
     previousFocus.focus({ preventScroll: true });
-  else if (started) $("#world").focus({ preventScroll: true });
+  else (started ? $("#world") : $("#start")).focus({ preventScroll: true });
 }
 function showFailure(title, message) {
   if (faulted) return;
@@ -452,7 +475,8 @@ function renderPanel() {
   let html = "";
   const body = $("#panel-body"),
     active = document.activeElement,
-    restore = lastPanel === panelName && body.contains(active),
+    changed = lastPanel !== panelName,
+    restore = !changed && body.contains(active),
     focusId = active?.id,
     focusData = active?.dataset ? { ...active.dataset } : {},
     scroll = $("#panel").scrollTop;
@@ -613,21 +637,6 @@ function renderPanel() {
     html = `<p>第 ${selected + 1} 格的${esc(itemName(state.grid[selected]?.id))}：家具會回到背包；植物會移除，最近一次可撤銷。</p><div class="actions">${button("確認清除", "data-clear-confirm", "danger")}${button("取消", 'data-open="grid"')}</div>`;
   }
   body.innerHTML = html;
-  if (restore) {
-    const replacement = focusId
-      ? document.getElementById(focusId)
-      : [...body.querySelectorAll("button,input,select")].find(
-          (el) =>
-            Object.entries(focusData).length &&
-            Object.entries(focusData).every(([k, v]) => el.dataset[k] === v),
-        );
-    (
-      replacement ||
-      body.querySelector("[data-grid-use]") ||
-      $("#close-panel")
-    ).focus({ preventScroll: true });
-    $("#panel").scrollTop = scroll;
-  }
   if (panelName === "settings") {
     const control = document.createElement("label");
     control.className = "setting";
@@ -660,6 +669,26 @@ function renderPanel() {
     reveal.className = "subtle";
     body.prepend(reveal);
   }
+  if (changed && $("#panel").open) {
+    $("#panel").scrollTop = 0;
+    $("#panel-title").focus({ preventScroll: true });
+  } else if (restore) {
+    const replacement = focusId
+      ? document.getElementById(focusId)
+      : [...body.querySelectorAll("button,input,select")].find(
+          (el) =>
+            Object.entries(focusData).length &&
+            Object.entries(focusData).every(([k, v]) => el.dataset[k] === v),
+        );
+    (
+      replacement ||
+      $("#panel-title")
+    ).focus({ preventScroll: true });
+    $("#panel").scrollTop = scroll;
+  } else if ($("#panel").open && !$("#panel").contains(document.activeElement)) {
+    $("#panel-title").focus({ preventScroll: true });
+  }
+
 }
 function tagName(tag) {
   return (
@@ -679,13 +708,36 @@ function exportSave() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   notice("庭園備份已下載，請妥善保存。");
 }
+// Capture trusted world gestures before tools or pointer handlers can open a panel.
+const gestureEvents = new AbortController();
+function recoverAudioFromGesture(event) {
+  if (!event.isTrusted || event.repeat || !started || paused || faulted) return;
+  if (sound.metrics().state !== "running") void sound.unlock();
+}
+for (const type of ["pointerdown", "keydown"])
+  document.addEventListener(type, recoverAudioFromGesture, {
+    capture: true, signal: gestureEvents.signal,
+  });
+$("#panel").addEventListener("keydown", (event) => {
+  if (event.key !== "Tab") return;
+  const controls = [...$("#panel").querySelectorAll(
+    'button,input,select,textarea,a[href],[tabindex="0"]',
+  )].filter((el) => !el.disabled && !el.closest("[hidden],[inert]") && el.getClientRects().length);
+  const first = controls[0], last = controls.at(-1), active = document.activeElement;
+  if (!first) { event.preventDefault(); $("#panel-title").focus(); return; }
+  if (event.shiftKey && (active === first || active === $("#panel-title"))) {
+    event.preventDefault(); last.focus();
+  } else if (!event.shiftKey && active === last) {
+    event.preventDefault(); first.focus();
+  }
+});
 document.addEventListener("click", (e) => {
   if (faulted) return;
   const b = e.target.closest("button");
   if (!b) return;
-  sound.unlock();
   const d = b.dataset;
-  if ("revealDialogue" in d) revealDialogue();
+  if ("dismissWarning" in d) $("#save-warning").hidden = true;
+  else if ("revealDialogue" in d) revealDialogue();
   else if (b.id === "start") {
     const first = state.revision === 0;
     start();
@@ -693,7 +745,7 @@ document.addEventListener("click", (e) => {
       const next = transact(state, { type: "tutorial", step: 1 });
       if (next.ok) {
         state = next.state;
-        persist();
+        if (!loaded.error) persist();
       }
       openPanel("help");
     }
@@ -736,7 +788,7 @@ document.addEventListener("click", (e) => {
     decor = d.decor;
     tool = "decorate";
     movingFrom = null;
-    closePanel();
+    returnToWorld();
     render();
     notice("已選 " + itemName(decor) + "，點空地預覽放置。");
   } else if ("rotateDecor" in d) {
@@ -744,7 +796,7 @@ document.addEventListener("click", (e) => {
     render();
   } else if ("cancelPlace" in d) {
     movingFrom = null;
-    closePanel();
+    returnToWorld();
   } else if ("confirmPlace" in d) {
     const a =
       movingFrom === null
@@ -752,7 +804,7 @@ document.addEventListener("click", (e) => {
         : { type: "move", from: movingFrom, index: selected, rotation };
     if (action(a)) {
       movingFrom = null;
-      closePanel();
+      returnToWorld();
     }
   } else if ("gridSelect" in d) {
     selected = +d.gridSelect;
@@ -785,12 +837,13 @@ document.addEventListener("click", (e) => {
   else if ("export" in d) exportSave();
   else if ("import" in d) $("#import-file").click();
   else if ("slot" in d) {
-    if (!persist()) return;
+    if (started && !protectFallback && !persist()) return;
     slot = +d.slot;
     try {
       localStorage.setItem("moss-and-moon:preferred-slot", String(slot));
     } catch {}
     loaded = loadSlot(slot);
+    protectFallback = !!loaded.error && !loaded.recovered;
     state = loaded.state || createState(slot);
     selected = -1;
     movingFrom = null;
@@ -798,8 +851,10 @@ document.addEventListener("click", (e) => {
     closePanel();
     render();
     if (!started) start();
-    else resume();
-    notice("已進入庭園 " + slot + "。");
+    else {
+      resume();
+      reportLoadOutcome("已進入庭園 " + slot + "。");
+    }
   } else if ("resetConfirm" in d) {
     const fresh = createState(slot);
     if (!persist(fresh)) return;
@@ -857,6 +912,8 @@ document.addEventListener("change", async (e) => {
       const saved = saveSlot(candidate);
       if (!saved.ok) throw new Error(saved.error);
       loaded = loadSlot(targetSlot);
+      protectFallback = false;
+      $("#save-warning").hidden = true;
       state = loaded.state;
       selected = -1;
       movingFrom = null;
@@ -942,11 +999,12 @@ addEventListener("blur", () => {
 });
 addEventListener("pagehide", (event) => {
   importSequence++;
-  persist();
+  if (!protectFallback) persist();
   if (event.persisted) {
     if (started && !paused) pause();
     return;
   }
+  gestureEvents.abort();
   sound.dispose();
   world?.dispose();
   connection?.dispose();
@@ -982,10 +1040,10 @@ try {
   $("#start").focus({ preventScroll: true });
   connection.ready();
   Object.defineProperty(window, "mossDiagnostics", {
-    value: () => ({
+    value: (options = {}) => ({
       buildId: BUILD,
       version: VERSION,
-      world: world.metrics(),
+      world: world.metrics(options.since),
       audio: sound.metrics(),
       day: state.day,
       slot,

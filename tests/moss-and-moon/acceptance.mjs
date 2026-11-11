@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { measureMovement, assertBudget } from "./performance.mjs";
+import os from "node:os";
+import { performance } from "node:perf_hooks";
 import { mkdir, writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 import {
   PLANTS,
   DISCOVERIES,
@@ -10,44 +11,20 @@ import {
 const { chromium } = await import(
   "/workspace/stteak8/tools/node_modules/playwright-core/index.mjs"
 );
-const base = "http://127.0.0.1:8104/games/moss-and-moon/";
+import { base, ensureServer } from "./server.mjs";
 const artifacts = process.env.MOSS_ARTIFACTS || "/tmp/moss-and-moon-acceptance";
 await mkdir(artifacts, { recursive: true });
 let server, browser;
 const errors = [],
   failed = [],
   report = {};
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 try {
-  try {
-    await fetch(base);
-  } catch {
-    server = spawn(
-      "python3",
-      [
-        "-m",
-        "http.server",
-        "8104",
-        "--bind",
-        "127.0.0.1",
-        "--directory",
-        fileURLToPath(new URL("../../public/", import.meta.url)),
-      ],
-      { stdio: "ignore" },
-    );
-    for (let i = 0; i < 40; i++) {
-      await sleep(100);
-      try {
-        if ((await fetch(base)).ok) break;
-      } catch {}
-    }
-  }
+  server = await ensureServer();
   browser = await chromium.launch({
     executablePath: "/usr/bin/google-chrome",
     args: [
       "--use-angle=swiftshader",
       "--enable-unsafe-swiftshader",
-      "--autoplay-policy=no-user-gesture-required",
     ],
   });
   const context = await browser.newContext({
@@ -70,8 +47,14 @@ try {
       }
     };
   });
+  await context.addInitScript(() => {
+    window.__pageShows = [];
+    addEventListener("pageshow", e => window.__pageShows.push({persisted:e.persisted,time:performance.now()}));
+  });
   const p = await context.newPage();
-  p.setDefaultTimeout(15000);
+  await p.route('**/__qa-away.html', route => route.fulfill({ contentType:'text/html', body:
+    '<!doctype html><html><head><link rel="icon" href="data:,"><title>QA away</title></head><body>History lifecycle check</body></html>' }));
+  p.setDefaultTimeout(30000);
   p.on("pageerror", (e) => errors.push(e.message));
   p.on("console", (m) => {
     if (m.type() === "error") errors.push(m.text());
@@ -141,6 +124,7 @@ try {
     await open("quests");
     await p.locator('[data-resident="all"]').click();
     await p.locator(`[data-accept="${id}"]`).click();
+    assert.equal(await p.evaluate(()=>document.querySelector("#panel").contains(document.activeElement)),true);
     await p.locator(`[data-deliver="${id}"]`).click();
     assert.ok(
       (await snapshot()).completedQuests.includes(id),
@@ -160,11 +144,27 @@ try {
   await p.waitForFunction(() => !!window.mossDiagnostics);
   assert.equal((await diagnostic()).audio.state, "locked");
   await p.screenshot({ path: artifacts + "/welcome-1280.png" });
+  await p.setViewportSize({width:1920,height:1080});
+  await p.screenshot({path:artifacts + "/welcome-1920.png"});
+  await p.setViewportSize({width:1280,height:720});
+  await p.locator("#switch-slot").click();
+  assert.equal((await diagnostic()).audio.state,"locked");
+  await close();
+  assert.equal(await p.evaluate(()=>document.activeElement.id),"switch-slot");
   await p.locator("#start").click();
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.match(await p.locator("#panel-title").textContent(), /慢慢來/);
   await close();
   await p.waitForFunction(() => window.mossDiagnostics().audio.ready);
   assert.equal((await diagnostic()).audio.loopSources, 2);
+  assert.equal(await p.locator('.hud').evaluate(el=>getComputedStyle(el).visibility), 'visible');
+  // A real canvas raycast plants and waters plot zero; this is not the text-grid path.
+  await p.mouse.click(640,98);
+  assert.equal((await snapshot()).grid[0]?.id,'moss');
+  await p.keyboard.press('2');
+  await p.mouse.click(640,98);
+  assert.equal((await snapshot()).grid[0]?.watered,true);
+  await p.keyboard.press('1');
   // The onboarding action opens the real keyboard-accessible garden. Focus survives rendering.
   await p.locator("[data-guide]").click();
   await p.locator('[data-grid-select="0"]').focus();
@@ -178,7 +178,6 @@ try {
     await p.evaluate(() => document.activeElement.dataset.gridSelect),
     "1",
   );
-  await use(0);
   await use(1);
   await close();
   for (let day = 0; day < 3; day++) {
@@ -196,6 +195,7 @@ try {
   await p.reload();
   await p.waitForFunction(() => !!window.mossDiagnostics);
   await p.locator("#start").click();
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal(await p.locator("#panel").evaluate((el) => el.open), false);
   assert.deepEqual(await snapshot(), saved);
   // Blur releases keyboard input, pauses the scene and suspends audio until explicit resume.
@@ -214,14 +214,22 @@ try {
   await p.waitForFunction(
     () => window.mossDiagnostics().audio.state === "running",
   );
-  // Browser-level AudioContext suspension recovers on the next real gesture without extra sources.
-  await p.evaluate(() => window.__audioContexts[0].suspend());
-  await p.locator("[data-guide]").click();
-  await p.waitForFunction(
-    () => window.mossDiagnostics().audio.state === "running",
-  );
-  assert.equal((await diagnostic()).audio.loopSources, 2);
-  await close();
+  // Canvas, movement and tool gestures recover browser-level suspensions under normal autoplay.
+  const cdp = await context.newCDPSession(p);
+  const listeners = (await cdp.send('Memory.getDOMCounters')).jsEventListeners;
+  for (let i=0;i<23;i++) {
+    await p.evaluate(()=>window.__audioContexts[0].suspend());
+    if (i===0) await p.mouse.click(640,98);
+    else { await p.keyboard.press(i===1 ? '1' : 'w'); }
+    await p.waitForFunction(()=>window.mossDiagnostics().audio.state==='running');
+    assert.equal((await diagnostic()).audio.loopSources,2);
+  }
+  assert.equal((await cdp.send('Memory.getDOMCounters')).jsEventListeners,listeners);
+  await p.keyboard.press('Escape');
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.state==='suspended');
+  await p.keyboard.press('w');
+  assert.equal((await diagnostic()).audio.state,'suspended');
+  await p.locator('[data-resume]').click();
   await open("settings");
   for (const bus of ["music", "ambient", "sfx"])
     await p.locator(`[data-setting="${bus}"]`).fill("0");
@@ -232,16 +240,109 @@ try {
     sfx: 0,
   });
   await open("settings");
+  await close();
+  assert.deepEqual((await diagnostic()).audio.volumes, { music:0, ambient:0, sfx:0 });
+  await open("settings");
   for (const bus of ["music", "ambient", "sfx"])
     await p.locator(`[data-setting="${bus}"]`).fill("0.4");
   await close();
   console.log("PASS save, focus and audio lifecycle");
   report.lifecycle =
     "exact reload; blur/input release; explicit resume; external audio suspension; volume controls";
+  const inDialog = async () => assert.equal(await p.evaluate(()=>document.querySelector('#panel').contains(document.activeElement)),true);
+  const tabsStayInside = async () => {
+    await inDialog();
+    for (let i=0;i<30;i++) { await p.keyboard.press('Tab'); await inDialog(); }
+    for (let i=0;i<30;i++) { await p.keyboard.press('Shift+Tab'); await inDialog(); }
+  };
+  await open('journal');
+  await p.locator('#panel [data-open="grid"]').click();
+  await tabsStayInside();
+  await close();
+  assert.notEqual(await p.evaluate(()=>document.activeElement.tagName),'BODY');
+  await open('shop');
+  await p.locator('[data-buy="planter"]').click();
+  await inDialog();
+  await p.locator('#panel [data-open="craft"]').click();
+  await inDialog();
+  await close();
+  // Regression: every furniture exit from a pause submenu resumes the actual world.
+  const pausedPicker = async () => {
+    await close();
+    await p.keyboard.press('Escape');
+    assert.equal((await diagnostic()).paused,true);
+    await p.locator('#panel [data-open="help"]').click(); await inDialog();
+    await p.locator('#panel [data-open="grid"]').click(); await inDialog();
+    await p.locator('[data-grid-tool="decorate"]').click(); await inDialog();
+    await p.locator('[data-decor="planter"]').click();
+    assert.equal(await p.locator('#panel').evaluate(el=>el.open),false);
+    assert.equal((await diagnostic()).paused,false);
+    await p.waitForFunction(()=>window.mossDiagnostics().audio.state==='running');
+  };
+  await pausedPicker();
+  const beforeMove = (await diagnostic()).world.position;
+  await p.keyboard.down('d'); await p.waitForTimeout(350); await p.keyboard.up('d');
+  const afterMove = (await diagnostic()).world.position;
+  assert.notDeepEqual(afterMove,beforeMove);
+  await p.waitForTimeout(150);
+  assert.deepEqual((await diagnostic()).world.position,afterMove);
+  await p.keyboard.press('q'); const turn = (await diagnostic()).world.cameraTurn;
+  await p.keyboard.press('r'); assert.equal((await diagnostic()).world.cameraTurn,(turn+1)%4);
+  // Re-enter the placement dialog through a paused grid (without selecting furniture again).
+  const pausedPlacement = async () => {
+    await p.keyboard.press('Escape');
+    await p.locator('#panel [data-open="help"]').click();
+    await p.locator('#panel [data-open="grid"]').click();
+    await use(63);
+    assert.equal((await diagnostic()).paused,true);
+  };
+  await pausedPlacement();
+  await p.locator('[data-cancel-place]').click();
+  assert.equal((await diagnostic()).paused,false);
+  await pausedPlacement();
+  await p.locator('[data-confirm-place]').click();
+  assert.equal((await diagnostic()).paused,false);
+  assert.equal((await snapshot()).grid[63]?.id,'planter');
+  await p.locator('[data-action="undo"]').click();
+  await grid(); await use(63);
+  await p.locator('[data-confirm-place]').click();
+  assert.equal((await diagnostic()).paused,false);
+  await p.locator('[data-action="undo"]').click();
+  // Unrelated UI actions preserve the garden's instance batches.
+  const rebuilds = (await diagnostic()).world.plantRebuilds;
+  await open('settings'); await p.locator('#panel [data-open="slots"]').click(); await inDialog();
+  await p.locator('#panel [data-open="reset"]').click(); await inDialog();
+  await tabsStayInside();
+  await close();
+  assert.equal((await diagnostic()).world.plantRebuilds,rebuilds);
+  // Synthetic document visibility, followed by real same-origin history navigation.
+  await p.evaluate(()=>{
+    Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+    document.dispatchEvent(new Event('visibilitychange',{bubbles:true}));
+    delete document.hidden;
+  });
+  assert.equal((await diagnostic()).paused,true);
+  await p.locator('[data-resume]').click();
+  const beforeHistory = await snapshot();
+  await p.goto(new URL('__qa-away.html',base).href);
+  await p.goBack();
+  await p.waitForFunction(()=>!!window.mossDiagnostics);
+  report.history = await p.evaluate(()=>({pageshows:window.__pageShows,navigation:performance.getEntriesByType('navigation').map(n=>n.type)}));
+  if (!(await diagnostic()).started) await p.locator('#start').click();
+  else if ((await diagnostic()).paused) await p.locator('[data-resume]').click();
+  assert.deepEqual(await snapshot(),beforeHistory);
+  report.regressions = 'paused selection/cancel/confirm/unpaused placement; audio canvas/WASD/tool + 20 recoveries; modal transitions/60 Tabs; canvas plant/water; movement/key release/Q/R; synthetic visibility; real history';
+  console.log('PASS round 2 interaction regressions');
   // Explore every area, record all discoveries and solve all three puzzles through the actual UI.
+  report.exploration = [];
   for (const region of ["forest", "brook", "ridge"]) {
+    const transitionStart = performance.now();
     await open("map");
     await p.locator(`#panel [data-region="${region}"]`).click();
+    const transitionMs = performance.now()-transitionStart;
+    await p.waitForTimeout(3000);
+    await p.screenshot({path:artifacts+`/${region}-1280.png`});
+    report.exploration.push({region,transitionMs,movement:await measureMovement(p,6000)});
     await p.locator(`[data-gather="${region}"]`).click();
     await p.locator('[data-open="fieldguide"]').click();
     for (const d of DISCOVERIES.filter((d) => d.region === region)) {
@@ -314,6 +415,7 @@ try {
   await p.reload();
   await p.waitForFunction(() => window.mossDiagnostics?.().slot === 2);
   await p.locator("#start").click();
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal((await snapshot()).grid[0].id, "moss");
   await open("settings");
   await p.locator('[data-open="slots"]').click();
@@ -328,6 +430,46 @@ try {
   await p.waitForFunction(() => window.mossDiagnostics().completedQuests === 8);
   assert.equal((await snapshot()).festival, true);
   await close();
+  // Slot faults use only real UI-earned save payloads; no campaign resources are injected.
+  const earnedSlot1 = await p.evaluate(()=>localStorage.getItem('moss-and-moon:v1:slot:1'));
+  const slot2Before = await p.evaluate(()=>localStorage.getItem('moss-and-moon:v1:slot:2'));
+  for (const mode of ['valid','recovered','both','unsupported','save-denied']) {
+    await p.evaluate(({raw,mode})=>{
+      const current='moss-and-moon:v1:slot:1', backup=current+':backup';
+      const unsupported=JSON.stringify({...JSON.parse(raw),version:999});
+      localStorage.setItem(current,mode==='valid' ? raw : mode==='unsupported' ? unsupported : '{broken');
+      localStorage.setItem(backup,['recovered','save-denied'].includes(mode) ? raw : mode==='valid' ? raw : '[]');
+      if (mode==='save-denied') {
+        window.__originalSet = Storage.prototype.setItem;
+        Storage.prototype.setItem=function(k,v) {
+          if(k.startsWith('moss-and-moon:v1:slot:1')) throw new DOMException('Injected quota failure','QuotaExceededError');
+          return window.__originalSet.call(this,k,v);
+        };
+      }
+    },{raw:earnedSlot1,mode});
+    await open('settings'); await p.locator('#panel [data-open="slots"]').click();
+    await p.locator('[data-slot="1"]').click();
+    const toast = await p.locator('#toast').textContent();
+    if(mode==='valid') assert.match(toast,/已進入庭園 1/);
+    if(mode==='recovered') {
+      assert.match(toast,/恢復庭園.*修復/);
+      assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('moss-and-moon:v1:slot:1')).version),1);
+    }
+    if(mode==='both'||mode==='unsupported') {
+      assert.match(await p.locator('#save-warning').textContent(),/無法讀取.*原始資料保留/);
+      assert.equal((await diagnostic()).day,1);
+      assert.notEqual(await p.evaluate(()=>localStorage.getItem('moss-and-moon:v1:slot:1')), earnedSlot1);
+    }
+    if(mode==='save-denied') {
+      assert.match(toast,/瀏覽器未能保存/);
+      assert.equal(await p.evaluate(()=>localStorage.getItem('moss-and-moon:v1:slot:1')),'{broken');
+      await p.evaluate(()=>{Storage.prototype.setItem=window.__originalSet;delete window.__originalSet;});
+    }
+    assert.equal(await p.evaluate(()=>localStorage.getItem('moss-and-moon:v1:slot:2')),slot2Before);
+    await open('settings'); await p.locator('#panel [data-open="slots"]').click();
+    await p.locator('[data-slot="2"]').click();
+  }
+  console.log('PASS in-session save fault reporting and repair');
   // Warm the renderer before measuring. Read-only diagnostics; scene remains interactive.
   await p.waitForTimeout(12000);
   await p.screenshot({ path: artifacts + "/garden-1280.png" });
@@ -365,6 +507,18 @@ try {
     report.beforeSoak.diagnostic.world.geometries,
   );
   assert.equal(report.afterSoak.diagnostic.audio.loopSources, 2);
+  report.machine = { chrome:browser.version(), platform:os.platform(), arch:os.arch(), cpu:os.cpus()[0]?.model, cores:os.cpus().length, loadavg:os.loadavg(), timestamp:new Date().toISOString(), autoplay:'Chrome default' };
+  report.warmupMs = 18000;
+  report.movement = [];
+  for (const viewport of [{width:1280,height:720},{width:1920,height:1080}]) {
+    await p.setViewportSize(viewport); await p.waitForTimeout(6000);
+    const measurement = await measureMovement(p,12000);
+    report.movement.push(measurement);
+    await writeFile(artifacts + '/movement.json',JSON.stringify(report.movement,null,2));
+    console.log('Movement',viewport,measurement.raf,measurement.completion,measurement.update,measurement.submit);
+
+  }
+  await p.setViewportSize({width:1280,height:720});
   // Context loss is an accessible recoverable screen, and reloading keeps all progress.
   await p.evaluate(() =>
     document
@@ -378,6 +532,7 @@ try {
   await p.locator("#fatal button").click();
   await p.waitForFunction(() => !!window.mossDiagnostics);
   await p.locator("#start").click();
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal((await snapshot()).festival, true);
   // Corrupt primary falls back to the preceding valid state; both corrupt starts safely.
   await p.evaluate(() =>
@@ -386,6 +541,7 @@ try {
   await p.reload();
   await p.waitForFunction(() => !!window.mossDiagnostics);
   await p.locator("#start").click();
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   assert.equal((await snapshot()).festival, true);
   await p.evaluate(() => {
     sessionStorage.setItem("moss-test-corruption", "both");
@@ -393,13 +549,17 @@ try {
   await p.reload();
   await p.waitForFunction(() => !!window.mossDiagnostics);
   await p.locator("#start").click();
+  await p.waitForFunction(()=>window.mossDiagnostics().audio.ready);
   await close();
   assert.equal((await diagnostic()).day, 1);
+  report.functionalChecks = 'all interaction, campaign, slots, corrupt/unsupported saves, context loss and history checks passed';
   report.errors = errors;
   report.failedRequests = failed;
   assert.deepEqual(errors, []);
   assert.deepEqual(failed, []);
-  console.log("PASS Moss & Moon acceptance", JSON.stringify(report, null, 2));
+  await writeFile(artifacts + "/acceptance.json",JSON.stringify(report,null,2));
+  for (const measurement of report.movement) assertBudget(measurement,`${measurement.viewport.width} movement`);
+  console.log("PASS Moss & Moon acceptance", JSON.stringify({...report,movement:report.movement.map(({samples,...m})=>({...m,samples:samples.length}))}, null, 2));
   await writeFile(
     artifacts + "/acceptance.json",
     JSON.stringify(report, null, 2),

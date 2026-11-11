@@ -4,7 +4,7 @@ const root = new URL("../../", import.meta.url);
 const units = readdirSync(new URL("../games/moss-and-moon/", import.meta.url))
   .filter((f) => f.endsWith(".test.js"))
   .map((f) => new URL("../games/moss-and-moon/" + f, import.meta.url).pathname);
-const unit = spawnSync(process.execPath, ["--test", ...units], {
+const unit = spawnSync(process.execPath, ["--test", ...units, new URL("./server.test.mjs", import.meta.url).pathname], {
   cwd: root,
   stdio: "inherit",
 });

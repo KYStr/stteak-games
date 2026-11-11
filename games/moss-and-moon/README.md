@@ -12,12 +12,12 @@ npm --prefix games/moss-and-moon run build
 npm --prefix games/moss-and-moon test
 ```
 
-The single test command runs the Node unit suite and a headless Chrome acceptance route. It starts a temporary HTTP server on **8104** if one is not already running and closes its browser and its own server afterwards. Requires Python 3, `/usr/bin/google-chrome`, and the shared Playwright installation at `/workspace/stteak8/tools/node_modules/playwright-core`. No external network requests are made by the game.
+The single test command runs the Node unit suite and a headless Chrome acceptance route. It starts a temporary HTTP server on **8104** by default (`MOSS_PORT` accepts an integer from 1 to 65535) if one is not already running and closes its browser and its own server afterwards. An existing server must serve the expected game page; an occupied wrong-service port fails clearly. Requires Python 3, `/usr/bin/google-chrome`, and the shared Playwright installation at `/workspace/stteak8/tools/node_modules/playwright-core`. No external network requests are made by the game.
 
 ```sh
 # Three-minute stability run, with screenshots and measured frame/heap/resource data:
-MOSS_ARTIFACTS=/tmp/moss-and-moon-qa npm --prefix games/moss-and-moon test
-MOSS_ARTIFACTS=/tmp/moss-and-moon-qa npm --prefix games/moss-and-moon run test:soak
+MOSS_PORT=8104 MOSS_ARTIFACTS=/tmp/moss-and-moon-qa npm --prefix games/moss-and-moon test
+MOSS_PORT=8104 MOSS_ARTIFACTS=/tmp/moss-and-moon-qa npm --prefix games/moss-and-moon run test:soak
 # Fast logic checks only:
 npm --prefix games/moss-and-moon run test:unit
 # Manual HTTP session (stop with Ctrl-C):
@@ -26,7 +26,7 @@ python3 -m http.server 8104 --bind 127.0.0.1 --directory public
 
 Open `http://127.0.0.1:8104/games/moss-and-moon/`. Runtime ES modules in `public/games/moss-and-moon/` are the authoritative editable source. The build copies the pinned Three.js 0.180.0 modules and its license into `vendor/`; there is no separate bundled copy to reconcile.
 
-The separate stability command imports the backup produced by the campaign test and measures a further three minutes after warmup, including post-GC heap, listeners, DOM, pending animation frames, geometry, textures, audio sources and frame intervals. Both commands close their browser.
+The separate stability command imports the backup produced by the campaign test and measures a further three minutes after warmup, including post-GC heap, listeners, DOM, pending animation frames, geometry, textures, audio sources and frame intervals. It warms every region, camera cutaway and resident skin, then compares the same garden/view/panel state. Native attribute wrappers are materialized on both sides before the strict CDP DOM-node check, because canvas focus can otherwise add six lazy `Attr` wrappers without changing the document. Both commands close their browser and only the server they own. `MOSS_ARTIFACTS` chooses the screenshots/JSON/export directory (default `/tmp/moss-and-moon-acceptance`). Acceptance performs the full campaign and a short leak check; `test:soak` is the separate three-minute monotonic stability gate. `MOSS_SOAK_MS` may lengthen stability but values below 180000 are rejected. Both run with normal Chrome autoplay policy.
 
 The browser suite performs actual UI actions from a new garden through the festival: planting, daily care, harvesting, eight quest deliveries, all discoveries and puzzles, buying, crafting, decoration, export/import, both slots, resetting, reload restoration, blur/input release, audio unlock/suspend/resume/volume, viewport screenshots, context-loss recovery, and corrupt-save recovery. It never injects inventory, coins, quests, or a winning state. The unit suite also verifies a complete twelve-quest/eight-recipe route and transaction/storage/audio edge cases.
 
@@ -41,7 +41,7 @@ The browser suite performs actual UI actions from a new garden through the festi
 
 Every successful action saves locally with a checksum and previous valid snapshot. Reload restores the selected slot without advancing time. Blur/hidden tabs pause movement and sound; resuming is explicit. Context loss offers a focused recovery screen; reload keeps the saved garden. Backups exported from settings can be imported into either slot. Old/incompatible or corrupt data is rejected, with the previous valid snapshot recovered when available. Browser storage restrictions are surfaced in the UI; play can continue and progress can be exported.
 
-The renderer instances repeated scenery and garden plants, caches static shadows, stops GPU drawing behind inactive panels, and adapts internal resolution to frame time. The HTML interface stays at native resolution. Diagnostics are read-only at `window.mossDiagnostics()` (recent average/p50/p95 frame interval, GPU resources, audio state and save revision).
+The renderer instances repeated scenery and garden plants, rebuilds plant batches only when visual state changes, caches static shadows, and stops drawing behind inactive panels. Auto/low use cached vertex-baked warm/cool lighting and distant resident LODs; high retains authored lighting, full resolution and shadows. Auto adapts with hysteresis and a 0.75 minimum internal scale at 720p; 1080p has a 1.5-million-pixel budget. The HTML interface stays at native resolution. Diagnostics are read-only at `window.mossDiagnostics()` (RAF intervals, simulation/update and render submission time, completion intervals, framebuffer, draw/triangle/resource counts, audio and save state). `mossDiagnostics({since:0})` returns bounded ring samples by sequence; the acceptance/soak collectors retain the full raw run outside the game. Movement is measured at 720p and 1080p; the QA budget is mean ≤33.3 ms and p95 ≤50 ms for RAF and submission-completion intervals. All slow samples remain in reports. Machine metadata and warmup duration accompany the results.
 
 ## Original assets and notices
 

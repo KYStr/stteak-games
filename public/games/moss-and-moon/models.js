@@ -1996,3 +1996,35 @@ export function disposeModelCache() {
   geometryCache.clear();
   modelCache.clear();
 }
+
+// Quality variants own their colors and material; authored high-quality assets stay intact.
+const lightweightCache = new WeakMap();
+export function lightweightVariant(geometry, material) {
+  let variants = lightweightCache.get(geometry);
+  if (!variants) lightweightCache.set(geometry, variants = new Map());
+  const key = material.color?.getHexString() || "ffffff";
+  if (variants.has(key)) return variants.get(key);
+  const g = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+  g.computeVertexNormals();
+  const n = g.attributes.normal, colors = g.attributes.color;
+  const base = material.color || new THREE.Color(1, 1, 1);
+  const sun = new THREE.Vector3(-9, 15, 8).normalize();
+  const rgb = new Float32Array(n.count * 3);
+  for (let i = 0; i < n.count; i++) {
+    const hemi = (n.getY(i) + 1) * 0.5;
+    const direct = Math.max(0, n.getX(i)*sun.x + n.getY(i)*sun.y + n.getZ(i)*sun.z);
+    // Warm sun, cool sky and moss-green bounce, computed once in linear color space.
+    const lighting = [0.48 + hemi*0.65 + direct*1.05,
+                      0.57 + hemi*0.65 + direct*0.98,
+                      0.54 + hemi*0.82 + direct*0.78];
+    for (let c = 0; c < 3; c++) {
+      const paint = colors ? colors.array[i*3+c] : 1;
+      rgb[i*3+c] = Math.min(1, paint * [base.r,base.g,base.b][c] * lighting[c]);
+    }
+  }
+  g.setAttribute("color", new THREE.BufferAttribute(rgb, 3));
+  const m = new THREE.MeshBasicMaterial({ vertexColors:true, toneMapped:false, name:"baked-moonlight" });
+  const result = { geometry:g, material:m };
+  variants.set(key, result);
+  return result;
+}
