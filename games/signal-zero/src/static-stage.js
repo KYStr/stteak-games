@@ -55,14 +55,14 @@ export class StaticStage {
   this.cameraFrustum.setFromProjectionMatrix(this.matrix);
   if(shadows)sun.shadow.updateMatrices(sun);
   const shadowFrustum=shadows?sun.shadow.getFrustum():null;let visible=0;
-  for(const chunk of this.chunks){
+  for(let chunkIndex=0;chunkIndex<this.chunks.length;chunkIndex++){const chunk=this.chunks[chunkIndex];
    // A caster outside the main camera must remain if the light can see it.
    chunk.visible=this.cameraFrustum.intersectsSphere(chunk.worldSphere)||!!shadowFrustum?.intersectsSphere(chunk.worldSphere);
    if(chunk.visible)visible++;
   }
   this.stats.visible=visible;
   let visibleGuards=0;
-  for(const guard of this.guards){guard.updateVisibility(this.cameraFrustum,shadowFrustum);if(guard.visible)visibleGuards++;}
+  for(let guardIndex=0;guardIndex<this.guards.length;guardIndex++){const guard=this.guards[guardIndex];guard.updateVisibility(this.cameraFrustum,shadowFrustum);if(guard.visible)visibleGuards++;}
   this.stats.visibleGuards=visibleGuards;
  }
 }

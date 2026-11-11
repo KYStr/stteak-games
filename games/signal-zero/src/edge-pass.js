@@ -9,28 +9,6 @@ export class EdgePass {
  constructor(software){
   this.target=new T.WebGLRenderTarget(1,1,{depthBuffer:true,stencilBuffer:true});this.prepared=new WeakSet();this.background=new T.Color();
   let fragmentShader=FXAAShader.fragmentShader;
-  // Software rasterizers use a bounded seven-sample edge filter. All authored
-  // objects still render; only the full-screen edge search is simplified.
-  if(software)fragmentShader=`
-   uniform sampler2D tDiffuse;
-   uniform vec2 resolution;
-   varying vec2 vUv;
-   void main(){
-    vec4 center=texture2D(tDiffuse,vUv);
-    float c=luminance(center.rgb);
-    float n=luminance(texture2D(tDiffuse,vUv+vec2(0.,resolution.y)).rgb);
-    float s=luminance(texture2D(tDiffuse,vUv-vec2(0.,resolution.y)).rgb);
-    float e=luminance(texture2D(tDiffuse,vUv+vec2(resolution.x,0.)).rgb);
-    float w=luminance(texture2D(tDiffuse,vUv-vec2(resolution.x,0.)).rgb);
-    float lo=min(c,min(min(n,s),min(e,w))),hi=max(c,max(max(n,s),max(e,w)));
-    if(hi-lo<max(.0312,hi*.063)){gl_FragColor=center;return;}
-    vec2 edge=vec2(s-n,e-w);
-    edge/=max(abs(edge.x)+abs(edge.y),.0001);
-    vec2 offset=edge*resolution*.75;
-    vec3 filtered=(texture2D(tDiffuse,vUv+offset).rgb+texture2D(tDiffuse,vUv-offset).rgb)*.5;
-    float amount=smoothstep(.03,.2,hi-lo)*.7;
-    gl_FragColor=vec4(mix(center.rgb,filtered,amount),center.a);
-   }`;
   this.uniforms=T.UniformsUtils.clone(FXAAShader.uniforms);this.uniforms.tDiffuse.value=this.target.texture;
   this.material=new T.ShaderMaterial({name:'signal-zero-edge-output',uniforms:this.uniforms,vertexShader:FXAAShader.vertexShader,fragmentShader,depthWrite:false,depthTest:false,toneMapped:false});
   this.quad=new FullScreenQuad(this.material);

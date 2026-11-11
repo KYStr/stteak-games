@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+import {LEVELS} from '../../games/signal-zero/src/levels.js';
+import {harness,instrumentation} from './browser-harness.mjs';
+const h=await harness('performance'),report={samples:[],profiles:[],errors:h.errors};
+try{
+ console.log('Browser connected');const {page}=h;await page.addInitScript(instrumentation);await page.goto(h.base);console.log('Document loaded');await page.click('#begin');await page.click('#deploy');console.log('Deployed');await page.keyboard.press('Escape');await page.click('#restart');await page.click('#confirm');await page.waitForTimeout(5000);
+ const cdp=await page.context().newCDPSession(page);await cdp.send('HeapProfiler.enable');console.log('Profiler connected');
+ async function capture(){report.forcedGC=(report.forcedGC||0)+1;const beforeGC=(await cdp.send('Runtime.getHeapUsage')).usedSize;await cdp.send('HeapProfiler.collectGarbage');const heap=(await cdp.send('Runtime.getHeapUsage')).usedSize,dom=await cdp.send('Memory.getDOMCounters'),d=await page.evaluate(()=>({state:signalZeroControlState,render:signalZeroDiagnostics.render,performance:signalZeroDiagnostics.performance,raf:{pending:__gameRaf.pending.size,max:__gameRaf.max},textures:__textureLedger,ownedListeners:__gameListenerCount()}));return {heap,beforeGC,dom,...d};}
+ async function moveFor(ms){const until=Date.now()+ms;let direction=1;while(Date.now()<until){const s=await page.evaluate(()=>signalZeroControlState);assert.equal(s.phase,'playing');if(s.player.x>10)direction=-1;if(s.player.x<3.5)direction=1;await page.keyboard.up(direction===1?'KeyA':'KeyD');await page.keyboard.down(direction===1?'KeyD':'KeyA');await page.waitForTimeout(75);}await page.keyboard.up('KeyD');await page.keyboard.up('KeyA');}
+
+ report.warmup=[];await cdp.send('HeapProfiler.startSampling',{samplingInterval:32768,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});await page.waitForTimeout(5000);await cdp.send('HeapProfiler.stopSampling');
+ for(let i=0;i<6;i++){await page.waitForTimeout(5000);const sample=await capture();report.warmup.push({heap:sample.heap,time:sample.state.time});if(i>=3&&Math.abs(sample.heap-report.warmup[i-1].heap)/sample.heap<.01)break;}
+ report.initial=await capture();const started=Date.now();let pendingProfile=false;
+ for(let block=0;block<12;block++){
+  if(block===0||block===4){await cdp.send('HeapProfiler.startSampling',{samplingInterval:32768,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});pendingProfile=true;}
+  if(block>=4&&block<8)await moveFor(15000);else await page.waitForTimeout(15000);const sample=await capture();report.samples.push({wallMs:Date.now()-started,heap:sample.heap,beforeGC:sample.beforeGC,dom:sample.dom,state:sample.state,render:sample.render,textures:sample.textures,raf:sample.raf,ownedListeners:sample.ownedListeners});assert.equal(sample.state.screen,'playing');assert.ok(sample.render.maxDrawCalls<=250);assert.ok(sample.render.maxTriangles<=1500000);assert.ok(sample.render.textureBytes<=256*1024*1024);assert.ok(sample.textures.peak<=256*1024*1024);assert.ok(sample.performance.phases.logic.p95<=6);console.log('PERF',block,sample.heap,sample.render.maxDrawCalls,sample.performance.phases.logic.p95);
+  if(block===3||block===7){const profile=await cdp.send('HeapProfiler.stopSampling');pendingProfile=false;const label=block===3?'stationary':'moving';await writeFile(h.artifacts+'/allocation-'+label+'.json',JSON.stringify(profile));const allocations=[];function visit(n){if(n.selfSize&&n.callFrame.url.includes('/games/signal-zero/'))allocations.push({function:n.callFrame.functionName,file:n.callFrame.url.split('/').at(-1),line:n.callFrame.lineNumber+1,bytes:n.selfSize});for(const child of n.children||[])visit(child);}visit(profile.profile.head);report.profiles.push({label,allocations:allocations.sort((a,b)=>b.bytes-a.bytes),samples:profile.profile.samples.length});}
+  if(block===8){await page.keyboard.press('Escape');await page.click('#restart');await page.click('#confirm');await page.waitForTimeout(3000);}
+  await writeFile(h.artifacts+'/performance.json',JSON.stringify(report,null,2));
+ }
+ if(pendingProfile)await cdp.send('HeapProfiler.stopSampling');
+ report.final=await capture();report.wallMs=Date.now()-started;assert.ok(report.wallMs>=180000);assert.ok(report.final.heap/report.initial.heap<1.1,JSON.stringify({initial:report.initial.heap,final:report.final.heap}));assert.equal(report.final.ownedListeners,report.initial.ownedListeners);assert.equal(report.final.render.geometries,report.initial.render.geometries);assert.equal(report.final.render.textures,report.initial.render.textures);assert.equal(report.final.raf.pending,1);assert.equal(report.final.raf.max,1);
+ // Sampling includes collected objects. Fail recurring corrected helper stacks;
+ // Web Audio event nodes, diagnostic exports and Three renderer internals are separate.
+ const hot=new Set(['canSee','lineBlocked','movePlayer','updateDevices','read','updateAtmosphere','cone','updateScene','frame']);for(const profile of report.profiles)for(const a of profile.allocations)if(hot.has(a.function)&&!a.file.startsWith('three'))assert.ok(a.bytes<1024*1024,'Recurring game allocation: '+JSON.stringify(a));
+ assert.deepEqual(h.errors,[]);report.passed=true;await writeFile(h.artifacts+'/performance.json',JSON.stringify(report,null,2));console.log('PASS three-minute restart soak, stationary/moving allocation profiles and all resource bars');
+}catch(error){report.error=error.message;await writeFile(h.artifacts+'/performance-failure.json',JSON.stringify(report,null,2));throw error;}finally{await h.close();}

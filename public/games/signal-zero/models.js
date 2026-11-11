@@ -22,9 +22,9 @@ export const assetMaterials = Object.fromEntries(Object.entries(palette).map(([n
 // Hero-only values keep the player readable against the night architecture without
 // lifting the value of every platform, cabinet and guard in the shared palette.
 const runnerMaterials = new Map([
-  [assetMaterials.fabric, new THREE.MeshStandardMaterial({ name: 'sz-runner-fabric', color: 0x2c465d, metalness: .13, roughness: .83 })],
+  [assetMaterials.fabric, new THREE.MeshStandardMaterial({ name: 'sz-runner-fabric', color: 0x486e7d, metalness: .13, roughness: .83 })],
   [assetMaterials.armor, new THREE.MeshStandardMaterial({ name: 'sz-runner-armor', color: 0x64879b, metalness: .50, roughness: .42 })],
-  [assetMaterials.edge, new THREE.MeshStandardMaterial({ name: 'sz-runner-edge', color: 0xb4d4dc, metalness: .67, roughness: .30 })],
+  [assetMaterials.edge, new THREE.MeshStandardMaterial({ name: 'sz-runner-edge', color: 0xcaf9e6, emissive:0x69d9b5,emissiveIntensity:.5, metalness: .67, roughness: .30 })],
 ]);
 const archiveGlass = new THREE.MeshStandardMaterial({ name: 'sz-archive-glass', color: 0x599cae, metalness: .30, roughness: .18, emissive: 0x163846, emissiveIntensity: .3, transparent: true, opacity: .23, depthWrite: false });
 function geometry(kind, a, b, c, n = 8) {
@@ -227,18 +227,18 @@ export function createSecurity(type) {
   });
   g.userData = { assetOwned: true, assetId: `signal-zero.security.${type}`, securityType: type, moving, indicator, rotors, animationTime: 0 }; return g;
 }
-export function animateSecurity(group, state, dt) {
-  const data = group.userData; const status = state.state ?? 'patrol'; const disabled = !!state.disabled;
+export function animateSecurity(group, state, dt, disabledOverride=state.disabled, timeOverride=state.time) {
+  const data = group.userData; const status = state.state ?? 'patrol'; const disabled = !!disabledOverride;
   if (data.securityType === 'guard') {
-    const animation = disabled ? 'caught' : ['chase', 'tracking', 'pursuit', 'alert'].includes(status) ? 'chase' : ['search', 'searching'].includes(status) ? 'search' : ['suspicious', 'notice'].includes(status) ? 'notice' : status === 'idle' ? 'idle' : 'patrol';
-    animateRunner(group, { animation, facing: state.dir ?? 1 }, dt); return;
+    const animation = disabled ? 'caught' : (status==='chase'||status==='tracking'||status==='pursuit'||status==='alert') ? 'chase' : (status==='search'||status==='searching') ? 'search' : (status==='suspicious'||status==='notice') ? 'notice' : status === 'idle' ? 'idle' : 'patrol';
+    if(!data.animationState)data.animationState={animation:'idle',facing:1};data.animationState.animation=animation;data.animationState.facing=state.dir??1;animateRunner(group,data.animationState,dt); return;
   }
-  data.animationTime += Math.min(Math.max(dt || 0, 0), .1); const t = state.time ?? data.animationTime;
-  const alert = ['alert', 'chase', 'tracking', 'pursuit'].includes(status); data.indicator.color.setHex(disabled ? 0x354451 : alert ? 0xff77ac : 0x71ffe2);
+  data.animationTime += Math.min(Math.max(dt || 0, 0), .1); const t = timeOverride ?? data.animationTime;
+  const alert = (status==='alert'||status==='chase'||status==='tracking'||status==='pursuit'); data.indicator.color.setHex(disabled ? 0x354451 : alert ? 0xff77ac : 0x71ffe2);
   data.indicator.emissive.setHex(disabled ? 0x000000 : alert ? 0xc92c61 : 0x32eac8); data.indicator.emissiveIntensity = disabled ? 0 : alert ? 1.8 : 1.3;
   if (state.dir !== undefined && state.dir !== 0) group.rotation.y = state.dir < 0 ? Math.PI : 0;
   if (data.securityType === 'camera') { data.moving.rotation.y = 0; data.moving.rotation.z = disabled ? -.7 : Math.atan(-.28) + (state.scanOffset ?? 0) * (state.dir ?? 1); }
-  if (data.securityType === 'drone') { data.moving.position.y = disabled ? -.08 : Math.sin(t * 2.8) * .035; data.moving.rotation.z = disabled ? -.35 : Math.atan(-.23); for (const rotor of data.rotors) rotor.rotation.y += disabled ? 0 : dt * 36; }
+  if (data.securityType === 'drone') { data.moving.position.y = disabled ? -.08 : Math.sin(t * 2.8) * .035; data.moving.rotation.z = disabled ? -.35 : Math.atan(-.23); for(let rotorIndex=0;rotorIndex<data.rotors.length;rotorIndex++)data.rotors[rotorIndex].rotation.y += disabled ? 0 : dt * 36; }
 }
 
 export function createProp(type, options = {}) {

@@ -44,6 +44,16 @@ Pulse disables a nearby electronic device for 8 seconds, decoys draw guards away
 for 7 seconds, and rewiring permanently disables one camera or laser. Invalid
 targets never consume tools. Every chapter can be completed without tools.
 
+Standard difficulty has a visible active-play trace deadline (7:00–8:15 across
+the six chapters). Every new alarm subtracts four seconds; detection warning time
+ramps from 0.95 to 0.70 seconds and patrol speed rises gradually. Jumping over a
+guard avoids their ground grapple. Relaxed difficulty removes the trace deadline;
+its records are stored separately. Settings changes apply on the next deployment.
+The briefing accepts an unsigned 32-bit frequency code. Equal codes reproduce
+patrol starts, directions and camera/laser phases; new frequency creates a variant.
+Checkpoint saves retain seed, phase and remaining trace. Standard medals aggregate
+across frequencies; speed records also keep chapter/difficulty/seed keys.
+
 Hack all four mission nodes, then reach the exit. Upper-route packets are optional.
 A checkpoint saves automatically after the first objective while not being tracked
 or searched. The first is shortly after the opening terminal; later checkpoints
@@ -63,59 +73,69 @@ download frame times, GPU timings, render counts and game state to the local dev
 
 ## Automated acceptance
 
-From the repository root, one command rebuilds and runs all checks:
+From the repository root:
 
 ```sh
-SIGNAL_ZERO_PORT=8127 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-r2-acceptance npm test --prefix games/signal-zero
+SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-release npm test --prefix games/signal-zero
+SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-campaign npm run test:campaign --prefix games/signal-zero
+SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-performance npm run test:performance --prefix games/signal-zero
 ```
 
-The suite requires `/usr/bin/google-chrome`, Python 3 and the provided Playwright
-at `/workspace/stteak8/tools/node_modules/playwright-core/index.mjs`. It starts a
-static server on `SIGNAL_ZERO_PORT` (default 8107) if none is running, uses one headless Chrome with
-SwiftShader, and closes its browser/server on success or failure. Stop any other
-Signal Zero browser before running it. Logs and PNGs default to
-`/tmp/signal-zero-acceptance/` (`SIGNAL_ZERO_ARTIFACTS` overrides this).
+Each browser command owns one headless Chrome and a temporary Python HTTP server,
+closing both in `finally`. Run commands sequentially. They require Python 3,
+`/usr/bin/google-chrome` and Playwright from `/workspace/stteak8/tools/node_modules/`.
+`SIGNAL_ZERO_PORT` defaults to 8107; `SIGNAL_ZERO_ARTIFACTS` sets report/PNG output.
 
-Unit tests cover physics, occlusion, tools, saves, full input-only campaign routes
-at 30/60 FPS, zero-alarm routes, resource culling, input ownership and build parity.
-The browser suite drives actual keyboard play through the opening hack/checkpoint,
-save/reload, blur/resume, audio unlock and recovery, mute/volume, key capture,
-focus, 720p/1080p layouts, defeat/retry, victory/replay, context loss and corrupt saves.
-Chrome uses its default gesture policy: no AudioContext may exist before the first
-click, then an analyser must observe nonzero samples. Real keyboard jumps must
-emit exactly one landing cue; mute and zero SFX must suppress its voice.
-Late-game UI checks use an explicitly constructed valid checkpoint fixture;
-whole-campaign traversal is independently exercised by the unit tests.
-The default stability soak lasts three minutes and reports measured average/p95
-frame time, heap, listeners, geometry counts and voice bounds. Four additional
-30-second steady samples test chapter 1 at x=35, 387.5, 937.5 (720p) and x=35
-(1080p), after camera/shader warm-up. Every sample must have mean <=33.4 ms,
-p95 <=50.1 ms, and no one-second window below 20 FPS. Reports record wall time
-and simulation time separately, phase costs, render calls/triangles, quality,
-resolution and scale. These are local regression gates; shared CPU contention
-still affects SwiftShader RAF intervals. Tests also enforce the 0.75 auto visual
-floor, bounded game RAFs (excluding Playwright polling), and zero RAF after
-context loss. Fixtures install in the next document after pagehide, and assert
-the restored chapter/checkpoint/graphics setting before measurements.
-Screenshots include minimum auto resolution and paused world views at both sizes.
-For quick iteration only,
-`SIGNAL_ZERO_PORT=8127 SIGNAL_ZERO_SOAK_MS=1000 npm run test:browser --prefix games/signal-zero`
-skips the full soak; it is not a substitute for release acceptance.
+`npm test` rebuilds, runs physics/save/input/build-parity tests and the browser
+acceptance suite. Unit evidence includes 90 input-only strategy/arrival-phase
+trials (three approaches × six chapters × five offsets), 72 finite-tool seeded
+routes (twelve seeds × six chapters), idle deadline defeats, and checkpoint layout
+migration. The browser suite tests actual opening movement, jumping, climbing,
+selection by Q/mouse, tool failure, hacking milestones, checkpoint save/reload,
+blur/audio recovery, settings/focus, both endings, context loss and corrupt saves.
+Music must wait for a gesture and produce nonzero analyser samples. Event voice
+spies check action envelopes with music disabled, plus mute/SFX-zero regressions.
+Late defeat/victory UI checks use explicitly labeled checkpoint fixtures; the
+additional first chapter traversal uses keyboard input from a fresh entrance.
 
-Static scenery merges by material and render flags in cells bounded to 32m.
-Collision/vision keep the original authored solids. Every skyline window remains
-an instance, using a front-facing pane instead of an almost flat six-sided box. Software auto/low use cached
-Lambert variants for opaque static surfaces; high retains original materials and
-shadows. Lighting, animated actors and the runner's occlusion silhouette remain.
-Auto quality starts at 0.75 on software renderers, uses a 120-frame RAF window,
-and changes resolution with hysteresis; low explicitly selects 0.65 resolution.
-Diagnostic phase samples are bounded to 120 frames and GPU queries are asynchronous.
-Auto/high also use a single FXAA output pass (a bounded seven-sample edge filter on
-software renderers). A byte-color target retains the runner stencil. Scene shader hooks
-preserve native exposure, tone mapping and sRGB conversion before AA, avoiding
-expensive half-float filtering and preserving the un-tonemapped silhouette.
-Low keeps direct rendering. `Pass.js` and `FXAAShader.js` are copied from pinned
-Three.js 0.180.0 with local imports; its MIT notice is shipped.
+Release gates are hardware independent: <=250 draw calls, <=1.5 million triangles,
+<=256 MiB texture/render-target memory, combined active update p95 <=6 ms, <10%
+post-GC heap growth, equal listeners/geometries/textures, and one pending game RAF.
+Combined logic starts before input read and stops before rendering/GPU query work.
+Typed numeric histories hold 3,600 samples; diagnostics serialize only on request.
+Four scene windows report mean/p95/minimum-window frame pacing, wall time,
+simulation time, and actual frame count. A window needs >=10 simulation seconds
+and >=100 frames; insufficient coverage is labeled separately and retried once
+with a longer window (up to three minutes), then fails if still insufficient.
+Shared SwiftShader RAF timing is reference information. `SIGNAL_ZERO_STRICT_RAF=1`
+adds calibrated-machine pacing gates (mean <=33.4 ms, p95 <=50.1 ms, >=20 window FPS).
+No console, request, memory, gameplay or resource failures are optional.
+
+`test:campaign` drives six complete chapters, ending, reload and replay with real
+keyboard/equipment input and the live renderer. Playwright's virtual clock advances
+RAF timestamps in 100 ms ticks; bounded 120 Hz physics substeps still run normally.
+This accelerates campaign coverage and is not wall-clock performance evidence.
+No player/objective/tool/victory state is assigned by the controller. It records
+terminal/exit traces, active duration, seed, finite inventory, introduction times
+and screenshots, plus real idle defeat and random/competent comparisons.
+`SIGNAL_ZERO_SEEDS` accepts comma-separated uint32 seeds for extended campaign runs.
+
+`test:performance` uses real wall time: a three-minute active soak with restart,
+stationary/moving allocation profiles including collected objects, intermediate
+heap samples, forced-GC counts, resource maxima and a conservative WebGL texture
+ledger. Audio nodes created for discrete cues/music are reported separately from
+steady game logic. The acceptance suite also warms shaders/JIT to a stable post-GC baseline, then runs a real three-minute soak and
+same-chapter reconstructions; `SIGNAL_ZERO_SOAK_MS=1000` is a development shortcut,
+not release evidence.
+
+Static scenery batches within 32 m cells. Per-sector canal bridges/pipes, archive
+frames and radial core towers have different silhouettes. The normal runner has
+light armor trim and a separate stencil-tested occlusion silhouette. Auto/high
+use pinned Three.js FXAA with a byte-color/stencil target; DOM text stays native.
+Software auto has a 0.75 visual floor, high caps DPR at 1.5, and low uses 0.65.
+Adaptive resolution uses a reusable 120-sample window with hysteresis. Context
+loss stops the game loop and offers checkpoint reload. Three.js 0.180.0 modules,
+FXAAShader/Pass and the MIT notice ship locally.
 
 Original procedural art and score are in `src/models.js` and `src/audio.js`.
 Existing exported assets, notices and Three.js MIT license remain intact.
