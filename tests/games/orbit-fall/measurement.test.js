@@ -180,10 +180,10 @@ test('actual main.animate keeps about 600 physics steps over 10 seconds while th
       performance: {now:()=>0}, updateSamples: [], lastUpdateMs:0, lastSimulationMs:0, totalActiveFrames: 0, activeBrowserSeconds: 0, longGaps: [], document: {hidden:false}, last: 1000 - 1000 / 165, accumulator: 0, simTime: 0, state: {},
       frameSamples: [], sampleCursor: 0, physics: { anchored: false }, toastUntil: Infinity,
       requestAnimationFrame(callback) { assert.equal(typeof callback, 'function'); counts.scheduled++; },
-      inputState() { return input; },
+      zeroInput:input,movement:input,inputState() { return input; },
       step(value) { assert.equal(value, input); counts.steps++; sandbox.simTime += 1 / 60; },
       audio: { update() { counts.audioUpdates++; } },
-      view: { update(_physics, _run, _state, _simTime, dt) { counts.renders++; counts.renderedSeconds += dt; } },
+      view: {render(){}, update(_physics, _run, _state, _simTime, dt) { counts.renders++; counts.renderedSeconds += dt; } },
       updateHud() {}, $() { return { classList: { remove() {} } }; },
     });
     vm.runInContext(animateSource, sandbox);

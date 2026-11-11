@@ -101,7 +101,7 @@ export function setDeviceState(g,state='offline') {
   let shared;
   for(const o of nodes.lights){if(!o.userData.uniqueStateMaterial){shared ||= o.material.clone();o.material=shared;o.userData.uniqueStateMaterial=true;}o.material.color.setHex(color);o.material.emissive.setHex(color);o.material.emissiveIntensity=state==='offline'?.2:1;}
 }
-export function animateDevice(g,time) {for(const o of (deviceNodes.get(g)||cacheDeviceNodes(g)).animated){if(o.name==='memory-orbit')o.rotation.y=time*.35;if(o.name==='memory-crystal')o.rotation.y=time*.6;if(o.name.startsWith('arc-segment'))o.visible=['active','danger'].includes(g.userData.state);if(o.name.startsWith('airflow-stream'))o.scale.y=.75+Math.sin(time*4+o.position.x)*.25;if(o.name.startsWith('gate-leaf')){const s=o.name==='gate-leaf--1'?-1:1;o.position.x=(g.userData.state==='powered'||g.userData.state==='complete')?s*1.55:0;}}}
+export function animateDevice(g,time) {const nodes=(deviceNodes.get(g)||cacheDeviceNodes(g)).animated;for(let i=0;i<nodes.length;i++){const o=nodes[i];if(o.name==='memory-orbit')o.rotation.y=time*.35;if(o.name==='memory-crystal')o.rotation.y=time*.6;if(o.name.startsWith('arc-segment'))o.visible=(g.userData.state==='active'||g.userData.state==='danger');if(o.name.startsWith('airflow-stream'))o.scale.y=.75+Math.sin(time*4+o.position.x)*.25;if(o.name.startsWith('gate-leaf')){const s=o.name==='gate-leaf--1'?-1:1;o.position.x=(g.userData.state==='powered'||g.userData.state==='complete')?s*1.55:0;}}}
 
 export function createAstronaut(){return fork('astronaut',buildAstronaut);}
 function buildAstronaut() {
@@ -131,7 +131,7 @@ function buildAstronaut() {
 export function animateAstronaut(g,state='idle',time=0,dt=1/60) {
   if(!g.userData.mixer){const mixer=new THREE.AnimationMixer(g);g.userData.mixer=mixer;g.userData.actions={};for(const clip of g.animations||[]){const action=mixer.clipAction(clip);if(['brake','damaged'].includes(clip.name)){action.setLoop(THREE.LoopOnce,1);action.clampWhenFinished=true;}g.userData.actions[clip.name]=action;}}
   if(g.userData.animationState!==state){const old=g.userData.actions[g.userData.animationState],next=g.userData.actions[state]||g.userData.actions.idle;old?.fadeOut(.18);next?.reset().fadeIn(.18).play();g.userData.animationState=state;}
-  g.userData.mixer.update(Math.max(0,Math.min(dt,.05)));g.traverse(o=>{if(o.name.startsWith('thruster-plume')){o.visible=state==='thrust';o.scale.y=.85+Math.sin(time*45)*.15;}});
+  if(!g.userData.plumes){g.userData.plumes=[];g.traverse(o=>{if(o.name.startsWith('thruster-plume'))g.userData.plumes.push(o)})}g.userData.mixer.update(Math.max(0,Math.min(dt,.05)));for(let i=0;i<g.userData.plumes.length;i++){const o=g.userData.plumes[i];o.visible=state==='thrust';o.scale.y=.85+Math.sin(time*45)*.15;}
 }
 /** Clears per-instance animation state. Shared library geometry/materials are retained
  * until the runtime is disposed; call disposeAssetLibrary when leaving the game. */
@@ -141,6 +141,7 @@ export function disposeAssetLibrary(){const geometries=new Set(),mats=new Set();
 // Wall-mounted room storytelling stays outside the navigable collider envelope.
 export function createRoomDetails(room){
  const g=new THREE.Group();g.name=`details-${room.visualRole}`;
+ const repairIndex=Number(room.id.match(/work-(\d+)/)?.[1]||2);if(room.puzzleId){for(let i=0;i<repairIndex;i++)panel(g,'repair-signature',[.32,.08,.05],[-2+ i*.65,6.9,-7.6],room.deck===3?'amber':'cyan');if(repairIndex%2){for(const x of [-7.6,7.6])panel(g,'service-riser',[.15,6,.2],[x,3.1,-6],'trim')}else{for(let i=0;i<3;i++)panel(g,'ceiling-bus',[9,.08,.14],[0,7.6,-5+i*.6],i%2?'amber':'cyan')}}
  if(room.visualRole==='greenhouse'){
   for(const x of [-6.8,6.8])for(const y of [1.3,3.2]){panel(g,'planter-rack',[2.6,.18,.65],[x,y,-7.2],'trim');panel(g,'soil-tray',[2.4,.24,.5],[x,y+.18,-7.2],'dark');for(let n=0;n<6;n++){const leaf=mesh(g,'sleeping-leaf',new THREE.ConeGeometry(.18,.65,5),'green',[x-1+n*.4,y+.6,-7.15]);leaf.rotation.z=(n%2?1:-1)*.25;}}
   panel(g,'grow-light',[15,.12,.15],[0,5.35,-7.45],'green');panel(g,'grow-light-cyan',[15,.06,.15],[0,5.12,-7.45],'cyan');

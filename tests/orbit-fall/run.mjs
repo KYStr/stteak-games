@@ -1,31 +1,39 @@
 import assert from 'node:assert/strict';
+import {isAbsolute} from 'node:path';
 import {spawn,spawnSync} from 'node:child_process';
-import {mkdir,writeFile,readdir} from 'node:fs/promises';
-import {fileURLToPath} from 'node:url';
+import {mkdir,writeFile,readdir,access} from 'node:fs/promises';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import {chromium} from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
 import {snapshot,fly,press,travel,device,dock} from './flight.mjs';
+import {graphicsProbe} from './graphics-probe.mjs';
 import {performanceSoak} from './performance.mjs';
+import {campaign,routeAndSeedBots} from './campaign-bots.mjs';
 import {regressions} from './regressions.mjs';
-const root=fileURLToPath(new URL('../../',import.meta.url)),evidence=new URL(`./evidence/${new Date().toISOString().replace(/[:.]/g,'-')}/`,import.meta.url);
+const root=fileURLToPath(new URL('../../',import.meta.url)),evidence=process.env.ORBIT_TEST_EVIDENCE?pathToFileURL(process.env.ORBIT_TEST_EVIDENCE.replace(/\/$/,'')+'/'):new URL(`./evidence/${new Date().toISOString().replace(/[:.]/g,'-')}/`,import.meta.url);
+if(process.env.ORBIT_TEST_EVIDENCE)assert.ok(isAbsolute(process.env.ORBIT_TEST_EVIDENCE),'ORBIT_TEST_EVIDENCE must be absolute');
 await mkdir(evidence,{recursive:true});
-for(const args of [['--prefix','games/orbit-fall','run','build']]){const r=spawnSync('npm',args,{cwd:root,stdio:'inherit'});assert.equal(r.status,0)}
+for(const args of (process.env.ORBIT_TEST_SKIP_BUILD==='1'?[]:[['--prefix','games/orbit-fall','run','build']])){const r=spawnSync('npm',args,{cwd:root,stdio:'inherit'});assert.equal(r.status,0)}
 const oldTests=(await readdir(new URL('../games/orbit-fall/',import.meta.url))).filter(n=>n.endsWith('.test.js')).map(n=>`tests/games/orbit-fall/${n}`);
-const unit=spawnSync('node',['--test',...oldTests,'tests/orbit-fall/lifecycle.test.mjs','tests/orbit-fall/audio.test.mjs'],{cwd:root,encoding:'utf8'});await writeFile(new URL('unit.log',evidence),unit.stdout+unit.stderr);assert.equal(unit.status,0,unit.stdout+unit.stderr);console.log(`Unit tests: ${unit.stdout.match(/# pass (\d+)/)?.[1]} passed; evidence ${fileURLToPath(evidence)}`);
+const unit=spawnSync('node',['--test',...oldTests,'tests/orbit-fall/lifecycle.test.mjs','tests/orbit-fall/audio.test.mjs','tests/orbit-fall/variants.test.mjs','tests/orbit-fall/controller.test.mjs'],{cwd:root,encoding:'utf8'});await writeFile(new URL('unit.log',evidence),unit.stdout+unit.stderr);assert.equal(unit.status,0,unit.stdout+unit.stderr);console.log(`Unit tests: ${unit.stdout.match(/# pass (\d+)/)?.[1]} passed; evidence ${fileURLToPath(evidence)}`);
 const url=process.env.ORBIT_TEST_URL||'http://127.0.0.1:8106/games/orbit-fall/';
-let server,browser,activePage;const errors=[],failed=[],results={};let performanceFailure;
+let server,browser,activePage;const errors=[],failed=[],results={failures:[]};let performanceFailure;
 process.once('SIGTERM',async()=>{results.interrupted='SIGTERM';if(activePage)results.lastSnapshot=await snapshot(activePage).catch(()=>null);await writeFile(new URL('acceptance.json',evidence),JSON.stringify(results,null,2));await browser?.close().catch(()=>{});server?.kill();process.exit(143)});
 try{
  if(!process.env.ORBIT_TEST_URL){server=spawn('python3',['-m','http.server','8106','--bind','127.0.0.1','--directory',`${root}public`],{stdio:'ignore'});await new Promise(r=>setTimeout(r,500));assert.equal(server.exitCode,null,'Port 8106 must be free')}
- browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
+ browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--renderer-process-limit=1','--num-raster-threads=1','--disable-dev-shm-usage','--autoplay-policy=no-user-gesture-required']});
  results.regressions=await regressions(browser,url,evidence);console.log('Regression cases passed');
+ try{results.newCampaign=await campaign(browser,url,evidence)}catch(e){results.failures.push(e.stack);console.error('New campaign failure retained:',e.message)}
+ try{await access(new URL('campaign-storage.json',evidence));results.strategyAndSeedBots=await routeAndSeedBots(browser,url,evidence)}catch(e){results.failures.push(e.stack);console.error('Strategy/seed bot failure retained:',e.message)}
  const context=await browser.newContext({viewport:{width:1280,height:720},acceptDownloads:true});
  await context.addInitScript(()=>{window.testPendingRaf=new Set();const request=window.requestAnimationFrame.bind(window),cancel=window.cancelAnimationFrame.bind(window);window.requestAnimationFrame=callback=>{const id=request(t=>{window.testPendingRaf.delete(id);callback(t)});window.testPendingRaf.add(id);return id};window.cancelAnimationFrame=id=>{window.testPendingRaf.delete(id);cancel(id)};window.testAudioContexts=[];const Native=window.AudioContext;window.AudioContext=new Proxy(Native,{construct(Target,args){const ctx=new Target(...args);window.testAudioContexts.push(ctx);const gain=ctx.createGain.bind(ctx);ctx.createGain=()=>{const g=gain();ctx.testMaster ||=g;return g};return ctx}})});
- const page=await context.newPage();activePage=page;
+ await context.addInitScript(graphicsProbe);const page=await context.newPage();activePage=page;
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('requestfailed',r=>failed.push(`${r.url()}: ${r.failure()?.errorText}`));page.on('response',r=>{if(r.status()>=400)failed.push(`${r.status()} ${r.url()}`)});
  await page.addLocatorHandler(page.locator('.overlay[data-screen=interruption]:visible'),async()=>{await page.evaluate(()=>{(window.testHostInterruptions ||= []).push(__orbitDiagnostics.snapshot())});await page.locator('#resume').click()});await page.goto(url);await page.locator('#story').waitFor({timeout:60000});await page.screenshot({path:fileURLToPath(new URL('title-1280.png',evidence))});await page.setViewportSize({width:1920,height:1080});await page.screenshot({path:fileURLToPath(new URL('title-1920.png',evidence))});await page.setViewportSize({width:1280,height:720});
- assert.equal(await page.evaluate(()=>window.testAudioContexts.length),0,'No audio context before a user gesture');await page.locator('#story-backup').focus();await press(page,'Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'story');await press(page,'Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'story-backup');await page.click('#preferences');await page.check('#reduced');await page.check('#low');await page.click('#preferences-back');await page.click('#story');
+ assert.equal(await page.evaluate(()=>window.testAudioContexts.length),0,'No audio context before a user gesture');await page.locator('#story-backup').focus();await press(page,'Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'story');await press(page,'Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'story-backup');await page.click('#preferences');await page.check('#reduced');await page.check('#low');await page.click('#preferences-back');
+ // Explicit legacy fixture: new-campaign coverage is the separate fresh controller above.
+ await page.evaluate(async()=>{const {createRun}=await import('./rules.js');localStorage.setItem('stteak:orbit-fall:story',JSON.stringify(createRun('story',{campaignVersion:1,seed:0})))});await page.reload();await page.click('#continue');
  await page.waitForFunction(()=>window.__orbitDiagnostics.snapshot().audio.ready);assert.equal((await snapshot(page)).audio.state,'running');
- const measureAudio=()=>page.evaluate(async()=>{const c=window.testAudioContexts[0],a=c.createAnalyser();a.fftSize=2048;c.testMaster.connect(a);await new Promise(r=>setTimeout(r,300));const data=new Float32Array(a.fftSize);a.getFloatTimeDomainData(data);c.testMaster.disconnect(a);return Math.sqrt(data.reduce((s,v)=>s+v*v,0)/data.length)});results.musicRms=await measureAudio();assert.ok(results.musicRms>.0001,'Music is audible after gesture');
+ const measureAudio=()=>page.evaluate(async()=>{const c=window.testAudioContexts[0],a=c.createAnalyser();a.fftSize=2048;c.testMaster.connect(a);await new Promise(r=>setTimeout(r,300));const data=new Float32Array(a.fftSize);a.getFloatTimeDomainData(data);c.testMaster.disconnect(a);return Math.sqrt(data.reduce((s,v)=>s+v*v,0)/data.length)});results.audioObservations=[];for(let attempt=0;attempt<3;attempt++){const before=await snapshot(page);if(before.modal==='interruption')await page.evaluate(()=>document.querySelector('#resume').click());const rms=await measureAudio(),after=await snapshot(page);results.audioObservations.push({rms,modal:after.modal,paused:after.paused,audio:after.audio});if(!after.modal&&!after.paused){results.musicRms=rms;break}}assert.ok(results.musicRms>.0001,'Music is audible during active gameplay after gesture; paused host interruptions recorded separately');
  await device(page,'tools');assert.deepEqual((await snapshot(page)).tools,['thruster','boots','tether']);
  await press(page,'Shift');assert.equal((await snapshot(page)).anchored,true);await press(page,'Shift');assert.equal((await snapshot(page)).anchored,false);
  await travel(page,'room-d1-cargo');await fly(page,[-3,1.5,2]);await press(page,'t');assert.equal((await snapshot(page)).tethered,true);await fly(page,[3,1.2,-.7]);await dock(page,'puzzle-momentum-1',{pointer:true});
@@ -80,7 +88,7 @@ try{
  await press(page,'Escape');await page.uncheck('#low');await page.click('#resume');await travel(page,'room-d3-optics');await page.setViewportSize({width:1280,height:720});await page.waitForTimeout(1500);
  try{results.performance=await performanceSoak(page,context,evidence)}catch(error){performanceFailure=error;results.performanceFailure=error.stack;console.error('Performance budget failure retained; completing remaining lifecycle coverage:',error.message)}
  assert.deepEqual(errors,[],'Console/page errors');assert.deepEqual(failed,[],'Failed HTTP requests');assert.deepEqual((await snapshot(page)).audio.errors,[]);assert.deepEqual((await snapshot(page)).audio.playbackErrors,[]);
- results.campaign='6 repairs, 6 recordings, 2 endings, all three challenges';results.lifecycle='reload partial puzzle/position, blur, visibility, suspended audio, mute, backup download, context restoration';
+ results.legacyCampaign='fixture-assisted compatibility: 6 repairs, 6 recordings, 2 endings, all three legacy challenges';results.lifecycle='reload partial puzzle/position, blur, visibility, suspended audio, mute, backup download, context restoration';
  await page.screenshot({path:fileURLToPath(new URL('soak-1280.png',evidence))});
  // Import a real file through the shipped preview/confirmation UI, then restore.
  await page.reload();await page.click('#story-backup');await page.setInputFiles('#story-backup-file',fileURLToPath(new URL('story-backup.json',evidence)));await page.locator('#story-backup-confirm:enabled').waitFor();await page.click('#story-backup-confirm');await page.click('#story-backup-reload');await page.click('#continue');assert.equal((await snapshot(page)).solvedPuzzles.length,6);
@@ -91,6 +99,6 @@ try{
  await press(page,'Escape');await page.click('#title-back');await page.evaluate(()=>{for(const suffix of ['',':pending',':backup'])localStorage.removeItem('stteak:orbit-fall:story'+suffix);localStorage.setItem('stteak:orbit-fall:story',JSON.stringify({schema:999}))});await page.reload();await page.locator('#story').waitFor();assert.match(await page.locator('#panel').innerText(),/較新版本/);await page.click('#story');assert.equal(await page.evaluate(()=>localStorage.getItem('stteak:orbit-fall:story')),JSON.stringify({schema:999}));assert.equal(await page.locator('#save-status').isVisible(),true);
  results.clockAdjustments=await page.evaluate(()=>window.testClockAdjustments||[]);results.hostInterruptions=await page.evaluate(()=>window.testHostInterruptions||[]);results.lifecycle+=', pointer capture release, backup import, oxygen failure/recovery, corrupt/future save protection';assert.deepEqual(errors,[]);assert.deepEqual(failed,[]);
 
- console.log(JSON.stringify({...results,regressions:results.regressions?.checks,performance:results.performance?{passed:results.performance.passed}:null},null,2));if(performanceFailure)throw performanceFailure;
+ console.log(JSON.stringify({...results,regressions:results.regressions?.checks,performance:results.performance?{passed:results.performance.passed}:null},null,2));if(performanceFailure)results.failures.push(performanceFailure.stack);if(results.failures.length)throw Error(results.failures.join('\n'));
 } catch(error){results.failure=error.stack;if(activePage){results.lastSnapshot=await snapshot(activePage).catch(()=>null);results.hostInterruptions=await activePage.evaluate(()=>window.testHostInterruptions||[]).catch(()=>[]);}if(activePage)await activePage.screenshot({path:fileURLToPath(new URL('failure.png',evidence))}).catch(()=>{});console.error(error);process.exitCode=1}
 finally{results.errors=errors;results.failedRequests=failed;await writeFile(new URL('acceptance.json',evidence),JSON.stringify(results,null,2));await browser?.close();server?.kill()}

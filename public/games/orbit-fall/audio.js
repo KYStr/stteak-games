@@ -22,8 +22,8 @@ export class AudioEngine {
   setVolumes(music,sfx){this.music=bound(music);this.sfx=bound(sfx);if(!this.context||this.disposed)return;const t=this.context.currentTime;this.musicGain.gain.setTargetAtTime(this.paused?0:this.music*.5,t,.04);this.sfxGain.gain.setTargetAtTime(this.sfx,t,.04);}
   // A menu pauses simulation and fades continuous sound, but keeps its short
   // confirmation/ending cues on the SFX bus. Visibility alone suspends the clock.
-  setPaused(value){this.paused=Boolean(value);if(!this.context||this.disposed)return;const t=this.context.currentTime;this.musicGain.gain.cancelScheduledValues(t);this.musicGain.gain.setTargetAtTime(this.paused?0:this.music*.5,t,.025);if(this.paused){this.thrust=0;this.thrustGain.gain.cancelScheduledValues(t);this.thrustGain.gain.setValueAtTime(0,t);}}
-  setHidden(value){this.hidden=Boolean(value);if(!this.context||this.disposed)return;if(this.hidden){this.thrust=0;this.thrustGain.gain.cancelScheduledValues(this.context.currentTime);this.thrustGain.gain.setValueAtTime(0,this.context.currentTime);this.context.suspend().catch(()=>{});}else{this.musicGain.gain.setTargetAtTime(this.paused?0:this.music*.5,this.context.currentTime,.025);this.context.resume().catch(()=>{});}}
+  setPaused(value){this.lastThrust=-1;this.paused=Boolean(value);if(!this.context||this.disposed)return;const t=this.context.currentTime;this.musicGain.gain.cancelScheduledValues(t);this.musicGain.gain.setTargetAtTime(this.paused?0:this.music*.5,t,.025);if(this.paused){this.thrust=0;this.thrustGain.gain.cancelScheduledValues(t);this.thrustGain.gain.setValueAtTime(0,t);}}
+  setHidden(value){this.lastThrust=-1;this.hidden=Boolean(value);if(!this.context||this.disposed)return;if(this.hidden){this.thrust=0;this.thrustGain.gain.cancelScheduledValues(this.context.currentTime);this.thrustGain.gain.setValueAtTime(0,this.context.currentTime);this.context.suspend().catch(()=>{});}else{this.musicGain.gain.setTargetAtTime(this.paused?0:this.music*.5,this.context.currentTime,.025);this.context.resume().catch(()=>{});}}
   play(rawName){const name=ALIASES[rawName]||rawName;if(name==='thrust'){this.update(1);return;}if(!this.context||this.hidden||this.disposed||this.sfx===0||(this.paused&&!MENU_STINGERS.has(name)))return;const c=this.context,t=c.currentTime;
     const cooldown=name==='low-oxygen'?8:name==='damage'?.4:.075;if(t-(this.lastEvent.get(name)??-100)<cooldown)return;this.lastEvent.set(name,t);
     let source,gain;
@@ -38,6 +38,6 @@ export class AudioEngine {
     } catch(error){cleanup();this.playbackErrors.push({name,message:error.message,time:t});if(this.playbackErrors.length>32)this.playbackErrors.shift();}
   }
 
-  update(amount=0){if(this.disposed||!this.context||this.paused||this.hidden)return;this.thrust=bound(typeof amount==='boolean'?(amount?1:0):amount);const t=this.context.currentTime;this.thrustGain.gain.setTargetAtTime(this.thrust*.22,t,.07);if(this.thrustFilter)this.thrustFilter.frequency.setTargetAtTime(500+this.thrust*1000,t,.1);}
+  update(amount=0){if(this.disposed||!this.context||this.paused||this.hidden)return;this.thrust=bound(typeof amount==='boolean'?(amount?1:0):amount);if(this.lastThrust===this.thrust)return;this.lastThrust=this.thrust;const t=this.context.currentTime;this.thrustGain.gain.setTargetAtTime(this.thrust*.22,t,.07);if(this.thrustFilter)this.thrustFilter.frequency.setTargetAtTime(500+this.thrust*1000,t,.1);}
   dispose(){if(this.disposed)return;this.disposed=true;this.musicSource?.stop();this.thrustSource?.stop();for(const voice of this.voices){try{voice.stop();}catch{}}this.voices.clear();this.buffers.clear();this.context?.close().catch(()=>{});this.context=null;}
 }

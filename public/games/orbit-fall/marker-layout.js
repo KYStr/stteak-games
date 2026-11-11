@@ -93,3 +93,25 @@ export function layoutClampedDockingMarkers(target, crate, viewportWidth, obstac
   } // 結束兩個分離停靠標籤的個別避讓。
   return { ...placed, centers, crowded }; // 不改呼叫者、Y高度、文字、hidden或近pair的左右身份。
 } // 結束貼邊停靠標籤補充布局。
+
+// Runtime workspace: reused projections and interval buffers, no per-frame arrays.
+// Public pure layout helpers above remain available to existing callers/tests.
+export function placeRuntimeMarkers(items,width){
+ for(let i=0;i<items.length;i++){
+  const p=items[i];p.x=p.anchorX;p.displaced=false;if(p.hidden)continue;
+  const min=Math.max(55,p.width/2+8),max=Math.min(width-55,width-p.width/2-8);
+  let preferred=p.anchorX;
+  if(Number.isFinite(p.avoidX)){for(let j=0;j<i;j++){const q=items[j];if(!q.hidden&&p.y>q.y-q.height-24&&p.y-p.height<q.y+24&&Math.abs(p.anchorX-q.x)<(p.width+q.width)/2+24){preferred=p.avoidX;break}}}
+  let candidate=Math.max(min,Math.min(max,preferred));
+  for(let pass=0;pass<items.length;pass++){
+   let conflict=false;
+   for(let j=0;j<i;j++){
+    const q=items[j];if(q.hidden||p.y<=q.y-q.height-8||p.y-p.height>=q.y+8)continue;
+    const gap=(p.width+q.width)/2+8;
+    if(Math.abs(candidate-q.x)<gap){const left=q.x-gap,right=q.x+gap;candidate=left>=min&&(right>max||Math.abs(left-preferred)<Math.abs(right-preferred))?left:right;candidate=Math.max(min,Math.min(max,candidate));conflict=true;}
+   }
+   if(!conflict)break;
+  }
+  p.x=candidate;p.displaced=Math.abs(candidate-p.anchorX)>.1;p.avoidX=p.displaced?candidate:NaN;
+ }
+}

@@ -31,3 +31,5 @@
 #game:has(.overlay[data-screen=start]:not([hidden])) :is(.hud,.objective,.controls,.telemetry,.proximity,#world-markers,#toast){visibility:hidden}
 
 button[aria-pressed=true]{background:#286075;border-color:#98e5ef;box-shadow:0 0 16px #80d8e74d;transform:translateY(1px)}
+
+input[type=number],select{font:inherit;color:#e4eef0;background:#10232e;border:1px solid #77939b;border-radius:4px;min-height:40px;padding:8px 12px}select:focus-visible{outline:3px solid #ffc983;outline-offset:3px}.challenges-panel label{display:inline-grid;gap:6px;margin:0 18px 18px 0;color:#c0d0d5;font-size:13px}

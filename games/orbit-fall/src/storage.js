@@ -1,4 +1,4 @@
-import { roomById, puzzles, signals, endings, challenges } from './content.js';
+import { roomById, puzzles, signals, endings, challenges, getCampaign } from './content.js';
 import { SAVE_SCHEMA, createRun, refreshUnlocks, legalizeSnapshot } from './rules.js';
 
 export const SAVE_PREFIX = 'stteak:orbit-fall:';
@@ -18,8 +18,10 @@ export function sanitizeRun(raw) {
   if (!isRecord(raw)) throw new Error('invalid-save');
   const schema = raw.schema ?? raw.schemaVersion ?? 1;
   if (schema > SAVE_SCHEMA) throw new Error('unsupported-schema');
-  if (schema !== 1 && schema !== SAVE_SCHEMA) throw new Error('invalid-schema');
-  const run = createRun(raw.mode ?? raw.difficulty);
+  if (![1,2,SAVE_SCHEMA].includes(schema)) throw new Error('invalid-schema');
+  const campaignVersion=schema<3?1:raw.campaignVersion===1?1:2;
+  const run = createRun(raw.mode ?? raw.difficulty,{campaignVersion,seed:Number.isInteger(raw.seed)&&raw.seed>=0&&raw.seed<=0xffffffff?raw.seed:0});
+  const {puzzles,roomById}=getCampaign(campaignVersion);
   run.solvedPuzzles = knownIds(raw.solvedPuzzles ?? raw.completedPuzzles, Object.keys(puzzles));
   run.signals = knownIds(raw.signals ?? raw.collectedSignals, Object.keys(signals));
   run.endings = knownIds(raw.endings, Object.keys(endings));
@@ -43,9 +45,9 @@ export function sanitizeRun(raw) {
   run.tutorial = knownIds(raw.tutorial, ['thrust', 'tools', 'movement', 'brake', 'boots', 'tether', 'oxygen', 'map', 'first-repair']);
   for (const key of Object.keys(run.stats)) run.stats[key] = finite(raw.stats?.[key]);
   if (isRecord(raw.snapshots)) for (const [roomId, snapshot] of Object.entries(raw.snapshots)) if (roomById[roomId]) run.snapshots[roomId] = legalizeSnapshot(snapshot);
-  for (const challenge of challenges) {
-    const record = raw.challengeRecords?.[challenge.id];
-    if (isRecord(record) && Number.isFinite(record.elapsed)) run.challengeRecords[challenge.id] = { elapsed: finite(record.elapsed), oxygenUsed: finite(record.oxygenUsed), thrustSeconds: finite(record.thrustSeconds), deaths: finite(record.deaths) };
+  for (const [id,record] of Object.entries(isRecord(raw.challengeRecords)?raw.challengeRecords:{})) {
+    if (!/^challenge-(cargo|engineering|core)(\|(story|standard)\|v1\|\d{1,10})?$/.test(id)) continue;
+    if (isRecord(record) && Number.isFinite(record.elapsed)) run.challengeRecords[id] = { elapsed: finite(record.elapsed), oxygenUsed: finite(record.oxygenUsed), thrustSeconds: finite(record.thrustSeconds), deaths: finite(record.deaths) };
   }
   if (run.status === 'completed') {
     const type = run.challengeId ? 'challenge' : 'ending';

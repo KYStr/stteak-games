@@ -1,19 +1,21 @@
-import { rooms, roomById, puzzles, signals, endings, decks, challenges, ROOM_BOUNDS } from './content.js';
+import { rooms, roomById, puzzles, signals, endings, decks, challenges, ROOM_BOUNDS, getCampaign } from './content.js';
 
-export const SAVE_SCHEMA = 2;
+import {freshSeed,challengeRecordKey} from './run-variants.js';
+export const SAVE_SCHEMA = 3;
 export const FIXED_STEP = 1 / 60;
 export const OXYGEN_RATES = Object.freeze({ story: 0.055, standard: 0.16, thrust: 0.04 });
 const fail = reason => ({ ok: false, reason });
 const active = run => run.status === 'running' && !run.paused;
 const unique = array => [...new Set(array)];
 
-export function createRun(mode = 'story') {
-  return { schema: SAVE_SCHEMA, mode: mode === 'standard' ? 'standard' : 'story', status: 'running', roomId: 'room-d1-safe', safeRoomId: 'room-d1-safe', oxygen: 100, maxOxygen: 100, health: 100, solvedPuzzles: [], signals: [], endings: [], tools: ['thruster'], unlockedDecks: [1], shortcuts: [], elapsed: 0, paused: false, accumulator: 0, snapshots: {}, challengeId: null, challengeTime: null, challengeRecords: {}, lastFailure: null, stats: { deaths: 0, thrustSeconds: 0, oxygenUsed: 0, resets: 0, puzzlesSolved: 0 }, tutorial: [] };
+export function createRun(mode = 'story', {campaignVersion=2,seed=freshSeed()}={}) {
+  return { schema: SAVE_SCHEMA, campaignVersion, seed:seed>>>0, variantVersion:campaignVersion===1?0:1, mode: mode === 'standard' ? 'standard' : 'story', status: 'running', roomId: 'room-d1-safe', safeRoomId: 'room-d1-safe', oxygen: 100, maxOxygen: 100, health: 100, solvedPuzzles: [], signals: [], endings: [], tools: ['thruster'], unlockedDecks: [1], shortcuts: [], elapsed: 0, paused: false, accumulator: 0, snapshots: {}, challengeId: null, challengeTime: null, challengeRecords: {}, lastFailure: null, stats: { deaths: 0, thrustSeconds: 0, oxygenUsed: 0, resets: 0, puzzlesSolved: 0, hazardHits:0, hazardExposureSeconds:0 }, tutorial: [] };
 }
 
 export function getProgress(run) {
-  const repairedDecks = decks.filter(deck => deck.puzzleIds.every(id => run.solvedPuzzles.includes(id))).map(deck => deck.id);
-  return { repairedDecks, repairedCount: repairedDecks.length, solvedCount: run.solvedPuzzles.length, signalCount: run.signals.length, canFinish: repairedDecks.length === 3, challengeUnlocked: run.endings.length > 0 };
+  const campaign=getCampaign(run.campaignVersion);
+  const repairedDecks = campaign.decks.filter(deck => deck.puzzleIds.every(id => run.solvedPuzzles.includes(id))).map(deck => deck.id);
+  return { repairedDecks, repairedCount: repairedDecks.length, requiredCount:campaign.requiredPuzzleIds.length, solvedCount: run.solvedPuzzles.filter(id=>campaign.requiredPuzzleIds.includes(id)).length, signalCount: run.signals.length, canFinish: repairedDecks.length === 3, challengeUnlocked: run.endings.length > 0 };
 }
 
 export function refreshUnlocks(run) {
@@ -27,7 +29,7 @@ export function refreshUnlocks(run) {
 
 export function enterRoom(run, id) {
   if (!active(run)) return fail('not-running');
-  const room = roomById[id];
+  const room = getCampaign(run.campaignVersion).roomById[id];
   if (!room) return fail('unknown-room');
   if (!run.unlockedDecks.includes(room.deck)) return fail('deck-locked');
   if (run.challengeId && room.deck !== challenges.find(item => item.id === run.challengeId)?.deck) return fail('challenge-boundary');
@@ -52,7 +54,7 @@ export function grantTool(run, id) {
 
 export function solvePuzzle(run, id) {
   if (!active(run)) return fail('not-running');
-  const puzzle = puzzles[id];
+  const puzzle = getCampaign(run.campaignVersion).puzzles[id];
   if (!puzzle) return fail('unknown-puzzle');
   if (run.roomId !== puzzle.roomId) return fail('wrong-room');
   if (!run.unlockedDecks.includes(puzzle.deck)) return fail('deck-locked');
@@ -107,28 +109,26 @@ export function setPaused(run, paused) {
   return { ok: true, paused: run.paused };
 }
 
-export function tick(run, seconds, { thrusting = false, paused = false } = {}) {
-  if (!active(run) || paused || !Number.isFinite(seconds) || seconds <= 0) return { ok: true, steps: 0, events: [] };
-  // Arithmetic fixed steps avoid frame-rate-dependent consumption and a loop on long input.
-  run.accumulator += seconds;
-  const steps = Math.floor((run.accumulator + 1e-9) / FIXED_STEP);
-  const dt = steps * FIXED_STEP;
-  run.accumulator = Math.max(0, run.accumulator - dt);
-  run.elapsed += dt;
-  if (thrusting) run.stats.thrustSeconds += dt;
-  const before = run.oxygen;
-  const safe = roomById[run.roomId]?.type === 'safe';
-  const used = safe ? 0 : Math.min(run.oxygen, dt * (OXYGEN_RATES[run.mode] + (thrusting ? OXYGEN_RATES.thrust : 0)));
-  run.oxygen = Math.max(0, run.oxygen - used);
-  run.stats.oxygenUsed += used;
-  const events = [];
-  for (const level of [25, 10]) if (before > level && run.oxygen <= level) events.push({ type: 'low-oxygen', level });
-  if (run.challengeId && Number.isFinite(run.challengeTime)) {
-    run.challengeTime = Math.max(0, run.challengeTime - dt);
-    if (run.challengeTime === 0) { run.status = 'failed'; run.lastFailure = 'challenge-time'; events.push({ type: 'failure', reason: 'challenge-time' }); }
-  }
-  if (run.oxygen === 0 && run.status === 'running') { run.status = 'failed'; run.lastFailure = 'oxygen'; events.push({ type: 'failure', reason: 'oxygen' }); }
-  return { ok: true, steps, events, failed: run.status === 'failed', reason: run.lastFailure };
+export function advanceRun(run, seconds, thrusting, out) {
+  out.steps=0;out.low25=false;out.low10=false;out.failed=false;
+  if(!active(run)||!Number.isFinite(seconds)||seconds<=0)return out;
+  run.accumulator+=seconds;
+  const steps=Math.floor((run.accumulator+1e-9)/FIXED_STEP),dt=steps*FIXED_STEP;
+  run.accumulator=Math.max(0,run.accumulator-dt);out.steps=steps;run.elapsed+=dt;
+  if(thrusting)run.stats.thrustSeconds+=dt;
+  const before=run.oxygen,safe=roomById[run.roomId]?.type==='safe';
+  const used=safe?0:Math.min(run.oxygen,dt*(OXYGEN_RATES[run.mode]*(run.campaignVersion===2&&out.onRail ? 0.1 : 1)+(thrusting?OXYGEN_RATES.thrust:0)));
+  run.oxygen=Math.max(0,run.oxygen-used);run.stats.oxygenUsed+=used;
+  out.low25=before>25&&run.oxygen<=25;out.low10=before>10&&run.oxygen<=10;
+  if(run.challengeId&&Number.isFinite(run.challengeTime)){run.challengeTime=Math.max(0,run.challengeTime-dt);if(run.challengeTime===0){run.status='failed';run.lastFailure='challenge-time'}}
+  if(run.oxygen===0&&run.status==='running'){run.status='failed';run.lastFailure='oxygen'}
+  out.failed=run.status==='failed';out.reason=run.lastFailure;return out;
+}
+// Public compatibility wrapper for callers that need a discrete event list.
+export function tick(run,seconds,{thrusting=false,paused=false}={}){
+ const out=advanceRun(run,paused?0:seconds,thrusting,{}),events=[];
+ if(out.low25)events.push({type:'low-oxygen',level:25});if(out.low10)events.push({type:'low-oxygen',level:10});
+ if(out.failed)events.push({type:'failure',reason:out.reason});return {ok:true,...out,events};
 }
 
 export function damage(run, amount, reason = 'collision') {
@@ -140,7 +140,7 @@ export function damage(run, amount, reason = 'collision') {
 }
 
 export function resetPuzzle(run, id = roomById[run.roomId]?.puzzleId) {
-  const puzzle = puzzles[id];
+  const puzzle = getCampaign(run.campaignVersion).puzzles[id];
   if (!puzzle || puzzle.roomId !== run.roomId) return fail('wrong-room');
   delete run.snapshots[puzzle.roomId];
   run.stats.resets += 1;
@@ -163,13 +163,13 @@ export function respawn(run, reason = run.lastFailure || 'recovery') {
   return { ok: true, reason, roomId: run.roomId, save: true };
 }
 
-export function startChallenge(id, storyRun) {
+export function startChallenge(id, storyRun, {seed=storyRun?.seed,mode=storyRun?.mode}={}) {
   const challenge = challenges.find(item => item.id === id);
   if (!challenge) return fail('unknown-challenge');
   if (!storyRun?.endings?.length) return fail('challenge-locked');
-  const run = createRun('standard');
+  const run = createRun(mode,{campaignVersion:storyRun.campaignVersion,seed});
   run.challengeId = id;
-  run.challengeTime = challenge.timeLimit;
+  run.challengeTime = run.campaignVersion===1?challenge.timeLimit:Math.ceil(challenge.competentP90*(run.mode==='story'?2.5:1.5));
   run.roomId = challenge.roomId;
   run.safeRoomId = `room-d${challenge.deck}-safe`;
   run.unlockedDecks = [challenge.deck];
@@ -179,7 +179,7 @@ export function startChallenge(id, storyRun) {
 
 export function recordChallenge(storyRun, challengeRun) {
   if (challengeRun.status !== 'completed' || challengeRun.result?.type !== 'challenge') return fail('challenge-incomplete');
-  const id = challengeRun.challengeId;
+  const id = challengeRecordKey(challengeRun);
   const prior = storyRun.challengeRecords[id];
   const next = { elapsed: challengeRun.elapsed, oxygenUsed: challengeRun.stats.oxygenUsed, thrustSeconds: challengeRun.stats.thrustSeconds, deaths: challengeRun.stats.deaths };
   storyRun.challengeRecords[id] = prior ? { elapsed: Math.min(prior.elapsed, next.elapsed), oxygenUsed: Math.min(prior.oxygenUsed, next.oxygenUsed), thrustSeconds: Math.min(prior.thrustSeconds, next.thrustSeconds), deaths: Math.min(prior.deaths, next.deaths) } : next;
@@ -200,7 +200,12 @@ export function legalizeSnapshot(snapshot, bounds = ROOM_BOUNDS) {
   }) };
   if(Array.isArray(snapshot.player)&&snapshot.player.length===3&&snapshot.player.every(Number.isFinite))clean.player=snapshot.player.map((n,i)=>Math.max(bounds.min[i],Math.min(bounds.max[i],n)));
   if(Array.isArray(snapshot.angles))clean.angles=snapshot.angles.slice(0,3).map(n=>Number.isInteger(n)&&n>=0&&n<8?n:0);
-  if(Array.isArray(snapshot.sequence))clean.sequence=snapshot.sequence.slice(0,4).filter(n=>Number.isInteger(n)&&n>=0&&n<3);
+  if(Array.isArray(snapshot.sequence))clean.sequence=snapshot.sequence.slice(0,8).filter(n=>Number.isInteger(n)&&n>=0&&n<4);
+  if(Number.isInteger(snapshot.phaseIndex))clean.phaseIndex=Math.max(0,Math.min(8,snapshot.phaseIndex));
+  if(typeof snapshot.activeObjectId==='string'&&/^crate-[a-z0-9-]+$/.test(snapshot.activeObjectId))clean.activeObjectId=snapshot.activeObjectId;
+  if(['direct','rail','bypass'].includes(snapshot.route))clean.route=snapshot.route;
+  if(typeof snapshot.bypass==='boolean')clean.bypass=snapshot.bypass;
+  if(Number.isInteger(snapshot.railIndex))clean.railIndex=Math.max(-1,Math.min(2,snapshot.railIndex));
   return clean;
 }
 

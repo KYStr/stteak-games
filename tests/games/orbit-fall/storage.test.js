@@ -28,7 +28,7 @@ test('version 1 direct saves migrate known progress and tools without trusting i
   const storage = new MemoryStorage();
   storage.setItem(SAVE_PREFIX + 'story', JSON.stringify({ schema: 1, difficulty: 'standard', completedPuzzles: ['puzzle-momentum-1', 'puzzle-reflection-1', 'fake'], collectedSignals: ['signal-1'], checkpoint: 'room-d2-safe' }));
   const result = loadRun(storage);
-  assert.equal(result.migrated, true); assert.equal(result.run.schema, 2); assert.equal(result.run.mode, 'standard');
+  assert.equal(result.migrated, true); assert.equal(result.run.schema, 3); assert.equal(result.run.mode, 'standard');
   assert.deepEqual(result.run.unlockedDecks, [1, 2]); assert.equal(result.run.safeRoomId, 'room-d2-safe'); assert.ok(result.run.tools.includes('tether'));
   assert.equal(saveRun(storage, result.run).ok, true); assert.equal(loadRun(storage).migrated, false);
 });

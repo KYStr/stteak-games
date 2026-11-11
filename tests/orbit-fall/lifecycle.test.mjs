@@ -4,7 +4,9 @@ import {readFile,readdir} from 'node:fs/promises';
 import {createRun,storeSnapshot,legalizeSnapshot,resetPuzzle} from '../../public/games/orbit-fall/rules.js';
 import {loadRun,saveRun} from '../../public/games/orbit-fall/storage.js';
 import {PhysicsRoom,initializePhysics} from '../../public/games/orbit-fall/physics.js';
-import {puzzles,roomById} from '../../public/games/orbit-fall/content.js';
+import {getCampaign} from '../../public/games/orbit-fall/content.js';
+
+const {puzzles,roomById}=getCampaign(1);
 
 test('reload preserves physical position and partial puzzle controls with zero velocity',async()=>{
   await initializePhysics();
@@ -19,7 +21,7 @@ test('reload preserves physical position and partial puzzle controls with zero v
 });
 test('transient snapshot inputs are bounded and reject invalid position triples',()=>{
   assert.deepEqual(legalizeSnapshot({objects:[],player:[Infinity,1,2]}),{objects:[]});
-  assert.deepEqual(legalizeSnapshot({player:[-99,99,99],angles:[NaN,7,100,3],sequence:[2,0,-1,1,1]}),{objects:[],player:[-7,7.25,7],angles:[0,7,0],sequence:[2,0,1]});
+  assert.deepEqual(legalizeSnapshot({player:[-99,99,99],angles:[NaN,7,100,3],sequence:[2,0,-1,1,1]}),{objects:[],player:[-7,7.25,7],angles:[0,7,0],sequence:[2,0,1,1]});
 });
 test('every recovered application file and original root module matches its shipped runtime',async()=>{
   const source=new URL('../../games/orbit-fall/src/',import.meta.url),runtime=new URL('../../public/games/orbit-fall/',import.meta.url);
