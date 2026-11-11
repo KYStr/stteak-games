@@ -31,7 +31,7 @@ test('modal notices persist without timers, survive same-kind redraw and clear o
 test('actual settings/modal wiring clears recovered failures without notice focus changes',()=>{
   const f=fixture(),opener={isConnected:true,focus(){focused=this;}},control={isConnected:true,focus(){focused=this;}};let focused=opener,ok=false,applyCount=0;
   const nodes={'#modal':f.dialog,'#modal-title':{},'#modal-content':{},'#close-modal':{}};
-  f.dialog.showModal=()=>{f.dialog.open=true;focused=control;};f.dialog.close=()=>{f.dialog.open=false;};
+  f.dialog.contains=()=>true;f.dialog.showModal=()=>{f.dialog.open=true;focused=control;};f.dialog.close=()=>{f.dialog.open=false;};
   const context=vm.createContext({notifications:f.notifications,$:s=>nodes[s],document:{get activeElement(){return focused;}},save:{settings:{}},settings:{},modalKind:'',previousFocus:null,saveSettings:(save,patch)=>({ok,save:{settings:{...save.settings,...patch}},notice:'寫入失敗'}),applySettings:()=>applyCount++});
   for(const name of ['toast','commitSettings','openModal','closeModal'])vm.runInContext(main.split('\n').find(line=>line.startsWith(`function ${name}(`)),context);
   vm.runInContext("openModal('設定','controls','settings');commitSettings({volume:.2});",context);
@@ -58,7 +58,7 @@ test('actual customization click handler retains failed writes across redraw and
     const f=fixture();f.notifications.open('customize');f.dialog.open=true;f.notifications.show('previous failure');
     let click,redraws=0,previewCount=0,patch;
     const context=vm.createContext({
-      contextLost:false,
+      contextLost:false,CSS:{escape:s=>s},
       $:selector=>selector==='#modal-content'?{addEventListener:(event,callback)=>{click=callback;}}:null,
       audio:{unlock(){},click(){}},commitSettings:value=>{patch=value;if(ok)f.notifications.clearModal();else f.notifications.show('write failure');},
       showPreview:()=>previewCount++,customize:()=>{redraws++;f.notifications.open('customize');},

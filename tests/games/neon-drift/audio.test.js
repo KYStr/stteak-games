@@ -16,3 +16,10 @@ test('a restart cancels delayed fallback success tones and rejects a late prior-
   const generation=audio.successGeneration;audio.success();audio.resetSuccess();audio.success(generation);
   await new Promise(r=>setTimeout(r,260));assert.deepEqual(played,[]);assert.equal(audio.successTimers.size,0);
 });
+test('a delayed AudioContext resume cannot undo a newer pause',async()=>{
+  const audio=new DriveAudio();let resolveResume,suspensions=0;
+  audio.ctx={state:'suspended',currentTime:0,resume(){return new Promise(resolve=>{resolveResume=()=>{this.state='running';resolve();};});},async suspend(){suspensions++;this.state='suspended';}};
+  audio.motorGain=node();audio.tireGain=node();
+  const pending=audio.unlock();audio.pause();resolveResume();await pending;
+  assert.equal(audio.ctx.state,'suspended');assert.equal(audio.active,false);assert.equal(suspensions,2);
+});

@@ -3,7 +3,7 @@ export function createInput({onPause,onReset,onGesture}){
   const keys=new Set(),pointers=new Map(),listeners=[];let touch=matchMedia('(pointer:coarse)').matches,autoThrottle=true,enabled=false,previousStart=false,previousReset=false;
   const listen=(el,name,handler)=>{el.addEventListener(name,handler);listeners.push(()=>el.removeEventListener(name,handler));};
   const clear=()=>{keys.clear();for(const [id,button] of pointers){try{if(button.hasPointerCapture(id))button.releasePointerCapture(id);}catch{}}pointers.clear();document.querySelectorAll('[data-control]').forEach(e=>e.classList.remove('pressed'));};
-  function down(e){if(e.target.closest('input,select,textarea')||document.querySelector('dialog[open]'))return;const key=e.code;if(enabled&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD','Escape','KeyR'].includes(key))e.preventDefault();if(key==='Escape'&&!e.repeat){onPause();return;}if(!enabled)return;if(key==='KeyR'&&!e.repeat)onReset();keys.add(key);onGesture();}
+  function down(e){if(e.code==='Escape'&&e.repeat){e.preventDefault();return;}if(e.target.closest('input,select,textarea')||document.querySelector('dialog[open]'))return;const key=e.code;if(enabled&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD','Escape','KeyR'].includes(key))e.preventDefault();if(key==='Escape'&&!e.repeat){onPause();return;}if(!enabled)return;if(key==='KeyR'&&!e.repeat)onReset();keys.add(key);onGesture();}
   listen(window,'keydown',down);listen(window,'keyup',e=>keys.delete(e.code));
   listen(document,'pointerdown',()=>onGesture());
   for(const button of document.querySelectorAll('[data-control]')){

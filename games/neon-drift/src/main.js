@@ -1,4 +1,4 @@
-import {saveSession,loadSession,clearSession} from './session.js';
+import {saveSession,loadSession,clearSession,SESSION_KEY} from './session.js';
 import {trackMenuLabel} from './presentation.js'; // 純資料標籤保持插入與重排後的選單正確。
 import { TRACKS,CARS,COLORS,DECALS,sampleTrack,PHYSICS_VERSION } from './content.js';
 import { createRace,stepRace,resetCar,getGhostPose,finishTutorial } from './physics.js';
@@ -11,25 +11,27 @@ import { createFrameProfiler,FRAME_PHASE } from './profiler.js';
 import { createFrameHistory } from './frame-history.js';
 import { createNotifications } from './notifications.js';
 
-const BUILD='neon-drift-rebuild-r1',VERSION='1.1.0'; // 教學進度提示使用獨立候選身分，不沿用0014的驗收證據或分數。
+const BUILD='neon-drift-rebuild-r2',VERSION='1.2.0'; // 教學進度提示使用獨立候選身分，不沿用0014的驗收證據或分數。
 const $=s=>document.querySelector(s);
 const fmt=t=>`${String(Math.floor(Math.max(0,t)/60)).padStart(2,'0')}:${(Math.max(0,t)%60).toFixed(2).padStart(5,'0')}`;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const audio=new DriveAudio();
 let save=loadSave(),settings={...save.settings};
 let trackId=settings.trackId||'harbor',carId=settings.carId||'comet',mode=settings.mode==='drift'?'drift':'time';
-let pendingSession=loadSession(),lastSessionSave=0,contextLost=false,lastRaceEvent=0;
+let pendingSession=loadSession(),lastSessionSave=0,contextLost=false,lastRaceEvent=0,raceEventUntil=0;
 let phase='menu',race=null,renderer=null,lastTime=0,lastHud=0,resultSaved=false,modalKind='',previousFocus=null;
 const notifications=createNotifications({dialog:$('#modal'),modalNotice:$('#modal-notice'),toast:$('#toast')});
-const frameSamples=createFrameHistory(),frameGaps=[],events=[];let runFrames=0;
-const profiler=createFrameProfiler(54000),profileRow=new Float64Array(13),renderContext={phase:'menu',frameSeq:0,elapsed:0,countdown:0};
+const frameSamples=createFrameHistory(),frameGaps=[],events=[];let runFrames=0;const updateCpu={count:0,totalMs:0,maxMs:0};
+const profilingEnabled=new URLSearchParams(location.search).get('profile')==='1';
+const omittedProfile=()=>({profilingEnabled:false,omitted:true,note:'Detailed samples require ?profile=1; normal play retains bounded frame history only.'});
+const profiler=profilingEnabled?createFrameProfiler(54000):{reset(){},snapshot:omittedProfile,summary:omittedProfile},profileRow=profilingEnabled?new Float64Array(13):null,renderContext={phase:'menu',frameSeq:0,elapsed:0,countdown:0};
 let frameSeq=0,previousCallbackEnd=null,profileActive=false,profileCompleted=false,profileStartedAt=0,profileEndedAt=0,completedFrameProfile=null,lastCompletedRun=null;
 const browserTimingTypes=[],observedRuns=[];
 const newBrowserTiming=()=>({supported:browserTimingTypes,longTasks:[],longAnimationFrames:[],totalCounts:{longtask:0,'long-animation-frame':0},retention:'Latest 1200 entries per type; totalCounts includes overwritten entries. Late deliveries are routed by entry startTime to the current or immediately previous run; older runs are not retained. Run interval includes pauses, so these entries alone are not gameplay-only measurements.'});
 let browserTiming=newBrowserTiming(),observedRun=null;
 // Browser work outside our callback is recorded separately; none of these
 // counters alone identifies GPU cost or the reason for scheduler delays.
-if(typeof PerformanceObserver!=='undefined')for(const type of ['longtask','long-animation-frame']){
+if(profilingEnabled&&typeof PerformanceObserver!=='undefined')for(const type of ['longtask','long-animation-frame']){
   if(!PerformanceObserver.supportedEntryTypes?.includes(type))continue;
   try{const observer=new PerformanceObserver(list=>{
     for(const entry of list.getEntries()){
@@ -43,7 +45,7 @@ if(typeof PerformanceObserver!=='undefined')for(const type of ['longtask','long-
 }
 function preserveCompletedRun(){if(!profileCompleted)return;completedFrameProfile??=profiler.snapshot();if(lastCompletedRun?.startedAt===completedFrameProfile.metadata.startedAt)return;lastCompletedRun={startedAt:completedFrameProfile.metadata.startedAt,buildId:BUILD,result:race?.result,frameProfile:completedFrameProfile,browserTiming,renderer:renderer?.stats,capturedPhase:phase};}
 function recordEvent(type,details={}){events.push({type,...details,at:Date.now()});if(events.length>400)events.shift();}
-function diagnostics(){return {gameId:'neon-drift',buildId:BUILD,version:VERSION,userAgent:navigator.userAgent,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,phase,frameMs:frameSamples.snapshot(),frameGaps,frameSampling:'Running frames after countdown, 0 < delta <= 2000 ms; gaps over 2000 ms pause before physics and are recorded separately, not counted as playable frames.',events,renderer:renderer?.stats,frameProfile:completedFrameProfile||profiler.snapshot(),browserTiming,lastCompletedRun};}
+function diagnostics(){return {profilingEnabled,gameId:'neon-drift',buildId:BUILD,version:VERSION,userAgent:navigator.userAgent,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,phase,frameMs:frameSamples.snapshot(),frameGaps,frameSampling:'Running frames after countdown, 0 < delta <= 2000 ms; gaps over 2000 ms pause before physics and are recorded separately, not counted as playable frames.',events,renderer:renderer?.stats,frameProfile:completedFrameProfile||profiler.snapshot(),browserTiming,lastCompletedRun};}
 function diagnosticsSummary(){
   // This UI path reads only bounded summaries and lengths of existing arrays.
   // Full profiler/renderer snapshots are reserved for diagnostics file export.
@@ -72,9 +74,11 @@ const bridge=createBridge({start:()=>startRace(),pause:()=>pauseRace(true,'host'
 const input=createInput({onPause:()=>phase==='running'?pauseRace():phase==='paused'?resumeRace():null,onReset:()=>recover(),onGesture:()=>audio.unlock()});
 function toast(message){notifications.show(message);}
 function commitSettings(patch){const result=saveSettings(save,patch);save=result.save;settings={...save.settings};if(!result.ok)toast(result.notice||'瀏覽器無法保存設定，本次仍可遊玩。');else notifications.clearModal();applySettings();}
-function applySettings(){input.setOptions({autoThrottle:settings.autoThrottle!==false,touch:settings.touchControls===true||matchMedia('(pointer:coarse)').matches});audio.setOptions({sfx:settings.volume??.65,music:settings.musicVolume??.3});renderer?.setOptions({quality:settings.quality||'auto',ghost:settings.ghost!==false,reducedMotion:settings.reducedMotion||matchMedia('(prefers-reduced-motion:reduce)').matches,speedFov:settings.speedFov!==false});$('#touch-controls').hidden=!(input.touch&&phase==='running');}
+function applySettings(){const effectiveReducedMotion=!!(settings.reducedMotion||matchMedia('(prefers-reduced-motion:reduce)').matches);document.body.classList.toggle('reduced-motion',effectiveReducedMotion);input.setOptions({autoThrottle:settings.autoThrottle!==false,touch:settings.touchControls===true||matchMedia('(pointer:coarse)').matches});audio.setOptions({sfx:settings.volume??.65,music:settings.musicVolume??.3});renderer?.setOptions({quality:settings.quality||'auto',ghost:settings.ghost!==false,reducedMotion:effectiveReducedMotion,speedFov:settings.speedFov!==false});$('#touch-controls').hidden=!(input.touch&&phase==='running');}
 function trackPath(t){const pts=Array.from({length:100},(_,i)=>sampleTrack(t,i/99*t.length));const xs=pts.map(p=>p.x),zs=pts.map(p=>p.z),minX=Math.min(...xs),minZ=Math.min(...zs),scale=25/Math.max(Math.max(...xs)-minX,Math.max(...zs)-minZ);return pts.map((p,i)=>`${i?'L':'M'}${(p.x-minX)*scale+4},${(p.z-minZ)*scale+2}`).join(' ');}
 function refreshMenu(){
+  const active=document.activeElement;
+  const focusKey=active?.matches('[data-track]')?['track',active.dataset.track]:active?.matches('[data-car]')?['car',active.dataset.car]:null;
   const resume=$('#continue-race');resume.hidden=!pendingSession;
   if(pendingSession){const r=pendingSession.race;resume.textContent=`繼續上次比賽 ↗ · ${r.track.name} · ${r.mode==='time'?'計時':r.mode==='drift'?'漂移':'學堂'} · ${fmt(r.elapsed)}`;}
   $('#track-options').innerHTML=TRACKS.map((t,i)=>`<button data-track="${t.id}" class="${t.id===trackId?'selected':''}" aria-pressed="${t.id===trackId}"><span class="track-number">${trackMenuLabel(t,i)}</span><svg viewBox="0 0 40 30" aria-hidden="true"><path d="${trackPath(t)}" fill="none" stroke="${t.id===trackId?'#b5ffd9':'#738b9d'}" stroke-width="1.1"/></svg>${t.name}</button>`).join(''); // 原HTML結構不變，僅難度與編號改由資料函式提供。
@@ -85,20 +89,31 @@ function refreshMenu(){
   $('#targets').textContent=`金 / 銀 / 銅 ${track().medals[mode].map(v=>mode==='time'?fmt(v):v.toLocaleString()+' 分').join(' · ')}`;
   $('#scene-track').textContent=track().subtitle.split(' / ')[0];
   const tutorialProgress=save.tutorialComplete===true?'教學進度：已完成（目前進度）':'教學進度：尚未完成'; // 只讀既有正規存檔狀態；目前進度不代表本機寫入一定成功。
-  const progressNode=$('#tutorial-progress');if(progressNode.textContent!==tutorialProgress)progressNode.textContent=tutorialProgress; // 只在狀態文字改變時更新，避免切換車款或賽道重複播報。
+  const progressNode=$('#tutorial-progress');if(progressNode.textContent!==tutorialProgress)progressNode.textContent=tutorialProgress;
+  if(focusKey)document.querySelector(`[data-${focusKey[0]}="${CSS.escape(focusKey[1])}"]`)?.focus({preventScroll:true}); // 只在狀態文字改變時更新，避免切換車款或賽道重複播報。
 }
 function showPreview(){race=createRace({trackId,carId,mode});renderer.setRace(track(),car(),COLORS.find(c=>c.id===settings.colorId)||COLORS[0],settings.decalId||'none');}
-function menu(){audio.resetSuccess();if(phase==='paused'||phase==='result')clearSession();pendingSession=loadSession();preserveCompletedRun();if(profileActive){profileEndedAt=performance.now();observedRun.end=profileEndedAt;}profileActive=false;phase='menu';input.setEnabled(false);audio.pause();closeModal();$('#garage').hidden=false;$('#scene-label').hidden=false;$('#hud').hidden=true;$('#touch-controls').hidden=true;$('#pause-button').hidden=true;bridge.state('ready');refreshMenu();showPreview();}
+function menu(){clearRaceFeedback();audio.resetSuccess();if(phase==='paused'||phase==='result')clearSession();pendingSession=loadSession();preserveCompletedRun();if(profileActive){profileEndedAt=performance.now();observedRun.end=profileEndedAt;}profileActive=false;phase='menu';input.setEnabled(false);audio.pause();closeModal();$('#garage').hidden=false;$('#scene-label').hidden=false;$('#hud').hidden=true;$('#touch-controls').hidden=true;$('#pause-button').hidden=true;bridge.state('ready');refreshMenu();showPreview();}
+function deleteAllLocalProgress(){
+  const failed=[];
+  for(const key of [SESSION_KEY,BACKUP_KEY,SAVE_KEY]){
+    try{localStorage.removeItem(key);if(localStorage.getItem(key)!==null)failed.push(key);}catch{failed.push(key);}
+  }
+  if(failed.length){toast('部分本機資料未能清除，請檢查瀏覽器儲存權限後重試。');return;}
+  pendingSession=null;save=loadSave();settings={...save.settings};trackId=settings.trackId||'harbor';carId=settings.carId||'comet';mode=settings.mode==='drift'?'drift':'time';
+  applySettings();menu();toast('本機紀錄與未完成比賽已清除。');
+}
 function selectedGhost(){return settings.ghost===false?null:save.records?.[`${trackId}:time`]?.ghost||null;}
 function checkpointSession(){if(race&&!race.finished&&race.elapsed>0){const ok=saveSession(race);if(!ok)toast('本場進度暫存失敗；已結算紀錄不受影響。');lastSessionSave=race.elapsed;}}
 function continueRace(){if(!pendingSession)return;const restored=pendingSession.race;trackId=restored.mode==='tutorial'?settings.trackId:restored.trackId;carId=restored.carId;mode=restored.mode==='tutorial'?mode:restored.mode;startRace(restored.mode,restored);pauseRace(true,'restored');}
 function startRace(selectedMode=mode,restored=null){
   audio.resetSuccess();audio.lastHit=-1;
-  if(contextLost)return;if(restored)restored.ghost=selectedGhost();clearSession();pendingSession=null;lastSessionSave=0;lastRaceEvent=0;
-  preserveCompletedRun();if(profileActive)observedRun.end=performance.now();completedFrameProfile=null;profileCompleted=false;profileStartedAt=performance.now();profileEndedAt=Infinity;profileActive=true;browserTiming=newBrowserTiming();observedRun={start:profileStartedAt,end:profileEndedAt,timing:browserTiming};observedRuns.push(observedRun);if(observedRuns.length>2)observedRuns.shift();
+  if(contextLost)return;if(restored)restored.ghost=selectedGhost();clearSession();pendingSession=null;lastSessionSave=0;clearRaceFeedback();
+  preserveCompletedRun();if(profileActive)observedRun.end=performance.now();completedFrameProfile=null;profileCompleted=false;profileStartedAt=performance.now();profileEndedAt=Infinity;profileActive=profilingEnabled;browserTiming=newBrowserTiming();observedRun={start:profileStartedAt,end:profileEndedAt,timing:browserTiming};observedRuns.push(observedRun);if(observedRuns.length>2)observedRuns.shift();
   profiler.reset({buildId:BUILD,startedAt:Date.now(),performanceTimeOrigin:performance.timeOrigin,mode:selectedMode,trackId,carId,viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,notes:'Every callback entered while running, including countdown rows (elapsed=0). totalCpuMs excludes the final profiler record and export. outsideCallbackMs includes browser rendering, scheduling, other tasks and idle time, not a measured GPU or scheduler duration. Long-gap rows are retained even when physics pauses.'});
   closeModal();phase='running';resultSaved=false;input.clear();input.setEnabled(true);
   race=restored||createRace({trackId,carId,mode:selectedMode,sensitivity:settings.sensitivityByCar?.[carId]??settings.sensitivity??1,ghost:selectedGhost()});
+  if(restored)lastRaceEvent=restored.lastEvent?.id||0;
   renderer.setRace(race.track,car(),COLORS.find(c=>c.id===settings.colorId)||COLORS[0],settings.decalId||'none');
   $('#garage').hidden=true;$('#scene-label').hidden=true;$('#hud').hidden=false;$('#pause-button').hidden=false;$('#tutorial-hint').hidden=selectedMode!=='tutorial';$('#finish-school').hidden=true;
   $('#hud-title').textContent=selectedMode==='tutorial'?'駕駛學堂 · 90 秒練習':track().name;
@@ -107,7 +122,7 @@ function startRace(selectedMode=mode,restored=null){
   recordEvent('start',{mode:selectedMode,trackId,carId,raceTrackId:race.track.id});
 }
 function recover(){if(phase==='running'&&resetCar(race)){toast('已回正到合法檢查點 · +2.00 秒，連段清除');audio.tone(220,.18,.14);}}
-function openModal(title,content,kind){previousFocus=document.activeElement;notifications.open(kind);$('#modal-title').textContent=title;$('#modal-content').innerHTML=content;modalKind=kind;$('#close-modal').hidden=kind==='result'||kind==='error';if(!$('#modal').open)$('#modal').showModal();if(kind==='result')$('#modal-content button')?.focus();}
+function openModal(title,content,kind){if(!$('#modal').open)previousFocus=document.activeElement;notifications.open(kind);$('#modal-title').textContent=title;$('#modal-content').innerHTML=content;modalKind=kind;$('#close-modal').hidden=kind==='result'||kind==='error';if(!$('#modal').open)$('#modal').showModal();if(kind==='result'||!document.activeElement?.isConnected||document.activeElement===$('#modal')||!$('#modal').contains(document.activeElement))$('#modal-content button, #modal-content input, #modal-content select')?.focus({preventScroll:true});}
 function closeModal(){notifications.close();if($('#modal').open)$('#modal').close();modalKind='';if(previousFocus?.isConnected)previousFocus.focus();}
 function pauseRace(show=true,reason='manual',details={}){if(phase!=='running')return;checkpointSession();recordEvent('pause',{reason,...details,elapsed:race?.elapsed,visibility:document.visibilityState,hasFocus:document.hasFocus()});phase='paused';input.setEnabled(false);audio.pause();$('#touch-controls').hidden=true;bridge.state('paused');if(show)showPause();}
 function showPause(){openModal('讓午夜等一下',`<p>比賽與聲音已暫停。已自動保存本場進度，可重新載入後繼續。返回車庫或重新挑戰會放棄這一場。</p><div class="modal-buttons"><button class="primary" data-action="resume">繼續疾行</button><button data-action="retry">重新挑戰</button><button data-action="garage">放棄並回車庫</button></div>`,'pause');}
@@ -140,6 +155,7 @@ function finishRace(){
   openModal(title,`<div class="result-medal">${medal}</div><div class="result-value">${race.mode==='time'?fmt(r.time):Math.floor(r.score).toLocaleString()+'<small style="font-size:15px"> 分</small>'}</div><p>${result.newBest?'新本機最佳紀錄。':improvement!==null?`與上一個最佳${race.mode==='time'?`差 ${improvement>=0?'+':''}${improvement.toFixed(2)} 秒`:`差 ${improvement>=0?'+':''}${improvement} 分`}。`:'這次路線已成為下一局的參考。'} ${r.success?'':'結果未達目標，不會覆蓋較佳紀錄。'}</p><div class="result-grid"><div>最快合法圈<strong>${r.bestLap?fmt(r.bestLap):'—'}</strong></div><div>碰撞 / 回正<strong>${r.collisions} / ${r.resets}</strong></div><div>回正罰時<strong>+${r.penalty.toFixed(0)} s</strong></div></div>${tutorialList}${sectorRows?`<details><summary style="margin-top:16px;font-size:12px;cursor:pointer">檢視最後一圈扇區</summary>${sectorRows}</details>`:''}<p>${r.collisions>0?'下次目標：彎前先鬆油煞車，減少護欄碰撞，保住出彎速度。':race.mode==='drift'?'下次目標：延長乾淨側滑至 ×4，試試內側黃色支線。':'下次目標：觀察幽靈車，在慢扇區更早準備出彎。'}</p>${medalCount()>oldMedals?`<p class="unlock">${result.ok?'新獎牌已保存 · 到塗裝工坊查看新外觀。':'本次已取得新獎牌 · 尚未保存，重新載入後可能遺失。'}</p>`:''}<p class="subtle">${esc(result.notice||'結算已保存至此瀏覽器。')}${result.ok&&race.mode==='time'&&r.success&&save.records?.[`${race.trackId}:time`]?.ghost?' 已保存的最佳合法圈可作為下次的無碰撞幽靈車。':''}</p><div class="modal-buttons"><button class="primary" data-action="retry">同配置再跑一場 ↗</button><button data-action="garage">返回車庫</button></div>`,'result');
   recordEvent('finish',{result:r});
 }
+function clearRaceFeedback(){lastRaceEvent=0;raceEventUntil=0;$('#race-event').textContent='';$('#race-event').classList.remove('show');}
 function updateHUD(){
   $('#speed').textContent=String(Math.round(Math.abs(race.speed)*3.6)).padStart(3,'0');$('#speed-meter').style.width=`${Math.min(150,Math.abs(race.speed)*3)}px`;
   $('#timer').textContent=fmt(race.mode==='time'?race.elapsed:race.timeRemaining);
@@ -149,7 +165,8 @@ function updateHUD(){
   const ahead=sampleTrack(race.track,race.s+Math.max(25,Math.abs(race.speed)*1.8));
   const bend=ahead.curvature,turn=Math.abs(bend)<.003?'↑ 直線加速':bend>0?'↖ 左彎 · 提早煞車':'↗ 右彎 · 提早煞車';
   $('#route-cue').textContent=race.countdown>0?'W 油門 · A/D 轉向 · Space 漂移':turn;
-  if(race.lastEvent&&race.lastEvent.id!==lastRaceEvent){lastRaceEvent=race.lastEvent.id;$('#race-event').textContent=race.lastEvent.text;$('#race-event').classList.remove('show');void $('#race-event').offsetWidth;$('#race-event').classList.add('show');if(race.lastEvent.type==='checkpoint')audio.tone(880,.10,.08);else if(race.lastEvent.type==='lap')audio.tone(1100,.25,.12);else if(race.lastEvent.type==='drift-bank')audio.tone(660,.13,.09);}
+  if(race.lastEvent&&race.lastEvent.id!==lastRaceEvent){lastRaceEvent=race.lastEvent.id;raceEventUntil=performance.now()+2500;$('#race-event').textContent=race.lastEvent.text;$('#race-event').classList.remove('show');void $('#race-event').offsetWidth;$('#race-event').classList.add('show');if(race.lastEvent.type==='checkpoint')audio.tone(880,.10,.08);else if(race.lastEvent.type==='lap')audio.tone(1100,.25,.12);else if(race.lastEvent.type==='drift-bank')audio.tone(660,.13,.09);}
+  if(raceEventUntil&&performance.now()>=raceEventUntil){raceEventUntil=0;$('#race-event').classList.remove('show');$('#race-event').textContent='';}
   $('#countdown').textContent=race.countdown>0?Math.ceil(race.countdown):race.elapsed<.7?'GO':'';
   if(race.mode==='tutorial'){
     const t=race.tutorial,cometDemo=race.carId==='comet'&&race.sensitivity===1&&!input.touch;
@@ -197,13 +214,21 @@ $('#continue-race').onclick=continueRace;
 $('#launch').onclick=()=>startRace();$('#tutorial-button').onclick=()=>startRace('tutorial');$('#customize-button').onclick=customize;
 $('#settings-button').onclick=()=>{if(!contextLost)showSettings();};$('#help-button').onclick=()=>{if(!contextLost)help();};$('#pause-button').onclick=()=>pauseRace();$('#touch-reset').onclick=recover;
 $('#close-modal').onclick=()=>{if(phase==='paused')resumeRace();else closeModal();};
+// Keep keyboard traversal inside the active dialog, including Chrome's browser-UI boundary.
+$('#modal').addEventListener('keydown',e=>{
+  if(e.key!=='Tab')return;
+  const targets=Array.from($('#modal').querySelectorAll('button:not(:disabled),input:not(:disabled),select:not(:disabled),summary,a[href],[tabindex="0"]')).filter(el=>el.getClientRects().length);
+  const first=targets[0],last=targets.at(-1),active=document.activeElement;
+  if(e.shiftKey&&(active===first||active===$('#modal'))){e.preventDefault();last?.focus();}
+  else if(!e.shiftKey&&(active===last||active===$('#modal'))){e.preventDefault();first?.focus();}
+});
 $('#modal').addEventListener('cancel',e=>{e.preventDefault();if(contextLost||phase==='result')return;if(phase==='paused')resumeRace();else closeModal();});
 $('#modal-content').addEventListener('input',e=>{const key=e.target.dataset.setting;if(!key)return;const value=e.target.type==='checkbox'?e.target.checked:e.target.tagName==='SELECT'?e.target.value:Number(e.target.value);const patch=key==='sensitivity'?{sensitivity:Number(value),sensitivityByCar:{...settings.sensitivityByCar,[carId]:Number(value)}}:{[key]:value};commitSettings(patch);if(key==='sensitivity'&&race)race.sensitivity=Number(value);});
 $('#modal-content').addEventListener('click',e=>{
   if(contextLost)return;
   const b=e.target.closest('button');if(!b)return;audio.unlock();audio.click();
-  if(b.dataset.color){commitSettings({colorId:b.dataset.color});showPreview();customize();return;}if(b.dataset.decal){commitSettings({decalId:b.dataset.decal});showPreview();customize();return;}
-  switch(b.dataset.action){case'resume':resumeRace();break;case'close':if(phase==='paused')resumeRace();else closeModal();break;case'retry':startRace(race?.mode||mode);break;case'garage':menu();break;case'tutorial':startRace('tutorial');break;case'export':download({gameId:'neon-drift',buildId:BUILD,physicsVersion:PHYSICS_VERSION,save},'neon-drift-local-save.json');toast('紀錄已匯出；尚未傳送到任何服務。');break;case'show-diagnostics':$('#diagnostics-json').hidden=false;$('#diagnostics-json').textContent=JSON.stringify(diagnosticsSummary(),null,2);break;case'export-diagnostics':download(diagnostics(),'neon-drift-diagnostics.json');break;case'confirm-reset':openModal('確定清除本機紀錄？','<p>這會刪除本機最佳成績、幽靈車與已解鎖外觀。可先返回設定匯出。此操作無法復原。</p><div class="modal-buttons"><button data-action="settings">保留紀錄</button><button data-action="delete-save">清除所有本機紀錄</button></div>','confirm');break;case'settings':showSettings();break;case'delete-save':try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(BACKUP_KEY);}catch{toast('儲存存取被阻擋，無法清除。');return;}save=loadSave();settings={...save.settings};trackId=settings.trackId||'harbor';carId=settings.carId||'comet';mode='time';menu();toast('本機紀錄已清除。');break;}
+  if(b.dataset.color||b.dataset.decal){const key=b.dataset.color?'color':'decal',id=b.dataset[key];commitSettings({[key==='color'?'colorId':'decalId']:id});showPreview();customize();$(`[data-${key}="${CSS.escape(id)}"]:not(:disabled)`)?.focus({preventScroll:true});return;}
+  switch(b.dataset.action){case'resume':resumeRace();break;case'close':if(phase==='paused')resumeRace();else closeModal();break;case'retry':startRace(race?.mode||mode);break;case'garage':menu();break;case'tutorial':startRace('tutorial');break;case'export':download({gameId:'neon-drift',buildId:BUILD,physicsVersion:PHYSICS_VERSION,save},'neon-drift-local-save.json');toast('紀錄已匯出；尚未傳送到任何服務。');break;case'show-diagnostics':$('#diagnostics-json').hidden=false;$('#diagnostics-json').textContent=JSON.stringify(diagnosticsSummary(),null,2);break;case'export-diagnostics':download(diagnostics(),'neon-drift-diagnostics.json');break;case'confirm-reset':openModal('確定清除本機紀錄？','<p>這會刪除所有未完成比賽、設定、教學進度、本機最佳成績、幽靈車與已解鎖外觀。可先返回設定匯出。此操作無法復原。</p><div class="modal-buttons"><button data-action="settings">保留紀錄</button><button data-action="delete-save">清除所有本機紀錄</button></div>','confirm');break;case'settings':showSettings();break;case'delete-save':deleteAllLocalProgress();break;}
 });
 addEventListener('blur',()=>{input.clear();if(phase==='running')pauseRace(true,'window-blur');else audio.pause();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){input.clear();if(phase==='running')pauseRace(true,'document-hidden');else audio.pause();}});
@@ -219,7 +244,7 @@ function frame(now){
   if(renderer&&race&&!contextLost){
     if(phase==='running'){
       const physicsStart=performance.now();
-      if(rawDt>2&&race.countdown===0){const rs=renderer.summary,gap={ms:rawDt*1000,countdown:race.countdown,elapsed:race.elapsed,visibility:document.visibilityState,hasFocus:document.hasFocus(),renderer:{adapter:rs.adapter,quality:rs.quality,drawingBufferSize:rs.drawingBufferSize,resizeCount:rs.resizeCount,renderSubmitMs:rs.renderSubmitMs,renderSubmitMaxMs:rs.renderSubmitMaxMs},at:Date.now()};frameGaps.push(gap);if(frameGaps.length>60)frameGaps.shift();pauseRace(true,'frame-gap',{frameGapMs:gap.ms});toast('畫面停頓超過 2 秒，比賽已自動暫停。可降低畫質後繼續。');}
+      if(rawDt>2){const rs=renderer.summary,gap={ms:rawDt*1000,countdown:race.countdown,elapsed:race.elapsed,visibility:document.visibilityState,hasFocus:document.hasFocus(),renderer:{adapter:rs.adapter,quality:rs.quality,drawingBufferSize:rs.drawingBufferSize,resizeCount:rs.resizeCount,renderSubmitMs:rs.renderSubmitMs,renderSubmitMaxMs:rs.renderSubmitMaxMs},at:Date.now()};frameGaps.push(gap);if(frameGaps.length>60)frameGaps.shift();pauseRace(true,'frame-gap',{frameGapMs:gap.ms});toast('畫面停頓超過 2 秒，比賽已自動暫停。可降低畫質後繼續。');}
       else{let remaining=rawDt;const controls=input.sample();while(remaining>1e-9&&!race.finished){const chunk=Math.min(.2,remaining);stepRace(race,controls,chunk);remaining-=chunk;}}
       physicsMs=performance.now()-physicsStart;
       if(phase==='running'&&rawDt>0&&race.countdown<=0){frameSamples.push(rawDt*1000);runFrames++;}
@@ -231,6 +256,7 @@ function frame(now){
     const audioStart=performance.now();audio.update(race,phase==='running'&&race.countdown===0);audioMs=performance.now()-audioStart;
     if(phase!=='menu'&&now-lastHud>60){const hudStart=performance.now();updateHUD();lastHud=now;hudMs=performance.now()-hudStart;}
   }
+  if(phaseAtStart==='running'){const ms=physicsMs+audioMs+hudMs+finishMs;updateCpu.count++;updateCpu.totalMs+=ms;updateCpu.maxMs=Math.max(updateCpu.maxMs,ms);}
   const callbackEnd=performance.now();
   if(profileActive&&phaseAtStart==='running'){
     profileRow[0]=frameSeq;profileRow[1]=now;profileRow[2]=rawDt*1000;profileRow[3]=Math.max(0,callbackStart-now);profileRow[4]=physicsMs;profileRow[5]=renderMs;profileRow[6]=audioMs;profileRow[7]=hudMs;profileRow[8]=finishMs;profileRow[9]=callbackEnd-callbackStart;profileRow[10]=outsideMs;profileRow[11]=race?.elapsed||0;profileRow[12]=FRAME_PHASE[phaseAtStart];profiler.record(profileRow);
@@ -238,7 +264,7 @@ function frame(now){
   }
   previousCallbackEnd=performance.now();requestAnimationFrame(frame);
 }
-try{renderer=createRenderer($('#world'),settings);applySettings();refreshMenu();showPreview();$('#boot').hidden=true;$('#garage').hidden=false;$('#build-label').textContent=`${VERSION} / ${BUILD.split('-').at(-1)}`;bridge.ready();if(save.notice)toast(save.notice);lastTime=performance.now();requestAnimationFrame(frame);}
+try{renderer=createRenderer($('#world'),{...settings,profilingEnabled});applySettings();refreshMenu();showPreview();$('#boot').hidden=true;$('#garage').hidden=false;$('#build-label').textContent=`${VERSION} / ${BUILD.split('-').at(-1)}`;bridge.ready();if(save.notice)toast(save.notice);lastTime=performance.now();requestAnimationFrame(frame);}
 catch(error){$('#boot').innerHTML='<b>無法啟動 3D 街道</b><span>需要支援 WebGL 2 的瀏覽器。請開啟硬體加速或重新載入。</span><button id="retry-load">重新載入</button>';$('#retry-load').onclick=()=>location.reload();bridge.error(error.message);console.error(error);}
 // Read-only diagnostics: supports reproducible review without granting game-state mutation.
-Object.defineProperty(window,'neonDrift',{value:Object.freeze({snapshot:()=>({buildId:BUILD,version:VERSION,phase,mode:race?.mode,trackId,carId,elapsed:race?.elapsed,s:race?.s,speed:race?.speed,lateral:race?.lateral,lap:race?.lap,checkpoint:race?.nextCheckpoint,score:race?.score,pendingScore:race?.pendingScore,drifting:race?.drifting,result:race?.result,tutorial:race?.tutorial,yaw:race?.yaw,velocityYaw:race?.velocityYaw,steer:race?.steer,countdown:race?.countdown,collisions:race?.collisions,timeRemaining:race?.timeRemaining,renderer:renderer?.summary,audio:audio.status,resumable:!!pendingSession,storageNotice:save.notice}),performance:()=>({buildId:BUILD,frames:frameSamples.snapshot(),count:runFrames,renderer:renderer?.stats}),events:()=>structuredClone(events)})});
+Object.defineProperty(window,'neonDrift',{value:Object.freeze({snapshot:(options={})=>({buildId:BUILD,version:VERSION,phase,mode:race?.mode,trackId,carId,elapsed:race?.elapsed,s:race?.s,speed:race?.speed,lateral:race?.lateral,lap:race?.lap,checkpoint:race?.nextCheckpoint,score:race?.score,pendingScore:race?.pendingScore,drifting:race?.drifting,result:race?.result,tutorial:race?.tutorial,yaw:race?.yaw,velocityYaw:race?.velocityYaw,steer:race?.steer,countdown:race?.countdown,collisions:race?.collisions,timeRemaining:race?.timeRemaining,renderer:options.renderer===false?undefined:renderer?.summary,audio:audio.status,resumable:!!pendingSession,storageNotice:save.notice}),performance:()=>({buildId:BUILD,frames:frameSamples.snapshot(),count:runFrames,updateCpu:{...updateCpu},renderer:renderer?.stats}),events:()=>structuredClone(events)})});

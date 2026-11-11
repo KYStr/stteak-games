@@ -2,7 +2,7 @@ import { build } from 'esbuild';
 import { mkdir, copyFile, cp } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url));
-const out=fileURLToPath(new URL('../../../public/games/neon-drift/',import.meta.url));
+const out=process.env.NEON_BUILD_OUT?process.env.NEON_BUILD_OUT.replace(/\/?$/,'/'):fileURLToPath(new URL('../../../public/games/neon-drift/',import.meta.url));
 await mkdir(out,{recursive:true});
 await build({entryPoints:[root+'src/main.js'],bundle:true,format:'esm',target:'es2022',minify:true,outfile:out+'game.js',legalComments:'eof'});
 for(const file of ['index.html','style.css']) await copyFile(root+'src/'+file,out+file);

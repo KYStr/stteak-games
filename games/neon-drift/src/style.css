@@ -58,3 +58,5 @@
 #finish-school{position:absolute;top:365px;left:30px;pointer-events:auto;font-size:14px;max-width:calc(100% - 60px)}
 @media(max-width:700px){#finish-school{top:375px;left:18px;max-width:calc(100% - 36px)}}
 @media(max-height:480px){#finish-school{top:245px;left:18px;padding:8px 12px}}
+
+.reduced-motion #race-event.show{animation:none;opacity:1}

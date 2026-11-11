@@ -575,8 +575,8 @@
     {
       "id": "neon-drift.road-kit",
       "source": "games/neon-drift/src/renderer.js",
-      "sha256": "def79cd61ff2506c611e36047733e8a4cbc12e8eb1377e4f15c5845cf68785f1",
-      "bytes": 38130,
+      "sha256": "c44d1d7e1cc025f72880bc83998af70af1ae6f0eb57cc8375f0834c4886337f2",
+      "bytes": 43866,
       "description": "Editable road ribbons, ramps, 3D curbs, armco, posts, road details (lane paint / kerbs / guide lamps / chevrons / puddles / start checkers / drain grates), contact shadows and district instancing. Bundled into runtime game.js.",
       "provenance": {
         "method": "original-procedural",
