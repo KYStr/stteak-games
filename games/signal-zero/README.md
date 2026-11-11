@@ -66,12 +66,12 @@ download frame times, GPU timings, render counts and game state to the local dev
 From the repository root, one command rebuilds and runs all checks:
 
 ```sh
-npm test --prefix games/signal-zero
+SIGNAL_ZERO_PORT=8127 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-r2-acceptance npm test --prefix games/signal-zero
 ```
 
 The suite requires `/usr/bin/google-chrome`, Python 3 and the provided Playwright
 at `/workspace/stteak8/tools/node_modules/playwright-core/index.mjs`. It starts a
-static server on port 8107 if none is running, uses one headless Chrome with
+static server on `SIGNAL_ZERO_PORT` (default 8107) if none is running, uses one headless Chrome with
 SwiftShader, and closes its browser/server on success or failure. Stop any other
 Signal Zero browser before running it. Logs and PNGs default to
 `/tmp/signal-zero-acceptance/` (`SIGNAL_ZERO_ARTIFACTS` overrides this).
@@ -81,12 +81,41 @@ at 30/60 FPS, zero-alarm routes, resource culling, input ownership and build par
 The browser suite drives actual keyboard play through the opening hack/checkpoint,
 save/reload, blur/resume, audio unlock and recovery, mute/volume, key capture,
 focus, 720p/1080p layouts, defeat/retry, victory/replay, context loss and corrupt saves.
+Chrome uses its default gesture policy: no AudioContext may exist before the first
+click, then an analyser must observe nonzero samples. Real keyboard jumps must
+emit exactly one landing cue; mute and zero SFX must suppress its voice.
 Late-game UI checks use an explicitly constructed valid checkpoint fixture;
 whole-campaign traversal is independently exercised by the unit tests.
 The default stability soak lasts three minutes and reports measured average/p95
-frame time, heap, listeners, geometry counts and voice bounds. For quick iteration
-only, `SIGNAL_ZERO_SOAK_MS=1000 npm run test:browser --prefix games/signal-zero`
+frame time, heap, listeners, geometry counts and voice bounds. Four additional
+30-second steady samples test chapter 1 at x=35, 387.5, 937.5 (720p) and x=35
+(1080p), after camera/shader warm-up. Every sample must have mean <=33.4 ms,
+p95 <=50.1 ms, and no one-second window below 20 FPS. Reports record wall time
+and simulation time separately, phase costs, render calls/triangles, quality,
+resolution and scale. These are local regression gates; shared CPU contention
+still affects SwiftShader RAF intervals. Tests also enforce the 0.75 auto visual
+floor, bounded game RAFs (excluding Playwright polling), and zero RAF after
+context loss. Fixtures install in the next document after pagehide, and assert
+the restored chapter/checkpoint/graphics setting before measurements.
+Screenshots include minimum auto resolution and paused world views at both sizes.
+For quick iteration only,
+`SIGNAL_ZERO_PORT=8127 SIGNAL_ZERO_SOAK_MS=1000 npm run test:browser --prefix games/signal-zero`
 skips the full soak; it is not a substitute for release acceptance.
+
+Static scenery merges by material and render flags in cells bounded to 32m.
+Collision/vision keep the original authored solids. Every skyline window remains
+an instance, using a front-facing pane instead of an almost flat six-sided box. Software auto/low use cached
+Lambert variants for opaque static surfaces; high retains original materials and
+shadows. Lighting, animated actors and the runner's occlusion silhouette remain.
+Auto quality starts at 0.75 on software renderers, uses a 120-frame RAF window,
+and changes resolution with hysteresis; low explicitly selects 0.65 resolution.
+Diagnostic phase samples are bounded to 120 frames and GPU queries are asynchronous.
+Auto/high also use a single FXAA output pass (a bounded seven-sample edge filter on
+software renderers). A byte-color target retains the runner stencil. Scene shader hooks
+preserve native exposure, tone mapping and sRGB conversion before AA, avoiding
+expensive half-float filtering and preserving the un-tonemapped silhouette.
+Low keeps direct rendering. `Pass.js` and `FXAAShader.js` are copied from pinned
+Three.js 0.180.0 with local imports; its MIT notice is shipped.
 
 Original procedural art and score are in `src/models.js` and `src/audio.js`.
 Existing exported assets, notices and Three.js MIT license remain intact.

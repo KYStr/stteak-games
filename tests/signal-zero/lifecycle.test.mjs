@@ -28,9 +28,17 @@ test('each chapter has an early checkpoint and four bounded recovery points',()=
 });
 test('build reproduces runtime and resolves every Three import locally',async()=>{
  for(const file of await readdir(new URL('../../games/signal-zero/src/',import.meta.url))){
-  const source=(await readFile(new URL('../../games/signal-zero/src/'+file,import.meta.url),'utf8')).replace(/\r\n/g,'\n').replace(/from 'three'/g,"from './vendor/three.module.js'").replace(/from 'three\/addons\/utils\/BufferGeometryUtils.js'/g,"from './vendor/BufferGeometryUtils.js'");
+  const source=(await readFile(new URL('../../games/signal-zero/src/'+file,import.meta.url),'utf8')).replace(/\r\n/g,'\n').replace(/from 'three'/g,"from './vendor/three.module.js'").replace(/from 'three\/addons\/(?:utils|postprocessing|shaders)\/([^']+)'/g,"from './vendor/$1'");
   assert.equal(await readFile(new URL('../../public/games/signal-zero/'+file,import.meta.url),'utf8'),source,file);
  }
+});
+
+test('vendored edge pass and shader match pinned Three.js and resolve locally',async()=>{
+ for(const path of ['postprocessing/Pass.js','shaders/FXAAShader.js']){
+  const source=(await readFile(new URL('../../games/signal-zero/node_modules/three/examples/jsm/'+path,import.meta.url),'utf8')).replace("from 'three'","from './three.module.js'");
+  assert.equal(await readFile(new URL('../../public/games/signal-zero/vendor/'+path.split('/').at(-1),import.meta.url),'utf8'),source);
+ }
+ assert.equal(await readFile(new URL('../../games/signal-zero/node_modules/three/LICENSE',import.meta.url),'utf8'),await readFile(new URL('../../public/games/signal-zero/vendor/THREE-LICENSE.txt',import.meta.url),'utf8'));
 });
 
 test('clearing input releases native pointer capture as well as held actions',async()=>{

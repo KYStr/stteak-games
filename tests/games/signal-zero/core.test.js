@@ -422,3 +422,16 @@ test('all twelve full input routes remain completable at 30 FPS', () => {
   assert.ok(results.every(result => result.phase === 'complete'));
   assert.ok(results.every(result => Math.abs(result.drift) < 3), 'frame rate does not materially change route reachability or completion time');
 });
+
+for(const fps of [30,60])test(`one jump and landing impact at ${fps} FPS, no standing clicks`,()=>{
+ const run=calm(0),events=[];
+ for(let n=0;n<fps*3;n++)events.push(...step(run,{jumpPressed:n===0,jumpHeld:n<fps/4},1/fps));
+ assert.equal(events.filter(e=>e.type==='jump').length,1);assert.equal(events.filter(e=>e.type==='land').length,1);assert.ok(run.player.grounded);
+ const standing=[];for(let n=0;n<fps*2;n++)standing.push(...step(run,{},1/fps));assert.equal(standing.filter(e=>e.type==='land').length,0);
+});
+test('walking off a real raised ledge emits one landing on the lower floor',()=>{
+ const run=calm(0),ledge=LEVELS[0].platforms.find(p=>p.y>1),events=[];
+ run.player.x=ledge.x+ledge.w/2-.2;run.player.y=ledge.y+ledge.h/2;
+ for(let n=0;n<180;n++)events.push(...step(run,{axis:run.player.x<27?1:0},1/60));
+ assert.equal(events.filter(e=>e.type==='jump').length,0);assert.equal(events.filter(e=>e.type==='land').length,1);assert.equal(run.phase,'playing');
+});

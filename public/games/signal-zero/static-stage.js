@@ -38,7 +38,7 @@ export class StaticStage {
    bounds.getCenter(center);
    // A very wide object (the skyline instances, for example) keeps its own
    // bucket so its conservative bound does not keep a distant street alive.
-   const key=bounds.max.x-bounds.min.x>96?`wide-${wide++}`:Math.floor(center.x/48);
+   const key=bounds.max.x-bounds.min.x>96?`wide-${wide++}`:Math.floor(center.x/32);
    let chunk=buckets.get(key);
    if(!chunk){chunk=new StaticChunk();chunk.name=`static-chunk-${key}`;buckets.set(key,chunk);stage.add(chunk);this.chunks.push(chunk);}
    chunk.worldBounds.union(bounds);chunk.add(object);roots++;

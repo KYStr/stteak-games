@@ -215,6 +215,8 @@ function movePlayer(run, input, dt) {
   run.traveled += Math.abs(p.x - oldX);
   if (climbed) return;
   const oldY = p.y;
+  const wasAirborne = !p.grounded;
+  const impactSpeed = Math.max(0, -p.vy);
   p.vy -= PHYSICS.gravity * dt;
   let nextY = oldY + p.vy * dt;
   p.grounded = false;
@@ -225,6 +227,7 @@ function movePlayer(run, input, dt) {
     else if (p.vy > 0 && oldY + h <= b.min.y + .02 && nextY + h >= b.min.y) { nextY = b.min.y - h; p.vy = 0; }
   }
   p.y = nextY;
+  if (wasAirborne && p.grounded && impactSpeed > 2) emit(run, 'land', '');
   p.animation = !p.grounded ? p.vy > 0 ? 'jump' : 'fall' : p.crouched ? 'crouch' : Math.abs(p.vx) > .15 ? 'run' : 'idle';
   if (p.y > 2.5) run.route = 'upper';
   if (p.y < -8) catchPlayer(run, '墜落至維修區下方。');
