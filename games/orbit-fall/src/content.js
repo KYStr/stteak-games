@@ -8,11 +8,11 @@ export const decks = [
 ];
 export const puzzles = {
   'puzzle-momentum-1': { id: 'puzzle-momentum-1', type: 'momentum', deck: 1, name: '靜止的電池', roomId: 'room-d1-cargo', requiredTool: 'tether', crateStart: [-3, 1, 0], target: [3, 1, -2], targetRadius: 1.3, maxDockSpeed: 0.65, holdSeconds: 1.5, hint: '取得牽引束後帶電池前往方框接點。到位先煞車；電池須在低速下保持 1.5 秒。', objective: '將電池低速停靠在下層方框接點。', resetLabel: '回收電池', reward: '生活循環泵供電', signalId: 'signal-1' },
-  'puzzle-reflection-1': { id: 'puzzle-reflection-1', type: 'reflection', deck: 1, name: '晨光折返', roomId: 'room-d1-optics', mirrorPositions: [[-2, 2, 0], [2, 2, -2]], initialAngles: [0, 0], targetAngles: [2, 6], angleSteps: 8, hint: '鏡面刻度共 8 格。依接收器線索設為「2 → 6」，每次互動旋轉一格。', objective: '調整兩面鏡，依序對準刻度 2、6。', resetLabel: '鏡面歸零', reward: '棲居甲板修復' },
-  'puzzle-airlock-1': { id: 'puzzle-airlock-1', type: 'airlock', deck: 2, name: '呼吸的門', roomId: 'room-d2-airlock', sequence: [0, 2, 1], valveLabels: ['封閉外門', '開啟內門', '等壓'], valvePositions: [[-4, 1.5, -2], [0, 1.5, -2], [4, 1.5, -2]], hint: '先隔絕外部，再等壓，最後開內門：① → ③ → ②。錯誤只重設控制序列。', objective: '依「封閉外門 → 等壓 → 開啟內門」操作三閥。', resetLabel: '洩壓重置', reward: '工程氣閘穩定', signalId: 'signal-3' },
+  'puzzle-reflection-1': { id: 'puzzle-reflection-1', type: 'reflection', deck: 1, name: '晨光折返', roomId: 'room-d1-optics', mirrorPositions: [[-2, 2, 0], [2, 2, -2]], initialAngles: [0, 0], targetAngles: [2, 6], angleSteps: 8, hint: '鏡面刻度共 8 格。依接收器線索設為「2 → 6」，每次互動旋轉一格。', objective: '串接兩面鏡，將晨光送入接收器。', resetLabel: '鏡面歸零', reward: '棲居甲板修復' },
+  'puzzle-airlock-1': { id: 'puzzle-airlock-1', type: 'airlock', deck: 2, name: '呼吸的門', roomId: 'room-d2-airlock', sequence: [0, 2, 1], valveLabels: ['封閉外門', '開啟內門', '等壓'], valvePositions: [[-4, 1.5, -2], [0, 1.5, -2], [4, 1.5, -2]], hint: '先隔絕外部，再等壓，最後開內門：① → ③ → ②。錯誤只重設控制序列。', objective: '安全轉換壓差，建立通往工程艙的路。', resetLabel: '洩壓重置', reward: '工程氣閘穩定', signalId: 'signal-3' },
   'puzzle-momentum-2': { id: 'puzzle-momentum-2', type: 'momentum', deck: 2, name: '向上墜落', roomId: 'room-d2-cargo', requiredTool: 'tether', crateStart: [-4, 1, 2], target: [3, 5, -2], targetRadius: 1.4, maxDockSpeed: 0.7, holdSeconds: 1.5, hint: '接點位於上層 5 公尺。用高度推進抬升電池，繞開碎片。接近接點時放慢並煞停。', objective: '把重電池運到上層方框接點。', resetLabel: '回收重電池', reward: '航行控制恢復' },
-  'puzzle-reflection-2': { id: 'puzzle-reflection-2', type: 'reflection', deck: 3, name: '跨層回聲', roomId: 'room-d3-optics', mirrorPositions: [[-4, 1.5, -2], [0, 4.5, -2], [4, 6, -2]], initialAngles: [0, 0, 0], targetAngles: [1, 5, 3], angleSteps: 8, hint: '線路跨越三層：下層 1、中層 5、上層 3。依圓環的數字與流動箭頭調整鏡面。', objective: '到不同高度，將三面鏡設為 1、5、3。', resetLabel: '鏡面歸零', reward: '記憶核心供電', signalId: 'signal-5' },
-  'puzzle-airlock-2': { id: 'puzzle-airlock-2', type: 'airlock', deck: 3, name: '最後的壓差', roomId: 'room-d3-airlock', sequence: [0, 2, 0, 1], valveLabels: ['隔離', '核心門', '等壓'], valvePositions: [[-4, 1.5, -2], [0, 4.5, -2], [4, 1.5, -2]], hint: '雙腔氣閘需要再次隔離：① → ③ → ① → ②。上層的核心門是最後一步。', objective: '依「隔離 → 等壓 → 再隔離 → 核心門」操作。', resetLabel: '雙腔洩壓', reward: '終端抉擇開放' },
+  'puzzle-reflection-2': { id: 'puzzle-reflection-2', type: 'reflection', deck: 3, name: '跨層回聲', roomId: 'room-d3-optics', mirrorPositions: [[-4, 1.5, -2], [0, 4.5, -2], [4, 6, -2]], initialAngles: [0, 0, 0], targetAngles: [1, 5, 3], angleSteps: 8, hint: '線路跨越三層：下層 1、中層 5、上層 3。依圓環的數字與流動箭頭調整鏡面。', objective: '跨越不同高度，接通三段光路。', resetLabel: '鏡面歸零', reward: '記憶核心供電', signalId: 'signal-5' },
+  'puzzle-airlock-2': { id: 'puzzle-airlock-2', type: 'airlock', deck: 3, name: '最後的壓差', roomId: 'room-d3-airlock', sequence: [0, 2, 0, 1], valveLabels: ['隔離', '核心門', '等壓'], valvePositions: [[-4, 1.5, -2], [0, 4.5, -2], [4, 1.5, -2]], hint: '雙腔氣閘需要再次隔離：① → ③ → ① → ②。上層的核心門是最後一步。', objective: '協調雙腔壓力，打開上層核心門。', resetLabel: '雙腔洩壓', reward: '終端抉擇開放' },
 };
 export const rooms = [
   { id: 'room-d1-safe', deck: 1, name: 'A1 · 甦醒氣閘', type: 'safe', description: '冷白燈逐段亮起。你的救生艙成了站內最後一處有空氣的地方。', objective: '閱讀操作指引，取得磁靴與牽引束，然後修復本甲板兩部設備。', grants: ['boots', 'tether'], hazard: null },
@@ -45,4 +45,12 @@ export const challenges = [
   { id: 'challenge-engineering', title: '工程接力', deck: 2, roomId: 'room-d2-safe', puzzleIds: ['puzzle-airlock-1', 'puzzle-momentum-2'], timeLimit: 360, objective: '360 秒內完成工程甲板兩項修復，計畫最省氧的路線。' },
   { id: 'challenge-core', title: '無聲的光路', deck: 3, roomId: 'room-d3-safe', puzzleIds: ['puzzle-reflection-2', 'puzzle-airlock-2'], timeLimit: 420, objective: '420 秒內修復核心甲板。所有線索均可從數字與圖形讀取。' },
 ];
+const briefings={
+ 'puzzle-reflection-1':'觀察光束與接收器，旋轉鏡面讓光路連通。',
+ 'puzzle-reflection-2':'光路跨越三個高度。從發射端追蹤光束，逐一接通鏡面。',
+ 'puzzle-airlock-1':'外門、等壓、內門各有功能。先讓艙室與外界隔離，再建立安全通道。',
+ 'puzzle-airlock-2':'雙腔氣閘需要在轉換壓力後再次隔離；核心門位於上層。'
+};
+for(const p of Object.values(puzzles))p.briefing=briefings[p.id]||p.hint;
+for(const r of rooms)r.visualRole=r.id==='room-d1-optics'?'greenhouse':r.id==='room-d1-cargo'?'cargo':r.id==='room-d2-cargo'?'shaft':r.id==='room-d3-optics'?'photon':r.signalId?'archive':r.type;
 export const roomById = Object.fromEntries(rooms.map(room => [room.id, room]));

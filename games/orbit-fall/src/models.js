@@ -93,11 +93,15 @@ function buildDevice(kind) {
   else if(kind==='beacon') {pipe(g,'beacon-base',.55,.22,[0,.11,0],'dark');pipe(g,'beacon-mast',.12,2.4,[0,1.4,0],'trim');mesh(g,'beacon-dish',new THREE.ConeGeometry(.9,.3,24,1,true),'hull',[0,2.62,0],[.5,0,Math.PI]);ring(g,'state-light',.65,.04,[0,2.7,.1],'amber',[Math.PI/2+.5,0,0]);pipe(g,'beacon-emitter',.06,.6,[0,2.9,0],'cyan');}
   return g;
 }
+const deviceNodes=new WeakMap();
+export function cacheDeviceNodes(g){const lights=[],animated=[];g.traverse(o=>{if(o.isMesh&&/^(state-light|gate-status|terminal-face)/.test(o.name))lights.push(o);if(/^(memory-orbit|memory-crystal|arc-segment|airflow-stream|gate-leaf)/.test(o.name))animated.push(o)});const nodes={lights,animated,state:null};deviceNodes.set(g,nodes);return nodes;}
 export function setDeviceState(g,state='offline') {
+  const nodes=deviceNodes.get(g)||cacheDeviceNodes(g);if(nodes.state===state)return;nodes.state=state;
   g.userData.state=state;const color={offline:0x6a8397,ready:0x6cdde7,active:0xffb347,powered:0x86e7b7,complete:0x86e7b7,danger:0xfb625b}[state]||0x6cdde7;
-  g.traverse(o=>{if(o.isMesh&&(o.name.startsWith('state-light')||o.name.startsWith('gate-status')||o.name.startsWith('terminal-face'))){if(!o.userData.uniqueStateMaterial){o.material=o.material.clone();o.userData.uniqueStateMaterial=true;}o.material.color.setHex(color);o.material.emissive.setHex(color);o.material.emissiveIntensity=state==='offline'?.2:1;}});
+  let shared;
+  for(const o of nodes.lights){if(!o.userData.uniqueStateMaterial){shared ||= o.material.clone();o.material=shared;o.userData.uniqueStateMaterial=true;}o.material.color.setHex(color);o.material.emissive.setHex(color);o.material.emissiveIntensity=state==='offline'?.2:1;}
 }
-export function animateDevice(g,time) {g.traverse(o=>{if(o.name==='memory-orbit')o.rotation.y=time*.35;if(o.name==='memory-crystal')o.rotation.y=time*.6;if(o.name.startsWith('arc-segment'))o.visible=['active','danger'].includes(g.userData.state);if(o.name.startsWith('airflow-stream')){o.scale.y=.75+Math.sin(time*4+o.position.x)*.25;}if(o.name.startsWith('gate-leaf')){const s=o.name==='gate-leaf--1'?-1:1;o.position.x=(g.userData.state==='powered'||g.userData.state==='complete')?s*1.55:0;}});}
+export function animateDevice(g,time) {for(const o of (deviceNodes.get(g)||cacheDeviceNodes(g)).animated){if(o.name==='memory-orbit')o.rotation.y=time*.35;if(o.name==='memory-crystal')o.rotation.y=time*.6;if(o.name.startsWith('arc-segment'))o.visible=['active','danger'].includes(g.userData.state);if(o.name.startsWith('airflow-stream'))o.scale.y=.75+Math.sin(time*4+o.position.x)*.25;if(o.name.startsWith('gate-leaf')){const s=o.name==='gate-leaf--1'?-1:1;o.position.x=(g.userData.state==='powered'||g.userData.state==='complete')?s*1.55:0;}}}
 
 export function createAstronaut(){return fork('astronaut',buildAstronaut);}
 function buildAstronaut() {
@@ -133,3 +137,27 @@ export function animateAstronaut(g,state='idle',time=0,dt=1/60) {
  * until the runtime is disposed; call disposeAssetLibrary when leaving the game. */
 export function disposeObject(g){g.userData.mixer?.stopAllAction();g.userData.mixer?.uncacheRoot(g);g.traverse(o=>{if(o.userData.uniqueStateMaterial)o.material?.dispose();if(g.userData.proceduralFallback)o.geometry?.dispose();});g.removeFromParent();}
 export function disposeAssetLibrary(){const geometries=new Set(),mats=new Set();for(const g of templates.values())g.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)mats.add(o.material);});for(const x of geometries)x.dispose();for(const x of mats)x.dispose();templates.clear();for(const x of Object.values(materials))x.dispose();}
+
+// Wall-mounted room storytelling stays outside the navigable collider envelope.
+export function createRoomDetails(room){
+ const g=new THREE.Group();g.name=`details-${room.visualRole}`;
+ if(room.visualRole==='greenhouse'){
+  for(const x of [-6.8,6.8])for(const y of [1.3,3.2]){panel(g,'planter-rack',[2.6,.18,.65],[x,y,-7.2],'trim');panel(g,'soil-tray',[2.4,.24,.5],[x,y+.18,-7.2],'dark');for(let n=0;n<6;n++){const leaf=mesh(g,'sleeping-leaf',new THREE.ConeGeometry(.18,.65,5),'green',[x-1+n*.4,y+.6,-7.15]);leaf.rotation.z=(n%2?1:-1)*.25;}}
+  panel(g,'grow-light',[15,.12,.15],[0,5.35,-7.45],'green');panel(g,'grow-light-cyan',[15,.06,.15],[0,5.12,-7.45],'cyan');
+ }
+ if(room.visualRole==='cargo'){
+  for(const x of [-7,7]){for(const y of [.4,1.7,3])panel(g,'cargo-shelf',[2.2,.12,.8],[x,y,-7],'trim');for(const y of [1,2.3])for(const dx of [-.55,.55])panel(g,'stored-container',[.85,.9,.65],[x+dx,y,-7],'gold');}
+  for(let z=-5;z<6;z+=1.5)for(const x of [-2,2])panel(g,'transport-guide',[.2,.02,.7],[x,.08,z],'amber');
+ }
+ if(room.visualRole==='shaft'||room.visualRole==='photon'){
+  const levels=room.visualRole==='shaft'?[1,5]:[1.5,4.5,6];
+  levels.forEach((y,i)=>{const x=-8.7;panel(g,'height-guide',[.06,.055,11],[x,y,-1],'cyan');for(let j=0;j<=i;j++)panel(g,'number-band',[.08,.18,.3],[x+.04,y+.25,-4+j*.45],'amber');panel(g,'rear-height-band',[16,.045,.06],[0,y,-7.6],'cyan');
+   // Seven-segment numerals on the rear wall, integrated as static geometry.
+   const digit=room.visualRole==='shaft'?(i?5:1):i+1,segments={1:[1,2],2:[0,1,6,4,3],3:[0,1,6,2,3],5:[0,5,6,2,3]}[digit];
+   for(const seg of segments){const horizontal=[0,3,6].includes(seg),sx=[0,.2,.2,0,-.2,-.2,0][seg],sy=[.55,.4,.1,-.05,.1,.4,.25][seg];panel(g,'level-digit',horizontal?[.4,.065,.03]:[.065,.3,.03],[-7.8+sx,y+sy,-7.5],'amber');}
+  });
+  if(room.visualRole==='shaft'){panel(g,'receiver-support',[2,.12,.65],[3,4.1,-2],'trim');for(let x=2.2;x<4;x+=.35)panel(g,'support-stripe',[.18,.035,.65],[x,4.18,-2],'amber');}
+ }
+ if(room.signalId){const archive=new THREE.Group();archive.position.set(-8.78,3.1,3);archive.rotation.y=Math.PI/2;g.add(archive);panel(archive,'archive-frame',[2.4,1.6,.12],[0,0,0],'gold');panel(archive,'archive-photo',[2.15,1.35,.06],[0,0,.11],'dark');for(let n=0;n<4;n++){mesh(archive,'portrait-head',new THREE.SphereGeometry(.13,8,6),'hull',[-.75+n*.5,.25,.21]);panel(archive,'portrait-suit',[.29,.5,.08],[-.75+n*.5,-.15,.22],n%2?'cyan':'amber');}panel(archive,'archive-caption',[1.8,.06,.03],[0,-.78,.25],'cyan');}
+ return g;
+}

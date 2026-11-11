@@ -29,3 +29,5 @@
 @media(max-height:740px){.start-panel{padding:24px 32px}.start-panel h2{font-size:42px;margin:12px 0}.start-panel .lead{font-size:16px;margin:16px 0}.start-panel .meta{margin-top:16px}.start-panel .actions{margin-top:16px}.mission-strip{padding:10px 0}}
 
 #game:has(.overlay[data-screen=start]:not([hidden])) :is(.hud,.objective,.controls,.telemetry,.proximity,#world-markers,#toast){visibility:hidden}
+
+button[aria-pressed=true]{background:#286075;border-color:#98e5ef;box-shadow:0 0 16px #80d8e74d;transform:translateY(1px)}

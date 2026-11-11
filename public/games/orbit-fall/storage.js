@@ -40,7 +40,7 @@ export function sanitizeRun(raw) {
   run.lastFailure = ['oxygen', 'arc', 'debris', 'collision', 'challenge-time', 'recovery'].includes(raw.lastFailure) ? raw.lastFailure : null;
   run.paused = false;
   run.accumulator = 0;
-  run.tutorial = knownIds(raw.tutorial, ['movement', 'brake', 'boots', 'tether', 'oxygen', 'map', 'first-repair']);
+  run.tutorial = knownIds(raw.tutorial, ['thrust', 'tools', 'movement', 'brake', 'boots', 'tether', 'oxygen', 'map', 'first-repair']);
   for (const key of Object.keys(run.stats)) run.stats[key] = finite(raw.stats?.[key]);
   if (isRecord(raw.snapshots)) for (const [roomId, snapshot] of Object.entries(raw.snapshots)) if (roomById[roomId]) run.snapshots[roomId] = legalizeSnapshot(snapshot);
   for (const challenge of challenges) {
