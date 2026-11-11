@@ -5,7 +5,7 @@ import { RenderBudget } from '../../../public/games/hollow-crown/render-budget.j
 test('sustained slow rendering lowers resolution without unbounded storage or oscillation', () => {
   const budget = new RenderBudget(true);
   for(let i=0;i<10000;i++)budget.record(85);
-  assert.equal(budget.scale,.8); assert.equal(budget.samples.length,40);
+  assert.equal(budget.scale,.8); assert.equal(budget.sampleCount,40);
   for(let i=0;i<1200;i++)budget.record(16.7);
   assert.equal(budget.scale,1);
 });
@@ -15,7 +15,7 @@ test('render budgeting ignores invalid timings and isolated scheduling stalls', 
   assert.equal(budget.frames,0);
   for(let i=0;i<90;i++)budget.record(i===20?800:16.7);
   assert.equal(budget.scale,1);
-  budget.reset();assert.deepEqual(budget.samples,[]);
+  budget.reset();assert.equal(budget.sampleCount,0);
 });
 
 test('software resolution has a readable floor and two-window recovery hysteresis',()=>{

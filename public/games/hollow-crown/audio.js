@@ -1,4 +1,4 @@
-const FILES=['camp','combat','boss','light','charge','hit','metal','stone','hurt','parry','dodge','death','win','loss','ui','warning'];
+export const FILES=['camp','combat','boss','light','charge','hit','metal','stone','hurt','parry','dodge','death','win','loss','ui','warning','guard'];
 export class Soundscape {
   constructor(settings,onError){this.settings=settings;this.onError=onError;this.ctx=null;this.buffers=new Map();this.voices=[];this.track=null;this.theme='camp';this.active=false;this.failed=false;this.loading=null;this.activation=0;this.disposed=false;}
   async unlock(){
@@ -22,7 +22,7 @@ export class Soundscape {
   setTheme(theme){if(this.theme!==theme){this.theme=theme;this.stopTrack();}this.playTheme();}
   playTheme(){if(this.disposed||!this.ctx||!this.active||this.track||!this.buffers.has(this.theme))return;const s=this.ctx.createBufferSource();s.buffer=this.buffers.get(this.theme);s.loop=true;s.connect(this.music);s.start();this.track=s;}
   stopTrack(){if(this.track){try{this.track.stop();}catch{}this.track.disconnect();this.track=null;}}
-  cue(type,material){if(type==='hit'&&material==='metal')type='metal';if(type==='hit'&&material==='stone')type='stone';if(type==='room-clear')type='win';if(!this.active||!this.ctx||!this.buffers.has(type))return;
+  cue(type,material){if(type==='charge-ready'||type==='objective')type='parry';if(type==='hazard')type='warning';if(type==='ui')type=material==='phase'||material==='wave'?'warning':'ui';if(type==='hit'&&material==='metal')type='metal';if(type==='hit'&&material==='stone')type='stone';if(type==='room-clear')type='win';if(!this.active||!this.ctx||!this.buffers.has(type))return;
     if(this.voices.length>=12){const old=this.voices.shift();try{old.stop();}catch{}}
     const s=this.ctx.createBufferSource();s.buffer=this.buffers.get(type);s.connect(this.fx);s.onended=()=>{s.disconnect();const i=this.voices.indexOf(s);if(i>=0)this.voices.splice(i,1);};this.voices.push(s);s.start();
   }

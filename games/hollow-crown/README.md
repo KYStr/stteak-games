@@ -1,51 +1,33 @@
 # Hollow Crown · 餘燼之冠
 
-A static, local-save Three.js combat game in Traditional Chinese. Serve `public/` over HTTP and open `/games/hollow-crown/`. No accounts, external fonts, CDNs, or service APIs are required.
+A static, local-save Three.js game in Traditional Chinese. Serve `public/` over HTTP and open `/games/hollow-crown/`. All models, textures, music and effects are original procedural assets. Pinned Three.js 0.180.0 retains its MIT notice.
 
-## Play
+The default **餘燼巡禮** (`crown-pilgrimage`) visits twelve arenas in three four-room chapters, then two crowns. Fight small staggered squads, secure two beacons by standing nearby after clearing their guards, break seals with ordinary thrusts to open routes and trigger reinforcements, and cross visible lane/circle/ring hazards. The latter teach the boss responses before the throne. Objectives and counters remain on screen; menus pause all combat/objective clocks. The accessible 行旅 difficulty is the fresh default; 守誓 remains available. Four equipment slots and twelve talents support mobility, counter and burn builds. An unequipped starting-school talent is guaranteed among new pilgrimage rewards. Rest is always available.
 
-The default **餘燼長征** has two acts: six original arenas, six new arenas, then both two-phase crowns. Second-act encounters mix melee, ranged and explosive reinforcements. Each room has a different obstacle layout and themed perimeter silhouettes. Clear waves, compare a talent with your current build or heal, then choose a destination and risk. Four equipment slots support three interacting schools; replacement cards show exact modifier changes. Stories occur after rooms 1, 6 and 12, and the final choice changes the ending.
+Old challenge IDs retain their lengths and checkpoint semantics: `long-watch-extended` is the previous twelve-room/two-crown expedition, `long-watch` six rooms/two crowns, and the four-room oaths remain selectable. Seeded choices, safe/risk routes, six starting unlocks, endings, best successful time/seed and an earned armor appearance give reasons to replay. Starting unlocks add choices without permanent stat growth.
 
-The six-room / two-crown **雙冠遠征** and four-room / one-crown oaths remain available. Stable challenge IDs preserve the original length and seeded routes of old checkpoints: `long-watch` is still six plus two; the expanded default uses `long-watch-extended`. Difficulty defaults to 守誓; 行旅 reduces damage and widens parry timing. A practical five-step tutorial cannot permanently kill the player. Unlocks add starting choices and an appearance, without permanent stat growth.
+- **WASD / arrows:** move. **Mouse:** aim; automatic nearest-visible targeting is enabled by default.
+- **J / left mouse:** thrust. Hold at least 0.65s and release for charge; readiness has a visual/sound cue. Light thrust costs no energy. The same thrust breaks square seals.
+- **K / right mouse:** guard. Raise just before a frontal impact to counter; held guard reduces damage. Guard has a distinct, single armor-raise cue.
+- **Space / L:** dodge. Flank shields or charge through their guard. Move sideways from lines, outside circles, and into the hollow center of rings.
+- **Escape:** pause/resume/back. **M:** reversible mute; typing in form controls does not trigger it.
+- **Touch:** movement/aim sticks and three action buttons. Cancellation/backgrounding releases held input. Keyboard/mouse are documented; gamepad/remapping are not exposed.
 
-- **WASD / arrows:** move. **Mouse:** aim, with automatic targeting available in settings.
-- **J / left mouse:** press to thrust; hold at least 0.65s and release for a charged thrust. The action meter indicates readiness. Light thrusts cost no energy.
-- **K / right mouse:** guard. A fresh frontal guard just before impact counters; early held guard reduces damage. Dodge circles and rings.
-- **Space / L:** dodge. Flank shields or break them with a charged thrust. Move sideways out of line warnings; approach the safe center of an outer ring.
-- **Escape:** pause/resume or close a secondary panel. **M:** mute without changing music/effects levels. Typing in form controls does not trigger M.
-- **Touch:** movement/aim sticks and three action buttons. Auto-aim starts enabled. Pointer cancellation/backgrounding releases held input. Gamepad and control remapping are not exposed.
+Settings persist immediately, including independent music/effects volume, mute, quality, auto-aim, flash, shake, practice-parry window, and explicit reduced motion. Fresh motion settings follow the OS. Modal focus is contained, menus scroll on small screens, and DOM text remains at native resolution.
 
-## Saves and lifecycle
+Combat saves the **room entrance**, including seed, health, equipment and objective entrance state. Continue restarts that room; reward and route checkpoints preserve exact settled offers. Corrupt checkpoints are discarded with a notice while retaining settings/unlocks, and a validated backup can repair a damaged primary. Blocked storage remains playable; JSON export is available. Blur/visibility pause sound/input/simulation and require explicit resume. WebGL loss stops the game and offers reload/Continue, including after an actual context restore.
 
-Settings save immediately. Combat saves the **room entrance**, including seed, health, equipment and waves. Reload opens camp; Continue restores that entrance. Reward and route offers recover exactly without rerolls or duplicate settlement. Semantically unusable checkpoints are discarded with a visible notice, preserving settings and unlocks. A validated backup can recover a damaged primary. Blocked storage remains playable; JSON export is available, importing is not exposed.
-
-Blur/hidden tabs pause simulation and audio; resume is explicit. Dialogs contain focus. Reduced motion follows the OS until the checkbox is explicitly changed; either explicit value survives reload and OS changes. Context loss freezes graphics, sound and input, then offers reload/Continue.
-
-## Build and validation
-
-Runtime modules in `public/games/hollow-crown/` are authoritative. The parametric asset source is `assets/games/hollow-crown/sources/kit.mjs`. Rebuild pinned vendors, GLBs, matching runtime kit, textures, audio and manifests:
+Runtime modules in `public/games/hollow-crown/` are authoritative; the asset build regenerates pinned vendors, original GLBs, textures, audio and manifests. No accounts/CDNs/services are required.
 
 ```sh
-npm --prefix games/hollow-crown ci --registry=https://registry.npmjs.org
 npm --prefix games/hollow-crown run build
-HOLLOW_TEST_PORT=8103 HOLLOW_ARTIFACT_DIR=/tmp/hollow-crown-check npm --prefix games/hollow-crown run check
+HOLLOW_TEST_PORT=8123 HOLLOW_ARTIFACT_DIR=/tmp/hollow-r3-release npm --prefix games/hollow-crown run check:release
 ```
 
-`check` sequentially runs units, targeted lifecycle regressions, acceptance and layout checks. Default port is 8103; default artifacts are `tests/hollow-crown/artifacts/`. `HOLLOW_TEST_PORT` and `HOLLOW_ARTIFACT_DIR` permit independent QA configuration. An occupied port fails without killing its owner. Chrome/server cleanup is idempotent and handles interruption. Playwright defaults to `/workspace/stteak8/tools/node_modules/playwright-core/index.mjs` (override `PLAYWRIGHT_PATH`); Chrome is `/usr/bin/google-chrome` with the required SwiftShader flags. Audio uses real gestures, without an autoplay bypass.
+`check` aliases the full release command. `check:dev` runs only units/lifecycle regressions and makes no release claim. The release command sequentially runs build, units, lifecycle, action-feedback timing, two no-controller 30s allocation/GC windows after warmup, an 18-case fixed-step rules matrix (three fixed seeds × three schools × both difficulties), live visible-cue play, functional acceptance/retention and visual layouts. Only one headless Chrome runs at a time; each harness closes its owned browser/server on success/failure/interruption. An occupied port fails without killing its owner. Playwright is imported from `/workspace/stteak8/tools/node_modules/playwright-core/index.mjs`; Chrome uses SwiftShader. Port/artifact paths are environment configurable.
 
-Acceptance completes tutorial and all fourteen expedition encounters through ordinary keyboard/menu input, validates win/loss/restart, save/reload, settings, blur/audio resume, malformed saves, focus and context recovery. It requires **180 seconds of active play**, GC heap growth below 16 MiB, bounded listeners, and one RAF after ten restarts. `HOLLOW_SOAK_MS` below 180000 labels a development run incomplete and exits nonzero. Failure JSON is timestamped and retained.
+The live visible controller decides every 200ms using actor position, current animation state, visible projectiles/warning shapes and room obstacles. It caches its own path for 400ms; it never reads enemy countdowns, future moves or RNG and never mutates game state. It preserves the school’s starting talent during replacements and uses ordinary keyboard events/DOM menu clicks. Three accessible build wins, idle loss, menu-capable random underperformance, a progressing first successful default run ≥600 active seconds, and introduced mechanics are release gates. The full rules matrix retains every outcome and per-stage conditional failure denominators, requiring no consecutive jump >40 percentage points and a standard win. Small scripted samples do not establish human enjoyment or population win rates. `HOLLOW_PACING_QUICK=1` is explicitly incomplete and exits nonzero; timeouts are never wins.
 
-Per the current QA rubric, absolute SwiftShader timings are reference data. Release work budgets enforce at most **45 draws / 35,000 triangles / 12ms p95 simulation update** in the sampled default expedition. Raw active RAF samples, independently sampled intervals, one-second work/resource windows and drawing-buffer dimensions are retained. The old 33.3/66.7ms frame targets remain audited reference fields. Layout tests verify the ≥768×432 desktop software floor after 30 seconds at both required sizes and save every room, both crowns, rewards, pause and portrait layouts.
+The separate `functionalPilot` reads exact threat geometry/countdowns, takes healing and verifies completion/lifecycle; it gives no build/depth credit. Hardware-independent release budgets are ≤250 draws, ≤1.5M triangles, ≤256MiB textures, ≤6ms update p95, <10% GC-retained heap growth, identical listeners/RAF and same-scene geometries/textures after an expedition and ten restarts. SwiftShader frame time is reference only. Finite prop/actor templates are warmed before interactive startup; their bytes are resident at the baseline and transfer accounting includes all startup requests. Numeric timing rings, reused inputs/substeps, indexed navigation, in-place compaction, frame stamps and reusable upload ranges remove recurring record allocations. Allocation traces retain sampled stacks and GC windows for inspection; a stable GC rate alone does not prove that every library allocation is absent.
 
-Additional probes:
-
-```sh
-HOLLOW_ARTIFACT_DIR=/tmp/hollow-crown-probe npm --prefix games/hollow-crown run test:performance
-HOLLOW_ARTIFACT_DIR=/tmp/hollow-crown-pacing npm --prefix games/hollow-crown run test:pacing
-```
-
-The pacing controller samples visible positions/actions at 200ms intervals, never reads enemy attack timers or exact warning geometry, and sends ordinary input. It tests mobility/counter/burn across two seeds and both difficulties, recording simulation/wall/menu time, rooms, builds, hits and deaths. `HOLLOW_PACING_CASE_MS` bounds development cases; incomplete cases cannot pass. Automated pacing is not evidence of human enjoyment. The optimal acceptance pilot does inspect exact threat geometry and serves a separate functional purpose.
-
-Software rendering uses baked room colors, one dynamic rigid-bone actor stream, shared sparks, cheap textured floor, contact shadows and no multisampling. Hardware retains the PBR/shadow path. Adaptive resolution has 120-frame hysteresis windows and a readable .8 software scale floor. DOM text stays at native resolution. Read-only `window.hollowCrownDiagnostics` exposes copied state and bounded metrics.
-
-All models, textures and sounds are original procedural assets. Pinned Three.js 0.180.0 retains its MIT notice. Round evidence and limitations are recorded in `docs/hollow-crown-r1.md` and the external round-2 artifacts.
+Acceptance also verifies actual input, tutorial, save/reload/continue, blur/audio suspend/resume, loss/restart, corruption/backup recovery, settings, focus, context loss/reload and responsive layouts. Visual tests label offline scene fixtures separately from live victories. Read-only `window.hollowCrownDiagnostics` returns copies only when explicitly queried; these copies are controller/diagnostic overhead and are excluded from the no-controller trace.

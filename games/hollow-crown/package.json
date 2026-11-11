@@ -1,17 +1,23 @@
 {
   "name": "@stteak/hollow-crown",
-  "version": "1.0.0",
+  "version": "1.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
     "test": "node --test ../../tests/games/hollow-crown/*.test.js",
     "test:acceptance": "node ../../tests/hollow-crown/acceptance.mjs",
-    "check": "npm test && npm run test:regressions && npm run test:acceptance && npm run test:polish",
+    "check": "npm run check:release",
     "test:polish": "node ../../tests/hollow-crown/polish.mjs",
     "test:regressions": "node ../../tests/hollow-crown/regressions.mjs",
     "test:performance": "node ../../tests/hollow-crown/performance.mjs",
-    "test:pacing": "node ../../tests/hollow-crown/pacing.mjs"
+    "test:pacing": "node ../../tests/hollow-crown/pacing.mjs",
+    "check:dev": "npm test && npm run test:regressions",
+    "check:release": "npm run build && npm test && npm run test:regressions && npm run test:feedback && npm run test:allocation && npm run test:matrix && npm run test:pacing && npm run test:acceptance && npm run test:polish",
+    "test:matrix": "node ../../tests/hollow-crown/matrix.mjs",
+    "test:feedback": "node ../../tests/hollow-crown/feedback.mjs",
+    "test:allocation": "node ../../tests/hollow-crown/allocation.mjs",
+    "test:pacing:standard": "HOLLOW_PACING_SCENARIO=standard-burn node ../../tests/hollow-crown/pacing.mjs"
   },
   "dependencies": {
     "three": "0.180.0"

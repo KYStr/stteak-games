@@ -31,10 +31,11 @@ function auxiliaryKind(element, document, window) { // 只判本次body直接附
 export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA專用方法或window接口。
   constructor(document, window) { // DOM依賴可用純mock測，正式由main傳真頁面。
     this.document = document; this.window = window; this.disposed = false; this.dirty = true; this.headChanged = false; this.rootsOkay = false; this.lastKind = null; this.structureUncertain = false; // 不保存遊戲資料或上一招倒數。
+    this.rootSnapshot={valid:false,auxiliaries:new Set()};this.style=element=>this.window.getComputedStyle(element);
     this.canvas = document.getElementById('world'); this.element = document.getElementById('warning-cue'); this.text = document.getElementById('warning-cue-text'); this.shape = document.getElementById('warning-cue-shape'); // 全為一般玩家看得到的節點。
-    this.overlay = document.getElementById('overlay'); this.vignette = document.getElementById('vignette'); this.masks = MASK_IDS.map(id => document.getElementById(id)); // 固定引用避免每幀query整棵樹。
+    this.primaryElements=[document.documentElement,document.body,this.canvas];this.overlay = document.getElementById('overlay'); this.vignette = document.getElementById('vignette'); this.masks = MASK_IDS.map(id => document.getElementById(id)); // 固定引用避免每幀query整棵樹。
     this.extensions = [document.querySelector('.room-label'), document.getElementById('aim-stick')]; // 只有source已證兩個外伸子框。
-    this.allowedMutations = new Set(['hp-text', 'energy-text', 'room-name', 'chapter', 'room-status', 'boss-name', 'boss-move', 'tutorial-copy', 'loadout', 'toast', 'save-notice', 'build-label', 'warning-cue-text'].map(id => document.getElementById(id))); // 僅原正常文字更新不視為新遮罩。
+    this.allowedMutations = new Set(['hp-text', 'energy-text', 'room-name', 'chapter', 'room-status', 'boss-name', 'boss-move', 'tutorial-copy', 'loadout', 'toast', 'save-notice', 'build-label', 'warning-cue-text', 'combat-tip'].map(id => document.getElementById(id))); // 僅原正常文字更新不視為新遮罩。
     this.rootById = new Map(ROOT_IDS.map(id => [id, document.getElementById(id)])); // 同ID替換也不是原已核根，不可借舊引用漏遮罩。
     this.rootNodes = new Set([document.body, document.documentElement, ...ROOT_IDS.map(id => document.getElementById(id)), ...this.extensions]); // 固定可重驗樣式集合，不掃全DOM。
     this.nubs = new Set(['move-stick', 'aim-stick'].map(id => document.getElementById(id)?.querySelector?.('i')).filter(Boolean)); // 原搖桿只容許正常27px位移，不增加rect讀取。
@@ -53,7 +54,7 @@ export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA�
   } // 結束固定屬性白名單。
   consume(records, validating=false, snapshot=null) { // callback與present共用一次當前有限快照，最多32筆，不借延時追認。
     let changed = records.length > 32; if (changed) this.structureUncertain = true; const current = snapshot || this.inspectRoots(); // 超量仍永久拒；每批最多一次body快照，不按record倍增。
-    for (const record of records.slice(0, 32)) { // 固定資料工作上限。
+    for(let i=0;i<Math.min(records.length,32);i++){const record=records[i]; // 固定資料工作上限。
       if (record.target === this.document.head) { this.headChanged = true; changed = true; continue; } // head政策原文保留，連非繪製script也無例外。
       if (current.valid && current.auxiliaries.has(record.target) && ['attributes', 'childList'].includes(record.type)) continue; // 只當次驗得的直接body同根例外；未知後代或element子樹不會進集合。
       if (record.type === 'attributes') { if (this.rootNodes.has(record.target)) changed = true; else if (!this.attributeSafe(record) && !this.overlay.contains(record.target)) { this.structureUncertain = true; changed = true; } continue; } // 根樣式下次重驗，未知內層保守鎖住。
@@ -68,23 +69,25 @@ export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA�
   clear() { this.setKind('none'); if (this.element && this.element.style.visibility !== 'hidden') this.element.style.visibility = 'hidden'; } // 清舊語義且保留固定行高，避免反覆顯示改變遮罩尺寸。
   dispose() { this.disposed = true; this.observer?.disconnect(); this.clear(); } // pagehide後永不恢復。
   inspectRoots() { // 每次present或observer批次重新核原根與最多四附屬根，不跨幀用cache。
-    const rejected = () => ({ valid: false, auxiliaries: new Set() }); // 無可用快照不能把部分合格根當白名單。
-    try { // 新可見性讀取例外只抑制提示，不移除或修未知節點。
-      const roots = this.document.body.children, count = roots.length; if (this.headChanged || this.structureUncertain || !Number.isInteger(count) || count > CUE_UI_LIMITS.rootElements) return rejected(); // 先長度gate再有限迭代，不展開未知大樹。
-      const expected = new Set(ROOT_IDS), auxiliaries = new Set(); let scripts = 0; // 原12同identity及唯一boot完全保留。
-      for (let i = 0; i < count; i++) { const element = roots[i]; if (!element) return rejected(); if (element.tagName === 'SCRIPT' && element.getAttribute('type') === 'module' && element.getAttribute('src') === './boot.js') { scripts++; continue; } if (expected.has(element.id)) { if (this.rootById.get(element.id) !== element) return rejected(); expected.delete(element.id); continue; } if (auxiliaries.size >= CUE_UI_LIMITS.auxiliaryRoots || !auxiliaryKind(element, this.document, this.window)) return rejected(); auxiliaries.add(element); } // 只有同次兩形狀可附加，不接受重複ID或未知root。
-      return { valid: expected.size === 0 && scripts === 1 && this.masks.every(Boolean) && this.extensions.every(Boolean) && !!this.element && !!this.text && !!this.shape, auxiliaries }; // body16仍限制原13之外最多三根，不為四根放大總額。
-    } catch { return rejected(); } // API缺失或未知CSS/動畫/幾何計算失敗皆failclosed。
+    const snapshot=this.rootSnapshot;snapshot.valid=false;snapshot.auxiliaries.clear();
+    try {
+      const roots=this.document.body.children,count=roots.length;if(this.headChanged||this.structureUncertain||!Number.isInteger(count)||count>CUE_UI_LIMITS.rootElements)return snapshot;
+      let seen=0,scripts=0;
+      for(let i=0;i<count;i++){const element=roots[i];if(!element)return snapshot;if(element.tagName==='SCRIPT'&&element.getAttribute('type')==='module'&&element.getAttribute('src')==='./boot.js'){scripts++;continue;}const index=ROOT_IDS.indexOf(element.id);if(index>=0){const bit=1<<index;if(seen&bit||this.rootById.get(element.id)!==element)return snapshot;seen|=bit;continue;}if(snapshot.auxiliaries.size>=CUE_UI_LIMITS.auxiliaryRoots||!auxiliaryKind(element,this.document,this.window))return snapshot;snapshot.auxiliaries.add(element);}
+      snapshot.valid=seen===(1<<ROOT_IDS.length)-1&&scripts===1&&this.masks.every(Boolean)&&this.extensions.every(Boolean)&&!!this.element&&!!this.text&&!!this.shape;return snapshot;
+    }catch{return snapshot;}
+
   } // 當前快照只在同步呼叫內傳遞，不保存來源信任或歷史動畫狀態。
   rootsValid(snapshot) { this.dirty = false; this.rootsOkay = !this.headChanged && !this.structureUncertain && snapshot?.valid === true; return this.rootsOkay; } // 不再有跨present的dirty早退；既有永久旗標絕不清空。
   present(candidate, enabled) { // 在本幀HUD與main render之後同步完成，不排延時工作。
+    if(this.disposed||!enabled||this.document.hidden){this.clear();return;}
     let result = 'none', visible = false; // 統一在finally一次寫語義，避免同幀none再windup造成ARIA重播。
     try { // 提示計算錯誤可降級，不吞renderer錯誤。
       const snapshot = this.inspectRoots(); if (this.observer) this.consume(this.observer.takeRecords(), true, snapshot); // 同步吸收本幀HUD並只共用本次快照；下一present必重新核CSS/幾何/動畫。
       if (this.disposed || !enabled || this.document.hidden || !this.rootsValid(snapshot) || !this.observer || this.overlay.children.length || this.overlay.textContent.trim()) { this.clear(); return; } // overlay/hidden/未知根不播動態字。
-      const style = element => this.window.getComputedStyle(element); // 固定次數樣式讀取，非全DOM搜尋。
+      const style = this.style; // 固定次數樣式讀取，非全DOM搜尋。
       if (style(this.overlay).display !== 'none') { this.clear(); return; } // 空文字overlay也可能有背景，必須真正display:none才放行。
-      if ([this.document.documentElement, this.document.body, this.canvas].some(element => !shown(style(element)) || !plain(style(element)) || !effectsOkay(style(element)) || !noInline(element) || element.className)) { this.clear(); return; } // 全頁裁剪、透明、filter未知拒絕。
+      for(const element of this.primaryElements)if(!shown(style(element))||!plain(style(element))||!effectsOkay(style(element))||!noInline(element)||element.className){this.clear();return;} // 全頁裁剪、透明、filter未知拒絕。
       const vignette = style(this.vignette), gradient = vignette.backgroundImage?.replace(/\s+/g, ''); // 僅允許原exact裝飾，不能把任意覆蓋層列白名單。
       if (!shown(vignette) || !plain(vignette) || !effectsOkay(vignette) || !noInline(this.vignette) || this.vignette.className || !/^radial-gradient\((?:ellipse)?at55%40%,(?:rgba\(0,0,0,0\)|transparent)35%,(?:rgba\(7,16,11,0\.6\)|#07100b99)100%\)$/.test(gradient)) { this.clear(); return; } // 原最大alpha.6只保不完全遮去，不宣稱對比達標。
       if (this.element.style.visibility !== 'visible') this.element.style.visibility = 'visible'; visible = true; // 中性列占相同行高；本幀不合格也不保留上一招。

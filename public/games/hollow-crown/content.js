@@ -22,10 +22,24 @@ export const ROUTES = [
   { id: 'ivory', name: '象牙誓路', boss: 'arbiter', bossName: '象牙審判者', description: '橫移閃過長槍與散射，抓住審判後的空檔。' },
 ];
 export const DIFFICULTIES = [
-  { id: 'pilgrim', name: '行旅', description: '傷害降低 30%，反擊窗口較寬。', enemyDamage: .7, enemyHp: .9, parryWindow: .32 },
-  { id: 'standard', name: '守誓', description: '原始戰鬥節奏，靠讀招與距離取勝。', enemyDamage: 1, enemyHp: 1, parryWindow: .22 },
+  { id: 'pilgrim', name: '行旅', description: '傷害降低 30%，反擊窗口較寬；王座前搖 +20%、恢復 +15%、王座傷害另減 15%。', enemyDamage: .7, enemyHp: .9, parryWindow: .32, bossWindupMultiplier: 1.2, bossRecoveryMultiplier: 1.15, bossDamageMultiplier: .85 },
+  { id: 'standard', name: '守誓', description: '原始戰鬥節奏，靠讀招與距離取勝。', enemyDamage: 1, enemyHp: 1, parryWindow: .22, bossWindupMultiplier: 1, bossRecoveryMultiplier: 1, bossDamageMultiplier: 1 },
 ];
+const PILGRIMAGE_POOLS = [ROOMS.slice(0,4).map(r=>r.id),ROOMS.slice(4,8).map(r=>r.id),ROOMS.slice(8,12).map(r=>r.id)];
+export const CHAPTERS = ['初誓 · 守住餘火','交火 · 穿越灰燼','解封 · 王座之前'];
+export const chapterIndex = state => state?.challenge==='crown-pilgrimage' ? Math.min(2,Math.floor((state.roomIndex ?? state.roomsCleared)/4)) : state?.challenge==='long-watch-extended' ? Math.min(1,Math.floor((state.roomIndex ?? state.roomsCleared)/6)) : 0;
+export const chapterName = state => state?.challenge==='crown-pilgrimage' ? CHAPTERS[chapterIndex(state)] : `第 ${chapterIndex(state)+1} 幕`;
+export const OBJECTIVES = [
+ {kind:'clear'}, {kind:'clear'},
+ {kind:'beacons',chargeRequired:8}, {kind:'beacons',chargeRequired:8},
+ {kind:'crossfire',shape:'line'}, {kind:'crossfire',shape:'ring'},
+ {kind:'beacons',chargeRequired:8,shape:'line'}, {kind:'crossfire',shape:'circle'},
+ {kind:'seals',hp:60}, {kind:'seals',hp:60,shape:'ring'},
+ {kind:'beacons',chargeRequired:8,shape:'circle'}, {kind:'seals',hp:60,shape:'ring'},
+];
+export const objectiveInstruction = o => !o ? '清除守衛 → 選擇餘燼 → 前往王座' : o.kind==='beacons' ? '守住燈台：靠近 1.6m，自動點燃；先清除附近守衛' : o.kind==='seals' ? 'J 刺破兩枚方形封印，開路並迎戰增援' : o.kind==='crossfire'&&o.mastered ? '穿越交火，清除所有守衛' : o.shape==='ring' ? '外環：進入空心區' : o.shape==='circle' ? '圓形：離開圓心' : o.kind==='crossfire' ? '交火：橫移離開直線，利用柱掩護' : '清除所有守衛，前往下一道誓言';
 export const JOURNEYS = Object.freeze({
+  'crown-pilgrimage': {rooms:12,crowns:2,acts:3,pools:PILGRIMAGE_POOLS},
   'long-watch-extended': { rooms:12,crowns:2,acts:2 },
   'long-watch': { rooms:6,crowns:2,acts:1 },
   normal: { rooms:4,crowns:1,acts:1 },
@@ -34,9 +48,10 @@ export const JOURNEYS = Object.freeze({
   daily: { rooms:4,crowns:1,acts:1 },
 });
 export const journeyPlan = state => JOURNEYS[state?.challenge] || JOURNEYS.normal;
-export const roomPool = state => state?.challenge==='long-watch-extended' && state.roomsCleared>=6 ? ROOMS.slice(6) : ROOMS.slice(0,6);
+export const roomPool = state => state?.challenge==='crown-pilgrimage' ? ROOMS.filter(r=>PILGRIMAGE_POOLS[Math.min(2,Math.floor(state.roomsCleared/4))].includes(r.id)) : state?.challenge==='long-watch-extended' && state.roomsCleared>=6 ? ROOMS.slice(6) : ROOMS.slice(0,6);
 export const crownType = state => journeyPlan(state).crowns===2 ? (state.roomsCleared<=journeyPlan(state).rooms?'regent':'arbiter') : ROUTES.find(route=>route.id===state.route).boss;
 export const CHALLENGES = [
+  {id:'crown-pilgrimage',name:'餘燼巡禮 · 三章雙冠',description:'約 10–14 分鐘。十二戰場：守燈、交火、破封，再迎戰雙冠。六房與四房短旅仍可選。'},
   {id:'long-watch-extended',name:'餘燼長征 · 兩幕雙冠',description:'兩幕十二座不同戰場，第二幕混合增援，再迎戰兩位守衛。每房選擇餘燼，四格裝備隨路線調整。'},
   { id: 'long-watch', name: '雙冠遠征 · 六房短旅', description: '走過六個不同房間，依序擊敗熾燼攝政與象牙審判者。六房＋雙王的長程守誓。' },
   { id: 'normal', name: '歸還王冠', description: '自由選擇天賦，擊敗路線的王座守衛。' },
@@ -89,8 +104,8 @@ export const ENEMIES = {
     { id: 'crown-ring', name: '焚冠外環', shape: 'ring', radius: 8.2, innerRadius: 3.1, range: 8.2, windup: 1.55, recover: 1.8, damage: 29 },
   ] },
   arbiter: { name: '象牙審判者', hp: 1150, speed: 1.65, radius: .86, reach: 5, damage: 26, windup: .95, recover: 1.3, material: 'armor', boss: true, moves: [
-    { id: 'sentence', name: '裁決直刺', shape: 'line', range: 8.5, width: 1.25, windup: .95, recover: 1.15, damage: 28 },
-    { id: 'edict', name: '三重敕令', shape: 'line', range: 13, width: .55, windup: 1.3, recover: 1.4, damage: 20, projectiles: 3 },
-    { id: 'pale-verdict', name: '蒼白終審', shape: 'circle', radius: 4.2, range: 4.2, windup: 1.45, recover: 1.65, damage: 32 },
+    { id: 'sentence', name: '裁決直刺', shape: 'line', range: 8.5, width: 1.25, windup: 1.2, recover: 1.4, damage: 28 },
+    { id: 'edict', name: '三重敕令', shape: 'line', range: 13, width: .55, windup: 1.3, recover: 1.65, damage: 20, projectiles: 3 },
+    { id: 'pale-verdict', name: '蒼白終審', shape: 'circle', radius: 4.2, range: 4.2, windup: 1.45, recover: 1.9, damage: 32 },
   ] },
 };

@@ -1,7 +1,7 @@
 // Targeted visual assertions; the boss checkpoint is an offline fixture, not victory evidence.
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
-import {createRun,startTutorial,step,chooseReward,chooseStory,enterRoom,checkpoint} from '../../public/games/hollow-crown/rules.js';
+import {createRun,createObjective,startTutorial,step,chooseReward,chooseStory,enterRoom,checkpoint} from '../../public/games/hollow-crown/rules.js';
 import {freshProfile} from '../../public/games/hollow-crown/storage.js';
 import {installPilot} from './browser-pilot.js';
 import {origin,url,artifact,harness} from './test-config.mjs';
@@ -33,11 +33,11 @@ try{
   for(const width of [1280,1920]){
     await page.setViewportSize({width,height:width*9/16});await load(startTutorial());await page.waitForTimeout(30000);const m=await page.evaluate(()=>hollowCrownDiagnostics.metrics());assert.ok(m.render.drawingBuffer[0]>=768);assert.ok(m.render.drawingBuffer[1]>=432);report.adapted.push({width,...m});await shot('adapted-'+width);
   }
-  const tour=createRun({seed:72,challenge:'long-watch-extended',difficulty:'pilgrim'});report.rooms=[];
+  const tour=createRun({seed:72,challenge:'crown-pilgrimage',difficulty:'pilgrim'});report.rooms=[];
   for(let i=0;i<14;i++){
-    await load(tour);report.rooms.push({id:tour.room.id,index:i,render:await page.evaluate(()=>hollowCrownDiagnostics.metrics().render)});await shot('room-'+String(i+1).padStart(2,'0')+'-'+tour.room.id);
+    await load(tour);if(tour.objective?.attack)await page.waitForFunction(()=>hollowCrownDiagnostics.snapshot().run.objective?.phase==='telegraph',null,{timeout:15000});report.rooms.push({id:tour.room.id,index:i,render:await page.evaluate(()=>hollowCrownDiagnostics.metrics().render)});await shot('room-'+String(i+1).padStart(2,'0')+'-'+tour.room.id);if(tour.objective?.kind!=='clear'){for(const width of [1280,1920]){await page.setViewportSize({width,height:width*9/16});await shot(`mechanic-${i+1}-${tour.objective?.kind||'boss'}-${width}`);}}
     if(i===0){await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);assert.ok(await page.locator('#journey').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth;}));await shot('journey-mobile');await page.setViewportSize({width:1920,height:1080});}
-    for(const enemy of tour.enemies)enemy.hp=0;tour.pendingWaves=[];step(tour,{},.02);
+    for(const enemy of tour.enemies)enemy.hp=0;tour.pendingWaves=[];if(tour.objective){for(const t of tour.objective.targets){t.done=true;t.hp=0;t.progress=tour.objective.chargeRequired;}tour.objective.completed=tour.objective.targets.length;}step(tour,{},.02);
     if(tour.phase==='result')break;
     if(tour.story)chooseStory(tour,tour.story.choices[0].id);
     if(i===3){await load(tour);await shot('reward-comparison');const card=page.locator('[data-action="reward"]').first();await card.click();}

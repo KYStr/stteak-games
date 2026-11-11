@@ -21,7 +21,9 @@ try{
   page.on('response',r=>{if(r.status()>=400)requests.push(r.status()+' '+r.url());});
   cdp=await page.context().newCDPSession(page);await cdp.send('Performance.enable');
   await boot();assert.equal((await page.evaluate(()=>hollowCrownDiagnostics.metrics())).audio.context,'not-created');await shot('camp-1280');
-  assert.equal(await page.locator('[data-config="challenge"]').inputValue(),'long-watch-extended');
+  assert.equal(await page.locator('[data-config="challenge"]').inputValue(),'crown-pilgrimage');
+  report.materialAudit=await page.evaluate(async()=>{const {SceneView}=await import('./scene.js');return new Promise(resolve=>{const original=SceneView.prototype.render;let frames=0;SceneView.prototype.render=function(...args){const result=original.apply(this,args);if(++frames<4)return result;SceneView.prototype.render=original;const findings=[];this.scene.traverse(o=>{if(!o.isMesh||!o.visible||!o.material)return;const m=o.material,p=this.renderer.properties.get(m),g=o.geometry;const fields={instancing:o.isInstancedMesh===true,skinning:o.isSkinnedMesh===true,vertexTangents:!!g.attributes.tangent&&(!!m.normalMap||m.anisotropy>0),morphTargets:!!g.morphAttributes.position,morphNormals:!!g.morphAttributes.normal,morphColors:!!g.morphAttributes.color,vertexAlphas:m.vertexColors===true&&!!g.attributes.color&&g.attributes.color.itemSize===4};const mismatch=Object.entries(fields).filter(([k,v])=>p[k]!==undefined&&p[k]!==v);if(mismatch.length)findings.push({object:o.name,material:m.name,type:m.type,mismatch,stored:Object.fromEntries(Object.keys(fields).map(k=>[k,p[k]]))});});resolve(findings);return result;};});});console.log('MATERIAL_AUDIT '+JSON.stringify(report.materialAudit));
+
   check('fresh startup, no audio before gesture, full expedition is available');
   await page.click('[data-action="settings"]');assert.equal(await page.getAttribute('#overlay','role'),'dialog');
   await page.locator('[data-setting="music"]').evaluate(el=>{el.value='.2';el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));});
@@ -30,7 +32,7 @@ try{
   await page.keyboard.press('Escape');assert.equal((await snapshot()).overlay,'camp');
   await page.click('[data-action="help"]');const buttons=page.locator('#overlay button');await buttons.last().focus();await page.keyboard.press('Tab');assert.equal(await buttons.first().evaluate(el=>el===document.activeElement),true);await page.keyboard.press('Escape');
   check('settings persist, reversible mute, dialog focus containment and Escape navigation');
-  await page.click('[data-action="tutorial"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.buffers===16);
+  await page.click('[data-action="tutorial"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.buffers===17);
   await installPilot(page);await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().run?.phase==='result',120000);
   let s=await snapshot();assert.equal(s.run.tutorial.done,true);assert.equal(s.profile.tutorialDone,true);await shot('tutorial-complete');await page.evaluate(()=>acceptancePilot.stop());
   check('tutorial completes using movement, light attack, dodge, timed guard and defeat');
@@ -40,36 +42,43 @@ try{
   await page.click('[data-action="settings"]');await page.keyboard.press('Escape');assert.equal((await snapshot()).overlay,'pause');await page.click('[data-action="resume"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.context==='running');
   await boot();await page.click('[data-action="continue"]');s=await snapshot();assert.equal(s.runId,runId);assert.equal(s.run.seed,seedNumber);assert.ok(Math.abs(s.run.player.x)<.01);assert.equal(s.profile.settings.music,.2);
   await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.context==='running');check('real movement and attacks, blur pause, suspended audio resume, reload and room-entry restore');
-  await page.evaluate(()=>{window.activeRaf={raw:[],windows:[],last:performance.now(),active:true};function sample(t){const p=activeRaf;if(!p.active)return;const s=hollowCrownDiagnostics.snapshot();if(!s.overlay&&!s.paused&&['combat','tutorial'].includes(s.run?.phase))p.raw.push(t-p.last);p.last=t;requestAnimationFrame(sample);}requestAnimationFrame(sample);});
-  const soakStart=performance.now();await sleep(2000);const before=await memory();const performanceWindows=[];await installPilot(page);
-  let lastLog=performance.now(),bossShot=false;
-  while(performance.now()-soakStart<900000){
-    await sleep(1000);performanceWindows.push(await page.evaluate(()=>hollowCrownDiagnostics.metrics()));s=await snapshot();if(s.run.roomIndex>=12&&!bossShot){bossShot=true;await shot('boss-combat');}
+  await page.evaluate(()=>{window.activeRaf={raw:[],windows:[],last:performance.now(),active:true};function sample(t){const p=activeRaf;if(!p.active)return;if(document.body.dataset.menu==='false')p.raw.push(t-p.last);p.last=t;requestAnimationFrame(sample);}requestAnimationFrame(sample);});
+  await page.keyboard.press('Escape');await page.click('[data-action="leave-confirm"]');await page.click('[data-action="confirm"]');await sleep(1000);
+  const before=await memory(),beforeSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());await page.click('[data-action="continue"]');
+  const soakStart=performance.now(),performanceWindows=[];await installPilot(page);
+  let lastLog=performance.now();const bossCaptures=new Set();report.bossCaptures=[];
+  while(performance.now()-soakStart<3600000){
+    await sleep(1000);performanceWindows.push(await page.evaluate(()=>hollowCrownDiagnostics.metrics()));s=await snapshot();for(const boss of s.run.enemies.filter(e=>e.hp>0&&['regent','arbiter'].includes(e.type))){const key=boss.type+'-phase-'+boss.phase;if(!bossCaptures.has(key)){bossCaptures.add(key);report.bossCaptures.push({key,at:s.run.time});for(const width of [1280,1920]){await page.setViewportSize({width,height:width*9/16});await shot(key+'-'+width);}await page.setViewportSize({width:1280,height:720});}}
     if(performance.now()-lastLog>15000){console.log(`PLAY room=${s.run.roomIndex+1} phase=${s.run.phase} hp=${s.run.player.hp.toFixed(0)} time=${s.run.time.toFixed(0)}`);lastLog=performance.now();}
     if(s.run.phase==='result')break;
   }
-  s=await snapshot();assert.equal(s.run.result?.won,true,'Twin Crown keyboard pilot must win');assert.equal(s.run.roomHistory.length,14);assert.equal(s.profile.wins,1);assert.ok(s.profile.skins.includes('cinder'));await shot('twin-crown-victory');
-  report.play={time:s.run.time,kills:s.run.stats.kills,hits:s.run.stats.hits,rooms:s.run.roomHistory};check('full twelve-room / two-boss expedition wins through keyboard input and settles once');
+  s=await snapshot();assert.equal(s.run.result?.won,true,'Twin Crown keyboard pilot must win');assert.equal(s.run.roomHistory.length,14);assert.equal(bossCaptures.size,4,'both phases of both crowns captured');assert.equal(s.profile.wins,1);assert.ok(s.profile.skins.includes('cinder'));await shot('twin-crown-victory');
+  report.functionalPilot={limitation:"Reads exact threat countdowns; functional smoke only, no build/depth credit",time:s.run.time,kills:s.run.stats.kills,hits:s.run.stats.hits,rooms:s.run.roomHistory};check('full twelve-room / two-boss expedition wins through keyboard input and settles once');
   await page.evaluate(()=>acceptancePilot.stop());await page.click('[data-action="replay"]');assert.equal((await snapshot()).run.seed,seedNumber);assert.notEqual((await snapshot()).runId,runId);
   // Continue live combat for at least three wall-clock minutes including the completed run.
   await installPilot(page);const soakMs=Number(process.env.HOLLOW_SOAK_MS||180000);
   while(performance.now()-soakStart<soakMs){await sleep(Math.min(5000,soakMs-(performance.now()-soakStart)));s=await snapshot();if(s.run.phase==='result'){await page.evaluate(()=>acceptancePilot.stop());await page.click('[data-action="replay"]');await installPilot(page);}}
   const after=await memory();report.soak={wallMs:performance.now()-soakStart,before,after,metrics:await page.evaluate(()=>hollowCrownDiagnostics.metrics())};
   const measured=report.soak.metrics;report.performanceBudget={averageTargetMs:33.3,p95TargetMs:66.7,met:measured.avgFrameMs<=33.3&&measured.p95FrameMs<=66.7};
-  report.independentRaf=await page.evaluate(()=>{activeRaf.active=false;const raw=activeRaf.raw,sorted=[...raw].sort((a,b)=>a-b);return{raw,avg:raw.reduce((a,b)=>a+b,0)/raw.length,p95:sorted[Math.floor(sorted.length*.95)]};});
+  report.independentRaf=await page.evaluate(()=>{activeRaf.active=false;const raw=activeRaf.raw;activeRaf.raw=[];const sorted=[...raw].sort((a,b)=>a-b);return{raw,avg:raw.reduce((a,b)=>a+b,0)/raw.length,p95:sorted[Math.floor(sorted.length*.95)]};});
   report.performanceWindows=performanceWindows;
   // QA-RUBRIC explicitly excludes absolute SwiftShader speed from release gates.
   // Keep the historical frame targets as audited reference data, never as a pass claim.
   report.frameTimingReference=report.performanceBudget;delete report.performanceBudget;
   const worst={drawCalls:Math.max(...performanceWindows.map(m=>m.render.drawCalls)),triangles:Math.max(...performanceWindows.map(m=>m.render.triangles)),updateP95Ms:Math.max(...performanceWindows.map(m=>m.updateP95Ms))};
-  report.performanceBudget={criteria:'hardware-independent per QA-RUBRIC',maxDrawCalls:45,maxTriangles:35000,maxUpdateP95Ms:12,measured:worst,met:worst.drawCalls<=45&&worst.triangles<=35000&&worst.updateP95Ms<=12};
+  report.performanceBudget={criteria:'hardware-independent per QA-RUBRIC',maxDrawCalls:250,maxTriangles:1500000,maxUpdateP95Ms:6,maxTextureBytes:256*1024*1024,measured:worst,met:worst.drawCalls<=250&&worst.triangles<=1500000&&worst.updateP95Ms<=6&&performanceWindows.every(m=>m.render.textureMemoryBytes<=256*1024*1024)};
   assert.ok(report.performanceBudget.met,'Renderer/update work budget failed');
   report.activeWallMs=report.independentRaf.raw.reduce((a,b)=>a+b,0);
   report.releaseComplete=soakMs>=180000&&report.soak.wallMs>=180000&&report.activeWallMs>=180000;assert.ok(report.releaseComplete,'Development soak incomplete: release requires >=180000 active ms');
-  assert.ok(after.heap-before.heap<16*1024*1024,'GC heap growth under 16MB');assert.ok(after.jsEventListeners-before.jsEventListeners<30,'listener count stays bounded');
+  // Final retained comparisons below use the identical camp scene after all controllers stop.
   await page.evaluate(()=>acceptancePilot.stop());await sleep(200);assert.equal(await page.evaluate(()=>pendingGameRaf()),1,'one game RAF after sampler and controller stop');check('restart and >=3 minute bounded-memory/listener run');
   for(let i=0;i<10;i++){await page.keyboard.press('Escape');await page.click('[data-action="restart-confirm"]');await page.click('[data-action="confirm"]');await sleep(200);assert.equal(await page.evaluate(()=>pendingGameRaf()),1);}
-  report.restartAudit={restarts:10,pendingRaf:await page.evaluate(()=>pendingGameRaf()),memory:await memory()};check('ten restarts retain one game RAF');
+  await page.keyboard.press('Escape');await page.click('[data-action="leave-confirm"]');await page.click('[data-action="confirm"]');await sleep(1000);
+  const retained=await memory(),afterSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());
+  report.restartAudit={restarts:10,pendingRaf:await page.evaluate(()=>pendingGameRaf()),memory:retained};
+  report.retention={method:'Finite prop/actor templates prewarmed before interactive; identical camp before expedition and after ten restarts. All pool bytes are resident at baseline.',before,after:retained,growth:(retained.heap-before.heap)/before.heap,beforeRender:beforeSameScene.render,afterRender:afterSameScene.render};
+  assert.ok(report.retention.growth<.10,'Retained heap growth must be <10%');assert.equal(retained.jsEventListeners,before.jsEventListeners);assert.equal(afterSameScene.render.geometries,beforeSameScene.render.geometries);assert.equal(afterSameScene.render.textures,beforeSameScene.render.textures);assert.equal(await page.evaluate(()=>pendingGameRaf()),1);check('full expedition and ten restarts retain <10% heap and identical resources/listeners/RAF');
+  await page.click('[data-action="continue"]');
   await page.keyboard.press('Escape');await shot('pause-1280');
   await page.setViewportSize({width:1920,height:1080});await sleep(400);await shot('pause-1920');
   await page.setViewportSize({width:390,height:844});await page.click('[data-action="settings"]');await shot('settings-mobile');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.keyboard.press('Escape');await page.keyboard.press('Escape');

@@ -21,18 +21,19 @@ export async function installPilot(page) {
       }
       if(lastRoom!==s.room.id+':'+s.roomIndex){lastRoom=s.room.id+':'+s.roomIndex;pilot.rooms.push({id:s.room.id,index:s.roomIndex});path=[];pathAge=0;release();}
       const dt=Math.max(0,Math.min(.15,s.time-lastTime));lastTime=s.time;pathAge-=dt;
-      const p=s.player,enemies=s.enemies.filter(e=>e.hp>0).sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z)),target=enemies[0];
+      const p=s.player,enemies=s.enemies.filter(e=>e.hp>0).sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z)),target=enemies[0]||s.objective?.targets?.filter(t=>!t.done).map(t=>({...t,type:s.objective.kind==='seals'?'seal':'beacon',radius:.65,id:t.id})).sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];
       if(!target){release();return;}
       const dx=target.x-p.x,dz=target.z-p.z,d=Math.hypot(dx,dz)||1;
       let mx=dx/d,mz=dz/d,attack=false,block=false,dodge=false,charge=false;
-      const desired=s.tutorial?.step===3?1.35:target.type==='shield'?3.3:['regent','arbiter'].includes(target.type)?3.5:target.type==='spear'?2.8:2.65;
+      const desired=target.type==='beacon'?0:target.type==='seal'?2.4:s.tutorial?.step===3?1.35:target.type==='shield'?3.3:['regent','arbiter'].includes(target.type)?3.5:target.type==='spear'?2.8:2.65;
       if(d<desired-.2){mx=-mx;mz=-mz;}else if(d<desired+.18){mx=0;mz=0;}
-      if(!lineClear(s.room,p.x,p.z,target.x,target.z,p.radius+.05)){
-        if(pathAge<=0||!path.length){path=findPath(s.room,p,target,p.radius);pathAge=.4;}
+      const goal=target.type==='seal'?{x:target.x-dx/d*2.4,z:target.z-dz/d*2.4}:target;if(!lineClear(s.room,p.x,p.z,goal.x,goal.z,p.radius+.05)){
+        if(pathAge<=0||!path.length){path=findPath(s.room,p,goal,p.radius);pathAge=.4;}
         while(path.length>1&&Math.hypot(path[0].x-p.x,path[0].z-p.z)<.4)path.shift();
         if(path[0]){const n=Math.hypot(path[0].x-p.x,path[0].z-p.z)||1;mx=(path[0].x-p.x)/n;mz=(path[0].z-p.z)/n;}
       }
-      const threats=enemies.filter(e=>e.attack&&['telegraph','attack'].includes(e.state)&&e.timer<.48&&shapeHits(e.attack,p,p.radius+.25));
+      const visibleWarnings=enemies.slice();if(s.objective?.attack&&['telegraph','attack'].includes(s.objective.phase))visibleWarnings.push({id:'hazard',type:'hazard',x:s.objective.attack.x,z:s.objective.attack.z,attack:s.objective.attack,state:s.objective.phase,timer:s.objective.timer});
+      const threats=visibleWarnings.filter(e=>e.attack&&['telegraph','attack'].includes(e.state)&&e.timer<.48&&shapeHits(e.attack,p,p.radius+.25));
       if(threats.length){const threat=threats[0],blockable=['soldier','spear','shield','royal-sweep','sentence'].includes(threat.attack.source);
         if(blockable&&threat.timer<.24&&threats.length===1&&p.actionTime<.05){block=true;mx=0;mz=0;}
         else if(p.energy>=s.modifiers.dodgeCost&&p.action!=='dodge'&&threat.timer<.24){
@@ -42,7 +43,7 @@ export async function installPilot(page) {
           }if(best){mx=best.x;mz=best.z;dodge=true;}
         }
       }
-      if(!dodge&&!block&&!threats.length){
+      if(!dodge&&!block&&!threats.length&&target.type!=='beacon'){
         if(target.type==='shield'&&target.shieldBroken<=0){charge=d<4.5&&(held.has('KeyJ')||p.cooldown<=0);if(p.heldTime>=.82)charge=false;}
         else if(d<3.3+target.radius&&p.cooldown<=0)attack=true;
       }

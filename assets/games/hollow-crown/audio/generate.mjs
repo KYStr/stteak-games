@@ -18,7 +18,7 @@ for(const [id,notes] of Object.entries(themes)){
     a[i]=(drone+chime+bass+bell)*swell;
   }await save(id,a,'music');
 }
-const cues={light:[.16,380,130,'air'],charge:[.65,110,440,'tone'],hit:[.2,170,50,'flesh'],metal:[.32,1100,300,'metal'],stone:[.2,230,60,'stone'],hurt:[.35,200,70,'flesh'],parry:[.45,650,1400,'metal'],dodge:[.2,200,90,'air'],death:[.7,190,40,'tone'],win:[1.4,330,660,'tone'],loss:[1,180,55,'tone'],ui:[.09,660,880,'tone'],warning:[.25,330,220,'metal']};
+const cues={light:[.16,380,130,'air'],charge:[.65,110,440,'tone'],hit:[.2,170,50,'flesh'],metal:[.32,1100,300,'metal'],stone:[.2,230,60,'stone'],hurt:[.35,200,70,'flesh'],parry:[.45,650,1400,'metal'],dodge:[.2,200,90,'air'],death:[.7,190,40,'tone'],win:[1.4,330,660,'tone'],loss:[1,180,55,'tone'],ui:[.09,660,880,'tone'],warning:[.25,330,220,'metal'],guard:[.09,780,350,'metal']};
 for(const [id,[duration,f0,f1,kind]] of Object.entries(cues)){
  const a=new Float32Array(Math.floor(rate*duration));let phase=0;for(let i=0;i<a.length;i++){const t=i/rate,u=t/duration,env=Math.min(1,t/.008)*Math.pow(1-u,2),f=f0+(f1-f0)*u;phase+=TWO*f/rate;const n=noise();a[i]=env*.28*(kind==='air'?n*.55:kind==='flesh'?.5*n+.5*Math.sin(phase):kind==='stone'?.6*n+.25*Math.sin(phase):kind==='metal'?.5*Math.sin(phase)+.3*Math.sin(phase*2.76)+.2*n:Math.sin(phase)+.15*Math.sin(phase*2));}await save(id,a,'sound');
 }

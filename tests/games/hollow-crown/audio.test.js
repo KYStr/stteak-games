@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Soundscape } from '../../../public/games/hollow-crown/audio.js';
+import { Soundscape, FILES } from '../../../public/games/hollow-crown/audio.js';
 
 const settings = { music: .5, effects: .7 };
 const deferred = () => {
@@ -74,7 +74,7 @@ for (const stage of ['fetch', 'body', 'decode']) {
   test(`dispose during delayed ${stage} prevents late buffer publication or music`, async () => environment(async ({ sound, requests, bodies, decodes, sources, errors }) => {
     const unlocking = sound.unlock(); await settle();
     const pending = stage === 'fetch' ? requests : stage === 'body' ? bodies : decodes;
-    assert.equal(pending.length, 16, 'all audio files reached the controlled delay');
+    assert.equal(pending.length, FILES.length, 'all audio files reached the controlled delay');
     sound.dispose();
     let lateThemeCalls = 0; sound.playTheme = () => { lateThemeCalls++; };
     for (const item of pending) item.gate.resolve(stage === 'fetch' ? item.response : { name: item.name ?? item.bytes.name });
@@ -93,7 +93,7 @@ for (const stage of ['fetch', 'decode']) {
   test(`dispose suppresses a late ${stage} failure notification`, async () => environment(async ({ sound, requests, decodes, errors }) => {
     const unlocking = sound.unlock(); await settle();
     const pending = stage === 'fetch' ? requests : decodes;
-    assert.equal(pending.length, 16);
+    assert.equal(pending.length, FILES.length);
     sound.dispose();
     for (const item of pending) item.gate.reject(new Error(`delayed ${stage} failure`));
     await unlocking;
@@ -105,8 +105,8 @@ for (const stage of ['fetch', 'decode']) {
 
 test('successful concurrent unlocks load once, keep one music track and cap effects at twelve', async () => environment(async ({ sound, requests, sources, errors }) => {
   await Promise.all([sound.unlock(), sound.unlock(), sound.unlock()]);
-  assert.equal(requests.length, 16);
-  assert.equal(sound.metrics().buffers, 16);
+  assert.equal(requests.length, FILES.length);
+  assert.equal(sound.metrics().buffers, FILES.length);
   assert.equal(sound.metrics().musicTracks, 1);
   for (let i = 0; i < 20; i++) sound.cue('light');
   assert.equal(sound.metrics().voices, 12);
@@ -126,7 +126,7 @@ test('pause while decoding permits caching but never starts music until explicit
   const unlocking = sound.unlock(); await settle(); sound.pause();
   for (const { gate, bytes } of decodes) gate.resolve({ name: bytes.name });
   await unlocking;
-  assert.equal(sound.active, false); assert.equal(sound.metrics().buffers, 16); assert.equal(sources.length, 0);
+  assert.equal(sound.active, false); assert.equal(sound.metrics().buffers, FILES.length); assert.equal(sources.length, 0);
   await sound.resume(); assert.equal(sound.metrics().musicTracks, 1);
 }, { decode: true }));
 
@@ -144,7 +144,7 @@ test('a later explicit unlock survives an older cancelled unlock completing out 
   assert.equal(sound.active, true); assert.equal(sound.metrics().musicTracks, 1);
   resumes[0].resolve(); await older;
   assert.equal(sound.active, true); assert.equal(sound.track, track);
-  assert.equal(requests.length, 16); assert.equal(sources.length, 1);
+  assert.equal(requests.length, FILES.length); assert.equal(sources.length, 1);
 }, { resume: true }));
 
 test('explicit resume stays inactive when rejected, and a pending resume cannot defeat a later pause', async () => environment(async ({ sound, resumes, sources }) => {
