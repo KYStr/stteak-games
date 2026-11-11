@@ -60,3 +60,5 @@
 @media(max-height:480px){#finish-school{top:245px;left:18px;padding:8px 12px}}
 
 .reduced-motion #race-event.show{animation:none;opacity:1}
+
+#tour-launch{width:100%;margin:10px 0}.tour-seed{display:flex;align-items:center;gap:12px;font-size:12px}.tour-seed input{width:145px;background:#152335;color:#d9ffef;border:1px solid #607886;padding:7px}#control-state{position:fixed;bottom:18px;left:50%;color:#b5ffd9;font-size:12px;z-index:4;pointer-events:none}

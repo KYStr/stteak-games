@@ -1,30 +1,38 @@
-import { TRACKS,CARS,PRACTICE_TRACK,FIXED_DT,PHYSICS_VERSION,TRACK_VERSION,sampleTrack,roadStatus } from './content.js';
+import { TRACKS,CARS,PRACTICE_TRACK,FIXED_DT,PHYSICS_VERSION,TRACK_VERSION,sampleTrack,sampleTrackInto,roadStatusInto,resolveTourTrack } from './content.js';
 
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 const angle=v=>Math.atan2(Math.sin(v),Math.cos(v));
 const round=v=>Math.round(v*10000)/10000;
 const finite=(v,fallback=0)=>Number.isFinite(v)?v:fallback;
+const histories=new WeakMap();
+const scratch=new WeakMap(),validatedGhosts=new WeakSet(),ghostPoses=new WeakMap();
+const driftReasons=['','乾淨漂移 ×1 · 放開手煞車、反打出彎','乾淨漂移 ×2 · 放開手煞車、反打出彎','乾淨漂移 ×3 · 放開手煞車、反打出彎','乾淨漂移 ×4 · 放開手煞車、反打出彎'];
 const neutral={throttle:0,brake:0,steer:0,handbrake:false};
 
 /** The presentation layer calls this with frame dt. All gameplay runs at exactly 120 Hz. */
-export function createRace({trackId='harbor',carId='comet',mode='time',sensitivity=1,ghost=null,seed=1337}={}) {
-  const track=mode==='tutorial'?PRACTICE_TRACK:TRACKS.find(t=>t.id===trackId)||TRACKS[0],car=CARS.find(c=>c.id===carId)||CARS[0];
-  const state={track,car,trackId:track.id,carId:car.id,mode:['time','drift','tutorial'].includes(mode)?mode:'time',sensitivity:clamp(sensitivity,0,2),seed,
+export function createRace({trackId='harbor',carId='comet',mode='time',sensitivity=1,ghost=null,seed=1337,track:resolvedTrack=null}={}) {
+  const track=resolvedTrack||(mode==='tutorial'?PRACTICE_TRACK:TRACKS.find(t=>t.id===trackId)||TRACKS[0]),car=CARS.find(c=>c.id===carId)||CARS[0];
+  const history={samples:packed(7000,[[0,0,0,0,0]]),inputs:packed(40000,[])};
+  let state={track,car,trackId:track.id,carId:car.id,mode:['time','drift','tutorial'].includes(mode)?mode:'time',sensitivity:clamp(sensitivity,0,2),seed,layoutId:track.layoutId||`${track.id}:original:v1`,
     s:0,lateral:0,yaw:0,velocityYaw:0,speed:0,steer:0,x:0,y:0,z:0,heading:0,pitch:0,
     elapsed:0,countdown:3,lap:1,lapTime:0,lapStart:0,lapTimes:[],nextCheckpoint:1,checkpointCount:0,
     lastLegalS:0,lastLegalCheckpoint:0,score:0,pendingScore:0,combo:1,driftTime:0,drifting:false,driftAngle:0,
-    cleanDriftTime:0,reason:'起跑準備',finished:false,result:null,ghostSamples:[[0,0,0,0,0]],ghostInputs:[],completedGhost:null,
-    bestLap:Infinity,ghost:validGhost(ghost,track.id)?ghost:null,ghostTime:0,sectors:[],lapSectors:[],checkpointTimes:[],
+    cleanDriftTime:0,reason:'起跑準備',finished:false,result:null,get ghostSamples(){return history.samples.rows();},set ghostSamples(rows){history.samples.load(rows);},get ghostInputs(){return history.inputs.rows();},set ghostInputs(rows){history.inputs.load(rows);},completedGhost:null,
+    bestLap:Infinity,ghost:validGhost(ghost,track.id,track.layoutId)?ghost:null,ghostTime:0,sectors:[],lapSectors:[],checkpointTimes:[],
     penalty:0,timeRemaining:mode==='tutorial'?90:120,collisions:0,resets:0,wallCooldown:0,offTrackTime:0,
     wrongWayTime:0,lastEvent:null,eventId:0,ticks:0,lapTicks:0,accumulator:0,forwardProgress:0,scoredProgress:0,
     tutorial:{accelerate:false,entry:false,control:false,exit:false,recover:false},driftRelease:0,lapInvalid:false,
   };
-  updatePose(state);return state;
+  // Descriptor construction keeps numeric fields in fast storage in V8 even with enumerable history accessors.
+  // This runs once per race; it avoids boxing every numeric assignment in the fixed-tick loop.
+  state=Object.create(Object.prototype,Object.getOwnPropertyDescriptors(state));
+  histories.set(state,history);
+  scratch.set(state,{p:{},next:{},pose:{},road:{}});updatePose(state);return state;
 }
 
 function event(state,type,text) {state.lastEvent={id:++state.eventId,type,text,time:state.elapsed};}
 function updatePose(state) {
-  const p=sampleTrack(state.track,state.s);
+  const p=sampleTrackInto(state.track,state.s,scratch.get(state).pose);
   state.x=p.x+Math.cos(p.heading)*state.lateral;state.y=p.y;state.z=p.z-Math.sin(p.heading)*state.lateral;
   state.heading=p.heading+state.yaw;state.pitch=Math.atan(p.slope);return p;
 }
@@ -44,12 +52,13 @@ function medalFor(state,value) {
 function finish(state,success=true) {
   bankDrift(state);state.finished=true;state.speed=0;state.drifting=false;
   const tutorialDone=Object.values(state.tutorial).every(Boolean);
+  const completed=success&&(state.mode==='tutorial'?tutorialDone:state.mode==='drift'?Math.floor(state.score)>=state.track.medals.drift[2]:true);
   state.result={mode:state.mode,trackId:state.trackId,carId:state.carId,time:round(state.elapsed),score:Math.floor(state.score),
     medal:state.mode==='tutorial'?(tutorialDone?'bronze':'none'):medalFor(state,state.mode==='time'?state.elapsed:state.score),
-    success:success&&(state.mode!=='tutorial'||tutorialDone),lapTimes:[...state.lapTimes],bestLap:Number.isFinite(state.bestLap)?state.bestLap:null,
+    success:completed,lapTimes:[...state.lapTimes],bestLap:Number.isFinite(state.bestLap)?state.bestLap:null,
     penalty:state.penalty,collisions:state.collisions,resets:state.resets,sectors:state.sectors.map(x=>({...x})),
-    tutorial:{...state.tutorial},physicsVersion:PHYSICS_VERSION,trackVersion:TRACK_VERSION,seed:state.seed};
-  state.reason=state.mode==='tutorial'?(tutorialDone?'教學完成 · 準備挑戰雙圈！':'練習時間到 · 可再練習未完成項目'):success?'挑戰完成':'超時 · 下次提早煞車，保住出彎速度';
+    tutorial:{...state.tutorial},physicsVersion:PHYSICS_VERSION,trackVersion:TRACK_VERSION,seed:state.seed,layoutId:state.layoutId,activeSeconds:round(state.elapsed-state.penalty)};
+  state.reason=state.mode==='tutorial'?(tutorialDone?'教學完成 · 準備挑戰雙圈！':'練習時間到 · 可再練習未完成項目'):completed?'挑戰完成':state.mode==='drift'?`漂移目標未達 · ${Math.floor(state.score)} / ${state.track.medals.drift[2]} 分`:'超時 · 下次提早煞車，保住出彎速度';
   event(state,'finish',state.reason);
 }
 /** Complete the school early only after every driving task has been earned. */
@@ -61,12 +70,12 @@ function recordLap(state) {
   const time=round(state.elapsed-state.lapStart);
   if(state.lapInvalid){state.reason='漏過檢查點，本圈無效';return;}
   const end=[time,round(((state.s%state.track.length)+state.track.length)%state.track.length),round(state.lateral),round(state.yaw),round(state.speed)];
-  if(state.ghostSamples.at(-1)?.[0]!==time)state.ghostSamples.push(end);
+  if(state.ghostSamples.at(-1)?.[0]!==time)histories.get(state).samples.append(...end);
   state.lapTimes.push(time);state.sectors.push(...state.lapSectors.map((duration,index)=>({lap:state.lap,sector:index+1,time:round(duration)})));
   if(time<state.bestLap) {
     state.bestLap=time;
     state.completedGhost={schemaVersion:1,physicsVersion:PHYSICS_VERSION,trackVersion:TRACK_VERSION,trackId:state.trackId,
-      carId:state.carId,seed:state.seed,fixedDt:FIXED_DT,time,samples:state.ghostSamples.map(p=>[...p]),
+      carId:state.carId,seed:state.seed,layoutId:state.layoutId,fixedDt:FIXED_DT,time,samples:state.ghostSamples.map(p=>[...p]),
       inputs:state.ghostInputs.map(p=>[...p]),checkpoints:state.checkpointTimes.map(p=>[...p])};
   }
   event(state,'lap',`第 ${state.lap} 圈 ${time.toFixed(2)} 秒`);
@@ -105,11 +114,11 @@ function tick(state,input) {
   state.elapsed+=dt;state.lapTime=state.elapsed-state.lapStart;state.ghostTime=state.lapTime;state.lapTicks++;
   state.timeRemaining=Math.max(0,(state.mode==='tutorial'?90:120)-state.elapsed);
   state.wallCooldown=Math.max(0,state.wallCooldown-dt);
-  const p=sampleTrack(state.track,state.s),car=state.car;
+  const work=scratch.get(state),p=sampleTrackInto(state.track,state.s,work.p),car=state.car;
   const throttle=clamp(finite(input.throttle),0,1),brake=clamp(finite(input.brake),0,1);
   const steer=clamp(finite(input.steer),-1,1),handbrake=Boolean(input.handbrake);
   state.steer+=(steer-state.steer)*(1-Math.exp(-11*dt));
-  const absSpeed=Math.abs(state.speed),sensitivity=[.78,1,1.22][state.sensitivity]||1;
+  const absSpeed=Math.abs(state.speed),sensitivity=state.sensitivity===0?.78:state.sensitivity===2?1.22:1;
   const activeHandbrake=handbrake&&state.speed>7;
   // Longitudinal velocity, rolling resistance, drag and road grade are separated.
   let acceleration=throttle*car.acceleration;
@@ -120,7 +129,7 @@ function tick(state,input) {
   if(activeHandbrake)acceleration-=3.6;
   if(throttle===0&&brake===0&&absSpeed<.035)state.speed=0;
   else state.speed=clamp(state.speed+acceleration*dt,-7.5,state.mode==='tutorial'?22:car.topSpeed);
-  const road=roadStatus(state.track,state.s,state.lateral);
+  const road=roadStatusInto(state.track,state.s,state.lateral,work.road);
   const speedFactor=clamp(absSpeed/10,0,1)/(1+Math.max(0,absSpeed-18)*.027);
   // Camera follows +Z with +Y up, so screen-right is -X and D means negative world yaw.
   const turnRate=-state.steer*car.steerRate*sensitivity*speedFactor*Math.sign(state.speed||1)*(activeHandbrake?1.22:1);
@@ -135,10 +144,10 @@ function tick(state,input) {
   const lateralVelocity=state.speed*Math.sin(state.velocityYaw);
   const before=state.s;
   state.s+=forward*dt;state.lateral+=lateralVelocity*dt;
-  const newP=sampleTrack(state.track,state.s);
+  const newP=sampleTrackInto(state.track,state.s,work.next);
   const roadTurn=angle(newP.heading-p.heading);
   state.yaw=angle(state.yaw-roadTurn);state.velocityYaw=angle(state.velocityYaw-roadTurn);
-  let status=roadStatus(state.track,state.s,state.lateral);
+  let status=roadStatusInto(state.track,state.s,state.lateral,work.road);
   if(!status.legal) {
     state.offTrackTime+=dt;
     if(state.wallCooldown<=0) {
@@ -155,7 +164,7 @@ function tick(state,input) {
     state.lateral=bound;
     state.velocityYaw*=.3;state.yaw*=.55;
     state.speed=Math.max(-4,state.speed-18*dt);
-    status=roadStatus(state.track,state.s,state.lateral);
+    status=roadStatusInto(state.track,state.s,state.lateral,work.road);
   }else state.offTrackTime=0;
   state.forwardProgress+=Math.max(0,state.s-before);
   state.wrongWayTime=forward<-.5?state.wrongWayTime+dt:0;
@@ -167,7 +176,7 @@ function tick(state,input) {
     // Reject momentary slip spikes from steering into a barrier. A sustained 0.4 s clean slide qualifies.
     if(state.cleanDriftTime>=.4)state.pendingScore+=state.speed*state.driftAngle*8*state.combo*dt;
     state.scoredProgress=state.s;state.driftRelease=0;
-    state.reason=`乾淨漂移 ×${state.combo} · 放開手煞車、反打出彎`;
+    state.reason=driftReasons[state.combo];
     state.tutorial.entry=true;if(state.cleanDriftTime>=2)state.tutorial.control=true;
   }else {
     state.driftRelease+=dt;
@@ -176,9 +185,10 @@ function tick(state,input) {
   }
   if(state.speed>11)state.tutorial.accelerate=true;
   // 20 Hz pose samples are tied to fixed ticks; compressed input changes retain exact tick timing.
-  if(state.lapTicks%6===0)state.ghostSamples.push([round(state.lapTime),round(((state.s%state.track.length)+state.track.length)%state.track.length),round(state.lateral),round(state.yaw),round(state.speed)]);
-  const encoded=[throttle,brake,steer,handbrake?1:0].map(round),last=state.ghostInputs.at(-1);
-  if(!last||encoded.some((v,i)=>v!==last[i+1]))state.ghostInputs.push([state.lapTicks,...encoded]);
+  const history=histories.get(state);
+  if(state.lapTicks%6===0)history.samples.append(round(state.lapTime),round(((state.s%state.track.length)+state.track.length)%state.track.length),round(state.lateral),round(state.yaw),round(state.speed));
+  const a=round(throttle),b=round(brake),c=round(steer),d=handbrake?1:0,store=history.inputs,n=(store.count-1)*5;
+  if(!store.count||a!==store.data[n+1]||b!==store.data[n+2]||c!==store.data[n+3]||d!==store.data[n+4])store.append(state.lapTicks,a,b,c,d);
   advanceCheckpoints(state,before,state.s,status.legal);
   updatePose(state);
   if(!state.finished&&state.mode!=='time'&&state.timeRemaining<=1e-8)finish(state);
@@ -201,28 +211,33 @@ export function resetCar(state) {
   const time=state.elapsed-state.lapStart;
   const before=[round(time),round(((state.s%state.track.length)+state.track.length)%state.track.length),round(state.lateral),round(state.yaw),round(state.speed)];
   // Replay the penalty as a hold followed by a teleport, never as a drive through intervening scenery.
-  state.ghostSamples.push(before,[round(time+2-FIXED_DT),...before.slice(1)]);
+  histories.get(state).samples.append(...before);histories.get(state).samples.append(round(time+2-FIXED_DT),...before.slice(1));
   state.s=state.lastLegalS+.1;state.lateral=0;state.yaw=0;state.velocityYaw=0;state.speed=0;state.steer=0;
   state.elapsed+=2;state.penalty+=2;state.resets++;state.wallCooldown=.5;state.offTrackTime=0;state.wrongWayTime=0;
-  state.ghostSamples.push([round(time+2),round(state.s%state.track.length),0,0,0]);
+  histories.get(state).samples.append(round(time+2),round(state.s%state.track.length),0,0,0);
   state.lapInvalid=false;state.pendingScore=0;state.combo=1;state.cleanDriftTime=0;state.drifting=false;
   state.tutorial.recover=true;state.reason='已回正 · +2.00 秒 · 連段清除';
   event(state,'reset',state.reason);updatePose(state);return true;
 }
 
-export function validGhost(ghost,trackId) {
-  return Boolean(ghost&&ghost.schemaVersion===1&&ghost.physicsVersion===PHYSICS_VERSION&&ghost.trackVersion===TRACK_VERSION&&ghost.trackId===trackId&&
+export function validGhost(ghost,trackId,layoutId=`${trackId}:original:v1`) {
+  return Boolean(ghost&&ghost.schemaVersion===1&&ghost.physicsVersion===PHYSICS_VERSION&&ghost.trackVersion===TRACK_VERSION&&ghost.trackId===trackId&&(ghost.layoutId||`${trackId}:original:v1`)===layoutId&&
     Number.isFinite(ghost.time)&&ghost.time>0&&Array.isArray(ghost.samples)&&ghost.samples.length>1&&ghost.samples.length<=7000&&
     ghost.samples.every(p=>Array.isArray(p)&&p.length===5&&p.every(Number.isFinite)));
 }
 export function getGhostPose(ghost,time) {
-  if(!ghost||!validGhost(ghost,ghost.trackId)||time<0||time>ghost.time)return null;
+  if(!ghost||time<0||time>ghost.time)return null;
+  if(!validatedGhosts.has(ghost)){if(!validGhost(ghost,ghost.trackId,ghost.layoutId))return null;validatedGhosts.add(ghost);ghostPoses.set(ghost,{sample:{},pose:{},track:ghost.layoutId?.includes(':mirrored:')?resolveTourTrack(ghost.trackId,7):TRACKS.find(x=>x.id===ghost.trackId)});}
   const samples=ghost.samples;let lo=0,hi=samples.length-1;
   while(lo+1<hi){const mid=(lo+hi)>>1;if(samples[mid][0]<=time)lo=mid;else hi=mid;}
-  const a=samples[lo],b=samples[hi],t=clamp((time-a[0])/(b[0]-a[0]||1),0,1),track=TRACKS.find(x=>x.id===ghost.trackId);
+  const a=samples[lo],b=samples[hi],t=clamp((time-a[0])/(b[0]-a[0]||1),0,1),track=ghostPoses.get(ghost).track;
   if(!track)return null;
   let distance=b[1]-a[1];if(distance<-track.length/2)distance+=track.length;
-  const s=a[1]+distance*t,lateral=a[2]+(b[2]-a[2])*t,yaw=a[3]+angle(b[3]-a[3])*t,p=sampleTrack(track,s);
-  return {x:p.x+Math.cos(p.heading)*lateral,y:p.y,z:p.z-Math.sin(p.heading)*lateral,heading:p.heading+yaw,
-    pitch:Math.atan(p.slope),s,lateral,yaw,speed:a[4]+(b[4]-a[4])*t,carId:ghost.carId};
+  const s=a[1]+distance*t,lateral=a[2]+(b[2]-a[2])*t,yaw=a[3]+angle(b[3]-a[3])*t,p=sampleTrackInto(track,s,ghostPoses.get(ghost).sample);
+  const out=ghostPoses.get(ghost).pose;out.x=p.x+Math.cos(p.heading)*lateral;out.y=p.y;out.z=p.z-Math.sin(p.heading)*lateral;out.heading=p.heading+yaw;out.pitch=Math.atan(p.slope);out.s=s;out.lateral=lateral;out.yaw=yaw;out.speed=a[4]+(b[4]-a[4])*t;out.carId=ghost.carId;return out;
+}
+
+function packed(capacity,rows){
+  const store={data:new Float64Array(capacity*5),count:0,append(a,b,c,d,e){if(this.count===capacity)return;const i=this.count++*5;this.data[i]=a;this.data[i+1]=b;this.data[i+2]=c;this.data[i+3]=d;this.data[i+4]=e;},load(rows){this.count=0;for(const row of rows)this.append(row[0],row[1],row[2],row[3],row[4]);},rows(){const out=new Array(this.count);for(let n=0;n<this.count;n++){const i=n*5;out[n]=[this.data[i],this.data[i+1],this.data[i+2],this.data[i+3],this.data[i+4]];}return out;}};
+  store.load(rows);return store;
 }

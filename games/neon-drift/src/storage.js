@@ -15,7 +15,7 @@ const finite=value=>typeof value==='number'&&Number.isFinite(value);
 const positive=value=>finite(value)&&value>0;
 const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
 function emptySave(){return {schemaVersion:SAVE_VERSION,physicsVersion:PHYSICS_VERSION,trackVersion:TRACK_VERSION,
-  settings:{...DEFAULT_SETTINGS,sensitivityByCar:{...DEFAULT_SETTINGS.sensitivityByCar}},records:{},unlocks:{medals:0,colors:['cyan','rose'],decals:['none']},tutorialComplete:false,notice:''};}
+  settings:{...DEFAULT_SETTINGS,sensitivityByCar:{...DEFAULT_SETTINGS.sensitivityByCar}},records:{},tourRecords:{},tourBests:{},unlocks:{medals:0,colors:['cyan','rose'],decals:['none']},tutorialComplete:false,notice:''};}
 function getStorage(storage) {
   if(storage)return storage;
   try{return globalThis.localStorage||null;}catch{return null;}
@@ -62,6 +62,8 @@ function sanitize(raw) {
     }
     out.records[key]=record;
   }
+  if(plain(raw.tourRecords))for(const [key,r] of Object.entries(raw.tourRecords).slice(-48)){if(/^tour:(harbor|skyway|oldtown):(time|drift):(harbor|skyway|oldtown):(original|mirrored):v1$/.test(key)&&plain(r)&&positive(r.bestTime)&&finite(r.bestScore)&&Object.hasOwn(rank,r.medal))out.tourRecords[key]={bestTime:r.bestTime,bestScore:r.bestScore,medal:r.medal};}
+  if(plain(raw.tourBests))for(const [key,r] of Object.entries(raw.tourBests).slice(-8)){if(plain(r)&&positive(r.activeSeconds)&&finite(r.score)&&finite(r.seed))out.tourBests[key]={...r};}
   out.unlocks=unlocksFor(out.records,plain(raw.unlocks)?raw.unlocks:{});
   if(!out.unlocks.colors.includes(out.settings.colorId))out.settings.colorId='cyan';
   if(!out.unlocks.decals.includes(out.settings.decalId))out.settings.decalId='none';
@@ -132,3 +134,12 @@ export function saveSettings(current,patch,storage) {
   if(!save.unlocks.decals.includes(save.settings.decalId))save.settings.decalId='none';
   return persist(save,storage);
 }
+
+export function saveTourStage(current,state,storage){
+  const save=sanitize(current),r=state.result;if(!r?.success)return {ok:false,save:current,newBest:false,notice:'本關未達目標，巡迴紀錄保持不變。'};
+  const key=`tour:${r.trackId}:${r.mode}:${r.layoutId}`,old=save.tourRecords[key];
+  const newBest=!old||(r.mode==='time'?r.time<old.bestTime:r.score>old.bestScore);
+  save.tourRecords[key]={bestTime:Math.min(old?.bestTime??Infinity,r.time),bestScore:Math.max(old?.bestScore??0,r.score),medal:rank[old?.medal]>rank[r.medal]?old.medal:r.medal};
+  return {...persist(save,storage),newBest};
+}
+export function saveTourBest(current,summary,storage){const save=sanitize(current),old=save.tourBests[summary.signature];if(!old||summary.activeSeconds<old.activeSeconds)save.tourBests[summary.signature]=summary;return persist(save,storage);}

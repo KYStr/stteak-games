@@ -80,7 +80,8 @@ export function buildTrack(raw) { // 讓新增資料使用唯一的正式賽道�
 }
 
 /** s is arc distance, wrapping around a closed course. Never a normalized percentage. */
-export function sampleTrack(trackOrId,s) {
+export function sampleTrack(trackOrId,s) {return sampleTrackInto(trackOrId,s,{});}
+export function sampleTrackInto(trackOrId,s,out) {
   const track=typeof trackOrId==='string'?TRACKS.find(t=>t.id===trackOrId):trackOrId;
   if(!track) throw new Error('Unknown track');
   const distance=modulo(Number.isFinite(s)?s:0,track.length),p=track.points;
@@ -88,8 +89,8 @@ export function sampleTrack(trackOrId,s) {
   while(lo+1<hi) { const mid=(lo+hi)>>1;if(p[mid].s<=distance)lo=mid;else hi=mid; }
   const a=p[lo],b=p[hi],span=b.s-a.s||1,t=(distance-a.s)/span;
   const heading=a.heading+angleDelta(b.heading,a.heading)*t;
-  return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t,heading,
-    width:track.width,curvature:angleDelta(b.heading,a.heading)/span,slope:(b.y-a.y)/span,s:distance};
+  out.x=a.x+(b.x-a.x)*t;out.y=a.y+(b.y-a.y)*t;out.z=a.z+(b.z-a.z)*t;out.heading=heading;
+  out.width=track.width;out.curvature=angleDelta(b.heading,a.heading)/span;out.slope=(b.y-a.y)/span;out.s=distance;return out;
 }
 export const TRACKS=rawTracks.map(buildTrack);
 /** A separate, broad and speed-limited driving school; never a seventh challenge card. */
@@ -108,9 +109,22 @@ export function shortcutOffset(track,s) {
   if(d<q.start||d>q.end)return null;
   return q.side*q.offset*Math.sin(Math.PI*(d-q.start)/(q.end-q.start));
 }
-export function roadStatus(track,s,lateral) {
+export function roadStatus(track,s,lateral) {return roadStatusInto(track,s,lateral,{});}
+export function roadStatusInto(track,s,lateral,out) {
   const offset=shortcutOffset(track,s);
   const main=Math.abs(lateral)<=track.width/2-0.9;
   const shortcut=offset!==null&&Math.abs(lateral-offset)<=track.shortcut.width/2-0.9;
-  return {legal:main||shortcut,main,shortcut:shortcut&&!main,offset};
+  out.legal=main||shortcut;out.main=main;out.shortcut=shortcut&&!main;out.offset=offset;return out;
+}
+
+export const TOUR_STAGES=TRACKS.flatMap(t=>[
+  {trackId:t.id,mode:'time',hint:t.description+' 按順序通過八個檢查點，300 秒內完成兩圈。'},
+  {trackId:t.id,mode:'drift',hint:`${t.id==='skyway'?'高速考驗：入彎前保持約 90–100 km/h，穩住高速側滑。':''}120 秒內入袋至少 ${t.medals.drift[2]} 分；放開手煞車並回穩即可入袋。`}
+]);
+const tourLayouts=new Map();
+export function resolveTourTrack(id,seed){
+  const index=TRACKS.findIndex(t=>t.id===id);if(index<0)throw Error('Unknown Tour district');
+  const mirrored=!!((seed>>>index)&1),layoutId=`${id}:${mirrored?'mirrored':'original'}:v1`;
+  if(!tourLayouts.has(layoutId)){const raw=rawTracks[index];tourLayouts.set(layoutId,{...buildTrack({...raw,nodes:raw.nodes.map(([x,y,z])=>[mirrored?-x:x,y,z])}),layoutId});}
+  return tourLayouts.get(layoutId);
 }

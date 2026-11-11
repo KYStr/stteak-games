@@ -28,6 +28,7 @@ export class DriveAudio {
   click(){if(!this.play('click'))this.tone(660,.06,.09);}
   resetSuccess(){this.successGeneration++;for(const timer of this.successTimers)clearTimeout(timer);this.successTimers.clear();} // 新局或釋放提升世代並清除尚未發生的成功音回呼。
   success(generation=this.successGeneration){if(generation!==this.successGeneration)return;if(!this.play('success'))[523.25,659.25,783.99].forEach((v,i)=>{const timer=setTimeout(()=>{this.successTimers.delete(timer);if(generation===this.successGeneration&&this.ctx?.state==='running')this.tone(v,.5,.12);},i*110);this.successTimers.add(timer);});} // 過期世代不排程；每個成功音回呼執行後移除並再次檢查世代。
+  failure(generation=this.successGeneration){if(generation!==this.successGeneration)return;for(let i=0;i<2;i++){const timer=setTimeout(()=>{this.successTimers.delete(timer);if(generation===this.successGeneration)this.tone(i?110:165,.24,.12,'triangle');},i*170);this.successTimers.add(timer);}}
   pause(){this.wantsContext=false;this.active=false;if(this.ctx){this.motorGain.gain.setValueAtTime(0,this.ctx.currentTime);this.tireGain.gain.setValueAtTime(0,this.ctx.currentTime);this.ctx.suspend().catch(()=>{});}}
   update(state,running){
     const ctx=this.ctx;if(!ctx||ctx.state!=='running')return;const t=ctx.currentTime;this.active=running;

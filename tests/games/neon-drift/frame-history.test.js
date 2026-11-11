@@ -69,7 +69,7 @@ test('actual diagnostics, summary and window performance keep their external arr
   const history=createFrameHistory(4);for(let i=0;i<8;i++)history.push(i+.1234567890123);
   let blockSnapshot=false;
   const guardedHistory={snapshot(){if(blockSnapshot)throw new Error('summary requested complete history');return history.snapshot();},summary:history.summary};
-  const env={updateCpu:{},profilingEnabled:false,BUILD:'fixture',VERSION:'fixture',navigator:{userAgent:'fixture'},innerWidth:1920,innerHeight:1080,devicePixelRatio:1,phase:'paused',frameSamples:guardedHistory,frameGaps:[],events:[],renderer:{stats:{calls:1},summary:{calls:1}},profiler:{snapshot:()=>({rows:[]}),summary:()=>({rows:{omitted:true,retainedCount:0}})},completedFrameProfile:null,browserTiming:null,lastCompletedRun:null,window:{},runFrames:8};
+  const env={updateSamples:history,updateCpu:{},profilingEnabled:false,BUILD:'fixture',VERSION:'fixture',navigator:{userAgent:'fixture'},innerWidth:1920,innerHeight:1080,devicePixelRatio:1,phase:'paused',frameSamples:guardedHistory,frameGaps:[],events:[],renderer:{stats:{calls:1},summary:{calls:1}},profiler:{snapshot:()=>({rows:[]}),summary:()=>({rows:{omitted:true,retainedCount:0}})},completedFrameProfile:null,browserTiming:null,lastCompletedRun:null,window:{},runFrames:8};
   const start=mainSource.indexOf('function diagnostics(){'),end=mainSource.indexOf('\nconst track=',start);
   assert.ok(start>=0&&end>start);
   const apiSource=mainSource.slice(mainSource.indexOf("Object.defineProperty(window,'neonDrift'"));

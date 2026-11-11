@@ -23,3 +23,7 @@ test('a delayed AudioContext resume cannot undo a newer pause',async()=>{
   const pending=audio.unlock();audio.pause();resolveResume();await pending;
   assert.equal(audio.ctx.state,'suspended');assert.equal(audio.active,false);assert.equal(suspensions,2);
 });
+test('failure cue descends, uses cancellable outcome timers and rejects stale generations',async()=>{
+  const audio=new DriveAudio(),played=[];audio.ctx={state:'running'};audio.tone=f=>played.push(f);audio.failure();await new Promise(r=>setTimeout(r,220));assert.deepEqual(played,[165,110]);assert.equal(audio.successTimers.size,0);
+  const old=audio.successGeneration;audio.failure();audio.resetSuccess();audio.failure(old);await new Promise(r=>setTimeout(r,220));assert.deepEqual(played,[165,110]);
+});
