@@ -2,6 +2,33 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../../games/aetherwake/node_modules/three/build/three.module.js';
 import { AetherScene, NavigationLabelOcclusion } from '../../games/aetherwake/src/scene.js';
+import { createIsland } from '../../games/aetherwake/src/models.js';
+
+test('all six terraces keep shared patch depth priorities above ground and below stepping markers', () => {
+  let sharedTurf, sharedSand;
+  for (const [index, radius] of [38,34,34,41,34,38].entries()) {
+    const island = createIsland({radius, index, region:[0,0,1,2,1,2][index]});
+    const high = island.children[0].levels[0].object;
+    const turf = high.getObjectByName('terrain-patch-turf-merged');
+    const sand = high.getObjectByName('terrain-patch-sand-merged');
+    const terrace = high.getObjectByName(`island-${index}-terrace-merged`);
+    assert.ok(turf && sand && terrace, `Island ${index} has both batched patch colours`);
+    for (const patch of [turf, sand]) {
+      assert.equal(patch.material.polygonOffset, true);
+      patch.geometry.computeBoundingBox(); terrace.geometry.computeBoundingBox();
+      const top = patch.geometry.boundingBox.max.y;
+      assert.ok(top > terrace.geometry.boundingBox.max.y && top < .05);
+      assert.ok(patch.geometry.boundingBox.min.y < 0, 'Patch sides stay embedded in ground');
+    }
+    assert.ok(sand.material.polygonOffsetFactor < turf.material.polygonOffsetFactor);
+    assert.ok(sand.material.polygonOffsetUnits < turf.material.polygonOffsetUnits);
+    sharedTurf ??= turf.material; sharedSand ??= sand.material;
+    assert.equal(turf.material, sharedTurf); assert.equal(sand.material, sharedSand);
+    const structuralSand = high.getObjectByName('mineral-sand-merged').material;
+    assert.equal(structuralSand.polygonOffset, false, 'Architectural slabs retain their own depth');
+    assert.notEqual(structuralSand, sand.material);
+  }
+});
 
 function wind(data) {
   return {data, group:{visible:true,userData:{update(dt){this.updates.push(dt);},updates:[]}},

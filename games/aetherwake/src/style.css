@@ -1504,4 +1504,13 @@ h2 {
   .energy-panel { padding: 8px 10px; }
   .collection { padding: 7px 9px; }
   #gate-conditions { font-size: 10px; gap: 3px; margin-top: 6px; }
+  #flight-hud {
+    --mobile-energy-bottom: 142px;
+    --mobile-energy-reserve: 70px;
+    --mobile-hud-gap: 12px;
+  }
+  .energy-panel { bottom: var(--mobile-energy-bottom); }
+  .map-panel {
+    bottom: calc(var(--mobile-energy-bottom) + var(--mobile-energy-reserve) + var(--mobile-hud-gap));
+  }
 }

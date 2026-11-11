@@ -38,12 +38,16 @@ Requires Node 22+, Python 3, `/usr/bin/google-chrome` and the provided
 `/workspace/stteak8/tools/node_modules/playwright-core`. Defaults to port 8101 (`AETHERWAKE_PORT` overrides it for an assigned QA port);
 starts and stops its own server if one is not already serving the game.
 One headless browser is used at a time and always closed. Allow roughly 10 minutes.
-The suite checks exact source/runtime build bytes, 107 unit/rule regressions,
+Temporary writable XDG directories isolate Chrome/SwiftShader caches when the
+host home directory is read-only; they are removed after the browser closes.
+The suite checks exact source/runtime build bytes, unit/rule regressions including
+all six islands' shared terrain depth priorities,
 gesture audio, mute, external audio suspension, blur/pause/input release,
 modal focus, save/reload/migration/corruption, real WebGL loss/restoration,
 1280×720 and 1920×1080 layouts, a complete keyboard-driven campaign and restart,
 completed-results settings navigation, tracked/active expedition cancellation,
 blocked browser storage, reduced-motion preference, reading-dialog focus,
+390×844 and 360×740 touch HUD clearance/hit areas, route switching and flight,
 and two fresh-context three-minute real-time frame/heap/geometry/voice stability runs.
 `unit.tap`, screenshots, raw frame intervals, 15-second phase/CDP/DOM/RAF samples,
 `stability-1.json`, `stability-2.json` and `acceptance.json` are written to the evidence directory.
@@ -55,10 +59,23 @@ The stability phase uses a separate context and unmodified real-time RAF.
 The deterministic unit pilot also traverses all optional content and every module.
 For a short local iteration only, `AETHERWAKE_SOAK_MS=15000 AETHERWAKE_SOAK_RUNS=1` reduces the soak;
 the default acceptance runs two full 180000 ms samples.
-The QA pacing targets are mean ≤33.5 ms and p95 ≤50.1 ms per sample. A missed
-target fails after writing both samples and a structured failure; shared-host
-SwiftShader delay is reported separately from measured JS/update/render CPU work.
-CPU render-call duration is not GPU timing. Normal Chrome autoplay policy is used;
+To isolate course-cancellation timing and touch layout, run
+`AETHERWAKE_REGRESSION_ONLY=1 node tests/aetherwake/acceptance.mjs` from the root.
+It repeats cancellation in three fresh contexts and checks both touch sizes;
+it does not replace the full acceptance run.
+Normal acceptance gates hardware-independent resource and lifecycle evidence.
+Shared-host SwiftShader mean/p95 frame intervals remain informational in
+`pacingReference`; `pacingMode` is `reference-only` by default. On a dedicated
+benchmark host, explicitly set `AETHERWAKE_STRICT_PACING=1` to also enforce
+mean ≤33.5 ms and p95 ≤50.1 ms after application-error checks.
+`resourceSummary` retains draw calls, triangles, geometry/texture counts, resolution,
+CPU phases, heap growth, listener counts and pending RAF callbacks from each window.
+CDP's raw listener count includes one ended callback per live audio voice. The
+report retains raw/live-voice/persistent counts and gates bounded total listeners
+plus no persistent listener growth; finished audio nodes clear their handlers.
+`sceneUpdateMs` and `simulationMs` exclude `renderer.render()`; `renderCpuMs`
+measures synchronous render submission/CPU work and is not a GPU timer.
+Normal Chrome autoplay policy is used;
 an analyser checks actual master output and settled mute without a second
 audible destination connection.
 
@@ -67,6 +84,18 @@ For an assigned QA server port, for example:
 ```sh
 AETHERWAKE_PORT=8121 AETHERWAKE_EVIDENCE=/tmp/aetherwake-qa npm --prefix games/aetherwake run verify
 ```
+
+Optional full terrain screenshot review (six checkpoint fixtures × Auto/High ×
+both desktop sizes, three orbit angles, zoom and successive-frame captures):
+
+```sh
+AETHERWAKE_EVIDENCE=/tmp/aetherwake-visual node tests/aetherwake/visual.mjs
+```
+
+This starts/stops its server and browser, checks contact/resource bounds and
+records screenshots for visual inspection. Fixtures do not count as traversal.
+For smaller batches, set `AETHERWAKE_VISUAL_WIDTH=1280` (or `1920`) and
+`AETHERWAKE_VISUAL_QUALITY=auto` (or `high`) with separate evidence directories.
 
 ## Saves, rendering and audio
 

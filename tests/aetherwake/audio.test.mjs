@@ -47,3 +47,21 @@ test('rejected audio permission can be retried without an unhandled rejection', 
     assert.equal(await audio.unlock(), true);
   } finally { await audio.dispose(); globalThis.AudioContext = old; }
 });
+test('completed synthesized and sampled voices release their ended listeners immediately', async () => {
+  const old = globalThis.AudioContext;
+  globalThis.AudioContext = Context;
+  const audio = new AudioEngine(); audio.loadSamples = () => {};
+  try {
+    await audio.unlock();
+    const voice = new Node(); audio.register(voice);
+    assert.equal(audio.active.has(voice),true);
+    voice.onended();
+    assert.equal(voice.onended,null); assert.equal(audio.active.has(voice),false);
+    audio.sampleBuffers.set('ui',{}); audio.play('ui');
+    const sample = [...audio.active][0];
+    assert.ok(sample); sample.onended();
+    assert.equal(sample.onended,null); assert.equal(audio.active.size,0);
+    audio.tone(440,0,.2,'sine',.1,audio.musicBus);
+    assert.equal(audio.active.size,0,'Synth completion releases the registered source too');
+  } finally { await audio.dispose(); globalThis.AudioContext = old; }
+});
