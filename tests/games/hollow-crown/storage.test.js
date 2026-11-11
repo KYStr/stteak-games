@@ -29,3 +29,15 @@ test('settlement is idempotent per run ID and retry is a distinct run',()=>{cons
 test('failed optional challenge does not earn challenge completion',()=>{const p=freshProfile();settleRun(p,'a',{won:true,challenge:'unbroken',challengeComplete:false});assert.deepEqual(p.challengeWins,[]);});
 test('v0 preferences migrate without accepting unknown version',()=>{assert.equal(validateProfile({schemaVersion:0,settings:{music:0}}).settings.music,0);assert.throws(()=>validateProfile({schemaVersion:20}));});
 test('values and arrays are bounded; mandatory starting choices stay available',()=>{const p=validateProfile({schemaVersion:1,wins:Infinity,settings:{music:7,effects:-2,quality:'ultra'},unlocked:['<script>'],completed:Array.from({length:200},(_,i)=>'r'+i)});assert.equal(p.wins,0);assert.equal(p.settings.music,1);assert.equal(p.settings.effects,0);assert.equal(p.settings.quality,'high');assert.equal(p.completed.length,150);assert.deepEqual(p.unlocked.sort(),['fleet-ash','wide-oath']);});
+
+
+test('system motion defaults are distinct from explicit current and historical choices',()=>{
+ assert.equal(freshProfile().settings.reducedMotionExplicit,false);
+ for(const reducedMotion of [true,false]) {
+  assert.equal(validateProfile({settings:{reducedMotion}}).settings.reducedMotionExplicit,true);
+  for(const reducedMotionExplicit of [true,false]) {
+   const settings=validateProfile({settings:{reducedMotion,reducedMotionExplicit}}).settings;
+   assert.equal(settings.reducedMotion,reducedMotion);assert.equal(settings.reducedMotionExplicit,reducedMotionExplicit);
+  }
+ }
+});

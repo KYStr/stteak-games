@@ -8,6 +8,12 @@ export const ROOMS = [
   { id: 'broken-archive', name: '斷頁書庫', theme: 'ash', description: '斷牆分隔戰線；從盾衛側後方刺擊。', obstacles: [{ x: -4, z: 0, w: 1, d: 5 }, { x: 4, z: 0, w: 1, d: 5 }], roster: ['shield', 'soldier', 'crossbow', 'beetle'], extra: ['spear', 'crossbow'] },
   { id: 'rain-cistern', name: '雨痕蓄池', theme: 'blue', description: '中央柱群逼迫移位，保持長槍距離。', obstacles: [{ x: 0, z: -3, r: 1 }, { x: 0, z: 3, r: 1 }, { x: -5, z: 0, r: .7 }, { x: 5, z: 0, r: .7 }], roster: ['spear', 'shield', 'beetle', 'crossbow'], extra: ['soldier', 'spear'] },
   { id: 'ash-garden', name: '灰燼花園', theme: 'ember', description: '低矮祭壇可擋箭；花園外緣留有迴旋空間。', obstacles: [{ x: -3, z: -1, w: 2, d: 2 }, { x: 3, z: 1, w: 2, d: 2 }], roster: ['beetle', 'beetle', 'shield', 'spear'], extra: ['crossbow', 'soldier'] },
+  { id:'gate-of-names',name:'刻名之門',theme:'ivory',description:'雙柱與矮牆；從兩端夾縫轉進，先處理遠方弩手。',obstacles:[{x:-5,z:-3,r:.7},{x:5,z:-3,r:.7},{x:0,z:1,w:4,d:.8}],roster:['soldier','spear','crossbow'],extra:['shield','soldier','crossbow'] },
+  { id:'split-furnace',name:'裂爐雙庭',theme:'ember',description:'兩座冷爐留出中央通道；別讓蟲群封住退路。',obstacles:[{x:-3,z:0,w:2,d:3},{x:3,z:0,w:2,d:3}],roster:['beetle','soldier','crossbow'],extra:['shield','beetle','spear'] },
+  { id:'sunken-vault',name:'沉水寶庫',theme:'blue',description:'三柱交叉射線；沿柱側接近兩名弩手。',obstacles:[{x:-4,z:-3,r:.8},{x:4,z:-3,r:.8},{x:0,z:2,r:.8}],roster:['crossbow','crossbow','spear'],extra:['soldier','shield','beetle'] },
+  { id:'vow-crossing',name:'誓言交道',theme:'ivory',description:'雙牆長廊，中央開闊；橫移避槍，勿在牆角久留。',obstacles:[{x:-4,z:0,w:.8,d:4},{x:4,z:0,w:.8,d:4}],roster:['spear','spear','soldier'],extra:['crossbow','shield','soldier'] },
+  { id:'fallen-reliquary',name:'傾覆聖匣',theme:'ash',description:'對角低台隔開盾與弩；穿過中線逐一破陣。',obstacles:[{x:-3,z:-2,w:2,d:2},{x:3,z:2,w:2,d:2}],roster:['shield','crossbow','beetle'],extra:['spear','soldier','crossbow'] },
+  { id:'last-watch',name:'最後守夜',theme:'crown',description:'四柱拱衛最後空地；盾、槍與弩輪番守住王座入口。',obstacles:[{x:-5,z:-3,r:.65},{x:5,z:-3,r:.65},{x:-5,z:3,r:.65},{x:5,z:3,r:.65}],roster:['shield','spear','crossbow'],extra:['beetle','soldier','spear'] },
 ];
 export const TUTORIAL_ROOM = { id: 'tutorial', name: '守誓者的試煉', theme: 'ivory', obstacles: [{ x: -5, z: 0, r: .8 }], description: '移動、刺擊、閃避，最後反擊教官。' };
 export const BOSS_ROOM = { id: 'crown-arena', name: '無王之座', theme: 'crown', description: '王座守衛出招時正面護甲減輕刺傷；繞背、蓄力或等待招後破綻。', obstacles: [{ x: -6.2, z: -2, r: .65 }, { x: 6.2, z: -2, r: .65 }] };
@@ -19,10 +25,20 @@ export const DIFFICULTIES = [
   { id: 'pilgrim', name: '行旅', description: '傷害降低 30%，反擊窗口較寬。', enemyDamage: .7, enemyHp: .9, parryWindow: .32 },
   { id: 'standard', name: '守誓', description: '原始戰鬥節奏，靠讀招與距離取勝。', enemyDamage: 1, enemyHp: 1, parryWindow: .22 },
 ];
-export const journeyPlan = state => state?.challenge === 'long-watch' ? { rooms: 6, crowns: 2 } : { rooms: 4, crowns: 1 };
-export const crownType = state => state.challenge === 'long-watch' ? (state.roomsCleared <= 6 ? 'regent' : 'arbiter') : ROUTES.find(route => route.id === state.route).boss;
+export const JOURNEYS = Object.freeze({
+  'long-watch-extended': { rooms:12,crowns:2,acts:2 },
+  'long-watch': { rooms:6,crowns:2,acts:1 },
+  normal: { rooms:4,crowns:1,acts:1 },
+  unbroken: { rooms:4,crowns:1,acts:1 },
+  'single-school': { rooms:4,crowns:1,acts:1 },
+  daily: { rooms:4,crowns:1,acts:1 },
+});
+export const journeyPlan = state => JOURNEYS[state?.challenge] || JOURNEYS.normal;
+export const roomPool = state => state?.challenge==='long-watch-extended' && state.roomsCleared>=6 ? ROOMS.slice(6) : ROOMS.slice(0,6);
+export const crownType = state => journeyPlan(state).crowns===2 ? (state.roomsCleared<=journeyPlan(state).rooms?'regent':'arbiter') : ROUTES.find(route=>route.id===state.route).boss;
 export const CHALLENGES = [
-  { id: 'long-watch', name: '雙冠遠征 · 完整旅程', description: '走過六個不同房間，依序擊敗熾燼攝政與象牙審判者。六房＋雙王的長程守誓。' },
+  {id:'long-watch-extended',name:'餘燼長征 · 兩幕雙冠',description:'兩幕十二座不同戰場，第二幕混合增援，再迎戰兩位守衛。每房選擇餘燼，四格裝備隨路線調整。'},
+  { id: 'long-watch', name: '雙冠遠征 · 六房短旅', description: '走過六個不同房間，依序擊敗熾燼攝政與象牙審判者。六房＋雙王的長程守誓。' },
   { id: 'normal', name: '歸還王冠', description: '自由選擇天賦，擊敗路線的王座守衛。' },
   { id: 'unbroken', name: '無傷誓約', description: '以至少一間無傷房完成一局；受傷仍可繼續練習。' },
   { id: 'single-school', name: '一脈餘燼', description: '本局只出現你起始天賦所屬流派的獎勵。' },

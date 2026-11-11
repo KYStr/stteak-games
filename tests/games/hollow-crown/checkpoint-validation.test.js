@@ -1,6 +1,6 @@
 import test from 'node:test'; // 以Node單元測試核對checkpoint資料契約。
 import assert from 'node:assert/strict'; // 使用嚴格斷言避免把NaN或型別轉換當成成功。
-import { createRun, step, checkpoint, restoreRun, chooseReward, ENEMIES } from '../../../public/games/hollow-crown/rules.js'; // 直接測試正式規則實作。
+import { createRun, step, checkpoint, restoreRun, chooseReward, enterRoom, ENEMIES } from '../../../public/games/hollow-crown/rules.js'; // 直接測試正式規則實作。
 import { SaveStore, SAVE_KEY, freshProfile } from '../../../public/games/hollow-crown/storage.js'; // 包含實際JSON及profile載入邊界。
 
 function rewardCheckpoint(risk = 'steady') { // 沿既有force-clear方法建立受控獎勵節點，非自然通關。
@@ -71,3 +71,17 @@ test('serialized profile loading cannot admit corrupt reward or active-attack ch
     assert.equal(restoreRun(loaded.checkpoint.run), null); assert.ok(loaded.unlocked.includes('kindling')); assert.equal(loaded.settings.music, .15); // 拒絕當局不應刪除整份profile。
   } // 結束兩種完整資料路徑組。
 }); // 結束profile資料路徑回歸。
+
+
+test('phase checkpoints require usable choices, preserving heal-only and crown routes', () => {
+  const state = createRun({seed:72,challenge:'long-watch'});
+  for(let i=0;i<7;i++) {
+    state.enemies.forEach(e=>e.hp=0);state.pendingWaves=[];step(state,{},.02);
+    const reward=checkpoint(state);assert.ok(restoreRun(reward));
+    const broken=structuredClone(reward);broken.run.rewardOptions=[];assert.equal(restoreRun(broken),null);
+    const single=structuredClone(reward);single.run.rewardOptions=single.run.rewardOptions.filter(o=>o.id==='restore');assert.ok(restoreRun(single));
+    chooseReward(state,'restore');const route=checkpoint(state);assert.ok(restoreRun(route));
+    route.run.routeOptions=[];assert.equal(restoreRun(route),null);
+    enterRoom(state,state.routeOptions[0].roomId,state.routeOptions[0].risk);
+  }
+});

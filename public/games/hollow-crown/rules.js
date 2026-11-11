@@ -1,4 +1,4 @@
-import { journeyPlan, crownType, ARENA, RULE_VERSION, ROOMS, TUTORIAL_ROOM, BOSS_ROOM, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, DIFFICULTIES, STORIES, ENDINGS, ENEMIES } from './content.js';
+import { roomPool, journeyPlan, crownType, ARENA, RULE_VERSION, ROOMS, TUTORIAL_ROOM, BOSS_ROOM, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, DIFFICULTIES, STORIES, ENDINGS, ENEMIES } from './content.js';
 
 const TAU = Math.PI * 2;
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -68,7 +68,8 @@ function enemyAt(state, type, x, z, index = 0) {
 const spawnPoints = [[-5.8, -5.4], [5.6, -4.8], [0, -6.8], [-6, 2], [6, 2], [-3, -6.5], [3, -6.5], [0, -3.8]];
 function spawnWave(state, types) {
   types.forEach((type, i) => {
-    const point = spawnPoints[(i + state.wave * 2) % spawnPoints.length];
+    const offset=(i+state.wave*2)%spawnPoints.length;
+    const point=Array.from({length:spawnPoints.length},(_,n)=>spawnPoints[(offset+n)%spawnPoints.length]).find(([x,z])=>Math.hypot(x-state.player.x,z-state.player.z)>3&&!state.enemies.some(e=>e.hp>0&&Math.hypot(x-e.x,z-e.z)<1.5))||spawnPoints[offset];
     state.enemies.push(enemyAt(state, type, point[0], point[1], i));
   });
   state.wave++;
@@ -85,7 +86,7 @@ export function enterRoom(state, roomId, risk = 'steady') {
   state.roomIndex = state.roomsCleared;
   state.roomRisk = risk === 'perilous' ? 'perilous' : 'steady';
   state.phase = 'combat'; state.roomElapsed = 0; state.roomHits = 0; state.wave = 0;
-  state.enemies = []; state.projectiles = []; state.effects = []; state.pendingWaves = [];
+  state.enemies = []; state.projectiles = []; state.effects = []; state.pendingWaves = [];state.waveArrival=null;
   Object.assign(state.player, { x: 0, z: 6.8, angle: Math.PI, action: 'idle', actionTime: 0, attack: null, invuln: .7, charge: 0, cooldown: 0, heldTime: 0, wasBlocking: false, energy: state.player.maxEnergy });
   state.rewardOptions = []; state.rewardChoices = []; state.routeOptions = []; state.routeChoices = [];
   if (boss) {
@@ -93,7 +94,8 @@ export function enterRoom(state, roomId, risk = 'steady') {
   } else {
     spawnWave(state, template.roster);
     state.pendingWaves.push([...template.extra, ...(state.roomRisk === 'perilous' ? [template.roster[0]] : [])]);
-    if (state.roomsCleared >= 2) state.pendingWaves.push([template.roster[0], template.extra[0], template.roster[template.roster.length - 1]]);
+    if (state.challenge==='long-watch-extended'&&state.roomsCleared>=6) state.pendingWaves.push([template.roster.find(t=>!ENEMIES[t].ranged),[...template.roster,...template.extra].find(t=>ENEMIES[t].ranged)||'crossbow','beetle']);
+    else if(state.roomsCleared>=2)state.pendingWaves.push([template.roster[0],template.extra[0],template.roster[template.roster.length-1]]);
   }
   event(state, 'ui', { text: `${template.name} · ${boss ? '王座守衛' : '清除敵人'}`, cue: boss ? 'boss' : 'room' });
   state.entrySnapshot = snapshot(state);
@@ -485,7 +487,7 @@ function updateTutorial(state) {
     '瞄準教官，按一下攻擊輕刺。長按再放開可蓄力刺；槍尖能打到比身體更遠的目標。',
     '按 Space 或閃避鍵移位。閃避消耗能量，但輕刺永遠不耗能。',
     '教官開始進攻。看紅色扇形前搖，在命中前按住右鍵／格擋鍵，完成一次反擊；太早只會普通格擋。',
-    '反擊成功！用槍的距離擊敗教官。清房後選擇餘燼，經過四房再挑戰王座。',
+    '反擊成功！用槍的距離擊敗教官。正式遠征清房後選擇餘燼，再依旅程進度挑戰王座；營地可選長程或短程誓約。',
   ];
   if (criteria[tutorial.step]) {
     tutorial.step++;
@@ -516,15 +518,15 @@ function clearRoom(state) {
   const plan = journeyPlan(state);
   if (state.room.id === BOSS_ROOM.id && state.roomsCleared >= plan.rooms + plan.crowns) { finishRun(state, true, 'boss'); return; }
   state.phase = 'reward'; makeRewards(state);
-  const storyIndex = state.challenge === 'long-watch' ? ({ 1: 0, 3: 1, 6: 2 })[state.roomsCleared] : state.roomsCleared - 1;
+  const storyIndex=plan.acts===2?({1:0,6:1,12:2})[state.roomsCleared]:plan.crowns===2?({1:0,3:1,6:2})[state.roomsCleared]:state.roomsCleared-1;
   state.story = storyIndex !== undefined && storyIndex < STORIES.length ? copy(STORIES[storyIndex]) : null;
 }
 
 function makeRoutes(state) {
   if (state.roomsCleared >= journeyPlan(state).rooms) {
-    state.routeOptions = [{ roomId: BOSS_ROOM.id, id: BOSS_ROOM.id, risk: 'steady', name: BOSS_ROOM.name, label: ENEMIES[crownType(state)].name, reward: '擊敗守衛，完成誓約', description: `${ENEMIES[crownType(state)].name} · ${state.challenge === 'long-watch' && state.roomsCleared === 6 ? '第一頂王冠。擊敗攝政後可休憩，再前往最後的審判。' : byId(ROUTES, crownType(state) === 'arbiter' ? 'ivory' : 'ash').description}` }];
+    state.routeOptions = [{ roomId: BOSS_ROOM.id, id: BOSS_ROOM.id, risk: 'steady', name: BOSS_ROOM.name, label: ENEMIES[crownType(state)].name, reward: '擊敗守衛，完成誓約', description: `${ENEMIES[crownType(state)].name} · ${journeyPlan(state).crowns===2 && state.roomsCleared===journeyPlan(state).rooms ? '第一頂王冠。擊敗攝政後可休憩，再前往最後的審判。' : byId(ROUTES, crownType(state) === 'arbiter' ? 'ivory' : 'ash').description}` }];
   } else {
-    const available = ROOMS.filter(room => !state.roomHistory.some(visit => visit.id === room.id));
+    const available = roomPool(state).filter(room => !state.roomHistory.some(visit => visit.id === room.id));
     for (let i = available.length - 1; i > 0; i--) { const j = Math.floor(random(state) * (i + 1)); [available[i], available[j]] = [available[j], available[i]]; }
     state.routeOptions = available.slice(0, 2).map((room, index) => ({ id: room.id, roomId: room.id, name: room.name, label: `${room.name} · ${index ? '險途' : '穩途'}`, risk: index ? 'perilous' : 'steady', reward: index ? '第二波多 1 名敵人、生命 +15%；天賦附帶回復 18，休憩回復 45' : '標準敵群；天賦附帶回復 12，休憩回復 32', description: room.description }));
   }
@@ -585,7 +587,9 @@ function advance(state, input, dt) {
   if (state.tutorial) { updateTutorial(state); return; }
   if (state.enemies.every(enemy => enemy.hp <= 0)) {
     if (state.pendingWaves.length) {
-      spawnWave(state, state.pendingWaves.shift()); event(state, 'ui', { text: `第 ${state.wave} 波守衛進場`, cue: 'wave' });
+      if(state.waveArrival==null){state.waveArrival=1;event(state,'ui',{text:`第 ${state.wave+1} 波即將進場 · 移動至開闊處`,cue:'wave'});}
+      state.waveArrival=Math.max(0,state.waveArrival-dt);
+      if(state.waveArrival<=0){spawnWave(state,state.pendingWaves.shift());state.waveArrival=null;event(state,'ui',{text:`第 ${state.wave} 波守衛進場 · 清除敵人`,cue:'wave'});}
     } else clearRoom(state);
   }
 }
@@ -672,7 +676,15 @@ export function restoreRun(saved) {
     if (state.phase === 'tutorial' && (!state.tutorial || !Number.isInteger(state.tutorial.step) || state.tutorial.step < 0 || state.tutorial.step > 5)) return null;
     state.room = copy([...ROOMS, TUTORIAL_ROOM, BOSS_ROOM].find(r => r.id === state.room.id));
     state.settings ||= {}; state.events = []; state.effects = []; state.projectiles ||= []; state.pendingWaves ||= [];
+    if(state.waveArrival!=null&&(!Number.isFinite(state.waveArrival)||state.waveArrival<0||state.waveArrival>1))return null;
     if (state.pendingWaves.some(wave => !Array.isArray(wave) || wave.some(type => !ENEMIES[type]))) return null;
+    const plan = journeyPlan(state);
+    if (state.phase === 'reward' && (state.roomsCleared < 1 || state.roomsCleared >= plan.rooms + plan.crowns || !state.rewardOptions.length || !state.rewardOptions.some(o => o.id === 'restore' && o.kind === 'heal'))) return null;
+    if (state.phase === 'route') {
+      if (state.roomsCleared < 1 || state.roomsCleared >= plan.rooms + plan.crowns || !state.routeOptions.length) return null;
+      if (state.roomsCleared >= plan.rooms && state.routeOptions.some(o => o.roomId !== BOSS_ROOM.id)) return null;
+      if (state.roomsCleared < plan.rooms && state.routeOptions.some(o => o.roomId === BOSS_ROOM.id || state.roomHistory.some(v => v.id === o.roomId))) return null;
+    }
     state.rewardChoices = state.rewardOptions || []; state.routeChoices = state.routeOptions || [];
     state.paused = false; refreshStats(state); state.entrySnapshot = snapshot(state);
     return state;

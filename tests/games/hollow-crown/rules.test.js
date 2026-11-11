@@ -33,7 +33,7 @@ function forceClear(state) {
   step(state, {}, .02);
 }
 
-test('pacing follow-up: six templates retain later waves and perilous adds one second-wave enemy without delay', () => {
+test('pacing follow-up: templates retain later waves and perilous adds one second-wave enemy after a readable arrival', () => {
   const originalTemplates = structuredClone(ROOMS);
   for (const room of ROOMS) for (let cleared = 0; cleared < 4; cleared++) for (const risk of ['steady', 'perilous']) {
     const state = createRun({ seed: 8801, difficulty: 'standard' });
@@ -52,8 +52,10 @@ test('pacing follow-up: six templates retain later waves and perilous adds one s
       assert.ok(state.roomElapsed - elapsed <= .020001);
       if (wave < waves.length - 1) {
         assert.equal(state.phase, 'combat');
+        assert.equal(state.wave,wave+1);assert.ok(state.waveArrival>0);
+        for(let frame=0;frame<55;frame++)step(state,{},.02);
         assert.equal(state.wave, wave + 2);
-        assert.equal(state.events.at(-1).text, `第 ${wave + 2} 波守衛進場`);
+        assert.equal(state.events.at(-1).text, `第 ${wave + 2} 波守衛進場 · 清除敵人`);
       } else assert.equal(state.phase, 'reward');
     }
   }
@@ -129,8 +131,8 @@ test('pacing follow-up: corrupt added healing amounts are rejected while old mis
   assert.ok(restoreRun(saved));
 });
 
-test('content contains six distinct rooms, five enemy classes, two three-move bosses, twelve talents and six starts', () => {
-  assert.equal(ROOMS.length, 6); assert.equal(new Set(ROOMS.map(r => JSON.stringify(r.obstacles))).size, 6);
+test('content contains twelve distinct rooms, five enemy classes, two three-move bosses, twelve talents and six starts', () => {
+  assert.equal(ROOMS.length, 12); assert.equal(new Set(ROOMS.map(r => JSON.stringify(r.obstacles))).size, 12);
   assert.equal(TALENTS.length, 12); assert.equal(STARTING_TALENTS.length, 6);
   assert.equal(Object.values(ENEMIES).filter(e => !e.boss).length, 5);
   for (const boss of Object.values(ENEMIES).filter(e => e.boss)) assert.equal(boss.moves.length, 3);
@@ -515,4 +517,34 @@ test('guard cancels a held charge instead of firing a charged thrust on the rele
   assert.equal(state.stats.attacks,attacks);
   assert.equal(state.player.action,'block');
   assert.equal(state.player.heldTime,0);
+});
+
+test('every room preserves traversable perimeter routes and obstacle-free player entry',()=>{
+  for(const room of ROOMS){
+    assert.equal(blocked(room,0,6.8,.58),false,room.id);
+    for(const target of [{x:-8,z:-8},{x:8,z:-8},{x:-8,z:8},{x:8,z:8}])assert.ok(findPath(room,{x:0,z:6.8},target,.58).length,room.id+' '+JSON.stringify(target));
+    for(const o of room.obstacles){assert.ok(Math.abs(o.x)+(o.r||o.w/2)<9.5);assert.ok(Math.abs(o.z)+(o.r||o.d/2)<9.5);}
+  }
+});
+
+test('tutorial graduation describes journey-independent reward and throne progression',()=>{
+  const s=startTutorial();s.tutorial.step=3;s.stats.parries=1;step(s,{},.02);
+  assert.equal(s.tutorial.step,4);assert.match(s.tutorial.text,/長程或短程/);assert.doesNotMatch(s.tutorial.text,/四房|六房/);
+});
+
+
+test('expanded two-act checkpoints preserve twelve distinct encounters, stories and both crowns',()=>{
+ let s=createRun({seed:72,challenge:'long-watch-extended'});const bosses=[];
+ for(let i=0;i<14;i++){
+  s=restoreRun(checkpoint(s));assert.ok(s);
+  if(i>=12)bosses.push(s.enemies[0].type);
+  if(i>=6&&i<12)assert.equal(s.pendingWaves.length,2);
+  forceClear(s);s=restoreRun(checkpoint(s));assert.ok(s);
+  if(s.story)chooseStory(s,s.story.choices[0].id);
+  if(i===13)break;
+  chooseReward(s,'restore');assert.ok(s.routeOptions.length);
+  for(const o of s.routeOptions)if(i<11)assert.ok(ROOMS.slice(i<5?0:6,i<5?6:12).some(r=>r.id===o.roomId));
+  enterRoom(s,s.routeOptions[0].roomId,s.routeOptions[0].risk);
+ }
+ assert.equal(s.result.won,true);assert.equal(new Set(s.roomHistory.slice(0,12).map(r=>r.id)).size,12);assert.deepEqual(bosses,['regent','arbiter']);assert.equal(s.stories.length,3);
 });
