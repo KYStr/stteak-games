@@ -38,3 +38,13 @@ svg .branch-safe{fill:none;stroke:#176b72;stroke-width:4}svg .branch-current,svg
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
 body.diving .sail-controls>div{display:none}body.diving #mini-chart{display:none!important}
+
+@media(min-width:901px) and (min-height:651px){
+ #mini-chart{left:30px;right:auto;top:330px;bottom:auto}
+ #voyage-hud{max-height:204px;overflow:visible}
+ #voyage-hud h1{margin:8px 0 6px;font-size:22px}.meters{margin-top:10px}
+}
+#dive-direction{position:fixed;transform:translate(-50%,-50%);z-index:3;pointer-events:none;border:1px solid #ffdd9b;background:#143f48ee;color:#ffdd9b;border-radius:6px;padding:6px 10px;text-align:center}
+#dive-direction span{display:block;font-size:23px}#dive-direction small{display:block}
+
+body.software nav button,body.software #tide-hud,body.software .modal{backdrop-filter:none}

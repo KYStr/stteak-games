@@ -12,17 +12,26 @@ float h=(sin(a)*.34+sin(b)*.22+sin(c)*.18)*uMotion;p.z+=h+uTide;
 vec4 world=modelMatrix*vec4(p,1.);vWorld=world.xyz;vWave=h;vNormal=normalize(vec3(-cos(a)*.0255*uMotion-cos(c)*.00738*uMotion,1.,-cos(b)*.0242*uMotion-cos(c)*.00738*uMotion));
 gl_Position=projectionMatrix*viewMatrix*world;}`;
 const oceanFragment=`
-uniform float uTime;uniform vec3 uCamera;uniform float uDive;
+uniform float uTime;uniform vec3 uCamera;uniform float uDive;uniform float uEconomy;
 varying vec3 vWorld;varying vec3 vNormal;varying float vWave;
 void main(){vec3 deep=vec3(.055,.34,.40),shallow=vec3(.10,.53,.55);float l=.52+vWave*.55;vec3 col=mix(deep,shallow,l);
+if(uEconomy>.5){float ripple=sin(vWorld.x*.13+vWorld.z*.17+uTime*.4);col+=smoothstep(.94,1.,ripple)*.025;float fog=smoothstep(240.,650.,length(uCamera-vWorld));gl_FragColor=vec4(mix(col,vec3(.69,.82,.79),fog),1.);return;}
 vec3 light=normalize(vec3(-.5,1.,-.35));vec3 viewDir=normalize(uCamera-vWorld);float spec=pow(max(dot(reflect(-light,vNormal),viewDir),0.),180.);
 float ripple=sin(vWorld.x*.22+sin(vWorld.z*.13)*1.3+uTime*.4)*sin(vWorld.z*.27+sin(vWorld.x*.14));float glint=smoothstep(.94,.999,ripple)*.085;
 col+=vec3(.82,.88,.70)*spec*.45+glint;float fog=smoothstep(240.,650.,distance(uCamera,vWorld));col=mix(col,vec3(.69,.82,.79),fog);
 gl_FragColor=vec4(col,1.-uDive*.43);}`;
 
+// Economy water keeps the vertex waves and tide palette; highlights interpolate
+// from those waves instead of evaluating trigonometry/specular per fragment.
+const economyOceanFragment=`
+uniform vec3 uCamera;varying vec3 vWorld;varying float vWave;
+void main(){vec3 col=mix(vec3(.055,.34,.40),vec3(.10,.53,.55),.52+vWave*.55);
+col+=smoothstep(.21,.34,vWave)*.025;float fog=smoothstep(240.,650.,length(uCamera-vWorld));
+gl_FragColor=vec4(mix(col,vec3(.69,.82,.79),fog),1.);}`;
+
 function ids(collection){return new Set(Array.isArray(collection)?collection.map(x=>typeof x==='string'?x:x.id):Object.keys(collection||{}));}
-function markerRing(radius,color){const m=mesh(new THREE.TorusGeometry(radius,.15,5,40),material('navigation-ring',color,.6,{emissive:color,emissiveIntensity:.12}));m.rotation.x=-Math.PI/2;m.castShadow=false;return m;}
-function instanceTrees(scene,placements,mangrove=false){if(!placements.length)return [];const prototype=createPalm(1,mangrove);prototype.updateMatrixWorld(true);const objects=[];prototype.traverse(part=>{if(!part.isMesh)return;const inst=new THREE.InstancedMesh(part.geometry,part.material,placements.length);inst.name=mangrove?'instanced-mangroves':'instanced-palms';inst.castShadow=true;inst.receiveShadow=true;const mat=new THREE.Matrix4(),q=new THREE.Quaternion(),s=new THREE.Vector3();placements.forEach((v,i)=>{q.setFromAxisAngle(new THREE.Vector3(0,1,0),v.a);s.setScalar(v.scale);mat.compose(new THREE.Vector3(v.x,v.y,v.z),q,s).multiply(part.matrixWorld);inst.setMatrixAt(i,mat);});inst.computeBoundingSphere();scene.add(inst);objects.push(inst);});return objects;}
+function markerRing(radius,color){const m=mesh(new THREE.TorusGeometry(radius,.22,5,40),material('navigation-ring',color,.6,{emissive:color,emissiveIntensity:.12}));m.rotation.x=-Math.PI/2;m.castShadow=false;return m;}
+function instanceTrees(scene,placements,mangrove=false,economy=false){if(!placements.length)return [];const prototype=(economy?batchColored:batchStatic)(createPalm(1,mangrove));prototype.updateMatrixWorld(true);const objects=[];prototype.traverse(part=>{if(!part.isMesh)return;const inst=new THREE.InstancedMesh(part.geometry,part.material,placements.length);inst.name=mangrove?'instanced-mangroves':'instanced-palms';inst.castShadow=true;inst.receiveShadow=true;const mat=new THREE.Matrix4(),q=new THREE.Quaternion(),s=new THREE.Vector3();placements.forEach((v,i)=>{q.setFromAxisAngle(new THREE.Vector3(0,1,0),v.a);s.setScalar(v.scale);mat.compose(new THREE.Vector3(v.x,v.y,v.z),q,s).multiply(part.matrixWorld);inst.setMatrixAt(i,mat);});inst.computeBoundingSphere();scene.add(inst);objects.push(inst);});return objects;}
 
 // Merge only direct static children: sail rigs, skeletons and animated groups keep their transforms.
 function batchStatic(root){
@@ -39,35 +48,58 @@ function batchStatic(root){
   return root;
 }
 
+// Software rendering pays for each submission. Opaque static colours can be
+// baked into vertex colours without removing any geometry or authored detail.
+// Emissive, transparent, skinned and nested animated objects keep their owners.
+function batchColored(root){
+  root.updateMatrixWorld(true);
+  const children=[...root.children].filter(o=>o.isMesh&&!o.isSkinnedMesh&&!Array.isArray(o.material)&&!o.material.transparent&&o.material.emissive?.getHex()===0);
+  if(children.length<2)return batchStatic(root);
+  const geometries=children.map(child=>{
+    const g=child.geometry.index?child.geometry.toNonIndexed():child.geometry.clone();
+    for(const name of Object.keys(g.attributes))if(!['position','normal','uv','color'].includes(name))g.deleteAttribute(name);
+    if(!g.attributes.uv)g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));
+    const colors=new Float32Array(g.attributes.position.count*3),old=g.attributes.color,c=child.material.color;
+    for(let i=0;i<g.attributes.position.count;i++){colors[i*3]=c.r*(old?old.getX(i):1);colors[i*3+1]=c.g*(old?old.getY(i):1);colors[i*3+2]=c.b*(old?old.getZ(i):1);}
+    g.setAttribute('color',new THREE.BufferAttribute(colors,3));return g.applyMatrix4(child.matrix);
+  });
+  const merged=mergeGeometries(geometries);geometries.forEach(g=>g.dispose());if(!merged)return root;
+  const combined=new THREE.Mesh(merged,new THREE.MeshStandardMaterial({name:'baked-static-colours',color:0xffffff,vertexColors:true,roughness:.78}));combined.name='colour-batched-'+root.name;combined.castShadow=children.some(o=>o.castShadow);combined.receiveShadow=true;
+  children.forEach(o=>root.remove(o));root.add(combined);return root;
+}
+
 export function createScene(canvas, worldData) {
   const {ISLANDS=[],DISCOVERIES=[],REEFS=[],CURRENTS=[],WHIRLS=[],DIVE_SITES=[],OBSERVATIONS=[]}=worldData;
   const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false,powerPreference:'high-performance'});renderer.setClearColor(0xb1d2ca);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
   const gl=renderer.getContext(),debug=gl.getExtension('WEBGL_debug_renderer_info');
   const software=!!debug&&/swiftshader|llvmpipe|software/i.test(gl.getParameter(debug.UNMASKED_RENDERER_WEBGL));
+  const batchSurface=software?batchColored:batchStatic;
   const scene=new THREE.Scene();scene.background=new THREE.Color(0xb1d2ca);scene.fog=new THREE.Fog(0xb1d2ca,230,620);
   const camera=new THREE.PerspectiveCamera(43,1,.35,1000);camera.position.set(0,73,229);
   const hemi=new THREE.HemisphereLight(0xe8f6e3,0x397876,2.3);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffecd1,3.0);sun.position.set(-130,220,-100);sun.castShadow=true;sun.shadow.mapSize.set(768,768);sun.shadow.camera.left=-95;sun.shadow.camera.right=95;sun.shadow.camera.top=95;sun.shadow.camera.bottom=-95;sun.shadow.camera.near=5;sun.shadow.camera.far=480;sun.shadow.bias=-.0005;sun.shadow.normalBias=.18;scene.add(sun);scene.add(sun.target);
-  const oceanMaterial=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uTide:{value:0},uMotion:{value:1},uCamera:{value:camera.position},uDive:{value:0}},vertexShader:oceanVertex,fragmentShader:oceanFragment,side:THREE.DoubleSide,transparent:true,depthWrite:true});
+  const oceanMaterial=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uTide:{value:0},uMotion:{value:1},uCamera:{value:camera.position},uDive:{value:0},uEconomy:{value:0}},vertexShader:oceanVertex,fragmentShader:oceanFragment,side:THREE.FrontSide,transparent:false,depthWrite:true});
+  const economyOceanMaterial=new THREE.ShaderMaterial({uniforms:oceanMaterial.uniforms,vertexShader:oceanVertex,fragmentShader:economyOceanFragment,side:THREE.FrontSide});
   let waterDetail=64;const water=new THREE.Mesh(new THREE.PlaneGeometry(1500,1500,waterDetail,waterDetail),oceanMaterial);water.rotation.x=-Math.PI/2;water.name='displaced-ocean-surface';water.frustumCulled=false;water.renderOrder=0;scene.add(water);
+  const surfaceObjects=[];
   const islandRecords=[],discoveries=[],landVoyagers=[],diveRecords=[],palmPlaces=[],mangrovePlaces=[];
   let lighthouse,beaconLight,beaconBeam;
   for(const data of ISLANDS){
-    const land=createIsland(data);land.position.set(data.x,0,data.z);scene.add(land);const detail=new THREE.Group();detail.name=`island-detail-${data.id}`;detail.position.set(data.x,0,data.z);scene.add(detail);const ground=land.userData.groundHeight;
-    if(data.id==='harbor')detail.add(batchStatic(createHarbor()));
+    const land=batchSurface(createIsland(data));land.position.set(data.x,0,data.z);scene.add(land);const detail=new THREE.Group();detail.name=`island-detail-${data.id}`;detail.position.set(data.x,0,data.z);scene.add(detail);const ground=land.userData.groundHeight;
+    if(data.id==='harbor')detail.add(batchSurface(createHarbor()));
     if(data.id==='lighthouse'){
-      lighthouse=createLighthouse(false);lighthouse.position.y=ground;detail.add(lighthouse);const lens=lighthouse.getObjectByName('keeper-lens');lens.material=lens.material.clone();lens.material.name='keeper-lens-active';beaconLight=new THREE.PointLight(0xffdc8a,0,80,2);beaconLight.position.set(data.x,ground+25,data.z);scene.add(beaconLight);
+      lighthouse=createLighthouse(false);lighthouse.position.y=ground;detail.add(lighthouse);const lens=lighthouse.getObjectByName('keeper-lens');lens.material=lens.material.clone();lens.material.name='keeper-lens-active';lighthouse.remove(lens);batchStatic(lighthouse);lighthouse.add(lens);beaconLight=new THREE.PointLight(0xffdc8a,0,80,2);beaconLight.position.set(data.x,ground+25,data.z);scene.add(beaconLight);
       beaconBeam=mesh(new THREE.ConeGeometry(17,110,24,1,true),material('restored-beacon-ray',0xffe5a0,.6,{transparent:true,opacity:.075,depthWrite:false,side:THREE.DoubleSide,emissive:0xffe2a2,emissiveIntensity:.8}),0,0,0,'restored-lighthouse-beam');beaconBeam.geometry.translate(0,-55,0);beaconBeam.rotation.z=Math.PI/2;const rotor=new THREE.Group();rotor.name='beacon-rotation';rotor.position.set(data.x,ground+25,data.z);rotor.add(beaconBeam);scene.add(rotor);beaconBeam.userData.rotor=rotor;rotor.visible=false;
     }
-    const toward=new THREE.Vector3(data.x-data.dock.x,0,data.z-data.dock.z);const length=Math.max(8,toward.length()-data.radius*.63);const pier=batchStatic(createPier(length));pier.rotation.y=Math.atan2(toward.x,toward.z);pier.position.set(data.dock.x+Math.cos(pier.rotation.y)*7,0,data.dock.z-Math.sin(pier.rotation.y)*7);scene.add(pier);
+    const toward=new THREE.Vector3(data.x-data.dock.x,0,data.z-data.dock.z);const length=Math.max(8,toward.length()-data.radius*.63);const pier=batchSurface(createPier(length));pier.rotation.y=Math.atan2(toward.x,toward.z);pier.position.set(data.dock.x+Math.cos(pier.rotation.y)*7,0,data.dock.z-Math.sin(pier.rotation.y)*7);scene.add(pier);surfaceObjects.push({object:pier,x:data.dock.x,z:data.dock.z});
     const harborRing=markerRing(5.9,0xffd88d);harborRing.position.set(data.dock.x,.85,data.dock.z);scene.add(harborRing);
     const bollard=mesh(new THREE.CylinderGeometry(.7,.9,4.5,8),material('dock-marker',PALETTE.coral),data.dock.x+Math.cos(pier.rotation.y)*4,2.8,data.dock.z-Math.sin(pier.rotation.y)*4,'safe-mooring-marker');scene.add(bollard);
-    const portLight=mesh(new THREE.IcosahedronGeometry(.9,0),material('port-lantern',PALETTE.cream,.4,{emissive:0xffd986,emissiveIntensity:.5}),0,2.9,0,'dock-lantern');bollard.add(portLight);
+    const portLight=mesh(new THREE.IcosahedronGeometry(.9,0),material('port-lantern',PALETTE.cream,.4,{emissive:0xffd986,emissiveIntensity:.5}),0,2.9,0,'dock-lantern');bollard.add(portLight);surfaceObjects.push({object:bollard,x:data.dock.x,z:data.dock.z});
     if(data.id!=='reef'&&data.id!=='ruin'&&data.id!=='lighthouse')for(let i=0;i<(data.id==='mangrove'?7:4);i++){const a=i*2.399+data.x*.01,r=data.radius*(.3+.1*(i%3));(data.id==='mangrove'?mangrovePlaces:palmPlaces).push({x:data.x+Math.cos(a)*r,y:ground,z:data.z+Math.sin(a)*r,a,scale:.75+(i%3)*.14});}
     if(data.id==='harbor'||data.id==='gull'){const person=createVoyager();person.scale.setScalar(1.3);person.position.set(-3,ground, -data.radius*.55);detail.add(person);const mixer=new THREE.AnimationMixer(person);mixer.clipAction(person.animations[data.id==='harbor'?2:0]).play();landVoyagers.push({mixer,person,islandId:data.id});}
-    for(const [i,d] of DISCOVERIES.filter(d=>d.islandId===data.id&&!d.diveSiteId).entries()){const model=createDiscovery(d.id);const a=-Math.PI*.7+i*1.3;model.position.set(Math.sin(a)*data.radius*.37,ground+.3,Math.cos(a)*data.radius*.37);if(d.id==='tern')model.position.y+=4.5;detail.add(model);const ring=markerRing(3,PALETTE.brass);ring.position.copy(model.position);ring.position.y=ground+.15;detail.add(ring);discoveries.push({id:d.id,model,ring,baseY:model.position.y,animal:d.kind==='animal'});}
+    for(const [i,d] of DISCOVERIES.filter(d=>d.islandId===data.id&&!d.diveSiteId).entries()){const model=batchStatic(createDiscovery(d.id));const a=-Math.PI*.7+i*1.3;model.position.set(Math.sin(a)*data.radius*.37,ground+.3,Math.cos(a)*data.radius*.37);if(d.id==='tern')model.position.y+=4.5;detail.add(model);const ring=markerRing(3,PALETTE.brass);ring.position.copy(model.position);ring.position.y=ground+.15;detail.add(ring);discoveries.push({id:d.id,model,ring,baseY:model.position.y,animal:d.kind==='animal'});}
     islandRecords.push({land,detail,ring:harborRing,data});
   }
-  const vegetation=[...instanceTrees(scene,palmPlaces),...instanceTrees(scene,mangrovePlaces,true)];
+  const vegetation=[...instanceTrees(scene,palmPlaces,false,software),...instanceTrees(scene,mangrovePlaces,true,software)];
   const buoyPrototype=batchStatic(createSurveyBuoy());
   const surveyRecords=OBSERVATIONS.map(data=>{
     const model=buoyPrototype.clone(true);model.name=`survey-${data.id}`;scene.add(model);
@@ -76,19 +108,22 @@ export function createScene(canvas, worldData) {
   });
   const navigationRing=markerRing(4,0x548feb);scene.add(navigationRing);
   const navigationPin=mesh(new THREE.ConeGeometry(.7,2.2,6),material('navigation-guide',0x548feb,.5,{emissive:0x295cba,emissiveIntensity:.25}),0,0,0,'selected-route-waypoint');scene.add(navigationPin);
-  const reefRecords=REEFS.map(data=>{const model=createReef(data.radius);model.scale.y=.42;const bounds=new THREE.Box3().setFromObject(model);model.position.set(data.x,data.safeHeight*1.7-bounds.max.y,data.z);scene.add(model);const ring=markerRing(data.radius+.5,0xed9b73);ring.position.set(data.x,0,data.z);scene.add(ring);return{data,model,ring};});
+  const reefRecords=REEFS.map(data=>{const model=batchStatic(createReef(data.radius));model.scale.y=.42;const bounds=new THREE.Box3().setFromObject(model);model.position.set(data.x,data.safeHeight*1.7-bounds.max.y,data.z);scene.add(model);const ring=markerRing(data.radius+.5,0xed9b73);ring.position.set(data.x,0,data.z);scene.add(ring);return{data,model,ring};});
   const currentRecords=CURRENTS.map((data,index)=>{const arrows=[];for(let i=0;i<7;i++){const a=batchStatic(createCurrentArrow());a.position.set(data.x+(index?8:-8)*Math.sin(i),.3,data.z+(i-3)*15);scene.add(a);arrows.push(a);}return{data,arrows};});
   const whirlRecords=WHIRLS.map(data=>{const model=batchStatic(createWhirlpool(data.radius));model.position.set(data.x,0,data.z);scene.add(model);const rim=markerRing(data.radius,PALETTE.coral);rim.position.copy(model.position);scene.add(rim);return{data,model,rim};});
   // Three shallow sites are distinct real underwater gardens in world coordinates.
   for(const site of DIVE_SITES){const group=new THREE.Group();group.name=`underwater-${site.id}`;const floor=mesh(new THREE.CylinderGeometry(site.radius,site.radius*1.1,2,16),material('underwater-sand',0xa4c6ad),site.entry.x,-9.5,site.entry.z,'shallow-seabed');group.add(floor);
-    const objects=[];for(let i=0;i<14;i++){const a=i*2.4,r=8+(i%4)*4;const d=createDiscovery(site.id==='ruin-dive'?(i%3?'glass-coral':'star-tablet'):i%2?'fan-coral':'seagrass');d.scale.setScalar(.45+(i%3)*.2);d.position.set(site.entry.x+Math.sin(a)*r,-8.6,site.entry.z+Math.cos(a)*r);group.add(d);objects.push(d);}
-    const treasure=createDiscovery(site.discoveryId);treasure.position.set(site.target.x,-6.8,site.target.z);treasure.scale.setScalar(1.35);group.add(treasure);discoveries.push({id:site.discoveryId,model:treasure,ring:null,baseY:-6.8,animal:site.discoveryId!=='tide-clock',underwater:true});
+    const dressing=new THREE.Group();dressing.name='dive-garden';group.add(dressing);for(let i=0;i<14;i++){const a=i*2.4,r=8+(i%4)*4;const d=createDiscovery(site.id==='ruin-dive'?(i%3?'glass-coral':'star-tablet'):i%2?'fan-coral':'seagrass');d.scale.setScalar(.45+(i%3)*.2);d.position.set(site.entry.x+Math.sin(a)*r,-8.6,site.entry.z+Math.cos(a)*r);d.updateMatrixWorld(true);d.traverse(o=>{if(!o.isMesh)return;const copy=new THREE.Mesh(o.geometry,o.material);copy.applyMatrix4(o.matrixWorld);dressing.add(copy);});}
+    batchStatic(dressing);
+    const treasure=batchStatic(createDiscovery(site.discoveryId));treasure.position.set(site.target.x,-6.8,site.target.z);treasure.scale.setScalar(1.35);group.add(treasure);discoveries.push({id:site.discoveryId,model:treasure,ring:null,baseY:-6.8,animal:site.discoveryId!=='tide-clock',underwater:true});
     const part=mesh(new THREE.OctahedronGeometry(1.2),material(`lighthouse-part-${site.partId}`,PALETTE.brass,.28,{metalness:.45,emissive:0xffcc67,emissiveIntensity:.3}),site.target.x+2,-6.1,site.target.z,'recoverable-lighthouse-part');group.add(part);
     const partRing=markerRing(4,PALETTE.brass);partRing.position.set(site.target.x,-8.4,site.target.z);group.add(partRing);
-    const bubbles=[];for(const b of site.bubbles){const source=mesh(new THREE.IcosahedronGeometry(.9,0),material('oxygen-spring',0xb9fbf0,.2,{emissive:0x72dcc5,emissiveIntensity:.6}),b.x,-8.1,b.z,'oxygen-spring');group.add(source);for(let i=0;i<8;i++){const bubble=mesh(new THREE.IcosahedronGeometry(.16+(i%3)*.07,1),material('oxygen-bubble',0xd8fff2,.2,{transparent:true,opacity:.6}),b.x,-7+i*.8,b.z);bubble.castShadow=false;group.add(bubble);bubbles.push({mesh:bubble,x:b.x,z:b.z,phase:i*.8});}}
-    const returnRing=markerRing(4,0x88eed9);returnRing.position.set(site.entry.x,-8.1,site.entry.z);group.add(returnRing);const line=mesh(new THREE.CylinderGeometry(.045,.045,8,5),material('dive-return-rope',PALETTE.cream),site.entry.x,-3.3,site.entry.z,'return-to-vessel-rope');group.add(line);scene.add(group);diveRecords.push({site,group,part,partRing,bubbles,objects,treasure});
+    const bubbles=[],bubbleGeometry=new THREE.IcosahedronGeometry(1,0),bubbleMaterial=material('oxygen-bubble',0xd8fff2,.2,{transparent:true,opacity:.6});
+    const bubbleMesh=new THREE.InstancedMesh(bubbleGeometry,bubbleMaterial,site.bubbles.length*8);bubbleMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);bubbleMesh.frustumCulled=false;group.add(bubbleMesh);
+    for(const b of site.bubbles){const source=mesh(new THREE.IcosahedronGeometry(.9,0),material('oxygen-spring',0xb9fbf0,.2,{emissive:0x72dcc5,emissiveIntensity:.6}),b.x,-8.1,b.z,'oxygen-spring');group.add(source);for(let i=0;i<8;i++)bubbles.push({x:b.x,z:b.z,phase:i*.8,scale:.16+(i%3)*.07});}
+    const returnRing=markerRing(4,0x88eed9);returnRing.position.set(site.entry.x,-8.1,site.entry.z);group.add(returnRing);const line=mesh(new THREE.CylinderGeometry(.045,.045,8,5),material('dive-return-rope',PALETTE.cream),site.entry.x,-3.3,site.entry.z,'return-to-vessel-rope');group.add(line);scene.add(group);diveRecords.push({site,group,part,partRing,bubbles,bubbleMesh,treasure});
   }
-  const boatRoot=new THREE.Group();boatRoot.name='player-buoyant-vessel';scene.add(boatRoot);const boats=['steady','swift','cargo'].map(id=>{const model=createBoat(id);batchStatic(model.getObjectByName('sail-rig'));batchStatic(model);model.visible=id==='steady';boatRoot.add(model);return model;});
+  const boatRoot=new THREE.Group();boatRoot.name='player-buoyant-vessel';scene.add(boatRoot);const boats=['steady','swift','cargo'].map(id=>{const model=createBoat(id);batchSurface(model.getObjectByName('sail-rig'));batchSurface(model);model.visible=id==='steady';boatRoot.add(model);return model;});
   const skipper=createVoyager();skipper.scale.setScalar(.83);skipper.position.set(-.9,1.1,3.5);boatRoot.add(skipper);const skipperMixer=new THREE.AnimationMixer(skipper);skipperMixer.clipAction(skipper.animations[0]).play();
   const diver=createVoyager();diver.scale.setScalar(1.2);scene.add(diver);const diverMixer=new THREE.AnimationMixer(diver);diverMixer.clipAction(diver.animations[1]).play();diver.visible=false;
   const wakes=[];for(let i=0;i<10;i++){const w=markerRing(1.6+i*.18,0xc2ead7);w.material.transparent=true;w.material.opacity=.3;scene.add(w);wakes.push(w);}
@@ -108,20 +143,25 @@ export function createScene(canvas, worldData) {
   batchStatic(celebration);
   let celebrationShown=false,celebrationClock=0;
   let renderScale=software?.85:1,slowFrames=0,fastFrames=0;
+  const cpu={update:{total:0,max:0,count:0},render:{total:0,max:0,count:0}};
   let cameraMode='follow',orbitOffset=0,quality='high',disposed=false,elapsed=0,frameCount=0,lastState=null,restored=false,lastDive=false;
+  const bubbleTransform=new THREE.Object3D(),projected=new THREE.Vector3();
+  let reduced=false,viewWidth=1280,viewHeight=720;
   const target=new THREE.Vector3(),desiredCamera=new THREE.Vector3(),look=new THREE.Vector3(0,0,157),direction=new THREE.Vector3();
-  function resize(){if(disposed)return;const rect=canvas.getBoundingClientRect();const width=Math.max(1,rect.width||canvas.clientWidth||1280),height=Math.max(1,rect.height||canvas.clientHeight||720);renderer.setSize(width,height,false);renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,quality==='low'?1:1.5)*renderScale);camera.aspect=width/height;camera.updateProjectionMatrix();}
-  function setQuality(next){if(quality===next)return;quality=next;renderer.shadowMap.enabled=quality==='high';waterDetail=quality==='high'?64:32;water.geometry.dispose();water.geometry=new THREE.PlaneGeometry(1500,1500,waterDetail,waterDetail);vegetation.forEach(m=>m.castShadow=quality==='high');resize();}
+  function resize(){if(disposed)return;const rect=canvas.getBoundingClientRect();const width=Math.max(1,rect.width||canvas.clientWidth||1280),height=Math.max(1,rect.height||canvas.clientHeight||720);viewWidth=width;viewHeight=height;renderer.setSize(width,height,false);renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,quality==='low'?1:1.5)*renderScale);camera.aspect=width/height;camera.updateProjectionMatrix();}
+  const economyMaterials=new Map(),originalMaterials=new Map();
+  scene.traverse(o=>{if(o.isMesh&&o.material?.isMeshStandardMaterial){const m=o.material;originalMaterials.set(o,m);if(!economyMaterials.has(m)){const cheap=new THREE.MeshLambertMaterial({name:m.name,color:m.color,emissive:m.emissive,emissiveIntensity:m.emissiveIntensity,transparent:m.transparent,opacity:m.opacity,side:m.side,depthWrite:m.depthWrite,vertexColors:m.vertexColors});economyMaterials.set(m,cheap);}}});
+  function setQuality(next){if(quality===next)return;quality=next;water.material=quality==='low'?economyOceanMaterial:oceanMaterial;renderer.toneMapping=quality==='low'?THREE.NoToneMapping:THREE.ACESFilmicToneMapping;for(const [o,m]of originalMaterials)o.material=quality==='low'?economyMaterials.get(m):m;oceanMaterial.uniforms.uEconomy.value=quality==='low'?1:0;renderer.shadowMap.enabled=quality==='high';waterDetail=quality==='high'?64:32;water.geometry.dispose();water.geometry=new THREE.PlaneGeometry(1500,1500,waterDetail,waterDetail);vegetation.forEach(m=>m.castShadow=quality==='high');resize();}
   function update(state,dt=0,options={}) {
-    if(disposed)return;lastState=state;
+    if(disposed)return;const updateStart=performance.now();lastState=state;
     if(dt>.036){slowFrames++;fastFrames=0;}else if(dt>0&&dt<.024){fastFrames++;slowFrames=Math.max(0,slowFrames-1);}
     if(slowFrames>45&&renderScale>.6){renderScale=Math.max(.6,renderScale-.15);slowFrames=0;resize();}else if(fastFrames>600&&renderScale<1){renderScale=Math.min(1,renderScale+.1);fastFrames=0;resize();}const frozen=!!options.paused;const step=frozen?0:Math.min(dt,.1);elapsed+=step;frameCount++;
-    setQuality(options.quality==='auto'?(software?'low':'high'):options.quality||'high');const t=Number(state.time)||0;const tidal=tideAt(t);const waterY=tidal.height*1.7;const motion=options.reducedMotion?.18:1;const diving=state.mode==='diving';
+    setQuality(options.quality==='auto'?(software?'low':'high'):options.quality||'high');const t=Number(state.time)||0;const tidal=tideAt(t);const waterY=tidal.height*1.7;reduced=!!options.reducedMotion;const motion=options.reducedMotion?.18:1;const diving=state.mode==='diving';
     oceanMaterial.uniforms.uTime.value=t;oceanMaterial.uniforms.uTide.value=waterY;oceanMaterial.uniforms.uMotion.value=motion;oceanMaterial.uniforms.uDive.value=diving?1:0;
     const b=state.boat||{x:0,z:157,heading:0,speed:0,sail:0};const wave=(x,z)=>Math.sin(x*.075+t*.9)*.34+Math.sin(z*.11-t*.65)*.22+Math.sin((x+z)*.041+t*.55)*.18;
     boatRoot.position.set(b.x,waterY+.14+wave(b.x,b.z)*motion,b.z);boatRoot.rotation.set((wave(b.x,b.z-3)-wave(b.x,b.z+3))*.075*motion,-(b.heading||0),(wave(b.x-2,b.z)-wave(b.x+2,b.z))*.11*motion,'YXZ');
     const rig=state.rigId||b.rig||'steady';boats.forEach(o=>{o.visible=o.userData.rig===rig;const sail=o.getObjectByName('sail-rig');const deployment=typeof b.sail==='number'?b.sail:1;sail.scale.y=.15+Math.max(0,Math.min(1,deployment))*.85;sail.rotation.y=Math.sin(t*.6)*.025*motion;});
-    skipperMixer.update(step);landVoyagers.forEach(p=>{if(!(options.reducedMotion&&p.islandId==='harbor'))p.mixer.update(step);});diverMixer.update(step);
+    if(!diving)skipperMixer.update(step);landVoyagers.forEach(p=>{const island=ISLANDS.find(i=>i.id===p.islandId);if(!diving&&Math.hypot(b.x-island.x,b.z-island.z)<150&&!options.reducedMotion)p.mixer.update(step);});if(diving)diverMixer.update(step);
     const homecoming=!!state.storyComplete&&state.currentIsland==='harbor';celebration.visible=!!state.storyComplete&&!diving;
     if(!state.storyComplete){celebrationShown=false;celebrationClock=0;}
     else if(homecoming&&!celebrationShown){celebrationShown=true;celebrationClock=0;}
@@ -138,10 +178,10 @@ export function createScene(canvas, worldData) {
       r.ring.position.set(r.data.x,waterY+.12,r.data.z);r.ring.visible=!diving&&!collected&&distance<55;
     }
     const known=ids(state.discoveries);for(const d of discoveries){if(d.ring){d.ring.material.color.setHex(known.has(d.id)?0x84c9a3:PALETTE.brass);d.ring.visible=true;}if(d.animal){d.model.position.y=d.baseY+Math.sin(t*1.7+d.baseY)*.25*motion;d.model.rotation.y=Math.sin(t*.3)*.25;}}
-    for(const r of reefRecords){const unsafe=tidal.height<=r.data.safeHeight;r.ring.position.y=waterY+.15;r.ring.visible=unsafe;r.model.visible=true;}
-    for(const c of currentRecords){const flow=currentAt(c.data.x,c.data.z,t,state.seed||1);const heading=Math.atan2(-flow.x,-flow.z);c.arrows.forEach((a,i)=>{a.position.y=waterY+.18+Math.sin(t+i)*.025;a.rotation.y=Number.isFinite(heading)?heading:0;});}
-    for(const w of whirlRecords){const active=Math.sin(t/240*TAU+w.data.phase)>.25;w.model.position.y=waterY+.19;w.model.rotation.y=options.reducedMotion?0:t*(active?.55:.12);w.model.scale.setScalar(active?1:.75);w.rim.position.y=waterY+.13;w.rim.material.color.setHex(active?PALETTE.coral:PALETTE.brass);w.model.visible=true;}
-    const parts=ids(state.parts);for(const d of diveRecords){d.group.visible=diving&&state.activeDive===d.site.id;d.objects.forEach((o,i)=>o.visible=quality!=='low'||i%3===0);d.part.visible=!parts.has(d.site.partId);d.part.position.y=-6.1+Math.sin(t*1.3)*.18*motion;d.part.rotation.y=t*.6;d.bubbles.forEach((b,i)=>{b.mesh.position.set(b.x+Math.sin(t+i)*.3,-8+((t*.8+b.phase)%8),b.z+Math.cos(t+i)*.3);});}
+    for(const r of reefRecords){const unsafe=tidal.height<=r.data.safeHeight;r.ring.position.y=waterY+.15;const nearby=!diving&&Math.hypot(b.x-r.data.x,b.z-r.data.z)<200;r.ring.visible=unsafe&&nearby;r.model.visible=nearby;}
+    for(const c of currentRecords){const flow=currentAt(c.data.x,c.data.z,t,state.seed||1);const heading=Math.atan2(-flow.x,-flow.z);c.arrows.forEach((a,i)=>{a.visible=!diving&&Math.hypot(b.x-a.position.x,b.z-a.position.z)<140;a.position.y=waterY+.18+Math.sin(t+i)*.025;a.rotation.y=Number.isFinite(heading)?heading:0;});}
+    for(const w of whirlRecords){const active=Math.sin(t/240*TAU+w.data.phase)>.25;w.model.position.y=waterY+.19;w.model.rotation.y=options.reducedMotion?0:t*(active?.55:.12);w.model.scale.setScalar(active?1:.75);w.rim.position.y=waterY+.13;w.rim.material.color.setHex(active?PALETTE.coral:PALETTE.brass);w.rim.visible=w.model.visible=!diving&&Math.hypot(b.x-w.data.x,b.z-w.data.z)<180;}
+    const parts=ids(state.parts);for(const d of diveRecords){d.group.visible=diving&&state.activeDive===d.site.id;d.part.visible=!parts.has(d.site.partId);d.part.position.y=-6.1+Math.sin(t*1.3)*.18*motion;d.part.rotation.y=t*.6;if(d.group.visible){d.bubbles.forEach((b,i)=>{bubbleTransform.position.set(b.x+Math.sin(t+i)*.3,-8+((t*.8+b.phase)%8),b.z+Math.cos(t+i)*.3);bubbleTransform.scale.setScalar(b.scale);bubbleTransform.updateMatrix();d.bubbleMesh.setMatrixAt(i,bubbleTransform.matrix);});d.bubbleMesh.instanceMatrix.needsUpdate=true;}}
     diver.visible=diving;if(diving){const d=state.diver||b;diver.position.set(d.x,-5.9+Math.sin(t*2)*.12*motion,d.z);diver.rotation.set(-Math.PI*.34,-(d.heading||0),0,'YXZ');}
     if(lighthouse&&!!state.lighthouseFixed!==restored){restored=!!state.lighthouseFixed;const lens=lighthouse.getObjectByName('keeper-lens');lens.material.color.setHex(restored?0xffdfa0:0x85ded1);lens.material.emissive.setHex(restored?0xffc85b:0x000000);lens.material.emissiveIntensity=restored?2:0;beaconLight.intensity=restored?50:0;beaconBeam.userData.rotor.visible=restored;}
     if(beaconBeam)beaconBeam.userData.rotor.rotation.y=options.reducedMotion?0:t*.16;
@@ -149,8 +189,10 @@ export function createScene(canvas, worldData) {
     birds.forEach((bird,i)=>{const a=t*.04+i*TAU/4;bird.position.set(119+Math.sin(a)*40,24+i*3,57+Math.cos(a)*30);bird.rotation.y=-a;bird.rotation.z=Math.sin(t*2+i)*.06*motion;bird.visible=!diving&&quality==='high';});
     target.set(diving?(state.diver?.x??b.x):b.x,diving?-5.4:waterY+1,diving?(state.diver?.z??b.z):b.z);
     let heading=-(b.heading||0)+orbitOffset,nearTower=false;
-    if(diving){desiredCamera.set(target.x+18,Math.min(waterY-.65,target.y+8),target.z+23);camera.fov=46;scene.fog.color.setHex(0x397f8a);scene.fog.near=15;scene.fog.far=90;scene.background.setHex(0x397f8a);water.visible=false;}
+    if(diving){const site=DIVE_SITES.find(s=>s.id===state.activeDive);target.set((site.entry.x+site.target.x)/2,-7,(site.entry.z+site.target.z)/2);target.lerp(direction.set(state.diver.x,-7,state.diver.z),.2);desiredCamera.set(target.x+20,target.y+34,target.z+26);camera.fov=50;scene.fog.color.setHex(0x397f8a);scene.fog.near=38;scene.fog.far=120;scene.background.setHex(0x397f8a);water.visible=false;}
     else {water.visible=true;camera.fov=43;scene.fog.color.setHex(0xb1d2ca);scene.fog.near=230;scene.fog.far=620;scene.background.setHex(0xb1d2ca);const overview=cameraMode==='overhead';const towerIsland=ISLANDS.find(i=>i.id==='lighthouse');nearTower=!!towerIsland&&Math.hypot(b.x-towerIsland.x,b.z-towerIsland.z)<78;const steep=overview||nearTower;const dist=steep?42:66,height=steep?108:61;desiredCamera.set(target.x+Math.sin(heading)*dist,target.y+height,target.z+Math.cos(heading)*dist);}
+    const ashore=['island','harbor','result'].includes(state.mode);
+    if(ashore){const island=ISLANDS.find(i=>i.id===state.currentIsland)||ISLANDS[0];target.set(island.x*.72+island.dock.x*.28,island.id==='lighthouse'?12:3,island.z*.72+island.dock.z*.28);desiredCamera.set(target.x+20,target.y+(island.id==='lighthouse'?105:85),target.z+85);camera.setViewOffset(viewWidth,viewHeight,Math.min(210,viewWidth*.16),0,viewWidth,viewHeight);}else camera.clearViewOffset();
     // Near the tall beacon both modes keep a steep, boat-centred sightline.
     // Camera/orbit interpolation between those positions stays above the crown.
     if(lastDive!==diving||(nearTower&&frameCount===1)){camera.position.copy(desiredCamera);look.copy(target);lastDive=diving;}
@@ -161,11 +203,15 @@ export function createScene(canvas, worldData) {
     if(frameCount%4===0||frameCount===1){sun.position.copy(target).add(direction.set(-100,180,-80));sun.target.position.copy(target);sun.target.updateMatrixWorld();renderer.shadowMap.needsUpdate=true;}
     islandRecords.forEach(r=>{r.detail.visible=!diving&&Math.hypot(target.x-r.data.x,target.z-r.data.z)<(quality==='low'?230:420);r.land.visible=!diving;r.ring.position.y=waterY+.14;r.ring.visible=!diving;});vegetation.forEach(v=>v.visible=!diving);boatRoot.visible=!diving;
     if(diving){hemi.intensity=2.8;sun.intensity=1.8;}else{hemi.intensity=2.3;sun.intensity=3;}
-    renderer.render(scene,camera);
+    for(const r of surfaceObjects)r.object.visible=!diving&&Math.hypot(b.x-r.x,b.z-r.z)<180;
+    if(beaconBeam)beaconBeam.userData.rotor.visible=restored&&!diving;
+    const renderStart=performance.now(),updateMs=renderStart-updateStart;cpu.update.total+=updateMs;cpu.update.count++;cpu.update.max=Math.max(cpu.update.max,updateMs);
+    renderer.render(scene,camera);const renderMs=performance.now()-renderStart;cpu.render.total+=renderMs;cpu.render.count++;cpu.render.max=Math.max(cpu.render.max,renderMs);
   }
   function setCamera(mode){cameraMode=mode==='overhead'||mode==='overview'?'overhead':'follow';orbitOffset=0;return cameraMode;}
   function orbit(delta){orbitOffset=THREE.MathUtils.clamp(orbitOffset+(Number(delta)||0),-Math.PI*.8,Math.PI*.8);}
-  function stats(){return{renderer:'Three.js WebGLRenderer',revision:THREE.REVISION,camera:cameraMode,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,frames:frameCount,quality,software,renderScale,waterVertices:water.geometry.attributes.position.count,rig: lastState?.rigId||'steady',sceneMeshes:scene.children.length,actualSkeletons:landVoyagers.length+2,transparentEffects:wakes.length+1,shadowMaps:renderer.shadowMap.enabled?1:0,celebration:{visible:celebration.visible,confetti:confetti.visible,elapsed:celebrationClock}};}
-  function dispose(){if(disposed)return;disposed=true;skipperMixer.stopAllAction();diverMixer.stopAllAction();landVoyagers.forEach(p=>p.mixer.stopAllAction());const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());renderer.dispose();renderer.forceContextLoss();}
-  resize();return{update,resize,dispose,setCamera,orbit,stats};
+  function stats(){return{renderer:'Three.js WebGLRenderer',cpu:Object.fromEntries(Object.entries(cpu).map(([k,v])=>[k,{average:v.total/(v.count||1),max:v.max,count:v.count}])),revision:THREE.REVISION,camera:cameraMode,orbitOffset,projections:lastState?.mode==='diving'?Object.fromEntries(['entry','target'].map(k=>{const site=DIVE_SITES.find(s=>s.id===lastState.activeDive);return[k,project(site[k].x,-6.8,site[k].z)];})):null,reducedMotion:reduced,motionScale:reduced?.18:1,cameraPosition:camera.position.toArray(),cameraTarget:look.toArray(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,frames:frameCount,quality,software,renderScale,waterVertices:water.geometry.attributes.position.count,rig: lastState?.rigId||'steady',sceneMeshes:scene.children.length,actualSkeletons:landVoyagers.length+2,transparentEffects:wakes.length+1,shadowMaps:renderer.shadowMap.enabled?1:0,celebration:{visible:celebration.visible,confetti:confetti.visible,elapsed:celebrationClock}};}
+  function dispose(){if(disposed)return;disposed=true;skipperMixer.stopAllAction();diverMixer.stopAllAction();landVoyagers.forEach(p=>p.mixer.stopAllAction());const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>materials.add(m));});geometries.forEach(g=>g.dispose());for(const m of originalMaterials.values())materials.add(m);for(const m of economyMaterials.values())materials.add(m);materials.add(oceanMaterial);materials.add(economyOceanMaterial);materials.forEach(m=>m.dispose());renderer.dispose();renderer.forceContextLoss();}
+  function project(x,y,z){projected.set(x,y,z).project(camera);return{x:(projected.x+1)*viewWidth/2,y:(1-projected.y)*viewHeight/2,z:projected.z};}
+  resize();return{update,resize,dispose,setCamera,orbit,stats,project};
 }

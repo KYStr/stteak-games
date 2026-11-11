@@ -159,12 +159,41 @@ export function nearestRouteChoice(state, radiusOverride) {
     .map((gate) => ({ ...gate, options: localRouteOptions(state, gate, gate.direction) }))[0] || null;
 }
 
+function routeEntries(gate, direction) {
+  if (typeof direction !== 'string' || !Object.hasOwn(ROUTE_DIRECTIONS, direction) || !Object.hasOwn(gate.directions, direction)) return [];
+  const data = gate.directions[direction];
+  return [validEntry(data.entry) ? data.entry : gate, ...(Array.isArray(data.entries) ? data.entries.filter(validEntry) : [])].map(entry => validOptions(entry.options) ? entry.options : data.options);
+}
 function validSavedRouteChoice(choice) {
-  if (!choice || typeof choice.direction !== 'string' || !Object.hasOwn(ROUTE_DIRECTIONS, choice.direction)) return false;
-  const gate = ROUTE_CHOICES.find((item) => item.id === choice.id);
-  if (!gate || !Object.hasOwn(gate.directions, choice.direction)) return false;
-  const options = gate.directions[choice.direction]?.options;
-  return Array.isArray(options) && options.some((option) => option.id === choice.optionId);
+  if (!choice) return false;
+  const gate = ROUTE_CHOICES.find(item => item.id === choice.id);
+  if (!gate) return false;
+  const entries = routeEntries(gate, choice.direction);
+  // Missing entryIndex is the only legacy form; malformed explicit values are rejected.
+  const index = Object.hasOwn(choice, 'entryIndex') ? choice.entryIndex : 0;
+  return Number.isInteger(index) && index >= 0 && !!entries[index]?.some(option => option.id === choice.optionId);
+}
+export function restoreNavigation(saved, voyage) {
+  if (!saved || !Number.isInteger(saved.legIndex) || saved.legIndex !== voyage.legIndex || !Number.isInteger(saved.index) || saved.index < 0) return null;
+  const gate = ROUTE_CHOICES.find(item => item.id === saved.choiceId);
+  if (!gate) return null;
+  const history = voyage.routeChoices.find(item => item.id === gate.id && item.optionId === saved.optionId && item.legIndex === saved.legIndex);
+  if (!history) return null;
+  const legacy = !Object.hasOwn(saved, 'direction') && !Object.hasOwn(saved, 'entryIndex');
+  const direction = legacy ? history.direction : saved.direction;
+  if (direction !== history.direction) return null;
+  const entries = routeEntries(gate, direction);
+  let entryIndex = saved.entryIndex;
+  if (legacy) {
+    const matches = entries.map((options, index) => ({ option: options.find(o => o.id === saved.optionId), index })).filter(({option}) => option && Array.isArray(saved.waypoints) && saved.waypoints.length === option.waypoints.length && saved.waypoints.every((p,i) => p && Number.isFinite(p.x) && Number.isFinite(p.z) && p.x === option.waypoints[i].x && p.z === option.waypoints[i].z));
+    if (!matches.length) return null;
+    // Equivalent duplicate entries share the same canonical option and are safe.
+    entryIndex = matches[0].index;
+  }
+  if (!Number.isInteger(entryIndex) || entryIndex < 0 || (!legacy && entryIndex !== history.entryIndex)) return null;
+  const option = entries[entryIndex]?.find(o => o.id === saved.optionId);
+  if (!option || saved.index >= option.waypoints.length) return null;
+  return { choiceId: gate.id, optionId: option.id, direction, entryIndex, label: option.label, waypoints: option.waypoints.map(p => ({x:p.x,z:p.z})), index:saved.index, legIndex:saved.legIndex };
 }
 
 export function chooseRoute(state, choiceId, optionId) {
@@ -173,8 +202,8 @@ export function chooseRoute(state, choiceId, optionId) {
   const option = gate.options.find((item) => item.id === optionId && item.available);
   if (!option) return [event('info', '請選擇這個導航門提供的航路。')];
   state.voyage.routeChoices ||= [];
-  state.voyage.routeChoices.push({ id: gate.id, choiceId: gate.id, direction: gate.direction, optionId, time: state.time, tideHeight: tideAt(state.time).height, cargoCount: state.cargo.length, legIndex: state.voyage.legIndex });
-  state.voyage.navigation = { choiceId: gate.id, optionId, label: option.label, waypoints: option.waypoints.map((point) => ({ ...point })), index: 0, legIndex: state.voyage.legIndex };
+  state.voyage.routeChoices.push({ id: gate.id, choiceId: gate.id, direction: gate.direction, entryIndex: gate.entryIndex ?? 0, optionId, time: state.time, tideHeight: tideAt(state.time).height, cargoCount: state.cargo.length, legIndex: state.voyage.legIndex });
+  state.voyage.navigation = { choiceId: gate.id, optionId, direction: gate.direction, entryIndex: gate.entryIndex ?? 0, label: option.label, waypoints: option.waypoints.map((point) => ({ ...point })), index: 0, legIndex: state.voyage.legIndex };
   return [event('route-choice', `已選${option.label}。${option.condition} 請手動駛向藍色航路點；隨時可取消引導。`, { choiceId: gate.id, optionId })];
 }
 
@@ -580,10 +609,17 @@ export function restore(raw) {
     observed: cleanIds(previousVoyage.observed ?? previousVoyage.harvested, DISCOVERIES.map((item) => item.id)),
     skippedObservations: cleanIds(previousVoyage.skippedObservations, OBSERVATIONS.map((item) => item.id)),
     legIndex: Math.floor(Math.max(0, finite(previousVoyage.legIndex))),
-    routeChoices: (Array.isArray(previousVoyage.routeChoices) ? previousVoyage.routeChoices : []).filter(validSavedRouteChoice).slice(-100).map((choice) => ({ id: choice.id, choiceId: choice.id, direction: choice.direction, optionId: choice.optionId, time: Math.max(0, finite(choice.time)), tideHeight: clamp(finite(choice.tideHeight), -1, 1), cargoCount: Math.floor(clamp(finite(choice.cargoCount), 0, 14)), legIndex: Math.floor(Math.max(0, finite(choice.legIndex))) })),
+    routeChoices: (Array.isArray(previousVoyage.routeChoices) ? previousVoyage.routeChoices : []).filter(validSavedRouteChoice).slice(-100).map((choice) => ({ id: choice.id, choiceId: choice.id, direction: choice.direction, entryIndex: choice.entryIndex ?? 0, optionId: choice.optionId, time: Math.max(0, finite(choice.time)), tideHeight: clamp(finite(choice.tideHeight), -1, 1), cargoCount: Math.floor(clamp(finite(choice.cargoCount), 0, 14)), legIndex: Math.floor(Math.max(0, finite(choice.legIndex))) })),
     navigation: null,
     visited: cleanIds(previousVoyage.visited, ISLANDS.map((item) => item.id)), rescued: previousVoyage.rescued === true,
   };
+  const restoredNavigation = restoreNavigation(previousVoyage.navigation, state.voyage);
+  // Upgrade legacy history together with its inferred entry. Otherwise a second
+  // save would pair explicit alternate-entry guidance with the legacy default 0.
+  if (restoredNavigation && !Object.hasOwn(previousVoyage.navigation, 'direction') && !Object.hasOwn(previousVoyage.navigation, 'entryIndex')) {
+    const choice = state.voyage.routeChoices.find(item => item.id === restoredNavigation.choiceId && item.direction === restoredNavigation.direction && item.optionId === restoredNavigation.optionId && item.legIndex === restoredNavigation.legIndex);
+    choice.entryIndex = restoredNavigation.entryIndex;
+  }
   state.elapsed = state.voyage.elapsed;
   const safeIsland = getIsland(saved.lastSafeIsland);
   putAtDock(state, safeIsland);
@@ -602,6 +638,7 @@ export function restore(raw) {
         state.mode='diving';state.currentIsland=safeIsland.id;state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen, .1,55);state.diveCollected=saved.diveCollected===true;
       }
     }
+    if (state.mode === 'sailing') state.voyage.navigation = restoredNavigation;
     return {state,message:'已恢復航程。船位、調查與貨物完整保留；離線不消耗潮汐或氧氣。'};
   }
   if(saved.mode==='diving'){

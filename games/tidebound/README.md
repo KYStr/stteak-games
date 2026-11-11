@@ -6,20 +6,29 @@ A complete single-player sailing and shallow-diving adventure across seven origi
 
 ```sh
 npm --prefix games/tidebound ci --no-audit --no-fund
-npm --prefix games/tidebound run verify
+TIDEBOUND_PORT=8128 TIDEBOUND_ARTIFACTS=/workspace/stteak8/work/tidebound/rounds/r2/final npm --prefix games/tidebound run verify
 ```
 
-`verify` rebuilds the bundled static runtime, runs all rule/asset/input/audio unit tests, then runs the real headless Chrome acceptance suite. It uses `/usr/bin/google-chrome`, the provided `/workspace/stteak8/tools/node_modules/playwright-core`, and port **8108** only. It starts and stops its own Python HTTP server if one is not already serving that port. One browser is used and always closed. Allow roughly 6 minutes for the entire suite.
+`verify` rebuilds the bundled static runtime, runs the rule/asset/input/audio/navigation tests and an exact source/runtime comparison, then runs real headless Chrome acceptance. It uses `/usr/bin/google-chrome`, `/workspace/stteak8/tools/node_modules/playwright-core`, and normal browser autoplay rules. `TIDEBOUND_PORT` defaults to **8128** (the round 2 repair plan's review port); it must be an integer from 1024 to 65535. An existing server is reused only if its entry document identifies Tidebound; only a server created by the runner is stopped. The browser always closes in `finally`.
 
-The browser suite uses real keyboard inputs to complete the Whitewing commission: sail, brake, dock, investigate, return, deliver and restart. Controlled local save fixtures separately exercise diving collection and the final story return; these are clearly named in its output. It also checks initial audio gating, suspend/resume, mute, modal focus, blur/map pause, exact save/reload, corrupt storage, WebGL context loss/recovery, both target viewport sizes, and a three-minute resource/performance soak. The default artifact folder is `games/tidebound/test-results/`; set `TIDEBOUND_ARTIFACTS` to put screenshots and `acceptance.json` elsewhere. `TIDEBOUND_SOAK_MS` may shorten local debugging runs; full acceptance uses 180000 ms.
+The default suite includes a keyboard-only short commission and a separate **fresh-storage full story**: the first six-objective commission, all three dives, lighthouse repair, homecoming and replay. The pilot reads snapshots only to steer; it never teleports, changes live state or accelerates time. Each waypoint has a finite deadline, a simulation-progress watchdog, and diagnostics for held keys, distance, heading, pause state and renderer progress. Expect **20–35 minutes** including unit checks, navigation, screenshots and two full three-minute soaks; shared CPU contention can lengthen navigation. A watchdog/deadline failure is retained as an incomplete run, with diagnostic state, rather than being counted as story completion.
+
+Clearly labeled save fixtures additionally check route restoration/completion (including legacy schema-one saves), corrupt/old storage, invalid-position recovery, rescue/retry, exact dive oxygen, failed writes and honest journal-export metadata. Real mouse capture is tested while held across blur. At 1280×720 and 1920×1080, all dive entries/targets/boundaries and shore views are captured; chart/HUD rectangles and actual chart hit targets are asserted. Audio checks require a real gesture and test keyboard/mouse sail cues, suspend/resume, mute, bounded voices and loops. Lifecycle checks count pending game RAFs separately from the performance sampler.
+
+`acceptance.json` records raw frame mean/p95, step/scene/HUD CPU timings, renderer update/submission timings, draw/triangle/resource counts, GC-normalized heap, DOM nodes and listeners. Fresh and restored-context stationary sailing each receive a **180000 ms** soak after warmup; additional 1920 and dive samples are labeled separately. The acceptance gate requires mean ≤33.3 ms and p95 ≤50 ms; a failed gate exits nonzero even if gameplay checks pass. Software-renderer intervals depend on shared machine load; the hardware-independent counts and CPU timings are retained alongside them.
+
+`TIDEBOUND_ARTIFACTS` selects an output directory (default `games/tidebound/test-results/`). For explicit partial debugging, `TIDEBOUND_SCENARIO=smoke|regressions|story|performance` runs only that scenario and labels its scope in the report; omit it for full acceptance. `TIDEBOUND_SOAK_MS` can shorten local performance debugging; full verification uses the default 180000 ms. A partial/debug result is not a full acceptance pass.
+
+
+Round 2 final validation: **99/99 unit checks and 17/17 browser regression checks passed**, including exact source/runtime equality. The recorded fresh story completed in 602.7 wall seconds before the final static rendering batches. Final three-minute fresh/restored soaks retained stable resources and one game RAF, but averaged **48.4 / 41.2 ms** (p95 **66.7 / 50.1 ms**), so the strict performance gate still fails. These final runs used `taskset -c 0,1` to constrain worker creation on the shared box after unrestricted Chrome context-creation failures. The report records available CPU count; affinity does not change assertions. See [round 2 evidence](../../docs/tidebound-round2-validation.md) for commands, all four performance samples and remaining verification limits. Omit `TIDEBOUND_SCENARIO` for the full default suite; no full acceptance pass is claimed.
 
 Serve manually:
 
 ```sh
-python3 -m http.server 8108 --bind 127.0.0.1 --directory public
+python3 -m http.server 8128 --bind 127.0.0.1 --directory public
 ```
 
-Open `http://127.0.0.1:8108/games/tidebound/`. Dependencies, models and sound are bundled/local; no service, account or network connection is required after downloading the game.
+Open `http://127.0.0.1:8128/games/tidebound/`. Dependencies, models and sound are bundled/local; no service, account or network connection is required after downloading the game.
 
 ## Play
 
@@ -41,4 +50,4 @@ Sinking and running out of oxygen trigger rescue at a nearby harbour, lose half 
 
 ## Source and licenses
 
-Edit `src/`, then run `npm --prefix games/tidebound run build`; runtime files are in `public/games/tidebound/`. `models.js` and `generate-audio.mjs` retain the original procedural asset sources. Existing asset manifests, hashes, licenses and Three.js notices remain intact. The runtime batches static mesh pieces by material, uses instanced trees and bounded sound voices, and automatically chooses economical rendering on software GPUs. `window.tidebound` exposes read-only snapshots and bounded diagnostic metrics for verification.
+Edit `src/`, then run `npm --prefix games/tidebound run build`; runtime files are in `public/games/tidebound/`. `models.js` and `generate-audio.mjs` retain the original procedural asset sources. Existing asset manifests, hashes, licenses and Three.js notices remain intact. The runtime batches static mesh pieces by material, uses instanced trees/bubbles, site-wide underwater material batches, economical software lighting and bounded sound voices, and automatically chooses economical rendering on software GPUs. `window.tidebound` exposes read-only snapshots and bounded diagnostic metrics for verification.

@@ -608,7 +608,8 @@ test('new geographical gates can replace an older guide after eighteen seconds; 
   chooseRoute(state, next.id, 'outer'); assert.equal(state.voyage.routeChoices.length, 2);
   assert.equal(activeNavigation(state).choiceId, next.id);
   const restored = restore(serialize(state)).state;
-  assert.equal(activeNavigation(restored), null); assert.equal(restored.voyage.routeChoices.length, 2);
+  assert.deepEqual(activeNavigation(restored), activeNavigation(state)); assert.equal(restored.voyage.routeChoices.length, 2);
+  const invalid=structuredClone(state);invalid.boat.x=999;assert.equal(activeNavigation(restore(invalid).state),null);
   rescue(state); assert.equal(activeNavigation(state), null);
 });
 
@@ -674,7 +675,7 @@ test('four-direction entrances expose the real east/west crossing, retain north/
     assert.equal(recovered.voyage.routeChoices.length, 1);
     assert.equal(recovered.voyage.routeChoices[0].direction, fixture.direction);
     assert.equal(recovered.credits, 93); assert.deepEqual(recovered.parts, ['prism']);
-    assert.equal(activeNavigation(recovered), null);
+    assert.deepEqual(activeNavigation(recovered), activeNavigation(state));
     state.boat.heading += Math.PI;
     state.voyage.routeChoices = []; state.voyage.navigation = null;
     assert.notEqual(nearestRouteChoice(state)?.direction, fixture.direction);
