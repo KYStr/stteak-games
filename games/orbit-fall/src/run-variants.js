@@ -26,8 +26,8 @@ export function resolveRepair(run,roomId,phaseIndex=0){
  if(p.type==='momentum'){
   p.objects=base.phases.map((ph,i)=>({id:ph.objectId,start:transform(cargoStarts[(i+variant.template)%cargoStarts.length])})).filter((o,i)=>base.phases[i].type==='momentum');
   p.crateStart=p.objects.find(o=>o.id===phase.objectId).start;p.target=transform(cargoTargets[(phaseIndex+variant.template)%cargoTargets.length]);if(base.id==='puzzle-momentum-1'&&phaseIndex===0){p.crateStart[1]=1.4;p.target[1]=1.5}if(room.signalId&&p.target[0]<-2&&p.target[1]<3&&p.target[2]>0)p.target[2]=-2;p.targetRadius=base.stage.dockTolerance;p.maxDockSpeed=.7;p.holdSeconds=1.5;
-  p.railPoints=[[p.crateStart[0],p.crateStart[1],p.crateStart[2]+1.8],[-6*mirror,6,-3],[p.target[0],p.target[1],p.target[2]+1.3]];p.bypassPosition=[0,6.5,3];
-  p.hint=`電芯 ${phaseIndex+1}：T 連接，拖到高度 ${p.target[1].toFixed(1)} m 插座後 Space 煞停。`+(p.routeEnabled?'直穿最快但有碎片；磁軌可用 F 逐段運輸；接管供氧時基礎耗氧降至 10%、節省推進；上層隔離開關可關閉本次危險，安全但較遠。':'一次牽引一件電芯。');
+  p.railStartPosition=[p.crateStart[0],p.crateStart[1],p.crateStart[2]+1.8];p.railPoints=[[p.crateStart[0],7.2,p.crateStart[2]+1.8],[-6*mirror,7.2,-5.8],[p.target[0],p.target[1],p.target[2]+1.3]];p.bypassPosition=[0,6.5,3];
+  p.hint=`電芯 ${phaseIndex+1}：T 連接，拖到高度 ${p.target[1].toFixed(1)} m 插座後 Space 煞停。`+(p.routeEnabled?'直穿最快但有碎片；磁軌可用 F 自動升至上層，再逐段運輸；接管供氧時基礎耗氧降至 10%、節省推進；上層隔離開關可關閉本次危險，安全但較遠。':'一次牽引一件電芯。');
  }else if(p.type==='reflection'){
   p.mirrorPositions=opticalTemplates[k].map(transform);if(base.id==='puzzle-reflection-1')p.mirrorPositions=[p.mirrorPositions[0],p.mirrorPositions[2]].map(v=>[v[0],2,v[2]]);else if(base.deck===1)p.mirrorPositions=p.mirrorPositions.map((v,i)=>[v[0],1.5+i,v[2]]);else if(base.deck===2)p.mirrorPositions=p.mirrorPositions.map((v,i)=>[v[0],i===1?4.5:1.5,v[2]]);p.initialAngles=Array(p.mirrorPositions.length).fill(0);p.targetAngles=[(1+variant.rotation+phaseIndex)%8,(3+variant.rotation)%8,(5+phaseIndex)%8].slice(0,p.mirrorPositions.length);p.angleSteps=8;
   p.hint=`由發射端依序調整鏡面：${p.targetAngles.join(' → ')}。位置與實際反射平面依本次種子決定。`;

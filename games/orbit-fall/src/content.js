@@ -84,7 +84,7 @@ for(let deck=1;deck<=3;deck++){
   room.visualRole=family==='reflection'?(deck===1?'greenhouse':'photon'):family==='momentum'?(deck===1?'cargo':'shaft'):family==='mixed'?'core':'airlock';
   rooms.push(room);
  }
- rooms.push({...original.at(-1)});
+ rooms.push({...original.at(-1),name:`${'ABC'[deck-1]}8 · ${original.at(-1).name.split(' · ').slice(1).join(' · ')}`});
 }
 export const roomById=Object.fromEntries(rooms.map(r=>[r.id,r]));
 const expanded=freeze({version:2,decks,rooms,puzzles,roomById,requiredPuzzleIds:decks.flatMap(d=>d.puzzleIds)});

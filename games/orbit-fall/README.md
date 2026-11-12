@@ -67,3 +67,16 @@ numbers, never pass/fail FPS gates. Fresh gameplay is distinguished from labelle
 lifecycle fixtures in the JSON evidence. A failed/interrupted attempt stays failed.
 Desktop keyboard/mouse and headless software WebGL are the verified targets;
 physical mobile devices and GPU hardware are outside this workflow.
+
+Expanded maps use A1–A8, B1–B8 and C1–C8; the final terminal is C8.
+Original twelve-room saves retain their C4 terminal and original room IDs.
+Challenge best labels refresh with seed/difficulty and show time, oxygen and thrust.
+Space/Enter activates a focused native button; the focused brake button continues
+to own held braking. Final acceptance includes independent groups and raw active-time
+GC/allocation evidence; see the test README for development-only subsets.
+
+The freight rail starts at the marked low control and automatically lifts the
+load to the upper transfer line before crossing. This keeps waiting cells clear
+of the route and trades travel time for lower oxygen and thrust use. A towed cell
+cannot push a braking suit through their mutual contact; releasing restores normal
+contact, and cargo still collides with the station and other cargo.

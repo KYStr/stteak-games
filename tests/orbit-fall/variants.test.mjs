@@ -35,3 +35,28 @@ test('every expanded repair resets locally while retaining all permanent progres
 test('reused docking label layout holds its chosen side across tiny contact motion',async()=>{const {placeRuntimeMarkers}=await import('../../public/games/orbit-fall/marker-layout.js');const crate={x:640,anchorX:640.01,y:300,width:80,height:24,hidden:false},target={x:640,anchorX:640,y:300,width:80,height:24,hidden:false};const items=[crate,target];placeRuntimeMarkers(items,1280);const first=target.x;crate.anchorX=639.99;placeRuntimeMarkers(items,1280);assert.ok(Math.abs(target.x-first)<1);assert.ok(Math.abs(target.x-crate.x)>=88);crate.anchorX=400;placeRuntimeMarkers(items,1280);assert.equal(target.x,target.anchorX)});
 
 test('seeded pressure consoles and recording consoles occupy separate physical volumes',()=>{for(const seed of [0,123,456,421,17,263]){const r=createRun('story',{seed});for(const room of getCampaign().rooms){const base=getCampaign().puzzles[room.puzzleId];if(!base)continue;for(let i=0;i<base.phases.length;i++){const p=resolveRepair(r,room.id,i);if(p.type!=='airlock')continue;const centers=p.valvePositions.map(v=>[v[0],v[1]-.5,v[2]]);if(room.signalId)centers.push([-5,1.05,3]);for(let a=0;a<centers.length;a++)for(let b=a+1;b<centers.length;b++)assert.ok(Math.abs(centers[a][0]-centers[b][0])>=1.56||Math.abs(centers[a][1]-centers[b][1])>=2.1||Math.abs(centers[a][2]-centers[b][2])>=1.1,`${seed} ${room.id} ${i} consoles ${a}/${b}`)}}}});
+
+test('navigation codes are unique and sequential in each campaign, preserving room IDs',()=>{
+ for(const version of [1,2]){const campaign=getCampaign(version),labels=campaign.rooms.map(room=>room.name.split(' · ')[0]);assert.equal(new Set(labels).size,campaign.rooms.length);for(const deck of campaign.decks)assert.deepEqual(campaign.rooms.filter(r=>r.deck===deck.id).map(r=>r.name.split(' · ')[0]),Array.from({length:version===1?4:8},(_,i)=>'ABC'[deck.id-1]+(i+1)))}
+ for(const room of getCampaign(1).rooms)assert.ok(getCampaign(2).roomById[room.id]);
+});
+
+test('physics snapshots reuse numeric storage and remain current after each fixed step',async()=>{
+ const {PhysicsRoom,initializePhysics}=await import('../../public/games/orbit-fall/physics.js');await initializePhysics();const run=createRun('story',{seed:123}),room=getCampaign().roomById['room-d1-cargo'],physics=new PhysicsRoom(resolveRepair(run,room.id,0),null,room);
+ try{const position=physics.playerPosition,velocity=physics.playerVelocity,crate=physics.cratePosition;for(let i=0;i<60;i++)physics.step({x:1,y:0,z:0,brake:false});assert.equal(physics.playerPosition,position);assert.equal(physics.playerVelocity,velocity);assert.equal(physics.cratePosition,crate);assert.deepEqual(position,{...physics.player.translation()});assert.deepEqual(velocity,{...physics.player.linvel()});assert.deepEqual(crate,{...physics.crate.translation()});assert.ok(position.x>0)}finally{physics.dispose()}
+});
+
+test('tethering a crate behind the suit cannot push a braking player; release restores contact',async()=>{
+ const {PhysicsRoom,initializePhysics}=await import('../../public/games/orbit-fall/physics.js');await initializePhysics();
+ const puzzle={type:'momentum',crateStart:[0,2,1.7],target:[6,2,-5]},physics=new PhysicsRoom(puzzle,{player:[0,2,0]});
+ try{assert.equal(physics.tether(),'attached');for(let i=0;i<300;i++)physics.step({x:0,y:0,z:0,brake:true});assert.ok(Math.hypot(physics.playerPosition.x,physics.playerPosition.y-2,physics.playerPosition.z)<.02);assert.ok(physics.cratePosition.z<-.9,'crate settles on tow point without pushing the suit');assert.equal(physics.crateCollider.collisionGroups(),0x0002fffe);assert.equal(physics.tether(),'released');physics.step({x:0,y:0,z:0,brake:true});assert.equal(physics.crateCollider.collisionGroups(),0x0002ffff)}finally{physics.dispose()}
+});
+
+test('upper freight rail lifts the load clear of waiting cells before crossing',async()=>{
+ const {PhysicsRoom,initializePhysics}=await import('../../public/games/orbit-fall/physics.js');await initializePhysics();const run=createRun('story',{seed:123});
+ for(let phase=0;phase<3;phase++){const p=resolveRepair(run,'room-d2-cargo',phase),physics=new PhysicsRoom(p,{player:p.railStartPosition},getCampaign().roomById[p.roomId]);
+  try{for(let node=0;node<3;node++){physics.rail(node);let reached=false;for(let step=0;step<1800;step++){physics.step({x:0,y:0,z:0,brake:true});const pos=physics.playerPosition,goal=p.railPoints[node];if(Math.hypot(pos.x-goal[0],pos.y-goal[1],pos.z-goal[2])<.05){reached=true;break}}assert.equal(reached,true,`phase ${phase} rail ${node} reachable`)}
+   for(const o of physics.objects.filter(o=>o.body!==physics.crate)){const start=p.objects.find(p=>p.id===o.id).start;assert.ok(Math.hypot(...start.map((v,i)=>v-o.position[['x','y','z'][i]]))<.05,`waiting ${o.id} stays on its work point`)}
+  }finally{physics.dispose()}
+ }
+});

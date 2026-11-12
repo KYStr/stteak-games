@@ -32,9 +32,18 @@ function useVertexLighting(root){
 }
 // Merge immutable software-lit surfaces with vertex colours; emission and
 // transparency remain separate compatible material groups.
-const vertexMaterials=new Map();
+const vertexMaterials=new Map(),skinnedTransparentMaterials=new WeakMap();
 function colouredGeometry(object,matrix){const geometry=object.geometry.index?object.geometry.toNonIndexed():object.geometry.clone();geometry.applyMatrix4(matrix);const c=object.material.color,normal=geometry.attributes.normal,colors=new Float32Array(geometry.attributes.position.count*3);for(let i=0;i<colors.length;i+=3){const n=i/3,shade=object.material.emissive?.getHex()?1.2:.72+.45*Math.max(0,normal.getX(n)*.25+normal.getY(n)*.85+normal.getZ(n)*.46);colors[i]=c.r*shade;colors[i+1]=c.g*shade;colors[i+2]=c.b*shade}geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));for(const key of Object.keys(geometry.attributes))if(!['position','normal','color'].includes(key))geometry.deleteAttribute(key);return geometry;}
-function compatibleMaterial(material){if(material.transparent)return material;const key=`${material.emissive?.getHex()||0}:${material.emissiveIntensity||0}:${material.side}`;if(!vertexMaterials.has(key))vertexMaterials.set(key,new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,side:material.side}));return vertexMaterials.get(key);}
+function compatibleMaterial(material,family='static'){
+ if(material.transparent){
+  if(family==='static')return material;
+  if(!skinnedTransparentMaterials.has(material))skinnedTransparentMaterials.set(material,material.clone());
+  return skinnedTransparentMaterials.get(material);
+ }
+ const key=`${family}:${material.emissive?.getHex()||0}:${material.emissiveIntensity||0}:${material.side}:${material.alphaTest}:${material.toneMapped}`;
+ if(!vertexMaterials.has(key))vertexMaterials.set(key,new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,side:material.side,alphaTest:material.alphaTest,toneMapped:material.toneMapped}));
+ return vertexMaterials.get(key);
+}
 function batchDevice(root,software){
  const buckets=new Map(),remove=[];root.updateMatrixWorld(true);
  root.traverse(o=>{if(!o.isMesh||Array.isArray(o.material)||o.material.transparent)return;
@@ -52,7 +61,7 @@ function batchSharedAnimations(root){
 function batchSuit(root){
  root.updateMatrixWorld(true);let skeleton;root.traverse(o=>{if(o.isSkinnedMesh)skeleton=o.skeleton});if(!skeleton)return root;
  const buckets=new Map(),remove=[];root.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||o.name.startsWith('thruster-plume'))return;let bone=o.parent;while(bone&&!bone.isBone)bone=bone.parent;if(!bone)return;
- const geometry=colouredGeometry(o,o.matrixWorld),count=geometry.attributes.position.count,indices=new Uint16Array(count*4),weights=new Float32Array(count*4),index=skeleton.bones.indexOf(bone);for(let i=0;i<count;i++){indices[i*4]=index;weights[i*4]=1}geometry.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(indices,4));geometry.setAttribute('skinWeight',new THREE.Float32BufferAttribute(weights,4));const material=compatibleMaterial(o.material),list=buckets.get(material)||[];buckets.set(material,list);list.push(geometry);remove.push(o);
+ const geometry=colouredGeometry(o,o.matrixWorld),count=geometry.attributes.position.count,indices=new Uint16Array(count*4),weights=new Float32Array(count*4),index=skeleton.bones.indexOf(bone);for(let i=0;i<count;i++){indices[i*4]=index;weights[i*4]=1}geometry.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(indices,4));geometry.setAttribute('skinWeight',new THREE.Float32BufferAttribute(weights,4));const material=compatibleMaterial(o.material,'skinned'),list=buckets.get(material)||[];buckets.set(material,list);list.push(geometry);remove.push(o);
  });for(const o of remove)o.removeFromParent();for(const [material,list] of buckets){const mesh=new THREE.SkinnedMesh(mergeGeometries(list),material);root.add(mesh);mesh.bind(skeleton);mesh.frustumCulled=false;for(const g of list)g.dispose();}return root;
 }
 export class StationView {
@@ -96,7 +105,7 @@ export class StationView {
     const identity=`${run.campaignVersion}:${run.seed}`;if(this.cacheIdentity!==identity){this.clearRoomCache();this.cacheIdentity=identity}this.dirty=true;this.opticsKey=-1;this.optics=null;this.cameraSettled=false;
     if(this.beam){this.beam.parent?.remove(this.beam);this.beam.geometry.dispose();this.beam.material.dispose();this.beam=null}
     if(this.roomGroup)this.scene.remove(this.roomGroup);
-    // Only one room is rendered. Cached rooms bound allocation to the authored 12-room station.
+    // Only one room is rendered. Cached rooms and work phases bound allocation to authored campaign content.
     const cacheKey=puzzle?.cacheKey||`${run.campaignVersion}:${run.seed}:${room.id}`;if(this.cache.has(cacheKey)){const cached=this.cache.get(cacheKey);this.roomGroup=cached.group;this.devices=cached.devices;this.scene.add(this.roomGroup);this.room=room;this.puzzle=puzzle;this.refresh(run);this.createMarkers();this.cacheReferences();return}
     this.room=room;this.puzzle=puzzle;this.roomGroup=new THREE.Group();this.devices=[];this.scene.add(this.roomGroup);
     const theme=room.type==='safe'?'airlock':room.type==='signal'?'habitat':room.deck===3?'core':'maintenance';const architecture=batchArchitecture(createRoomKit(theme));if(this.software){useVertexLighting(architecture);batchDevice(architecture,true);}this.roomGroup.add(architecture);const details=batchArchitecture(createRoomDetails(room));if(this.software){useVertexLighting(details);batchDevice(details,true);}this.roomGroup.add(details);
@@ -112,8 +121,8 @@ export class StationView {
       const receiver=this.addDevice('receiver',[puzzle.target[0],puzzle.target[1]-.72,puzzle.target[2]],{id:'target',label:'低速停靠接點 · 煞車保持 1.5 秒',range:3});receiver.pos.fromArray(puzzle.target);
       const ring=new THREE.Mesh(new THREE.BoxGeometry(2.1,2.1,2.1),new THREE.MeshBasicMaterial({color:'#e8bc78',wireframe:true}));receiver.mesh.add(ring);ring.position.y=.72;
       if(puzzle.routeEnabled){
-        puzzle.railPoints.forEach((pos,index)=>{const d=this.addDevice('magnetic',[pos[0],pos[1]-.4,pos[2]],{id:`rail-${index}`,index,label:`磁軌 ${index+1} · F 轉運 / Shift 離軌`,range:index===0?3.2:16},'ready');d.pos.fromArray(pos)});
-        const line=new THREE.BufferGeometry().setFromPoints(puzzle.railPoints.map(p=>new THREE.Vector3(...p)));this.roomGroup.add(new THREE.Line(line,new THREE.LineBasicMaterial({color:'#83d4e4'})));
+        puzzle.railPoints.forEach((goal,index)=>{const pos=index===0?puzzle.railStartPosition||goal:goal;const d=this.addDevice('magnetic',[pos[0],pos[1]-.4,pos[2]],{id:`rail-${index}`,index,label:index===0?'磁軌升降 · F 進入上層 / Shift 離軌':`磁軌 ${index+1} · F 轉運 / Shift 離軌`,range:index===0?3.2:16},'ready');d.pos.fromArray(pos)});
+        const line=new THREE.BufferGeometry().setFromPoints((puzzle.railStartPosition?[puzzle.railStartPosition,...puzzle.railPoints]:puzzle.railPoints).map(p=>new THREE.Vector3(...p)));this.roomGroup.add(new THREE.Line(line,new THREE.LineBasicMaterial({color:'#83d4e4'})));
         this.addDevice('console',[0,4.9,3],{id:'bypass',label:'上層旁路 · F 隔離本次危險',range:2.5},'ready').pos.fromArray(puzzle.bypassPosition);
       }
     }
@@ -143,9 +152,9 @@ export class StationView {
       }
     }
     this.needsRender=false;if(this.contextLost||(run.paused&&!this.dirty))return;this.dirty=false;this.needsRender=true;
-    const p=physics.player.translation(),v=physics.player.linvel();this.astronaut.position.set(p.x,p.y,p.z);const moving=Math.hypot(v.x,v.z)>.15;if(moving)this.astronaut.rotation.y=Math.atan2(v.x,v.z);
+    const p=physics.playerPosition,v=physics.playerVelocity;this.astronaut.position.set(p.x,p.y,p.z);const moving=Math.hypot(v.x,v.z)>.15;if(moving)this.astronaut.rotation.y=Math.atan2(v.x,v.z);
     animateAstronaut(this.astronaut,run.status==='failed'?'damaged':physics.anchored?'anchored':input.brake?'brake':input.thrusting?'thrust':'idle',this.settings.reducedMotion?0:time,run.paused?0:dt);
-    for(let i=0;i<physics.objects.length;i++){const object=physics.objects[i];const d=this.objectDevices.get(object.id);if(d){const c=object.body.translation();d.mesh.position.set(c.x,c.y-.5133,c.z);d.pos.set(c.x,c.y,c.z)}}
+    for(let i=0;i<physics.objects.length;i++){const object=physics.objects[i];const d=this.objectDevices.get(object.id);if(d){const c=object.position;d.mesh.position.set(c.x,c.y-.5133,c.z);d.pos.set(c.x,c.y,c.z)}}
     for(let i=0;i<this.rails.length;i++)this.rails[i].disabled=this.rails[i].index!==puzzleState.railIndex+1;
     const key=puzzleState.revision;
     if(this.puzzle?.type==='reflection'&&key!==this.opticsKey){this.opticsKey=key;this.optics=traceOptics(this.puzzle,puzzleState.angles);for(const d of this.mirrors)setDeviceState(d.mesh,this.optics.powered?'powered':d.index<this.optics.hitCount?'ready':'offline');const receiver=this.devices.find(d=>d.id==='light-target');if(receiver)setDeviceState(receiver.mesh,this.optics.powered?'powered':'offline');const n=this.normalScratch ||= new THREE.Vector3(),axis=this.axisScratch ||=new THREE.Vector3(0,0,1);for(const d of this.mirrors){const pivot=d.pivot;if(pivot&&this.optics.normals[d.index]){n.fromArray(this.optics.normals[d.index]);pivot.quaternion.setFromUnitVectors(axis,n);pivot.position.set(-n.x*.12,this.puzzle.mirrorPositions[d.index][1]-n.y*.12,-n.z*.12);}}}
@@ -154,7 +163,7 @@ export class StationView {
     for(let i=0;i<this.devices.length;i++){const d=this.devices[i];if(d.id==='hazard'&&this.room.hazard==='arc')setDeviceState(d.mesh,arcPhase(time,this.puzzle?.stage)==='active'?'danger':arcPhase(time,this.puzzle?.stage)==='warning'?'ready':'offline');animateDevice(d.mesh,this.settings.reducedMotion?0:time);if(d.id==='hazard'&&this.room.hazard==='debris'){d.mesh.visible=!puzzleState.bypass;d.mesh.position.fromArray(debrisPosition(time,this.debrisScratch,this.puzzle?.stage));d.pos.copy(d.mesh.position)}}
     if(!this.beam){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(18),3));this.beam=new THREE.Line(g,new THREE.LineBasicMaterial({color:'#ffc078',transparent:true,opacity:.95}));this.beam.frustumCulled=false;this.roomGroup.add(this.beam)}
     const beamPosition=this.beam.geometry.attributes.position;let count=0;
-    if(physics.tethered&&physics.crate){const c=physics.crate.translation();beamPosition.setXYZ(0,p.x,p.y,p.z);beamPosition.setXYZ(1,c.x,c.y,c.z);count=2}
+    if(physics.tethered&&physics.crate){const c=physics.cratePosition;beamPosition.setXYZ(0,p.x,p.y,p.z);beamPosition.setXYZ(1,c.x,c.y,c.z);count=2}
     else if(this.puzzle?.type==='reflection'&&optics){for(let i=0;i<optics.path.length;i++){const point=optics.path[i];beamPosition.setXYZ(i,point[0],point[1],point[2])}count=optics.path.length}
     this.beam.visible=count>0;if(count){beamPosition.needsUpdate=true;this.beam.geometry.setDrawRange(0,count);this.beam.material.color.setHex(physics.tethered?0x83d4e4:0xffc078)}
     const goal=this.goalScratch ||=new THREE.Vector3(),look=this.lookScratch ||=new THREE.Vector3();
