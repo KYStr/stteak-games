@@ -16,7 +16,7 @@ function harness(){
  let throwRelease=false,throwCapture=false;
  const helm={style,attributes,setAttribute(k,v){attributes[k]=v},setPointerCapture(id){if(throwCapture)throw Error('inactive pointer');capture.add(id)},hasPointerCapture:id=>capture.has(id),releasePointerCapture(id){released.push(id);capture.delete(id);if(throwRelease)throw Error('capture already ended');this.onlostpointercapture?.({pointerId:id})},getBoundingClientRect:()=>({left:10,top:20,width:100,height:100})};
  const knob={style:{setProperty(k,v){this[k]=v}}};
- const context={paused:false,overlay:null,phase:'running',window:new EventTarget(),document:{createElement:()=>helm,querySelectorAll:()=>[]},__tideClock:{reset(){}},__tideInput(){},steer:{prepend(){}},$:selector=>selector==='#helm'?helm:knob,unlock(){},pause(){context.paused=true},console};
+ const context={pendingInputAt:-1,paused:false,overlay:null,phase:'running',window:new EventTarget(),document:{createElement:()=>helm,querySelectorAll:()=>[]},__tideClock:{reset(){}},__tideInput(){},steer:{prepend(){}},$:selector=>selector==='#helm'?helm:knob,input(){},unlock(){},__tideEligible:()=>true,audio:{play(){}},flashControl(){},pause(){context.paused=true},console};
  vm.createContext(context);vm.runInContext(state+clear+binding+blur+'\nglobalThis.snapshot=()=>({owner:helmPointer,x:helmInput.x,y:helmInput.y});globalThis.clear=clearInput;',context);
  const send=(type,id,x=92,y=70)=>{let prevented=false;helm['on'+type]({pointerId:id,clientX:x,clientY:y,preventDefault(){prevented=true}});return prevented};
  return{helm,context,knob,attributes,capture,released,send,state:()=>context.snapshot(),clear:()=>context.clear(),failRelease(){throwRelease=true},failCapture(value=true){throwCapture=value}};
@@ -56,7 +56,7 @@ function heldHarness(){
  const source=readFileSync(new URL('../../../games/tidebound/src/main.js',import.meta.url),'utf8');
  const a=source.indexOf("document.querySelectorAll('[data-hold]').forEach"),b=source.indexOf("document.querySelectorAll('[data-sail]').forEach",a);
  const buttons=['left','right'].map(hold=>({dataset:{hold},capture:new Set(),setPointerCapture(id){this.capture.add(id)},hasPointerCapture(id){return this.capture.has(id)},releasePointerCapture(id){this.capture.delete(id);this.onlostpointercapture?.({pointerId:id})}}));
- const c={paused:false,overlay:null,holds:new Map(),holdOwners:new Map(),document:{querySelectorAll:()=>buttons},unlock(){},__tideInput(){}};vm.createContext(c);vm.runInContext(source.slice(a,b),c);
+ const c={paused:false,overlay:null,holds:new Map(),holdOwners:new Map(),input(){},document:{querySelectorAll:()=>buttons},input(){},unlock(){},__tideEligible:()=>true,audio:{play(){}},flashControl(){},__tideInput(){}};vm.createContext(c);vm.runInContext(source.slice(a,b),c);
  const send=(i,type,id)=>buttons[i]['on'+type]({pointerId:id,preventDefault(){}});
  return{buttons,c,send};
 }

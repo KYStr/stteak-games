@@ -7,7 +7,8 @@
     "build": "node build.mjs",
     "assets": "node export-assets.mjs",
     "test": "node --test ../../tests/games/tidebound/*.test.js ../../tests/tidebound/*.test.mjs",
-    "verify": "npm run build && npm test && node ../../tests/tidebound/acceptance.mjs"
+    "verify": "npm run build && npm run check",
+    "check": "npm test && node ../../tests/tidebound/acceptance.mjs"
   },
   "dependencies": {
     "three": "0.180.0"

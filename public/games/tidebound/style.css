@@ -48,3 +48,10 @@ body.diving .sail-controls>div{display:none}body.diving #mini-chart{display:none
 #dive-direction span{display:block;font-size:23px}#dive-direction small{display:block}
 
 body.software nav button,body.software #tide-hud,body.software .modal{backdrop-filter:none}
+
+.action-cue{color:#fff8cc!important;background:#286c6b!important;box-shadow:0 0 0 2px #f2cd81;border-radius:5px;transition:background .08s}
+.reduced .action-cue{transition:none}
+
+#supply-clock{display:block;font-size:11px;color:#244b50;white-space:nowrap}.urgent{color:#993e29!important;font-weight:800}#dive-checklist{font-size:12px;margin-top:8px}#dive-checklist ol{margin:4px 0;padding-left:22px;columns:2;column-gap:16px}#dive-checklist li{break-inside:avoid;margin:3px 0}#dive-checklist .done{color:#376f62}#dive-checklist .eyebrow{font-size:10px}
+
+body.diving #voyage-hud{max-height:calc(100vh - 325px);overflow:hidden}#dive-checklist{line-height:1.5}#dive-checklist ol{columns:1}#supply-clock{margin-left:0;letter-spacing:.02em}

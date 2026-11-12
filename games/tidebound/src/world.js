@@ -174,7 +174,24 @@ export const WHIRLS = [
 ];
 
 export const DIVE_SITES = [
-  { id: 'coral-dive', islandId: 'coral', name: '珊瑚淺灣', partId: 'prism', partName: '聚光稜鏡', discoveryId: 'foxfish', entry: { x: -98, z: 66 }, target: { x: -83, z: 54 }, bubbles: [{ x: -91, z: 60 }], radius: 26, oxygen: 55 },
-  { id: 'ruin-dive', islandId: 'ruin', name: '沉鐘水庭', partId: 'gear', partName: '潮鐘齒輪', discoveryId: 'tide-clock', entry: { x: 99, z: -80 }, target: { x: 83, z: -69 }, bubbles: [{ x: 91, z: -74 }], radius: 26, oxygen: 55 },
-  { id: 'reef-dive', islandId: 'reef', name: '琉璃洞灣', partId: 'crystal', partName: '燈芯晶石', discoveryId: 'nautilus', entry: { x: 0, z: 27 }, target: { x: 16, z: 40 }, bubbles: [{ x: 8, z: 33 }], radius: 26, oxygen: 55 },
+  { id: 'coral-dive', islandId: 'coral', name: '珊瑚淺灣', partId: 'prism', partName: '聚光稜鏡', discoveryId: 'foxfish', entry: { x: -98, z: 66 }, target: { x: -83, z: 54 }, bubbles: [{ x: -91, z: 60 }], radius: 42, oxygen: 55 },
+  { id: 'ruin-dive', islandId: 'ruin', name: '沉鐘水庭', partId: 'gear', partName: '潮鐘齒輪', discoveryId: 'tide-clock', entry: { x: 99, z: -80 }, target: { x: 83, z: -69 }, bubbles: [{ x: 91, z: -74 }], radius: 42, oxygen: 45 },
+  { id: 'reef-dive', islandId: 'reef', name: '琉璃洞灣', partId: 'crystal', partName: '燈芯晶石', discoveryId: 'nautilus', entry: { x: 0, z: 27 }, target: { x: 16, z: 40 }, bubbles: [{ x: 8, z: 33 }], radius: 42, oxygen: 50 },
 ];
+
+// Ordered lessons: observe, read a tidal mechanism, then predict a moving sweep.
+export const STORY_STAGES = [
+ {siteId:'coral-dive',partId:'prism',mechanic:'observation',name:'棲地觀察',offsets:[[-28,18],[28,18],[28,-18]],labels:['扇珊瑚的庇護','狐魚的食物','海草的育幼場']},
+ {siteId:'reef-dive',partId:'crystal',mechanic:'valves',name:'潮汐閥門',offsets:[[-28,-18],[28,-18],[28,18],[-28,18]],labels:['入水閥','分流閥','壓力閥','燈芯閥']},
+ {siteId:'ruin-dive',partId:'gear',mechanic:'guardian',name:'守鐘洋流',offsets:[[-28,-18],[28,18],[-28,18],[28,-18]],labels:['西庭星盤','東庭星盤','回聲碑','守鐘封印']},
+];
+const safeSurvey=p=>ISLANDS.every(i=>Math.hypot(p.x-i.x,p.z-i.z)>i.radius+9)&&REEFS.every(i=>Math.hypot(p.x-i.x,p.z-i.z)>i.radius+4)&&WHIRLS.every(i=>Math.hypot(p.x-i.x,p.z-i.z)>i.radius+6);
+const alternateSurvey=(p,variant)=>{for(let j=0;j<48;j++){const angle=(j+(variant===2?0:19))*Math.PI/24,q={...p,x:p.x+15*Math.cos(angle),z:p.z+15*Math.sin(angle)};if(safeSurvey(q))return Object.freeze(q);}throw Error('No safe survey position '+p.id);};
+const variants=[1,2,3].map(id=>Object.freeze({id,version:1,name:['晨光海圖','返潮海圖','星潮海圖'][id-1],hazardPhase:id===3?Math.PI/2:0,observations:Object.freeze(OBSERVATIONS.filter((_,i)=>id===1||i%(id===2?5:4)!==(id===2?0:1)).map(p=>id===1?p:alternateSurvey(p,id))),stages:Object.freeze(STORY_STAGES.map(stage=>{const site=DIVE_SITES.find(s=>s.id===stage.siteId),stations=stage.offsets.map(([x,z],i)=>Object.freeze({id:stage.siteId+'-'+i,name:stage.labels[i],x:site.entry.x+x,z:site.entry.z+z}));if(id===2)[stations[1],stations[2]]=[stations[2],stations[1]];return Object.freeze({...stage,stations:Object.freeze(stations)});} ))}));
+export function voyageVariant(seed=1){return variants[((Math.trunc(Number(seed)||1)-1)%3+3)%3];}
+export function encounterVariant(state){return voyageVariant(state.voyage?.active?state.voyage.variantId||state.seed:state.seed);}
+export function diveStage(state,siteId=state.activeDive){const stages=encounterVariant(state).stages;for(let i=0;i<stages.length;i++)if(stages[i].siteId===siteId)return stages[i];}
+export function diveTarget(state){const stage=diveStage(state);let site;for(let i=0;i<DIVE_SITES.length;i++)if(DIVE_SITES[i].id===state.activeDive)site=DIVE_SITES[i];if(stage)for(let i=0;i<stage.stations.length;i++){const p=stage.stations[i];if(!state.diveTasks[site.id].completedStationIds.includes(p.id))return p;}return site?.target;}
+export function valvePhase(time,variant=1){return ((time+(voyageVariant(variant).hazardPhase/Math.PI*3))%6+6)%6;}
+// Ring is visible at the current crossing; the two-second amber cue precedes its sweep.
+export function guardianInto(time,site,out,variant=1){const phase=((time+(variant===3?2:0))%8+8)%8;out.x=site.entry.x+Math.sin(phase/8*Math.PI*2)*23;out.z=site.entry.z;out.radius=6;out.warning=phase>=6;out.active=phase<6;return out;}

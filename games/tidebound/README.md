@@ -1,53 +1,46 @@
 # 逐潮之旅 · Tidebound
 
-A complete single-player sailing and shallow-diving adventure across seven original islands. Compare safe offshore routes with tide windows, record twelve discoveries, recover three lighthouse parts, repair the northern beacon, and return home. Six commissions, three rigs and sixteen deterministic current seeds support repeat voyages. The continuous story takes about 8–12 minutes with efficient navigation; completing the journal and commissions takes longer.
+Sail seven original islands, investigate twelve discoveries, recover three lighthouse parts, repair the northern beacon and return home. The first complete story takes about 11–15 active minutes depending on rig and route. Six commissions, three rigs, three deterministic encounter charts, optional samples and separate records support replay.
 
 ## Run and verify
 
 ```sh
 npm --prefix games/tidebound ci --no-audit --no-fund
-TIDEBOUND_PORT=8128 TIDEBOUND_ARTIFACTS=/workspace/stteak8/work/tidebound/rounds/r2/final npm --prefix games/tidebound run verify
+TIDEBOUND_PORT=8128 TIDEBOUND_ARTIFACTS=/workspace/stteak8/work/tidebound/rounds/r3/full npm --prefix games/tidebound run verify
 ```
 
-`verify` rebuilds the bundled static runtime, runs the rule/asset/input/audio/navigation tests and an exact source/runtime comparison, then runs real headless Chrome acceptance. It uses `/usr/bin/google-chrome`, `/workspace/stteak8/tools/node_modules/playwright-core`, and normal browser autoplay rules. `TIDEBOUND_PORT` defaults to **8128** (the round 2 repair plan's review port); it must be an integer from 1024 to 65535. An existing server is reused only if its entry document identifies Tidebound; only a server created by the runner is stopped. The browser always closes in `finally`.
+`verify` builds, then runs `check`: all unit/asset/input/audio/navigation/stage tests, an exact in-memory source/runtime comparison and headless Chrome acceptance. `npm --prefix games/tidebound run check` is read-only on game code. Chrome uses `/usr/bin/google-chrome`, SwiftShader, and Playwright from `/workspace/stteak8/tools/node_modules/playwright-core`. Only one browser and owned server are active at a time; major sections use fresh contexts, `finally` and signal handlers close them. The report records ownership, closure and runtime hashes. Review port defaults to **8128**, as specified in the round 2 fix plan. Initialization allows 120 seconds on the shared CPU host and retains diagnostics on failure.
 
-The default suite includes a keyboard-only short commission and a separate **fresh-storage full story**: the first six-objective commission, all three dives, lighthouse repair, homecoming and replay. The pilot reads snapshots only to steer; it never teleports, changes live state or accelerates time. Each waypoint has a finite deadline, a simulation-progress watchdog, and diagnostics for held keys, distance, heading, pause state and renderer progress. Expect **20–35 minutes** including unit checks, navigation, screenshots and two full three-minute soaks; shared CPU contention can lengthen navigation. A watchdog/deadline failure is retained as an incomplete run, with diagnostic state, rather than being counted as story completion.
+The default `scope: all` suite includes a real keyboard short commission, fresh-storage full story and replay, staged swimming and interactions, save fixtures for lifecycle/recovery, held Escape/M, immediate warm audio cues, pointer release, storage errors, back navigation, context loss, chart clearance and both desktop viewports. The story pilot only reads snapshots and sends real keyboard/mouse inputs; it never teleports or advances the clock. Active-time and wall-time measurements are separate. Expect 30–60 minutes under contention. A timeout remains a failure.
 
-Clearly labeled save fixtures additionally check route restoration/completion (including legacy schema-one saves), corrupt/old storage, invalid-position recovery, rescue/retry, exact dive oxygen, failed writes and honest journal-export metadata. Real mouse capture is tested while held across blur. At 1280×720 and 1920×1080, all dive entries/targets/boundaries and shore views are captured; chart/HUD rectangles and actual chart hit targets are asserted. Audio checks require a real gesture and test keyboard/mouse sail cues, suspend/resume, mute, bounded voices and loops. Lifecycle checks count pending game RAFs separately from the performance sampler.
+Fresh and restored-context sailing each receive a 180-second soak, with a real UI restart during the first. Additional 1920, dive and high-quality homecoming samples check shadow and main draw work, CPU update p95, GC-normalized heap, listeners, resources and one game RAF. Allocation samples and GC traces are retained. Gates follow the rubric: ≤250 calls, ≤1.5M triangles, ≤256 MiB texture storage, update p95 ≤6 ms, <10% heap growth, stable listeners/RAF/GPU resources, DPR ≤2 and ≤30 MiB initial transfer. Frame mean/p95 under SwiftShader are reported for reference. Shadow work is included by resetting renderer counters before the complete render and disabling Three's internal main-pass reset. A conservative texture bound covers the 768² shadow map and bounded bone textures. Unit tests inject over-budget calls/CPU to verify the gates.
 
-`acceptance.json` records raw frame mean/p95, step/scene/HUD CPU timings, renderer update/submission timings, draw/triangle/resource counts, GC-normalized heap, DOM nodes and listeners. Fresh and restored-context stationary sailing each receive a **180000 ms** soak after warmup; additional 1920 and dive samples are labeled separately. The acceptance gate requires mean ≤33.3 ms and p95 ≤50 ms; a failed gate exits nonzero even if gameplay checks pass. Software-renderer intervals depend on shared machine load; the hardware-independent counts and CPU timings are retained alongside them.
+`TIDEBOUND_SCENARIO=smoke|regressions|story|performance` runs an explicitly partial scenario. `TIDEBOUND_SOAK_MS` shortens debugging soaks; omit it for full acceptance. Set `TIDEBOUND_ARTIFACTS` to a new directory for each attempt. A passing partial scenario is not a full pass.
 
-`TIDEBOUND_ARTIFACTS` selects an output directory (default `games/tidebound/test-results/`). For explicit partial debugging, `TIDEBOUND_SCENARIO=smoke|regressions|story|performance` runs only that scenario and labels its scope in the report; omit it for full acceptance. `TIDEBOUND_SOAK_MS` can shorten local performance debugging; full verification uses the default 180000 ms. A partial/debug result is not a full acceptance pass.
-
-
-Round 2 final validation: **99/99 unit checks and 17/17 browser regression checks passed**, including exact source/runtime equality. The recorded fresh story completed in 602.7 wall seconds before the final static rendering batches. Final three-minute fresh/restored soaks retained stable resources and one game RAF, but averaged **48.4 / 41.2 ms** (p95 **66.7 / 50.1 ms**), so the strict performance gate still fails. These final runs used `taskset -c 0,1` to constrain worker creation on the shared box after unrestricted Chrome context-creation failures. The report records available CPU count; affinity does not change assertions. See [round 2 evidence](../../docs/tidebound-round2-validation.md) for commands, all four performance samples and remaining verification limits. Omit `TIDEBOUND_SCENARIO` for the full default suite; no full acceptance pass is claimed.
-
-Serve manually:
+Continuous rules pilots provide additional reproducible pacing, stage, seed and bot evidence:
 
 ```sh
-python3 -m http.server 8128 --bind 127.0.0.1 --directory public
+TIDEBOUND_ARTIFACTS=/tmp/tidebound-model node tests/tidebound/model-evidence.mjs
 ```
 
-Open `http://127.0.0.1:8128/games/tidebound/`. Dependencies, models and sound are bundled/local; no service, account or network connection is required after downloading the game.
+These model runs are labeled separately from browser acceptance. They include five starts per stage/variant, all rigs, standard idle loss, random input, competent navigation, and deterministic encounter signatures.
+
+Serve manually with `python3 -m http.server 8128 --bind 127.0.0.1 --directory public`, then open `http://127.0.0.1:8128/games/tidebound/`. All models, modules and audio are local.
 
 ## Play
 
-- **W / S** or **↑ / ↓** adjust sail power. The boat travels toward its bow; these are not forward/reverse controls.
-- **A / D** or **← / →** steer. **Space** quickly furls the sail and brakes.
-- Approach a golden mooring ring, slow below 1.4 m/s, then press **E** to dock. **E** investigates when ashore.
-- Underwater, **WASD / arrows** swim. Approach the golden discovery and press **E**. Bubble springs replenish oxygen; **浮出回船** returns safely at any time.
-- **M** opens the chart and pauses time; **C** switches the camera. Right-drag or drag the right half of the sea on touch to orbit.
-- **Escape** pauses/resumes. Settings provide music/effects volume (zero mutes), reduced motion and automatic/standard/economy graphics.
-- Buttons support mouse and touch; coarse-pointer devices receive an analog helm and dive movement controls. All menus support keyboard focus.
+- **W / S** or **↑ / ↓** raise/lower sail; **A / D** or **← / →** steer. **Space** furls and brakes.
+- Approach a gold mooring, slow below 1.4 m/s, then **E** to dock. **E** investigates ashore.
+- Underwater, **WASD / arrows** swim. Follow the line and teal station marker, come within 4.5 m, then **E**. Each completed station refills oxygen; complete the checklist before collecting the gold part. Emergency surface is always available.
+- **Coral:** three habitat observations, 55 seconds oxygen. **Reef:** four valves opening for half of each six-second cycle, 50 seconds oxygen, a gentle visible current band. **Ruin:** four stations and an outlined guardian-current sweep; amber warns two seconds ahead, contact costs at most four oxygen with a two-second cooldown, 45 seconds oxygen. Swim outside its ring to avoid it.
+- Main-part order is coral → reef → ruin. Every island remains explorable. Existing parts automatically complete the corresponding new task lists.
+- Standard expedition supplies last fifteen active minutes, refill at home and once per newly recovered part, and warn at 120/60/15 seconds. Depletion rescues you home without erasing permanent progress. Relaxed mode disables supply pressure; underwater oxygen remains.
+- **M** opens the chart and pauses; **C** switches camera; **Escape** pauses/resumes. Holding a toggle key cannot dismiss its own overlay. Mouse presets/helm, touch controls and keyboard menus are supported.
 
-The first commission compares four habitats in one voyage. Shore research and dive research are separate checklist entries; return to the home harbour after the whole list is complete. Other commissions provide shorter expeditions. Research is independent of cargo capacity. Optional survey buoys occupy cargo space and award collectible marks; all rigs and repairs are free.
+Three encounter charts change safe survey positions/subsets, task order or hazard phase while preserving the coastline and safe routes. An active voyage retains its resolved chart across reload; selecting another chart at home affects the next departure. Optional buoys consume cargo and award collectible marks. All rigs and repairs are free. Replay targets are fastest swift voyage, clean steady gold rank, and maximum-sample cargo expedition. Records are separated by contract, rig and chart; earlier combined records remain explicitly labeled. Gold means complete/no rescue/no damage, silver complete/no rescue, bronze complete with rescue. Best time, damage, samples and rank never regress.
 
-## Progress and lifecycle
+## Lifecycle and source
 
-Autosaves occur every fifteen seconds, when pausing or leaving the page, and after important actions. Reloading restores a valid live boat/dive position, hull, cargo, oxygen and research; press **繼續航程** to resume. Offline time consumes nothing. Invalid live positions fall back to the last safe harbour without erasing discoveries. Corrupt or incompatible saves start a clean journal with a visible recovery message. The journal can be exported as JSON; settings contain an explicit confirmation before clearing progress.
+Autosaves occur every fifteen seconds, on pause/page exit and important actions, including station activation. Continue restores position, oxygen, tasks, supplies, discoveries, cargo and guidance without consuming offline resources. Corrupt saves recover visibly; schema-one saves migrate with defaults. Rescue halves ordinary cargo, preserves parts/discoveries and repairs the boat. Menus, blur, hidden tabs and WebGL loss freeze simulation and release inputs. Restoration leaves the game paused. Settings include music/effects volume (zero mutes), reduced motion and adaptive graphics. Journal export reports whether local saving succeeded.
 
-Sinking and running out of oxygen trigger rescue at a nearby harbour, lose half of ordinary cargo, preserve story parts/discoveries, and repair the boat. Restart returns home with permanent progress intact. Blur, hidden tabs, modal overlays and WebGL context loss freeze simulation and release held input. Graphics restoration leaves the game paused until continued.
-
-## Source and licenses
-
-Edit `src/`, then run `npm --prefix games/tidebound run build`; runtime files are in `public/games/tidebound/`. `models.js` and `generate-audio.mjs` retain the original procedural asset sources. Existing asset manifests, hashes, licenses and Three.js notices remain intact. The runtime batches static mesh pieces by material, uses instanced trees/bubbles, site-wide underwater material batches, economical software lighting and bounded sound voices, and automatically chooses economical rendering on software GPUs. `window.tidebound` exposes read-only snapshots and bounded diagnostic metrics for verification.
+Edit `src/` and rebuild `public/games/tidebound/`. Original procedural sources are retained in `models.js` and `generate-audio.mjs`; nine local PCM sounds include sail, steering and oxygen cues. Initial decoding retains at most one recent cue; warm intent cues are immediate and voices are bounded to eight. All asset hashes, provenance, licenses and Three notices are retained. `window.tidebound` provides read-only snapshots and bounded diagnostics. See [round 3 validation](../../docs/tidebound-round3-validation.md) for actual results and limitations.

@@ -1,6 +1,7 @@
+import {completeDive} from '../../tidebound/pilot-rules.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, REEFS, WHIRLS, CURRENTS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, TIDE_PERIOD } from '../../../games/tidebound/src/world.js';
+import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, REEFS, WHIRLS, CURRENTS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, TIDE_PERIOD, STORY_STAGES } from '../../../games/tidebound/src/world.js';
 import { CREDITS_DESCRIPTION, createState, tideAt, currentAt, whirlActive, step, depart, dock, interact, startDive, surface, rescue, advanceTide, serialize, restore, contractProgress, nextObjective, nearestObservation, collectObservation, skipObservation, nearestRouteChoice, chooseRoute, activeNavigation, cancelRoute } from '../../../games/tidebound/src/rules.js';
 import { measureFirst } from './maker-pacing.mjs';
 import { simulateReturn, simulateBranch, simulateCompleteLeg, crossingLegs, startLeg } from './maker-0011-navigation.mjs';
@@ -14,6 +15,7 @@ const pointSegmentDistance = (p, a, b) => {
 };
 function moor(state, islandId) {
   const island = islandById(islandId);
+  const index=STORY_STAGES.findIndex(s=>DIVE_SITES.find(d=>d.id===s.siteId).islandId===islandId);for(const stage of STORY_STAGES.slice(0,Math.max(0,index)))if(!state.parts.includes(stage.partId))state.parts.push(stage.partId);
   Object.assign(state.boat, island.dock, { speed: 0, sail: 0 });
   state.mode = 'sailing';
   return dock(state);
@@ -35,7 +37,9 @@ function navigate(state, waypoints) {
   for (let i = 0; i < 15; i += 1) step(state, 0.1, { brake: true });
 }
 function swimTo(state, target) {
-  for (let i = 0; i < 300; i += 1) {
+  if(target===DIVE_SITES.find(s=>s.id===state.activeDive)?.target&&!state.diveTasks[state.activeDive].opened)completeDive(state);
+
+  for (let i = 0; i < 1200; i += 1) {
     const dx = target.x - state.diver.x, dz = target.z - state.diver.z, d = Math.hypot(dx, dz);
     if (d < 1) return;
     step(state, 0.1, { diveX: dx / d, diveZ: dz / d });
@@ -274,7 +278,7 @@ test('each finite dive supports three collect-and-return trips with >15% oxygen 
       surface(state);
       assert.equal(state.mode, 'island');
     }
-    assert.equal(state.parts.length, 1);
+    assert.equal(state.parts.length,STORY_STAGES.findIndex(s=>s.siteId===site.id)+1);
   }
 });
 
@@ -312,7 +316,7 @@ test('dive region is bounded, bubbles refill oxygen and surface never soft-locks
 test('all three main parts, lighthouse repair, return celebration and free replay form a complete story', () => {
   const state = createState();
   depart(state);
-  for (const site of DIVE_SITES) {
+  for (const site of [...DIVE_SITES].sort((a,b)=>STORY_STAGES.findIndex(s=>s.siteId===a.id)-STORY_STAGES.findIndex(s=>s.siteId===b.id))) {
     moor(state, site.islandId); interact(state); startDive(state, site.id);
     swimTo(state, site.target); interact(state); surface(state); depart(state);
   }
@@ -527,12 +531,12 @@ test('sailing interaction prioritizes a nearby port over samples', () => {
   assert.equal(state.cargo.length, 0);
 });
 
-test('recommended stable-rig rule navigation completes first voyage in 4–6 minutes and continuous story in 8–12 without waiting', () => {
+test('recommended stable-rig rule navigation completes first voyage in 6–9 minutes and continuous story in 10–15 without waiting', () => {
   // Deterministic pure-rules autopilot, not a browser or human-play timing claim.
   for (const seed of [1, 2, 3, 8, 16]) for (const time of [0, 60, 120, 180]) {
     const result = measureFirst(seed, time, 'safe', true);
-    assert.ok(result.seconds >= 240 && result.seconds <= 360, `${seed}/${time}: first ${result.seconds}s`);
-    assert.ok(result.story.totalSeconds >= 480 && result.story.totalSeconds <= 720, `${seed}/${time}: story ${result.story.totalSeconds}s`);
+    assert.ok(result.seconds >= 360 && result.seconds <= 540, `${seed}/${time}: first ${result.seconds}s`);
+    assert.ok(result.story.totalSeconds >= 600 && result.story.totalSeconds <= 900, `${seed}/${time}: story ${result.story.totalSeconds}s`);
     assert.equal(result.damage, 0); assert.equal(result.story.damage, 0);
     assert.equal(result.delivered, true); assert.equal(result.story.completed, true);
     assert.equal(new Set(result.decisions.filter((item) => item.kind === 'optional-sample-or-skip').map((item) => item.id)).size, result.decisions.filter((item) => item.kind === 'optional-sample-or-skip').length, 'repeated buoy sightings must not count as fresh choices');

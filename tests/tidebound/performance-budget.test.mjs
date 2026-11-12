@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {assertBudgets} from './performance-budget.mjs';
+const sample=()=>({renderer:{maxDrawCalls:140,maxTriangles:34000,updateP95:.2},cpu:{step:{p95:.1},hud:{p95:.4}},textureBytes:12000000,transferBytes:2100000});
+test('rubric rejects draw and CPU overruns, independent of software frame interval',()=>{let s=sample();s.average=500;s.p95=900;assert.doesNotThrow(()=>assertBudgets(s));s.renderer.maxDrawCalls=251;assert.throws(()=>assertBudgets(s),/draw calls/);s=sample();s.renderer.updateP95=6.1;assert.throws(()=>assertBudgets(s),/update p95/);});
