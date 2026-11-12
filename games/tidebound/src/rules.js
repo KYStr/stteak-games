@@ -6,6 +6,8 @@ const islandLookup=Object.fromEntries(ISLANDS.map(s=>[s.id,s])),rigLookup=Object
 const getIsland=id=>Object.hasOwn(islandLookup,id)?islandLookup[id]:ISLANDS[0];
 const getRig=id=>Object.hasOwn(rigLookup,id)?rigLookup[id]:RIGS[0];
 const getSite=id=>Object.hasOwn(siteLookup,id)?siteLookup[id]:undefined;
+// Permanent parts unlock stations; only an observation on this voyage completes a dive.
+function observedDiveThisVoyage(state,site){return !!site && state.voyage.observed?.includes(site.discoveryId)===true;}
 const event = (type, text, extra = {}) => ({ type, text, ...extra });
 // The level remains a continuous sine wave; a phase name describes its whole quarter,
 // rather than calling the entire falling quarter "high tide".
@@ -428,8 +430,10 @@ export function startDive(state, siteId) {
   state.mode = 'diving';
   state.oxygen = site.oxygen;
   state.diver = { ...site.entry };
-  state.diveCollected = state.parts.includes(site.partId);
-  return [event('dive', `${site.name}：${diveStage(state).name}。依序到發光站按 E，每站補滿 ${site.oxygen} 秒氧氣。最後取得零件；隨時可浮出回船。${diveStage(state).mechanic==='guardian'?'入水有 2 秒緩衝，可先離開洋流圈。':''}`)];
+  state.diveCollected = observedDiveThisVoyage(state,site);
+  const tasks=state.diveTasks[site.id],name=DISCOVERIES.find(d=>d.id===site.discoveryId).name;
+  const guidance=state.diveCollected?'本趟調查完成，可浮出回船。':tasks.opened?(state.parts.includes(site.partId)?`各站保持解鎖，沿引導前往${name}，按 E 記錄本趟重新調查。`:`各站已解鎖，前往金色目標按 E 取得零件：${site.partName}。`):`依序到發光站按 E，每站補滿 ${site.oxygen} 秒氧氣。最後取得零件；隨時可浮出回船。`;
+  return [event('dive', `${site.name}：${diveStage(state).name}。${guidance}${diveStage(state).mechanic==='guardian'?'入水有 2 秒緩衝，可先離開洋流圈。':''}`)];
 }
 
 export function surface(state) {
@@ -683,7 +687,7 @@ export function restore(raw) {
       const site=getSite(saved.activeDive);
       // Diving is entered from a moored boat, so valid dive saves use the safe dock below.
       if(site && site.islandId===safeIsland.id && validPoint(saved.diver) && distance(saved.diver, site.entry)<=site.radius && finite(saved.oxygen)>0){
-        state.mode='diving';state.currentIsland=safeIsland.id;state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,site.oxygen);state.diveCollected=saved.diveCollected===true;
+        state.mode='diving';state.currentIsland=safeIsland.id;state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,site.oxygen);state.diveCollected=observedDiveThisVoyage(state,site);
       }
     }
     if (state.mode === 'sailing') state.voyage.navigation = restoredNavigation;
@@ -692,7 +696,7 @@ export function restore(raw) {
   if(saved.mode==='diving'){
     const site=getSite(saved.activeDive);
     if(site&&site.islandId===safeIsland.id&&validPoint(saved.diver)&&distance(saved.diver,site.entry)<=site.radius&&finite(saved.oxygen)>0){
-      state.mode='diving';state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,site.oxygen);state.diveCollected=saved.diveCollected===true;
+      state.mode='diving';state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,site.oxygen);state.diveCollected=observedDiveThisVoyage(state,site);
       return {state,message:'已恢復淺水探索，離線不扣氧氣。'};
     }
   }

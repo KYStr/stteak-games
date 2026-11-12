@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createState,depart,dock,startDive,interact,step,surface,restore,serialize,collectObservation,sampleTideInto,tideAt,currentAt,currentAtInto} from '../../games/tidebound/src/rules.js';
+import {createState,depart,dock,startDive,interact,step,surface,restore,serialize,collectObservation,sampleTideInto,tideAt,currentAt,currentAtInto,contractProgress} from '../../games/tidebound/src/rules.js';
 import {DIVE_SITES,STORY_STAGES,ISLANDS,voyageVariant,diveStage,diveTarget,guardianInto} from '../../games/tidebound/src/world.js';
 import {completeDive} from './pilot-rules.mjs';
 function enter(seed,index=0){let s=createState(seed);depart(s);s.parts=STORY_STAGES.slice(0,index).map(s=>s.partId);const site=DIVE_SITES.find(s=>s.id===STORY_STAGES[index].siteId);Object.assign(s.boat,ISLANDS.find(i=>i.id===site.islandId).dock);dock(s);startDive(s,site.id);return s;}
@@ -19,5 +19,30 @@ test('guardian grants saved two-second entry grace at every compulsory overlap p
   s.time=0;s.guardianCooldown=0;const site=DIVE_SITES.find(d=>d.id==='ruin-dive');const angle=(seed===3?2:0)/8*Math.PI*2;s.diver={x:site.entry.x+Math.sin(angle)*10,z:site.entry.z+Math.cos(angle)*7};
   // Explicit hazardous centre from the production scalar sampler.
   const point={};guardianInto(0,site,point,s.voyage.variantId);s.diver={x:point.x,z:point.z};const before=s.oxygen;events=step(s,.01);assert.ok(events.some(e=>e.text?.includes('氧氣 -4')));assert.ok(Math.abs(s.oxygen-(before-4.01))<1e-6);assert.equal(s.guardianCooldown,2);assert.ok(!step(s,.1).some(e=>e.text?.includes('氧氣 -4')));
+ }
+});
+
+test('all three dives distinguish permanent parts from observations on this voyage, including stale saves',()=>{
+ for(let index=0;index<STORY_STAGES.length;index++){
+  let s=enter(1,index);const site=DIVE_SITES.find(d=>d.id===s.activeDive);
+  completeDive(s);assert.ok(s.voyage.observed.includes(site.discoveryId));
+  surface(s);startDive(s,site.id);assert.equal(s.diveCollected,true,'same-voyage completion');
+  surface(s);depart(s);Object.assign(s.boat,ISLANDS[0].dock);dock(s);depart(s,'coral-survey');
+  Object.assign(s.boat,ISLANDS.find(i=>i.id===site.islandId).dock);dock(s);interact(s);
+  const tasks=structuredClone(s.diveTasks[site.id]),parts=[...s.parts];
+  const entry=startDive(s,site.id);assert.match(entry[0].text,/各站保持解鎖/);assert.match(entry[0].text,/本趟重新調查/);
+  assert.equal(s.diveCollected,false);assert.ok(!s.voyage.observed.includes(site.discoveryId));assert.deepEqual(s.diveTasks[site.id],tasks);
+  // Exercise both live-position and safe-dock restoration branches.
+  for(const sailingPosition of [false,true]){
+   const stale=structuredClone(s);stale.diveCollected=true;if(sailingPosition)stale.boat={...stale.boat,...ISLANDS[0].dock};else stale.boat.x=999;
+   const repaired=restore(serialize(stale)).state;assert.equal(repaired.mode,'diving');assert.equal(repaired.diveCollected,false);assert.ok(!repaired.voyage.observed.includes(site.discoveryId));
+  }
+  s.diveCollected=true;s=restore(serialize(s)).state;const progress=contractProgress(s).completedCount;
+  s.supplyRemaining=470;Object.assign(s.diver,site.target);interact(s);
+  assert.equal(s.diveCollected,true);assert.deepEqual(s.parts,parts);assert.equal(s.supplyRemaining,470);
+  assert.equal(s.voyage.observed.filter(id=>id===site.discoveryId).length,1);
+  if(site.id!=='ruin-dive')assert.equal(contractProgress(s).completedCount,progress+1);
+  const after=serialize(s);interact(s);assert.equal(serialize(s),after,'repeat E grants no duplicate cargo, parts, rewards or refill');
+  s=restore(serialize(s)).state;assert.equal(s.diveCollected,true);assert.deepEqual(s.diveTasks[site.id],tasks);
  }
 });

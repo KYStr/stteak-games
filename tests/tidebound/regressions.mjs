@@ -1,12 +1,58 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {createState,depart,dock,interact,startDive,serialize} from '../../games/tidebound/src/rules.js';
-import {ISLANDS,DIVE_SITES,OBSERVATIONS,STORY_STAGES,diveTarget,voyageVariant,DISCOVERIES} from '../../games/tidebound/src/world.js';
-export async function runRegressions({page,base,output:out,report,check}){
+import {driveDive} from './dive-pilot.mjs';
+import {completeDive} from './pilot-rules.mjs';
+import {createState,depart,dock,interact,startDive,surface,serialize} from '../../games/tidebound/src/rules.js';
+import {ISLANDS,DIVE_SITES,OBSERVATIONS,STORY_STAGES,diveTarget,voyageVariant,DISCOVERIES,CONTRACTS} from '../../games/tidebound/src/world.js';
+export async function runRegressions({page,base,output:out,report,check,setPhase=()=>{}}){
  const snap=()=>page.evaluate(()=>tidebound.snapshot()),metrics=()=>page.evaluate(()=>tidebound.metrics());
  const fixture=async state=>{await page.evaluate(raw=>sessionStorage.setItem('tidebound.test.fixture',raw),typeof state==='string'?state:serialize(state));await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.tidebound)};
- const test=async(name,fn)=>{const data=await fn();(report.regressions??=[]).push({name,data});check(name)};
+ const test=async(name,fn)=>{setPhase('regression: '+name);const data=await fn();(report.regressions??=[]).push({name,data});check(name)};
  await page.evaluate(()=>localStorage.setItem('stteak.tidebound.preferences.v1',JSON.stringify({music:.35,sfx:.65,reducedMotion:false,quality:'auto',camera:'overhead'})));
+ await test('dive checklist shows locked, unlocked pending and completed states for all three sites',async()=>{
+  const rows=[];
+  for(const site of DIVE_SITES){const s=createState();s.parts=STORY_STAGES.slice(0,STORY_STAGES.findIndex(d=>d.siteId===site.id)).map(d=>d.partId);depart(s);Object.assign(s.boat,ISLANDS.find(i=>i.id===site.islandId).dock);dock(s);startDive(s,site.id);
+   await fixture(s);await page.click('#continue-voyage');assert.match(await page.locator('#dive-checklist li').last().innerText(),/完成各站解開零件/);
+   s.diveTasks[site.id]={completedStationIds:STORY_STAGES.find(d=>d.siteId===site.id).offsets.map((_,i)=>site.id+'-'+i),opened:true};s.diver={...site.target};
+   await fixture(s);await page.click('#continue-voyage');assert.match(await page.locator('#dive-checklist li').last().innerText(),new RegExp('◇ 前往零件：'+site.partName));
+   await page.keyboard.press('e');assert.equal((await snap()).diveCollected,true);assert.match(await page.locator('#dive-checklist li').last().innerText(),/✓ 本趟調查完成.*可浮出回船/);assert.match(await page.locator('#dive-checklist li').last().getAttribute('class'),/done/);
+   await page.keyboard.press('Escape');await page.click('#save-voyage');await page.reload({waitUntil:'domcontentloaded'});await page.click('#continue-voyage');assert.match(await page.locator('#dive-checklist li').last().innerText(),/✓ 本趟調查完成/);rows.push({site:site.id,afterReload:await page.locator('#dive-checklist').innerText()});
+  }return rows;
+ });
+ await test('repeat owned-part dives guide real swimming, persist completion and settle a repeated commission',async()=>{
+  const results=[];let held=new Set();
+  async function hold(keys){const next=new Set(keys);for(const key of held)if(!next.has(key))await page.keyboard.up(key);for(const key of next)if(!held.has(key))await page.keyboard.down(key);held=next;}
+  async function bounds(){const b=await page.evaluate(()=>['#dive-checklist','#oxygen-row'].map(id=>{const el=document.querySelector(id),r=el.getBoundingClientRect();return{id,x:r.x,y:r.y,right:r.right,bottom:r.bottom,w:r.width,h:r.height,clipped:el.scrollHeight>el.clientHeight+1,width:innerWidth,height:innerHeight}}));for(const r of b){assert.ok(r.x>=0&&r.y>=0&&r.right<=r.width&&r.bottom<=r.height&&r.w>0&&r.h>0,JSON.stringify(r));assert.equal(r.clipped,false);}return b;}
+  try{for(const [w,h] of [[1280,720],[1920,1080]]){await page.setViewportSize({width:w,height:h});for(const site of DIVE_SITES){
+   const s=createState();s.parts=STORY_STAGES.slice(0,STORY_STAGES.findIndex(d=>d.siteId===site.id)).map(d=>d.partId);depart(s);Object.assign(s.boat,ISLANDS.find(i=>i.id===site.islandId).dock);dock(s);startDive(s,site.id);completeDive(s);surface(s);
+   depart(s);Object.assign(s.boat,ISLANDS[0].dock);dock(s);s.completed=['coral-survey'];s.credits=65;s.records.byContract['coral-survey']={bestTime:800,bestDamage:0,voyages:1};depart(s,'coral-survey');
+   // Seed other observations in the save fixture; the missing underwater action uses only real input.
+   s.voyage.observed=CONTRACTS[0].objectives.map(o=>o.discoveryId).filter(id=>id!==site.discoveryId);s.discoveries=[...new Set([...s.discoveries,...s.voyage.observed])];s.cargo=[];s.supplyRemaining=700;
+   Object.assign(s.boat,ISLANDS.find(i=>i.id===site.islandId).dock);dock(s);await fixture(s);
+   assert.match(await page.locator('#panel').innerText(),/各站保持解鎖/);await page.click('#dive');const before=await snap();
+   assert.equal(before.activeDive,site.id);assert.equal(before.diveCollected,false);assert.ok(!before.voyage.observed.includes(site.discoveryId));
+   const detail=await page.locator('#objective-detail').innerText(),name=DISCOVERIES.find(d=>d.id===site.discoveryId).name;
+   assert.match(detail,new RegExp('本趟重新調查：'+name));assert.doesNotMatch(detail,/調查完成|已完成調查|可浮出/);
+   assert.match(await page.locator('#dive-checklist li').last().innerText(),new RegExp('◇ 本趟重新調查：'+name));assert.doesNotMatch(await page.locator('#dive-checklist li').last().getAttribute('class'),/done/);
+   await page.waitForFunction(()=>tidebound.metrics().renderer.diveGuideVisible&&tidebound.metrics().renderer.diveTargetRingVisible);
+   const renderer=(await metrics()).renderer;assert.equal(renderer.divePartVisible,false,'owned physical part must remain hidden');
+   const p=renderer.projections.target;assert.ok((p.z<1&&p.x>=340&&p.x<=w-90&&p.y>=130&&p.y<=h-230)||await page.locator('#dive-direction').isVisible());
+   const pendingBounds=await bounds();await page.screenshot({path:out+`/repeat-${site.id}-pending-${w}.png`});
+   const actions=await driveDive({page,snap,hold});assert.equal(actions.length,1,'unlocked stations require one final investigation');const after=await snap();
+   assert.equal(after.diveCollected,true);assert.equal(after.voyage.observed.filter(id=>id===site.discoveryId).length,1);assert.deepEqual(after.parts,before.parts);assert.equal(after.credits,before.credits);assert.equal(after.cargo.length,1);assert.ok(after.supplyRemaining<=before.supplyRemaining);
+   assert.match(await page.locator('#objective-detail').innerText(),/本趟調查完成，可浮出回船/);assert.match(await page.locator('#dive-checklist li').last().innerText(),/✓ 本趟調查完成.*可浮出回船/);assert.match(await page.locator('#dive-checklist li').last().getAttribute('class'),/done/);
+   await page.click('#interact-button');const repeated=await snap();assert.deepEqual(repeated.parts,after.parts);assert.deepEqual(repeated.cargo,after.cargo);assert.equal(repeated.credits,after.credits);assert.ok(repeated.supplyRemaining<=after.supplyRemaining);
+   await page.keyboard.press('Escape');await page.click('#save-voyage');const saved=await snap();await page.reload({waitUntil:'domcontentloaded'});const restored=await snap();assert.equal(restored.diveCollected,true);assert.deepEqual(restored.voyage.observed,saved.voyage.observed);assert.equal(restored.supplyRemaining,saved.supplyRemaining);await page.click('#continue-voyage');
+   assert.match(await page.locator('#dive-checklist li').last().innerText(),/✓ 本趟調查完成/);const completedBounds=await bounds();await page.screenshot({path:out+`/repeat-${site.id}-completed-${w}.png`});
+   const result={site:site.id,w,pendingDetail:detail,actions,pendingBounds,completedBounds,before,after,restored};
+   if(site.id==='reef-dive'&&w===1280){
+    await page.click('#surface-button');await page.click('#leave-island');const deadline=Date.now()+3600000;
+    for(const point of [{x:-35,z:55},{x:-35,z:115},ISLANDS[0].dock]){while(true){assert.ok(Date.now()<deadline,'repeat return navigation deadline');const state=await snap();assert.equal(state.mode,'sailing');const dx=point.x-state.boat.x,dz=point.z-state.boat.z;if(Math.hypot(dx,dz)<6)break;const angle=Math.atan2(dx,-dz),e=Math.atan2(Math.sin(angle-state.boat.heading),Math.cos(angle-state.boat.heading));await hold([...(Math.abs(e)>.07?[e>0?'d':'a']:[]),Math.abs(e)>.8?'Space':'w']);await page.waitForTimeout(180);}}
+    await hold(['Space']);await page.waitForFunction(()=>tidebound.snapshot().boat.speed<.5);await hold([]);const delivery=await snap();await page.keyboard.press('e');const home=await snap();assert.equal(home.mode,'result');assert.ok(home.result.rank);assert.equal(home.records.byContract['coral-survey'].voyages,2);assert.equal(home.result.reward,delivery.cargo.length*3,'65-mark commission reward must not repeat');assert.equal(home.credits,65+home.result.reward);result.settlement=home;await page.screenshot({path:out+'/repeat-contract-result.png'});
+   }
+   results.push(result);
+  }}return results;}finally{await hold([]);await page.setViewportSize({width:1280,height:720});}
+ });
  await test('real first island discoveries aggregate visible names and one immediate sound, lessons remain readable',async()=>{
   const results=[];
   for(const [w,h]of [[1280,720],[1920,1080]]){await page.setViewportSize({width:w,height:h});for(const id of ['gull','mangrove']){
