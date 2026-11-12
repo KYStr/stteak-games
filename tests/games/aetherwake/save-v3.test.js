@@ -32,8 +32,8 @@ function withPhaseContent(check) {
   }
 }
 
-test('schema 3 defaults provide independent phase counters and undamaged cargo', () => {
-  assert.equal(SAVE_VERSION, 3);
+test('schema 4 defaults provide independent phase counters and undamaged cargo', () => {
+  assert.equal(SAVE_VERSION, 4);
   const first = defaultSave(), second = defaultSave();
   assert.deepEqual(first.mainSamples, [0, 0, 0]);
   assert.deepEqual(Object.keys(first.courseStages), WORLD.challenges.map((challenge) => challenge.id));
@@ -45,20 +45,20 @@ test('schema 3 defaults provide independent phase counters and undamaged cargo',
 
 test('v1 aliases migrate without losing discovery, settings, or the old ending', () => {
   const alias = migrateSave({ version: 1, island: 'island-reed', fragments: ['relic-03'], unlocked: ['island-reed'], settings: { music: 0 }, elapsed: 33, stalls: 1, assist: true });
-  assert.equal(alias.migrated, true); assert.equal(alias.save.schemaVersion, 3);
+  assert.equal(alias.migrated, true); assert.equal(alias.save.schemaVersion, 4);
   assert.equal(alias.save.checkpoint, 'island-reed'); assert.deepEqual(alias.save.relics, ['relic-03']);
   assert.deepEqual(alias.save.unlocked, ['island-camp', 'island-reed']); assert.equal(alias.save.settings.music, 0);
   assert.equal(alias.save.elapsed, 33); assert.equal(alias.save.stalls, 1); assert.equal(alias.save.usedAssist, true);
   const ending = migrateSave(legacySave(1)).save;
-  assert.equal(ending.completed, true); assert.deepEqual(ending.activated, STATIONS); assert.deepEqual(ending.legacyRecords.reserve, oldRecord);
+  assert.equal(ending.completed, false); assert.deepEqual(ending.activated, []); assert.deepEqual(ending.legacyRecords.reserve, oldRecord);
 });
 
 test('v2 migration archives short-course achievements and starts new phases and records empty', () => withPhaseContent(() => {
   const original = legacySave();
   Object.assign(original, { mainSamples: [4, 5, 6], courseStages: { 'challenge-1': 99 }, cargoStability: 14, cargoDamage: 30 });
   const { save, migrated } = migrateSave(original);
-  assert.equal(migrated, true); assert.equal(save.completed, true);
-  for (const key of ['seed', 'module', 'checkpoint', 'unlocked', 'activated', 'relics', 'settings', 'assist', 'usedAssist', 'stalls', 'elapsed', 'routeStyle']) assert.deepEqual(save[key], original[key], key);
+  assert.equal(migrated, true); assert.equal(save.completed, false);
+  for (const key of ['seed', 'module', 'checkpoint', 'unlocked', 'relics', 'settings', 'assist', 'usedAssist', 'stalls', 'elapsed', 'routeStyle']) assert.deepEqual(save[key], original[key], key);
   assert.deepEqual(save.legacyRecords, original.records); assert.deepEqual(save.legacyRouteRecords, original.routeRecords);
   assert.deepEqual(save.legacyChallenges, ['challenge-1', 'challenge-2']);
   assert.deepEqual(save.records, {}); assert.deepEqual(save.routeRecords, {}); assert.deepEqual(save.challenges, []); assert.deepEqual(save.completedChallenges, []);
@@ -72,7 +72,7 @@ test('historical records survive migration, safe save, reload and later settings
   old.legacyRouteRecords = { 'retired-route': { ...oldRoute, time: 75 } };
   old.legacyChallenges = ['retired-challenge'];
   const raw = JSON.stringify(old), storage = memoryStorage(raw), store = new SaveStore(storage);
-  const loaded = store.load(); assert.equal(loaded.migrated, true); assert.match(loaded.warning, /升級/);
+  const loaded = store.load(); assert.equal(loaded.migrated, true); assert.match(loaded.warning, /舊版/);
   assert.equal(storage.getItem(SAVE_KEY), raw, 'Loading must not overwrite the original legacy save'); assert.equal(storage.writes.length, 0);
   assert.equal(store.save({ settings: { sfx: 0.8 } }).ok, true);
   const reloaded = new SaveStore(storage).load(); assert.equal(reloaded.migrated, false); assert.equal(reloaded.warning, null);
@@ -146,7 +146,7 @@ test('quota failure cannot replace the safe checkpoint or erase new in-memory da
   assert.equal(blocked.save({ cargoStability: 70, cargoDamage: 30, relics: ['relic-01'] }).ok, false);
   assert.equal(storage.getItem(SAVE_KEY), previous); assert.equal(blocked.memory.cargoDamage, 30); assert.deepEqual(blocked.memory.relics, ['relic-01']);
   const working = new SaveStore(storage); working.load(); assert.equal(working.save({ cargoDamage: 18 }).ok, true);
-  assert.equal(storage.writes.length, 1); assert.equal(storage.writes[0].key, SAVE_KEY); assert.equal(JSON.parse(storage.writes[0].value).schemaVersion, 3);
+  assert.equal(storage.writes.length, 1); assert.equal(storage.writes[0].key, SAVE_KEY); assert.equal(JSON.parse(storage.writes[0].value).schemaVersion, 4);
 });
 
 test('explicit clear-progress resets all current and legacy achievements but retains settings', () => withPhaseContent(() => {
@@ -171,7 +171,7 @@ test('new expedition reset keeps permanent phases, badges, discoveries and archi
 test('saving a migrated ending cannot reclassify its old short-run time as a new record', async () => {
   const { FlightSimulation } = await import('../../../games/aetherwake/src/simulation.js');
   const converted = migrateSave(legacySave()).save, sim = new FlightSimulation({ save: converted });
-  assert.equal(sim.status, 'complete', 'The old ending remains viewable');
+  assert.equal(sim.status, 'ready', 'Historical victories cannot complete the new campaign');
   const saved = validateSave(sim.saveData());
   assert.deepEqual(saved.records, {}); assert.deepEqual(saved.routeRecords, {});
   assert.deepEqual(saved.legacyRecords, converted.legacyRecords); assert.deepEqual(saved.legacyRouteRecords, converted.legacyRouteRecords);

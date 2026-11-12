@@ -3,6 +3,9 @@ export class FlightInput {
     this.keys = new Set();
     this.axes = { x: 0, z: 0 };
     this.glide = false;
+    this.requestId = 0;
+    this.pendingId = 0;
+    this.sample = { x: 0, z: 0, brake: false, glide: false, requestId: 0 };
     this.touchBrake = false;
     this.brakePointer = null;
     this.enabled = false;
@@ -53,7 +56,7 @@ export class FlightInput {
           if (e.code === "KeyV") actions.view();
           if (e.code === "KeyC") actions.recenter();
           if (e.code === "KeyE" && this.enabled) actions.interact();
-          if (e.code === "Space" && this.enabled) this.glide = true;
+          if (e.code === "Space" && this.enabled) this.queueGlide();
         }
         if (this.enabled) this.keys.add(e.code);
       }
@@ -165,7 +168,7 @@ export class FlightInput {
     const glide = document.querySelector("#touch-glide");
     on(glide, "pointerdown", (e) => {
       e.preventDefault();
-      if (this.enabled) this.glide = true;
+      if (this.enabled) this.queueGlide();
     });
     const brake = document.querySelector("#touch-brake");
     on(brake, "pointerdown", (e) => {
@@ -206,8 +209,15 @@ export class FlightInput {
       // Teardown remains neutral if the browser already invalidated capture.
     }
   }
+  queueGlide() {
+    if (!this.enabled || this.glide) return false;
+    this.glide = true; this.pendingId = ++this.requestId;
+    this.actions.glideQueued?.(this.pendingId);
+    return true;
+  }
   read(yaw = 0) {
-    if (!this.enabled) return { x: 0, z: 0, brake: false, glide: false };
+    const result = this.sample;
+    if (!this.enabled) { result.x = result.z = result.requestId = 0; result.brake = result.glide = false; return result; }
     const x =
       (this.keys.has("KeyD") || this.keys.has("ArrowRight") ? 1 : 0) -
       (this.keys.has("KeyA") || this.keys.has("ArrowLeft") ? 1 : 0) +
@@ -216,16 +226,12 @@ export class FlightInput {
       (this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0) -
       (this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0) +
       this.axes.z;
-    const n = Math.max(1, Math.hypot(x, z)),
-      result = {
-        x: (x * Math.cos(yaw) + z * Math.sin(yaw)) / n,
-        z: (z * Math.cos(yaw) - x * Math.sin(yaw)) / n,
-        brake:
-          this.touchBrake ||
-          this.keys.has("ShiftLeft") ||
-          this.keys.has("ShiftRight"),
-        glide: this.glide,
-      };
+    const n = Math.max(1, Math.sqrt(x*x+z*z));
+    result.x = (x * Math.cos(yaw) + z * Math.sin(yaw)) / n;
+    result.z = (z * Math.cos(yaw) - x * Math.sin(yaw)) / n;
+    result.brake = this.touchBrake || this.keys.has('ShiftLeft') || this.keys.has('ShiftRight');
+    result.glide = this.glide; result.requestId = this.pendingId;
+    this.pendingId = 0;
     this.glide = false;
     return result;
   }
@@ -234,6 +240,8 @@ export class FlightInput {
     this.pointerCaptures.clear();
     this.keys.clear();
     this.glide = false;
+    this.pendingId = 0;
+    this.actions.glideCleared?.();
     this.axes = { x: 0, z: 0 };
     this.touchBrake = false;
     this.brakePointer = null;

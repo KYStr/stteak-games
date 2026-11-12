@@ -144,7 +144,7 @@ test('tracked transit blocks keyboard station delivery and final return until tr
   assert.equal(station.trackChallenge('challenge-3'), true);
   assert.equal(station.interact(), false); assert.deepEqual(station.activated, []); assert.equal(station.status, 'running');
   assert.equal(station.cancelChallenge(), true); assert.equal(station.interact(), true); assert.deepEqual(station.activated, [STATIONS[0]]);
-  const returning = expedition(islandById('island-camp'), 'turn', { mainSamples: totals, activated: [...STATIONS] });
+  const returning = expedition(islandById('island-camp'), 'turn', { mainSamples: totals, activated: [...STATIONS], campaignCircuitStages: [3,3,3], returnSamples: 6 });
   assert.equal(returning.trackChallenge('challenge-5'), true);
   assert.equal(returning.interact(), false); assert.equal(returning.status, 'running'); assert.equal(returning.state.routeTimes.length, 0);
   assert.equal(returning.cancelChallenge(), true); assert.equal(returning.interact(), true); assert.equal(returning.status, 'complete');

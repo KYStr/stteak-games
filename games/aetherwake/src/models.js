@@ -16,6 +16,17 @@ const M = {
   turf: new THREE.MeshStandardMaterial({ name: 'weathered-turf', color: 0x668c78, roughness: 1, flatShading: true }),
   sand: new THREE.MeshStandardMaterial({ name: 'mineral-sand', color: 0x99aa8c, roughness: 1, flatShading: true }),
 };
+// Contrasting patches overlap on a shared plane. Keep their depth priority
+// deterministic without changing the sand used by architectural slabs.
+const TERRAIN_PATCH = { turf: M.turf.clone(), sand: M.sand.clone() };
+Object.assign(TERRAIN_PATCH.turf, {
+  name: 'terrain-patch-turf', polygonOffset: true,
+  polygonOffsetFactor: 0, polygonOffsetUnits: -1,
+});
+Object.assign(TERRAIN_PATCH.sand, {
+  name: 'terrain-patch-sand', polygonOffset: true,
+  polygonOffsetFactor: 0, polygonOffsetUnits: -2,
+});
 const mat = key => M[key] || M.stone;
 const seeded = seed => { let x = (seed + 1) >>> 0; return () => { x = Math.imul(1664525, x) + 1013904223 >>> 0; return x / 4294967296; }; };
 const mesh = (geo, material, position, scale) => { const o = new THREE.Mesh(geo, typeof material === 'string' ? mat(material) : material); if (position) o.position.set(...position); if (scale) o.scale.set(...scale); o.castShadow = true; o.receiveShadow = true; return o; };
@@ -32,9 +43,9 @@ function mergeGeometries(geometries) {
 }
 function batchStatic(group) {
   group.updateMatrixWorld(true); const batches=new Map(), remove=[];
-  group.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&!o.isSkinnedMesh&& !Array.isArray(o.material)){const g=(o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone()).applyMatrix4(o.matrixWorld); const key=o.material.uuid; if(!batches.has(key)) batches.set(key,{material:o.material,geometries:[]}); batches.get(key).geometries.push(g); remove.push(o);}});
+  group.traverse(o=>{if(o.isMesh&&!o.isInstancedMesh&&!o.isSkinnedMesh&& !Array.isArray(o.material)){const g=(o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone()).applyMatrix4(o.matrixWorld); const key=`${o.material.uuid}:${Number(o.castShadow)}:${Number(o.receiveShadow)}`; if(!batches.has(key)) batches.set(key,{material:o.material,geometries:[],castShadow:o.castShadow,receiveShadow:o.receiveShadow}); batches.get(key).geometries.push(g); remove.push(o);}});
   for(const o of remove) o.removeFromParent();
-  for(const {material,geometries} of batches.values()){const o=mesh(mergeGeometries(geometries),material);o.name=material.name+'-merged'; group.add(o);for(const g of geometries) g.dispose();}
+  for(const {material,geometries,castShadow,receiveShadow} of batches.values()){const o=mesh(mergeGeometries(geometries),material);o.name=material.name+'-merged';o.castShadow=castShadow;o.receiveShadow=receiveShadow; group.add(o);for(const g of geometries) g.dispose();}
   return group;
 }
 
@@ -82,7 +93,8 @@ function islandTier(radius,index,region,detail) {
   // Six compatible cliff/terrace variants share a circular ground contract.
   for(let i=0;i<(detail?22:9);i++) {const a=i*Math.PI*2/(detail?22:9)+random()*.1, rr=radius*(.88+random()*.07), h=radius*(.12+random()*.2); const o=mesh(cylinder(radius*.1,radius*.07,h,5),'stone',[Math.sin(a)*rr,-h*.45-.25,Math.cos(a)*rr]);o.rotation.y=a;o.rotation.z=(random()-.5)*.24;g.add(o);}
   if(detail){
-    for(let i=0;i<Math.max(9,Math.round(radius*.6));i++){const a=random()*Math.PI*2,rr=radius*(.23+random()*.62),patch=mesh(cylinder(1,1,.05,9),i%3?'turf':'sand',[Math.sin(a)*rr,-.016,Math.cos(a)*rr],[1.5+random()*radius*.12,1,1.2+random()*radius*.1]);patch.rotation.y=random()*6;patch.castShadow=false;g.add(patch);}
+    const patchGeometry=new THREE.CircleGeometry(1,9);patchGeometry.rotateX(-Math.PI/2);
+    for(let i=0;i<Math.max(9,Math.round(radius*.6));i++){const a=random()*Math.PI*2,rr=radius*(.23+random()*.62),patch=mesh(patchGeometry,i%3?TERRAIN_PATCH.turf:TERRAIN_PATCH.sand,[Math.sin(a)*rr,i%3?.02:.03,Math.cos(a)*rr],[1.5+random()*radius*.12,1,1.2+random()*radius*.1]);patch.rotation.y=random()*6;patch.castShadow=false;g.add(patch);}
     const loop=ring(radius*.72,.055,'copper',48);loop.rotation.x=-Math.PI/2;loop.position.y=.025;g.add(loop);
     // Inlaid brass stepping markers point towards the rim without obstructing play.
     for(let i=0;i<10;i++){const marker=mesh(new THREE.BoxGeometry(.32,.05,.9),'gold',[0,.025,radius*(.17+i*.063)]);marker.rotation.y=(index%3-1)*.1;g.add(marker);}

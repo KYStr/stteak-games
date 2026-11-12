@@ -8,6 +8,7 @@
     />
     <meta name="theme-color" content="#163f47" />
     <title>風起之境 · Aetherwake</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23153f47'/%3E%3Cpath d='M32 7 39 25 57 32 39 39 32 57 25 39 7 32 25 25Z' fill='%23efc47a'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -40,7 +41,7 @@
           ><strong id="flight-mode">安全地面</strong>
           <div>
             <span id="altitude">0 m</span><span id="speed">0 m/s</span
-            ><span id="clock">00:00</span>
+            ><span id="clock">00:00</span></div><div class="telemetry-feedback"><span id="weather-clock">天候 45:00</span><span id="sail-feedback" role="status" aria-live="polite"></span>
           </div>
         </div>
         <div id="guide">
@@ -77,6 +78,7 @@
           <span class="eyebrow" id="course-kicker">航線觀測</span
           ><strong id="course-title"></strong>
           <p id="course-detail"></p>
+          <div id="gate-conditions" aria-label="觀測條件"></div>
           <button id="leave-course">退出並返回安全島</button>
         </div>
         <div class="collection">
@@ -124,6 +126,8 @@
             <button id="daily-seed">今日風況</button
             ><button id="new-seed">另一陣風</button>
           </div>
+          <label class="seed-label">航程模式<select id="mode"><option value="expedition">遠征 · 45 分鐘天候窗口</option><option value="exploration">自由探索 · 不限時、不排名</option></select></label>
+          <p class="mode-note">完成三座觀測台、九段必修巡測與六座返航航標。逾時遠征撤回；選擇自由探索可不限時飛行。</p>
           <button id="start" class="primary">啟程 <span>↗</span></button
           ><button id="continue" class="secondary hidden">
             繼續上次安全落點

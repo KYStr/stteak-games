@@ -5,7 +5,7 @@
   "generatedAt": "2026-10-25",
   "runtimeGeometry": "The live game imports games/aetherwake/src/models.js. GLB exports retain the equivalent reusable meshes, rigs, UVs, PBR materials and five clips; no GLB network fetch is required for gameplay.",
   "audioRuntime": "Gesture-unlocked WebAudio loads six original WAV events with procedural fallback; environmental sound and the retained score are synthesised live.",
-  "totalRuntimeBytes": 5137378,
+  "totalRuntimeBytes": 4804726,
   "entries": [
     {
       "id": "aetherwake.island-1",
@@ -16,7 +16,7 @@
         "models/island-1.glb"
       ],
       "sha256": {
-        "models/island-1.glb": "c7b8c9fa1a60a325654ee2be92592cd3feb935eb52a31ea30e810a06fe97840d"
+        "models/island-1.glb": "611ea399003bdc697522ae69ff9afbb039939e61f79e3596cd247521a3b346cd"
       },
       "provenance": {
         "method": "original-procedural",
@@ -32,8 +32,8 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6362,
-        "drawCalls": 10,
+        "triangles": 5741,
+        "drawCalls": 11,
         "bones": 0,
         "dimensions": [
           76.129,
@@ -44,11 +44,12 @@
           "island-0-terrace",
           "teal-basalt",
           "deep-basalt",
-          "mineral-sand",
-          "weathered-turf",
+          "terrain-patch-sand",
+          "terrain-patch-turf",
           "ochre-ceramic",
           "aged-brass",
           "chalk-sail",
+          "mineral-sand",
           "moss"
         ],
         "collision": "assets/data/collision.json",
@@ -70,7 +71,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 333068,
+        "runtimeBytes": 274604,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -98,7 +99,7 @@
         "models/island-1-low.glb"
       ],
       "sha256": {
-        "models/island-1-low.glb": "94136d645d000ceaaa58b5e5a685b946cc818fb8ca314f8a9fc29cfaa5d7eef9"
+        "models/island-1-low.glb": "a6f2067be6917112e6cbe9a891fc64cbacb272199ef3b08f35af588c98983f34"
       },
       "provenance": {
         "method": "original-procedural",
@@ -166,7 +167,7 @@
         "models/island-2.glb"
       ],
       "sha256": {
-        "models/island-2.glb": "b2e05206c4c1d58b87348041bdd419d1b15b27517199d3a85e9a2306e2fe0a0a"
+        "models/island-2.glb": "3e144be45e321ca5c5c5b329bdb298ecf81ef0c61bb082fb1aa12260a47240c0"
       },
       "provenance": {
         "method": "original-procedural",
@@ -182,8 +183,8 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6448,
-        "drawCalls": 10,
+        "triangles": 5908,
+        "drawCalls": 11,
         "bones": 0,
         "dimensions": [
           69.042,
@@ -194,11 +195,12 @@
           "island-1-terrace",
           "teal-basalt",
           "deep-basalt",
-          "mineral-sand",
-          "weathered-turf",
+          "terrain-patch-sand",
+          "terrain-patch-turf",
           "ochre-ceramic",
           "aged-brass",
           "chalk-sail",
+          "mineral-sand",
           "moss"
         ],
         "collision": "assets/data/collision.json",
@@ -220,7 +222,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 361784,
+        "runtimeBytes": 311096,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -248,7 +250,7 @@
         "models/island-2-low.glb"
       ],
       "sha256": {
-        "models/island-2-low.glb": "427983ebae29681819672093796dcad92719ae007315a4a04622bf1530391c98"
+        "models/island-2-low.glb": "294219a2930425a739c15d0efe8f614f1cf6240615c6bd8254c90b28da7bbf10"
       },
       "provenance": {
         "method": "original-procedural",
@@ -315,7 +317,7 @@
         "models/island-3.glb"
       ],
       "sha256": {
-        "models/island-3.glb": "1a37b74ee3aa22c15c107bf36f25b69b223d2e7c7ae7a73238beb577acb8bae4"
+        "models/island-3.glb": "0dc93b03b8b03e393ee4299a730ee4bc3cf067411643837bafd944e947af7c45"
       },
       "provenance": {
         "method": "original-procedural",
@@ -331,8 +333,8 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6138,
-        "drawCalls": 10,
+        "triangles": 5598,
+        "drawCalls": 11,
         "bones": 0,
         "dimensions": [
           77.704,
@@ -343,11 +345,12 @@
           "island-2-terrace",
           "teal-basalt",
           "deep-basalt",
-          "mineral-sand",
-          "weathered-turf",
+          "terrain-patch-sand",
+          "terrain-patch-turf",
           "ochre-ceramic",
           "aged-brass",
           "chalk-sail",
+          "mineral-sand",
           "moss"
         ],
         "collision": "assets/data/collision.json",
@@ -369,7 +372,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 322184,
+        "runtimeBytes": 271488,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -397,7 +400,7 @@
         "models/island-3-low.glb"
       ],
       "sha256": {
-        "models/island-3-low.glb": "39fcb8b3bde4ce32cd13aa90eaf576d1570c09c59069cc7571fed9f6bf061191"
+        "models/island-3-low.glb": "7d8f8bb06d84f006740cde95b8283e53076e8741e019d23240452623eee8826b"
       },
       "provenance": {
         "method": "original-procedural",
@@ -464,7 +467,7 @@
         "models/island-4.glb"
       ],
       "sha256": {
-        "models/island-4.glb": "8b54f97d04cc7c67de3613f7a74a357f22db923f4eec402d485ff9688becbbf9"
+        "models/island-4.glb": "59ced7b731b511d57f22b66f95c28f8ae73db125465fe09014b402bc74ff0017"
       },
       "provenance": {
         "method": "original-procedural",
@@ -480,8 +483,8 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 7858,
-        "drawCalls": 11,
+        "triangles": 7183,
+        "drawCalls": 12,
         "bones": 0,
         "dimensions": [
           83.558,
@@ -492,11 +495,12 @@
           "island-3-terrace",
           "teal-basalt",
           "deep-basalt",
-          "mineral-sand",
-          "weathered-turf",
+          "terrain-patch-sand",
+          "terrain-patch-turf",
           "ochre-ceramic",
           "aged-brass",
           "chalk-sail",
+          "mineral-sand",
           "aether-glass",
           "moss"
         ],
@@ -519,7 +523,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 425196,
+        "runtimeBytes": 361548,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -547,7 +551,7 @@
         "models/island-4-low.glb"
       ],
       "sha256": {
-        "models/island-4-low.glb": "deeab58dde489de8695001869b663d1919244b5f63d5cca7a3815b49c6ec8af1"
+        "models/island-4-low.glb": "f5816cc678e54b23f0f593f52f36b7c2f909af2ac0988ed673095a4c285cc831"
       },
       "provenance": {
         "method": "original-procedural",
@@ -614,7 +618,7 @@
         "models/island-5.glb"
       ],
       "sha256": {
-        "models/island-5.glb": "7ee06c0e94ab8ee2db1596295af58d2c2a1767753a14f05a7935a84f086a2071"
+        "models/island-5.glb": "f7c3bd5bf702742d21cc6a5b6d9dc013c9768cc2a687ad5b93e5db1230d10892"
       },
       "provenance": {
         "method": "original-procedural",
@@ -630,8 +634,8 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6974,
-        "drawCalls": 10,
+        "triangles": 6434,
+        "drawCalls": 11,
         "bones": 0,
         "dimensions": [
           80.567,
@@ -642,11 +646,12 @@
           "island-4-terrace",
           "teal-basalt",
           "deep-basalt",
-          "mineral-sand",
-          "weathered-turf",
+          "terrain-patch-sand",
+          "terrain-patch-turf",
           "ochre-ceramic",
           "aged-brass",
           "chalk-sail",
+          "mineral-sand",
           "moss"
         ],
         "collision": "assets/data/collision.json",
@@ -668,7 +673,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 381940,
+        "runtimeBytes": 331248,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -696,7 +701,7 @@
         "models/island-5-low.glb"
       ],
       "sha256": {
-        "models/island-5-low.glb": "6eb5e4f18de7f55ae1f735690fca12c197079886806dcc68364128c4a959f97b"
+        "models/island-5-low.glb": "234ef8c3b0a9bf4fe5f3523858b74bf4ea27cff4f6765486ea2ac85b120ddaab"
       },
       "provenance": {
         "method": "original-procedural",
@@ -763,7 +768,7 @@
         "models/island-6.glb"
       ],
       "sha256": {
-        "models/island-6.glb": "b65a75f12ed417750bbdf843337a361b3a188f435594cd7ecc87d5a11648fa43"
+        "models/island-6.glb": "37b6d2e16faa2c1d14fe334dd1a57ceec6169d1fad8ed493b9469aebdab3ae44"
       },
       "provenance": {
         "method": "original-procedural",
@@ -779,8 +784,8 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 8194,
-        "drawCalls": 11,
+        "triangles": 7573,
+        "drawCalls": 12,
         "bones": 0,
         "dimensions": [
           77.771,
@@ -791,11 +796,12 @@
           "island-5-terrace",
           "teal-basalt",
           "deep-basalt",
-          "mineral-sand",
-          "weathered-turf",
+          "terrain-patch-sand",
+          "terrain-patch-turf",
           "ochre-ceramic",
           "aged-brass",
           "chalk-sail",
+          "mineral-sand",
           "aether-glass",
           "moss"
         ],
@@ -818,7 +824,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 457384,
+        "runtimeBytes": 398920,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -846,7 +852,7 @@
         "models/island-6-low.glb"
       ],
       "sha256": {
-        "models/island-6-low.glb": "889b2642f4ccad1ae1c8a6c0840978b5b045289893b8f19600dbddea1d597277"
+        "models/island-6-low.glb": "5e902e91a9ac80be3c09e03558ec26c33931df5faad3bae1d06e00dba931b9fb"
       },
       "provenance": {
         "method": "original-procedural",
@@ -914,7 +920,7 @@
         "models/pilot.glb"
       ],
       "sha256": {
-        "models/pilot.glb": "43ff07b262dd8eb044e2ed866547621734a54490fe1f55c75867c73ccfd26470"
+        "models/pilot.glb": "79bcd02edf911d757554a262cea3dc7df71c30d3bdf621ce9cb5e712072be0dc"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1013,7 +1019,7 @@
         "models/station-1.glb"
       ],
       "sha256": {
-        "models/station-1.glb": "df7330ab0d85b8bfdc31e56ceef9b6c02a3cb87318e5ca38cb39f1da9b650ad7"
+        "models/station-1.glb": "06b2a3c98a3da9581236adc3f4b429e1de16a427dd3b953fc6c311dd1d721c36"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1079,7 +1085,7 @@
         "models/station-2.glb"
       ],
       "sha256": {
-        "models/station-2.glb": "16af2c3880dae59d670a50f2fb018cce4d019cb12047bf9c14e09b10a5233e47"
+        "models/station-2.glb": "c9a0e6021a87259a1c9966a49170d6487aed59d86b506bd51e1f620cf9928d61"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1145,7 +1151,7 @@
         "models/station-3.glb"
       ],
       "sha256": {
-        "models/station-3.glb": "959e993ec19c4a9efc0284fdb597cdb703b36d2ee0edb3a9d5364ca86cc1fd35"
+        "models/station-3.glb": "ae2cdb110d54b7262bd43be53eb9205a06a0bc941e157420af4d93549327c88b"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1211,7 +1217,7 @@
         "models/relic-01.glb"
       ],
       "sha256": {
-        "models/relic-01.glb": "882a1707562afdb81bcde5e8f19e2815ed084382fb643857040425287653da31"
+        "models/relic-01.glb": "9f193f8ec14d592f4452cb55e4c82255da2c0de8f1d868d6ce6df35e58dc1ee6"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1276,7 +1282,7 @@
         "models/relic-02.glb"
       ],
       "sha256": {
-        "models/relic-02.glb": "18cbcc27ea725128f6186099f74abc8433c3b1fafe36f6cc3b6d74dfbf65865a"
+        "models/relic-02.glb": "63caa331bbaa016fb375bb0851e893d5e418abbdc67423558cb7b4de1dc3cf62"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1341,7 +1347,7 @@
         "models/relic-03.glb"
       ],
       "sha256": {
-        "models/relic-03.glb": "f01390940f757904752bf988483a43d82dff5bbee4dfe54ff654c267f1edb534"
+        "models/relic-03.glb": "3202cb024f2e5b01ed09cbdf2e7bdf5bcfa0ebce7b79faaafe97a1554ec405c9"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1406,7 +1412,7 @@
         "models/relic-04.glb"
       ],
       "sha256": {
-        "models/relic-04.glb": "4a18210f2e05215c83e779d14392567d47c36eb4e04afd3b29a6938a8a3f0993"
+        "models/relic-04.glb": "63a8be5f7755ee08290ba55c75e1f62d6f58e355ed7b0d7a1d6b4e1c2b740434"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1471,7 +1477,7 @@
         "models/relic-05.glb"
       ],
       "sha256": {
-        "models/relic-05.glb": "6556ce94d833151f45b1531d4da075cf15a33e0359f7db0e1c22b742f5223c2d"
+        "models/relic-05.glb": "6cb0df7788b7e426a3561e9584608d14d198fbb3a51827269a7a286540d7e4e2"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1536,7 +1542,7 @@
         "models/relic-06.glb"
       ],
       "sha256": {
-        "models/relic-06.glb": "3d058507e1507af001d6e8b61ba36b809fc89c83f4ebcc045e353545db2c41a8"
+        "models/relic-06.glb": "3258827cafc417539d723b1359d9f7c9095560b065739065d4b7ce30daa08b27"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1601,7 +1607,7 @@
         "models/relic-07.glb"
       ],
       "sha256": {
-        "models/relic-07.glb": "f38a0a6ee0cf05f2778af9a24fd3c51a7039be08d272a9888ef8725c700c9c77"
+        "models/relic-07.glb": "f32d8cfc2a8d934dfce918ac2239bd143ab6a2ba00e544b3af22111394360e78"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1667,7 +1673,7 @@
         "models/relic-08.glb"
       ],
       "sha256": {
-        "models/relic-08.glb": "70ca2323040ccb7724b74d636390f9af4b8c0531e9e8dc3d8656923275258c3a"
+        "models/relic-08.glb": "2d535295847f31606bf2c19e0a83f8bb57dd03113ff0da065e2898ec6221b5ac"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1733,7 +1739,7 @@
         "models/relic-09.glb"
       ],
       "sha256": {
-        "models/relic-09.glb": "376f68d73e5b7244ccc1a0fd2d22886e1251cf2c6167ac6c0ea1c8161f7e34c7"
+        "models/relic-09.glb": "8b4686d0738b0ae6c9a8c47677705c0e1d9b6f236783c0537497524cef192f0d"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1799,7 +1805,7 @@
         "models/relic-10.glb"
       ],
       "sha256": {
-        "models/relic-10.glb": "e7ca1bf03d0c48f18fb9566872c890856ead72a0a0556ff2fa915c9185759954"
+        "models/relic-10.glb": "8c1eba98108b52272b6419a9b8f77f68a8c4f4fef3c40e47f07897fca16dc919"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1865,7 +1871,7 @@
         "models/relic-11.glb"
       ],
       "sha256": {
-        "models/relic-11.glb": "7e2de9bdce00ce159ad5f1b080bad34dc6387fc10ef2d99c40caf01c16158965"
+        "models/relic-11.glb": "6e3038af83ea290cb00d76755b339dd85ff9b83b04cebe31ec1b422ebef569ff"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1931,7 +1937,7 @@
         "models/relic-12.glb"
       ],
       "sha256": {
-        "models/relic-12.glb": "1f59eaf462ac3e84c6d121bdd5bb366c5bd16eb13c20ec3e81d520df12bb6668"
+        "models/relic-12.glb": "bb5e3ad7549835253561db2c35947bd667124c81fb083f25cfddf750543b0c85"
       },
       "provenance": {
         "method": "original-procedural",

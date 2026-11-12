@@ -6,12 +6,14 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "assets": "node scripts/export-assets.mjs",
-    "test": "node --experimental-vm-modules --test ../../tests/games/aetherwake/*.test.js"
+    "test": "node --experimental-vm-modules --test ../../tests/games/aetherwake/*.test.js ../../tests/aetherwake/*.test.mjs",
+    "verify": "node ../../tests/aetherwake/verify.mjs"
   },
   "dependencies": {
     "three": "0.180.0"
   },
   "devDependencies": {
+    "acorn": "8.15.0",
     "esbuild": "0.25.11",
     "playwright": "1.56.1",
     "prettier": "3.6.2"
