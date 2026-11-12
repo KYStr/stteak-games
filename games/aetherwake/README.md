@@ -75,7 +75,7 @@ mean ≤33.5 ms and p95 ≤50.1 ms after application-error checks.
 CPU phases, heap growth, listener counts and pending RAF callbacks from each window.
 CDP's raw listener count includes one ended callback per live audio voice. The
 report retains raw/live-voice/persistent counts and gates bounded total listeners
-plus no persistent listener growth; finished audio nodes clear their handlers.
+plus no persistent listener growth at collected endpoints and equal modal states; finished audio nodes clear their handlers. Natural-window CDP counts also include unreachable wrappers awaiting GC and are reported separately.
 `sceneUpdateMs` and `simulationMs` exclude `renderer.render()`; `renderCpuMs`
 measures synchronous render submission/CPU work and is not a GPU timer.
 Normal Chrome autoplay policy is used;
@@ -99,6 +99,10 @@ This starts/stops its server and browser, checks contact/resource bounds and
 records screenshots for visual inspection. Fixtures do not count as traversal.
 For smaller batches, set `AETHERWAKE_VISUAL_WIDTH=1280` (or `1920`) and
 `AETHERWAKE_VISUAL_QUALITY=auto` (or `high`) with separate evidence directories.
+`AETHERWAKE_VISUAL_ISLANDS=camp,reed` selects a smaller island batch. Each
+completed island is written to `visual.json` immediately, including full-frame
+raw GL peaks and same-frame telemetry comparisons. Interrupted batches retain
+completed cases but are never labelled a complete suite pass.
 
 ## Saves, rendering and audio
 
@@ -125,7 +129,7 @@ Original models, icons, audio recipes and asset rights are documented in
 `assets/games/aetherwake/README.md`. Three.js is MIT; its notice is retained at
 `public/games/aetherwake/THREE-LICENSE.txt`.
 
-## Round 4 campaign and verification
+## Campaign and verification
 
 The ranked expedition has a visible 45-minute active weather window, including
 grounded play. Pauses, dialogs, hidden pages and context loss freeze it; stall
@@ -143,7 +147,7 @@ feedback probes, browser idle loss, two 180-second resource soaks (the second
 with sustained flight and midpoint restart), and 24 visual fixtures with:
 
 ```sh
-VK_ICD_FILENAMES=/opt/google/chrome/vk_swiftshader_icd.json AETHERWAKE_PORT=8101 AETHERWAKE_EVIDENCE=/tmp/aetherwake-r4 npm --prefix games/aetherwake run verify
+VK_ICD_FILENAMES=/opt/google/chrome/vk_swiftshader_icd.json AETHERWAKE_PORT=8101 AETHERWAKE_EVIDENCE=/tmp/aetherwake-r5 npm --prefix games/aetherwake run verify
 ```
 
 The Vulkan ICD variable is a runner fallback if a minimal WebGL canvas fails on
@@ -154,11 +158,47 @@ sampling includes collected objects and omits inspection calls during each
 profile window. Render submission delay is reported separately from synchronous
 HUD/audio acknowledgement. Browsers and owned servers close in finally blocks.
 
-The source allocation gate reports residual sampled allocations explicitly; it
-does not claim zero total V8 allocation. Packed wind buffers remove the former
-per-step object/array weather pipeline, and cached scene views avoid rebuilding
-unchanged courses. Rich inspection APIs intentionally allocate only on request.
+The source allocation gate profiles two warmed, event-free 10,800-step flight
+windows, includes collected objects and rejects recurring application sites; it
+no longer permits a bytes-per-step allocation budget. It also parses the hot
+routines with the pinned Acorn dependency to reject explicit containers, closures
+and string construction in numeric loops, and checks the label/HUD cache guards.
+Packed force/direction/time buffers avoid boxed scalar arguments at the wind
+integration boundary. Public simulation state and save schema remain unchanged.
+Browser profiles generate an external source map and assert byte identity with
+the served bundle. Reports retain all application bytes, independently attributed
+Three.js bytes, test instrumentation and unclassified engine samples, normalized
+by observed simulation steps, rendered frames and seconds. Sampling does not
+identify object types: the report labels numeric/native-call and cached-display
+sites using the separate source contracts, without calling all V8 samples JS
+container allocations or claiming literal zero total engine allocation.
+The three-minute soaks sample natural heap/GC behavior between explicit before/
+after retained-heap collections, including the sustained-flight restart phase.
+`AETHERWAKE_SOAK_ONLY=1 node tests/aetherwake/acceptance.mjs` runs the same full
+resource phase alone. Repeated modal-state comparisons use collected counts to
+distinguish live listeners from unreachable audio/DOM wrappers awaiting GC.
+The label fallback regression also checks immediate first-frame placement and
+retaining the actual screen anchor between 10 Hz text updates.
+
+Preparation has bounded scrolling between the header and footer on compact
+desktop/tablet screens. Fresh and genuinely progressed menus are checked at
+1280×720, 1920×1080, 800×720, 960×540 and 640×360; keyboard focus reveals each
+control, and Start/Continue are checked at their centers and corners. Run this
+phase alone with `AETHERWAKE_MENU_ONLY=1 node tests/aetherwake/acceptance.mjs`.
+Touch flight/hit areas remain checked at 390×844 and 360×740 in full acceptance.
+
+Terrain patches are upward-facing polygons at .02/.03 m with unit-only depth
+priority, and static merging preserves cast/receive-shadow flags. Full-frame
+resource counters include both shadow and main passes. Test-only raw WebGL draw
+wrappers corroborate the same frame in Auto/High preparation, ground, flight,
+three orbit angles and zoom at all six checkpoints and both desktop sizes.
 
 The visual runner uses a fresh context per checkpoint and renews its browser and
 cache after each six-island batch, limiting browser process churn on this shared
 host. WebGL initialization errors are retained and fail the run.
+
+Acceptance renews Chrome/cache between independent preparation, lifecycle,
+course, touch, campaign and soak phases to bound software-renderer cache churn.
+Natural resource windows remain continuous within each soak. On a heavily shared
+host, execute the documented isolated phases/batches when an external runner
+terminates a long invocation; preserve its failure/exit status separately.

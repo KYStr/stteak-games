@@ -2,6 +2,22 @@
 // master output. It never changes a game timestamp or adds an audible connection.
 export function instrumentBrowser() {
   window.testTextureBytes = 0;
+  window.testDrawPeak={calls:0,triangles:0,instances:0};
+  window.testDraw={calls:0,triangles:0,instances:0,frame:0,rendered:false};
+  for(const Constructor of [window.WebGLRenderingContext,window.WebGL2RenderingContext]) {
+    if(!Constructor)continue;
+    for(const name of ['drawArrays','drawElements','drawArraysInstanced','drawElementsInstanced']) {
+      const original=Constructor.prototype[name];if(!original)continue;
+      Constructor.prototype[name]=function(...args){
+        const mode=args[0],count=args[name.startsWith('drawArrays')?2:1];
+        const instances=name.endsWith('Instanced')?args[name==='drawArraysInstanced'?3:4]:1;
+        testDraw.calls++;testDraw.instances+=instances;
+        testDraw.triangles+=(mode===4?count/3:mode===5||mode===6?Math.max(0,count-2):0)*instances;
+        testDraw.rendered=true;
+        return original.apply(this,args);
+      };
+    }
+  }
   for (const Constructor of [window.WebGLRenderingContext,window.WebGL2RenderingContext]) {
     if (!Constructor) continue;
     for (const name of ['texImage2D','texStorage2D']) {
@@ -28,7 +44,14 @@ export function instrumentBrowser() {
         if (testRAF.previous !== null) testRAF.frames.push(t - testRAF.previous);
         testRAF.previous = t;
       }
+      // Reset only around an actual rendering callback. Other RAF consumers
+      // (test pilots or waits) preserve the most recent completed game frame.
+      const previousDraw=testDraw;
+      const nextDraw={calls:0,triangles:0,instances:0,frame:previousDraw.frame+1,rendered:false};
+      window.testDraw=nextDraw;
       callback(t);
+      if(!nextDraw.rendered)window.testDraw=previousDraw;
+      else {testDrawPeak.calls=Math.max(testDrawPeak.calls,nextDraw.calls);testDrawPeak.triangles=Math.max(testDrawPeak.triangles,nextDraw.triangles);testDrawPeak.instances=Math.max(testDrawPeak.instances,nextDraw.instances);}
     });
     pending.add(id); testRAF.pending = pending.size;
     return id;
@@ -67,9 +90,12 @@ export function summarize(frames) {
 
 // Profile collected allocations as well as survivors. Do not call snapshot() or
 // metrics() in this interval: instrumentation must not dominate application data.
-export async function sampleAllocations(cdp, durationMs = 15000) {
+export async function sampleAllocations(cdp, page, durationMs = 15000) {
+  const counts=()=>page.evaluate(()=>({frames:__aetherwake.metrics().frames,steps:__aetherwake.metrics().simulationSteps,time:performance.now(),feedbackEvents:__aetherwake.metrics().feedback.eventCount}));
+  const before=await counts();
   await cdp.send('HeapProfiler.startSampling',{samplingInterval:16384,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});
   await new Promise(resolve=>setTimeout(resolve,durationMs));
   const {profile}=await cdp.send('HeapProfiler.stopSampling');
-  return profile;
+  const after=await counts();
+  return {profile,before,after,frames:after.frames-before.frames,steps:after.steps-before.steps,durationMs:after.time-before.time};
 }

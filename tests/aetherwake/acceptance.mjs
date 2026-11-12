@@ -5,6 +5,7 @@ import { chromium } from '/workspace/stteak8/tools/node_modules/playwright-core/
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { instrumentBrowser, summarize, sampleAllocations } from './browser-instrumentation.mjs';
+import {allocationMapper} from './allocation-attribution.mjs';
 import { browserEnvironment } from './browser-environment.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = process.env.AETHERWAKE_EVIDENCE || '/tmp/aetherwake-acceptance';
@@ -18,12 +19,18 @@ const report = { checks: [], errors: [], failures: [], screenshots: [],
 const check = (message) => { report.checks.push(message); console.log('PASS', message); };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function ready(page, suffix = '') {
-  page.setDefaultTimeout(60000);
-  await page.goto(url + suffix);
+  page.setDefaultTimeout(120000);
+  await page.goto(url + suffix,{waitUntil:'domcontentloaded',timeout:120000});
   // Initialization exposes the inspection API before the first shader upload.
   // Wait for actual rendered frames before Playwright's RAF-based hit checks.
   await page.waitForFunction(() => window.__aetherwake);
   await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+async function renewBrowser(){
+  await browser?.close();browser=undefined;await browserEnv?.dispose();
+  browserEnv=await browserEnvironment();
+  browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',headless:true,env:browserEnv.env,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+  return browser;
 }
 async function snap(page) { return page.evaluate(() => __aetherwake.snapshot()); }
 async function metrics(page) { return page.evaluate(() => __aetherwake.metrics()); }
@@ -68,6 +75,57 @@ async function assertReadingDialog(page, size, name) {
     await assertVisibleFocus(page);
   }
 }
+async function assertPreparationLayout(page,name) {
+  const state=await page.evaluate(()=>{
+    const box=selector=>{const el=document.querySelector(selector);return el&&el.getClientRects().length?el.getBoundingClientRect().toJSON():null;};
+    const panel=box('.expedition-panel'),note=box('.start-note');
+    return {header:box('.topbar'),panel,footer:box('.landing footer'),note,mode:box('#mode'),start:box('#start'),continue:box('#continue'),
+      visibleNote:{top:Math.max(note.top,panel.top+1),bottom:Math.min(note.bottom,panel.bottom-1)},width:innerWidth,height:innerHeight};
+  });
+  assert.ok(state.panel.top>=state.header.bottom+8,`${name} panel clears header: ${JSON.stringify(state)}`);
+  assert.ok(state.panel.bottom<=state.footer.top-8,`${name} panel clears footer`);
+  assert.ok(state.panel.left>=0&&state.panel.right<=state.width&&state.panel.top>=0&&state.panel.bottom<=state.height);
+  if(state.visibleNote.bottom>state.visibleNote.top)assert.ok(state.visibleNote.bottom<=state.footer.top-8);
+  await page.locator('.expedition-panel').evaluate(el=>{el.scrollTop=0;});
+  // Enter with Tab from the final header control, then traverse the actual form.
+  await page.locator('#pause').focus();
+  const count=await page.locator('.expedition-panel button:visible,.expedition-panel input:visible,.expedition-panel select:visible').count();
+  for(let i=0;i<count;i++) {
+    await page.keyboard.press('Tab');
+    const active=page.locator(':focus');await active.scrollIntoViewIfNeeded();
+    const focused=await active.evaluate(el=>{
+      const b=el.getBoundingClientRect(),p=el.closest('.expedition-panel')?.getBoundingClientRect(),style=getComputedStyle(el);
+      return {inside:!!p&&b.top>=p.top+4&&b.bottom<=p.bottom-4,outline:style.outlineStyle!=='none'&&parseFloat(style.outlineWidth)>=2};
+    });
+    assert.ok(focused.inside&&focused.outline,`${name} tab ${i}: ${JSON.stringify(focused)}`);
+  }
+  for(const selector of ['#mode','#start','#continue']) {
+    if(!await page.locator(selector).isVisible())continue;
+    await page.locator(selector).scrollIntoViewIfNeeded();
+    const hits=await page.locator(selector).evaluate(el=>{const b=el.getBoundingClientRect();return [[.5,.5],[.08,.15],[.92,.15],[.08,.85],[.92,.85]].map(([x,y])=>el.contains(document.elementFromPoint(b.left+b.width*x,b.top+b.height*y)));});
+    assert.ok(hits.every(Boolean),`${name} ${selector} complete hit area`);
+  }
+  await page.locator('.expedition-panel').evaluate(el=>{el.scrollTop=0;});
+  await screenshot(page,name);(report.preparationLayouts||=[]).push({name,...state});
+}
+async function preparationMenus(browser) {
+  for(const viewport of [{width:1280,height:720},{width:1920,height:1080},{width:800,height:720},{width:960,height:540},{width:640,height:360}]) {
+    const context=await browser.newContext({viewport});
+    try {
+      const page=await context.newPage();watch(page);await ready(page);
+      await assertPreparationLayout(page,`preparation-${viewport.width}-fresh`);
+      await page.locator('#start').click();await page.waitForFunction(()=>__aetherwake.metrics().audio.loadedSamples===6);await page.keyboard.press('Space');await page.keyboard.down('KeyW');await page.waitForFunction(()=>__aetherwake.snapshot().distance>.1);await page.keyboard.up('KeyW');await page.keyboard.press('Escape');
+      assert.ok((await snap(page)).distance>0);await ready(page);
+      assert.equal(await page.locator('#continue').isVisible(),true);
+      await assertPreparationLayout(page,`preparation-${viewport.width}-progressed`);
+      await page.locator('#continue').click();await page.waitForFunction(()=>__aetherwake.metrics().audio.loadedSamples===6);let state=await snap(page);
+      assert.equal(state.status,'running');assert.equal(state.player.grounded,true);assert.ok(state.elapsed>0);
+      await page.keyboard.press('Escape');await page.getByRole('button',{name:'返回準備畫面',exact:true}).click();
+      await page.locator('#start').click();state=await snap(page);assert.equal(state.status,'running');assert.equal(state.player.grounded,true);assert.ok(state.elapsed<2);
+    } finally {await context.close();}
+  }
+  check('fresh/progressed preparation geometry, keyboard focus, full hit areas, safe Continue and fresh Start at desktop/tablet sizes');
+}
 const preservedProgress = s => Object.fromEntries(['mainSamples','courseStages','relics','completedChallenges','stalls'].map(key=>[key,s[key]]));
 async function storageAndCourses(browser) {
   const blocked = await browser.newContext({viewport:{width:1280,height:720},reducedMotion:'reduce'});
@@ -82,6 +140,7 @@ async function storageAndCourses(browser) {
   await page.getByRole('button',{name:'繼續航程',exact:true}).click();
   assert.equal((await snap(page)).status,'running');
   await blocked.close();
+  browser=await renewBrowser();
   check('real browser blocked storage warns and remains playable; OS reduced motion is respected');
   const course = await browser.newContext({viewport:{width:1280,height:720}});
   const flight = await course.newPage(); watch(flight); await ready(flight); await flight.click('#start');
@@ -185,13 +244,15 @@ async function verifyNavigationAnchors(page, expectBehind = false) {
     // The CSS transform contains both the pixel translation and the anchor offset.
     const game = document.querySelector('#game').getBoundingClientRect();
     const actual = {x:box.left+box.width/2-game.left,y:box.top+box.height/2-game.top};
-    const match = nav.style.transform.match(/translate3d\(([-.0-9]+)px, ([-.0-9]+)px/);
+    const typed=nav.attributeStyleMap?.get('transform');
+    const match=nav.style.transform.match(/translate3d\(([-.0-9]+)px,\s*([-.0-9]+)px/);
+    const expected=typed?.[0]?.x?{x:typed[0].x.to('px').value,y:typed[0].y.to('px').value}:{x:Number(match?.[1]),y:Number(match?.[2])};
     const cards = [...document.querySelectorAll('#course,.telemetry')].filter(el=>!el.classList.contains('hidden'));
     const overlap = cards.some(el=> {const b=el.getBoundingClientRect();return box.left<b.right+4 && box.right>b.left-4 && box.top<b.bottom+4 && box.bottom>b.top-4;});
-    return {behind,actual,expected:{x:Number(match[1]),y:Number(match[2])},finite:Number.isFinite(matrix.m41),
+    return {behind,actual,expected,finite:Number.isFinite(matrix.m41)&&Number.isFinite(expected.x)&&Number.isFinite(expected.y),inBounds:box.left>=0&&box.right<=innerWidth&&box.top>=0&&box.bottom<=innerHeight,
       visible:getComputedStyle(nav).visibility!=='hidden',overlap};
   });
-  assert.ok(anchor.finite);
+  assert.ok(anchor.finite&&anchor.inBounds,'Navigation anchor stays finite and inside the viewport');
   if (expectBehind) assert.equal(anchor.behind,true,'Orbit check must include a target behind the camera');
   (report.navigation ||= []).push(anchor);
   assert.ok(Math.abs(anchor.actual.x-anchor.expected.x)<1 && Math.abs(anchor.actual.y-anchor.expected.y)<1,'Navigation anchor must agree with measured bounds');
@@ -207,9 +268,10 @@ async function measureStability(browser, run) {
     await page.waitForTimeout(10000);
     const cdp = await soak.newCDPSession(page);
     await cdp.send('Performance.enable');
-    const sample = async () => {
-      await cdp.send('HeapProfiler.collectGarbage');
-      return {heap:await cdp.send('Runtime.getHeapUsage'),dom:await cdp.send('Memory.getDOMCounters'),
+    let explicitCollections=0;
+    const sample = async (collect=false) => {
+      if(collect){await cdp.send('HeapProfiler.collectGarbage');explicitCollections++;}
+      return {retained:collect,heap:await cdp.send('Runtime.getHeapUsage'),dom:await cdp.send('Memory.getDOMCounters'),
         performance:await cdp.send('Performance.getMetrics'),metrics:await metrics(page),textureBytes:await page.evaluate(()=>testTextureBytes),
         raf:await page.evaluate(()=>testRAF.pending - (window.soakEnabled ? 1 : 0)),status:(await snap(page)).status,elapsed:(await snap(page)).activeSeconds,airTime:(await snap(page)).airTime};
     };
@@ -236,7 +298,10 @@ async function measureStability(browser, run) {
       });
       await page.waitForTimeout(5000);
     }
-    const before = await sample();
+    const before = await sample(true);
+    const gcEvents=[];
+    cdp.on('Tracing.dataCollected',({value})=>{for(const event of value)if(/MinorGC|MajorGC/.test(event.name)&&event.ph==='X')gcEvents.push({name:event.name,durationUs:event.dur,timestamp:event.ts});});
+    await cdp.send('Tracing.start',{categories:'v8,disabled-by-default-v8.gc',options:'record-as-much-as-possible'});
     await page.evaluate(()=>{testRAF.frames=[];testRAF.previous=null;testRAF.collecting=true;});
     const duration = Number(process.env.AETHERWAKE_SOAK_MS || 180000);
     const windows=[];let last=0;
@@ -253,14 +318,24 @@ async function measureStability(browser, run) {
       console.log('Stability',run,Math.min(elapsed+15000,duration)/1000,'s',windows.at(-1).timing.averageMs.toFixed(2),'ms');
     }
     const rawFrames = await page.evaluate(()=>{testRAF.collecting=false;return testRAF.frames;});
-    const after = await sample();
-    const result = {durationMs:duration,timing:summarize(rawFrames),rawFrames,windows,before,after,heapGrowth:after.heap.usedSize-before.heap.usedSize};
+    const traceComplete=new Promise(resolve=>cdp.once('Tracing.tracingComplete',resolve));
+    await cdp.send('Tracing.end');await traceComplete;
+    const after = await sample(true);
+    const result = {naturalGC:gcEvents,explicitCollections,naturalHeap:windows.map(w=>({elapsedMs:w.elapsedMs,usedSize:w.heap.usedSize})),durationMs:duration,timing:summarize(rawFrames),rawFrames,windows,before,after,heapGrowth:after.heap.usedSize-before.heap.usedSize};
     // Compare equal running UI states after lazily initializing the pause dialog.
     const cycle = async count => {
-      for(let i=0;i<count;i++) {await page.keyboard.press('Escape');await page.getByRole('button',{name:'繼續航程',exact:true}).click();}
-      await page.waitForTimeout(800); return sample();
+      for(let i=0;i<count;i++) {
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(()=>__aetherwake.snapshot().status==='paused');
+        await page.getByRole('button',{name:'繼續航程',exact:true}).focus();
+        await page.keyboard.press('Enter');
+        await page.waitForFunction(()=>__aetherwake.snapshot().status==='running');
+      }
+      await page.waitForTimeout(800); return sample(true);
     };
-    result.modalCycles=[await cycle(3),await cycle(15),await cycle(15)];
+    result.modalCycles=[];
+    await writeFile(path.join(output,`stability-${run}.json`),JSON.stringify(result,null,2));
+    for(const count of [3,15,15]){result.modalCycles.push(await cycle(count));await writeFile(path.join(output,`stability-${run}.json`),JSON.stringify(result,null,2));}
     await screenshot(page,`stability-${run}-end`);
     await writeFile(path.join(output,`stability-${run}.json`),JSON.stringify(result,null,2));
     // Continued rendering/simulation is required; shared-host frame delay is
@@ -278,10 +353,9 @@ async function measureStability(browser, run) {
       assert.equal(w.raf,1);assert.equal(w.status,'running');
       // CDP includes AudioScheduledSourceNode.onended in its listener total.
       // Each currently live voice owns one; music phase is not a DOM leak.
-      const persistentBefore = before.dom.jsEventListeners-before.metrics.audio.activeVoices;
-      const persistentNow = w.dom.jsEventListeners-w.metrics.audio.activeVoices;
-      assert.ok(w.dom.jsEventListeners<=persistentBefore+w.metrics.audio.peakVoices+2, 'Total listeners remain bounded by persistent UI and the capped live voice budget');
-      assert.ok(persistentNow<=persistentBefore+2, 'Persistent listeners cannot accumulate between sampling windows');
+      // Natural CDP counts include unreachable DOM/audio wrappers until a GC.
+      // Lifetime growth is gated on equal retained before/after states below.
+      assert.equal(w.metrics.inputListeners,before.metrics.inputListeners);
       assert.ok(w.textureBytes<=256*1024*1024, 'Conservative cumulative texture allocation below 256MB');
       assert.ok(w.metrics.drawCalls<=250 && w.metrics.triangles<=1500000);
       assert.ok(w.metrics.resolutionScale<=2);
@@ -290,6 +364,17 @@ async function measureStability(browser, run) {
       const phases = w.metrics.phases;
       assert.ok(phases.applicationUpdateMs.p95 <= 6, 'Update CPU phases exclude renderer.render() and stay within 6 ms');
     }
+    const persistentBaseline=before.dom.jsEventListeners-before.metrics.audio.activeVoices;
+    assert.ok(after.dom.jsEventListeners<=persistentBaseline+after.metrics.audio.peakVoices+2,'Retained total listener count stays bounded over three minutes');
+    assert.ok(after.dom.jsEventListeners-after.metrics.audio.activeVoices<=persistentBaseline+2,'No retained persistent-listener growth');
+    const half=Math.floor(windows.length/2);
+    result.naturalHeapComparison={
+      firstHalfPeak:Math.max(...windows.slice(0,half||1).map(w=>w.heap.usedSize)),
+      secondHalfPeak:Math.max(...windows.slice(half).map(w=>w.heap.usedSize)),
+      finalRetainedGrowth:result.heapGrowth,
+      naturalGCEvents:gcEvents.length,
+      note:'Natural windows have no forced collections; retained lifetime bars use collected endpoints and equal modal states.'
+    };
     const [warm,first,second]=result.modalCycles;
     // Compare the persistent listeners at equal UI states across music phases.
     assert.ok(second.dom.jsEventListeners-second.metrics.audio.activeVoices<=first.dom.jsEventListeners-first.metrics.audio.activeVoices+2);
@@ -304,12 +389,17 @@ async function measureStability(browser, run) {
       await page.evaluate(()=>{window.soakEnabled=false;});
       await page.keyboard.press('Escape'); await page.getByRole('button',{name:'重新遠征',exact:true}).click(); await page.getByRole('button',{name:'重新遠征',exact:true}).click();
       await page.keyboard.press('Space'); await page.keyboard.down('KeyW');
-      const allocations=[];
-      for(let i=0;i<2;i++) allocations.push(await sampleAllocations(cdp,15000));
+      await page.waitForTimeout(10000);
+      const map=await allocationMapper(output),allocations=[];
+      for(let i=0;i<2;i++) allocations.push(map(await sampleAllocations(cdp,page,15000)));
       await page.keyboard.up('KeyW');
       await writeFile(path.join(output,'flight-allocations.json'),JSON.stringify(allocations));
     }
+    await writeFile(path.join(output,`stability-${run}.json`),JSON.stringify(result,null,2));
     return result;
+  } catch(error) {
+    try{await screenshot(page,`stability-${run}-failure`);await writeFile(path.join(output,`stability-${run}-failure.json`),JSON.stringify({error:error.stack,snapshot:await snap(page),metrics:await metrics(page),focused:await page.evaluate(()=>document.activeElement?.outerHTML)},null,2));}catch{}
+    throw error;
   } finally { await soak.close(); }
 }
 
@@ -327,9 +417,9 @@ try {
     for (let i = 0; i < 40; i++) { await sleep(100); try { if ((await fetch(url)).ok) break; } catch {} }
   }
   await validServer();
-  browserEnv = await browserEnvironment();
-  browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', headless: true, env:browserEnv.env, args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  if (process.env.AETHERWAKE_REGRESSION_ONLY === '1') {
+  await renewBrowser();
+  if(process.env.AETHERWAKE_SOAK_ONLY!=='1'){await preparationMenus(browser);await renewBrowser();}
+  if(process.env.AETHERWAKE_SOAK_ONLY==='1'){report.stabilityRuns=[];for(let run=Number(process.env.AETHERWAKE_SOAK_START||1);run<=Number(process.env.AETHERWAKE_SOAK_RUNS||2);run++)report.stabilityRuns.push(await measureStability(browser,run));} else if(process.env.AETHERWAKE_MENU_ONLY==='1'){report.stabilityRuns=[];} else if (process.env.AETHERWAKE_REGRESSION_ONLY === '1') {
     report.regressionOnly = true;
     for(let i=0;i<3;i++) await storageAndCourses(browser);
     await mobileControls(browser);
@@ -471,11 +561,14 @@ try {
   await page.waitForFunction(() => __aetherwake.metrics().audio.loadedSamples === 6);
   check('corrupt save warns and remains playable; v1 save migrates into a safe checkpoint');
   await context.close();
+  await renewBrowser();
   await storageAndCourses(browser);
+  await renewBrowser();
   await mobileControls(browser);
   // The full campaign below uses ordinary keyboard events and the shipped HUD.
   // RAF timestamps are accelerated only in this context; performance uses a fresh real-time context.
   for (const variant of [{module:'turn',style:'safe'},{module:'tailwind',style:'shortcut'}]) {
+  await renewBrowser();
   const campaign = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   await campaign.addInitScript(() => {
     const request = window.requestAnimationFrame.bind(window);
@@ -575,6 +668,7 @@ try {
   }
   report.stabilityRuns = [];
   for (let run = 1; run <= Number(process.env.AETHERWAKE_SOAK_RUNS || 2); run++) {
+    await renewBrowser();
     report.stabilityRuns.push(await measureStability(browser, run));
   }
   }

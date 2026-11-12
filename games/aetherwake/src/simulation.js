@@ -1,12 +1,12 @@
-import { packWinds, accumulateWinds } from './wind-physics.js';
-import { length2, length3 } from './math.js';
+import { packWinds, accumulateWinds, LIFT, CHARGE, WIND_X, WIND_Z, BOOST, COUNT, DIRECTION_X, DIRECTION_Z, TIME, PHASE } from './wind-physics.js';
+import { length2 } from './math.js';
 import { WORLD, MODULES, STATIONS, islandById, EXPEDITION_LIMIT_SECONDS } from './world.js';
 import { defaultSave, validateSave, SAVE_VERSION } from './storage.js';
 import { planSafeTransit } from './transit.js';
 
 const clamp = (n, low, high) => Math.max(low, Math.min(high, n));
 const copy = (value) => JSON.parse(JSON.stringify(value));
-const horizontal = (a, b) => length2(a.x - b.x, a.z - b.z);
+const horizontalSquared = (a, b) => { const dx=a.x-b.x,dz=a.z-b.z; return dx*dx+dz*dz; };
 const normalizeSeed = (seed) => {
   if (Number.isFinite(Number(seed))) return Math.trunc(Number(seed)) >>> 0;
   let hash = 2166136261;
@@ -48,7 +48,7 @@ export class FlightSimulation {
     this.routePhysics = ['safe','shortcut',null].map(style => packWinds(WORLD.winds.filter(w => !w.routeId || w.style === style)));
     this.stagePhysics = new Map();
     for (const course of [...WORLD.challenges,...WORLD.campaignCircuits]) for (const stage of course.stages) this.stagePhysics.set(stage.id,packWinds(stage.winds));
-    this.windForces = { lift:0, charge:0, wx:0, wz:0, boost:0, count:0 };
+    this.windForces = new Float64Array(10);
     this.module = MODULES.find(m => m.id === this.state.module);
     this.nearbyRecord = { islandId: '', station: false, name: '', canInteract: false, message: '' };
     this.courseEntries = new Map();
@@ -195,13 +195,14 @@ export class FlightSimulation {
   }
   _nearby() {
     const s = this.state, p = s.player;
+    if(!p.grounded){s.nearby=null;return;}
     let island = null;
-    for (const item of WORLD.islands) if (horizontal(item, p) < item.radius - 1 && Math.abs(p.y - item.y) < 2.5) { island = item; break; }
+    for(let i=0;i<WORLD.islands.length;i++){const item=WORLD.islands[i];if(horizontalSquared(item,p)<(item.radius-1)**2&&Math.abs(p.y-item.y)<2.5){island=item;break;}}
     let course = null;
-    for (const c of WORLD.challenges) if (c.id === s.activeChallenge) { course = c; break; }
+    for(let i=0;i<WORLD.challenges.length;i++){const c=WORLD.challenges[i];if(c.id===s.activeChallenge){course=c;break;}}
     const stage = this.campaignStage() || this.courseStage(course);
     const deliveryReady = stage && (s.activeCampaignCircuit != null ? s.campaignGate : s.challengeProgress[course.id] || 0) >= stage.gates.length;
-    if (island && p.grounded && horizontal(island,p) < 13) {
+    if (island && p.grounded && horizontalSquared(island,p) < 13*13) {
       const n = this.nearbyRecord;
       n.islandId = island.id; n.station = island.station; n.name = island.name;
       n.canInteract = stage ? !!deliveryReady && island.id === stage.toIslandId : island.id === s.objective?.islandId && !s.surveyHint && !s.trackedHint;
@@ -293,7 +294,7 @@ export class FlightSimulation {
   }
   _collect() {
     const s = this.state, p = s.player;
-    for (let relicIndex = 0; relicIndex < WORLD.relics.length; relicIndex++) { const relic = WORLD.relics[relicIndex]; if (!s.relics.includes(relic.id) && horizontal(p, relic) < relic.radius && Math.abs(p.y - relic.y) < 4) { s.relics.push(relic.id); this.emit('relic', { id: relic.id, name: relic.name, text: relic.text }); this.emit('save'); } }
+    for (let relicIndex = 0; relicIndex < WORLD.relics.length; relicIndex++) { const relic = WORLD.relics[relicIndex]; if (!s.relics.includes(relic.id) && horizontalSquared(p, relic) < relic.radius*relic.radius && Math.abs(p.y - relic.y) < 4) { s.relics.push(relic.id); this.emit('relic', { id: relic.id, name: relic.name, text: relic.text }); this.emit('save'); } }
     if (!p.gliding) return;
     if (s.activeCampaignCircuit != null) {
       const stage = this.campaignStage();
@@ -316,7 +317,7 @@ export class FlightSimulation {
       if (this.suppressedChallengeEntries.size) for (const id of this.suppressedChallengeEntries) {
         const challenge = WORLD.challenges.find((item) => item.id === id);
         const entry = this.courseEntry(challenge);
-        if (length3(p.x - entry.x, p.y - entry.y, p.z - entry.z) > entry.radius + 4) this.suppressedChallengeEntries.delete(id);
+        if ((p.x-entry.x)**2+(p.y-entry.y)**2+(p.z-entry.z)**2 > (entry.radius+4)**2) this.suppressedChallengeEntries.delete(id);
       }
       let challenge = null;
       if (s.trackedHint?.entry) for (const item of WORLD.challenges) if (item.id === s.trackedHint.id && !s.challenges.includes(item.id) && !this.suppressedChallengeEntries.has(item.id) && this._sampleSatisfied(this.courseEntry(item))) { challenge = item; break; }
@@ -350,8 +351,10 @@ export class FlightSimulation {
   }
   _sampleSatisfied(target) {
     if (!target) return false;
-    const p = this.player, speed = length2(p.vx, p.vz);
-    if (length3(p.x - target.x, p.y - target.y, p.z - target.z) >= target.radius) return false;
+    const p = this.player;
+    const tx=p.x-target.x,ty=p.y-target.y,tz=p.z-target.z;
+    if (tx*tx+ty*ty+tz*tz >= target.radius*target.radius) return false;
+    const speed=length2(p.vx,p.vz);
     if (speed < (target.minSpeed || 0) || speed > (target.maxSpeed ?? Infinity) || p.energy < (target.minEnergy || 0)) return false;
     if (Number.isFinite(target.maxVerticalSpeed) && Math.abs(p.vy) > target.maxVerticalSpeed) return false;
     if (target.heading) {
@@ -384,31 +387,32 @@ export class FlightSimulation {
       p.vx = ix * 10; p.vz = iz * 10; p.vy = 0; p.energy = Math.min(100, p.energy + dt * 28);
       p.x += p.vx * dt; p.z += p.vz * dt;
       let ground = null;
-      for (const island of WORLD.islands) if (horizontal(island,p) <= island.radius - 1.5 && Math.abs(p.y-island.y) < 2) { ground = island; break; }
+      for (let i=0;i<WORLD.islands.length;i++) {const island=WORLD.islands[i];if (horizontalSquared(island,p) <= (island.radius - 1.5)**2 && Math.abs(p.y-island.y) < 2) { ground = island; break; }}
       if (!ground) { p.grounded = false; p.gliding = false; p.vy = 0; this.emit('edge', { message: '已離開島緣，按展帆接住風！' }); }
       s.wind.length = 0; s.hazard = null;
     } else {
       s.airTime += dt;
       let activeChallenge = null;
       if (s.activeCampaignCircuit != null) activeChallenge = WORLD.campaignCircuits[s.activeCampaignCircuit];
-      else for (const c of WORLD.challenges) if (c.id === s.activeChallenge) { activeChallenge = c; break; }
+      else for (let i=0;i<WORLD.challenges.length;i++) if (WORLD.challenges[i].id === s.activeChallenge) { activeChallenge = WORLD.challenges[i]; break; }
       const activeStage = this.campaignStage() || this.courseStage(activeChallenge);
       const gateIndex = s.activeCampaignCircuit != null ? s.campaignGate : activeChallenge ? s.challengeProgress[activeChallenge.id] : -1;
       const previousWind = s.wind[0], forces = this.windForces;
-      forces.lift=forces.charge=forces.wx=forces.wz=forces.boost=forces.count=0;
+      forces[LIFT]=forces[CHARGE]=forces[WIND_X]=forces[WIND_Z]=forces[BOOST]=forces[COUNT]=0;
       const dx = inputMagnitude > 0.06 ? ix / inputMagnitude : Math.sin(p.heading), dz = inputMagnitude > 0.06 ? iz / inputMagnitude : -Math.cos(p.heading);
       const base = activeChallenge ? 2 : s.trackedHint || s.mainTransit[s.mainTransitIndex] || s.routeStyle === 'safe' ? 0 : 1;
       const phase = (s.seed % 1009) / 1009 * Math.PI * 2;
-      accumulateWinds(this.routePhysics[base],p,-1,dx,dz,s.elapsed,phase,module.id==='tailwind',forces,s.wind);
-      if (activeStage) accumulateWinds(this.stagePhysics.get(activeStage.id),p,gateIndex,dx,dz,s.elapsed,phase,module.id==='tailwind',forces,s.wind);
-      s.wind.length=forces.count;
-      const lift=forces.lift,charge=forces.charge,wx=forces.wx,wz=forces.wz,tailBoost=forces.boost;
+      forces[DIRECTION_X]=dx;forces[DIRECTION_Z]=dz;forces[TIME]=s.elapsed;forces[PHASE]=phase;
+      accumulateWinds(this.routePhysics[base],p,-1,module.id==='tailwind',forces,s.wind);
+      if (activeStage) accumulateWinds(this.stagePhysics.get(activeStage.id),p,gateIndex,module.id==='tailwind',forces,s.wind);
+      s.wind.length=forces[COUNT];
+      const lift=forces[LIFT],charge=forces[CHARGE],wx=forces[WIND_X],wz=forces[WIND_Z],tailBoost=forces[BOOST];
       if (s.wind[0] && s.wind[0] !== previousWind) this.emit('wind', { wind: s.wind[0] });
       s.hazard = null; let hazardDrain = 0;
       const extraHazard = activeStage?.hazard || activeChallenge?.hazard;
       for (let index = 0; index < WORLD.hazards.length + (extraHazard ? 1 : 0); index++) {
         const hazard = index < WORLD.hazards.length ? WORLD.hazards[index] : extraHazard;
-        if (!(horizontal(hazard, p) < hazard.radius && p.y >= hazard.y && p.y <= hazard.y + hazard.height)) continue;
+        if (!(horizontalSquared(hazard, p) < hazard.radius*hazard.radius && p.y >= hazard.y && p.y <= hazard.y + hazard.height)) continue;
         s.hazard = hazard.type;
         if (hazard.type === 'thunder' && Math.sin(s.elapsed / hazard.period * Math.PI * 2 + (s.seed % 19)) > 0.15) hazardDrain = 9;
       }
@@ -428,7 +432,7 @@ export class FlightSimulation {
       } else { p.vy -= 16 * dt; p.vy = Math.max(-25, p.vy); }
       p.x += p.vx * dt; p.z += p.vz * dt; p.y += p.vy * dt;
       let land = null;
-      for (const island of WORLD.islands) if (horizontal(island,p) <= island.radius-1.5 && oldY >= island.y-.4 && p.y <= island.y+.1 && p.vy <= 0) { land = island; break; }
+      for (let i=0;i<WORLD.islands.length;i++) {const island=WORLD.islands[i];if (horizontalSquared(island,p) <= (island.radius-1.5)**2 && oldY >= island.y-.4 && p.y <= island.y+.1 && p.vy <= 0) { land = island; break; }}
       if (land) {
         const precise = length2(p.vx, p.vz) < 8.5;
         Object.assign(p, { y: land.y, vy: 0, grounded: true, gliding: false, energy: Math.min(100, p.energy + (precise ? 20 : 7)) });
@@ -437,12 +441,14 @@ export class FlightSimulation {
       } else {
         // A tapered solid cliff collider prevents flying through island sides.
         // The flat walkable disc and tapered body are independent of rendering.
-        for (const island of WORLD.islands) {
+        for (let i=0;i<WORLD.islands.length;i++) {
+          const island=WORLD.islands[i];
           const depth = island.y - p.y;
           if (depth <= 0.1 || depth >= 38) continue;
           const bodyRadius = island.radius * Math.max(0.15, 1 - Math.max(0, depth - 2) / 43) + 0.75;
-          const radius = horizontal(p, island);
-          if (radius >= bodyRadius) continue;
+          const radiusSquared = horizontalSquared(p, island);
+          if (radiusSquared >= bodyRadius*bodyRadius) continue;
+          const radius = Math.sqrt(radiusSquared);
           const nx = radius > 0.001 ? (p.x - island.x) / radius : 1, nz = radius > 0.001 ? (p.z - island.z) / radius : 0;
           p.x = island.x + nx * bodyRadius; p.z = island.z + nz * bodyRadius;
           const inwardSpeed = p.vx * nx + p.vz * nz;
@@ -456,9 +462,9 @@ export class FlightSimulation {
         const stress = Math.max(0, turnRate - 0.85) * 4 + Math.max(0, -p.vy - 5) * 0.5;
         s.cargoStability = clamp(s.cargoStability - stress * dt, 0, 100);
       }
-      if (!p.grounded && (p.y < -55 || p.energy <= 0 || length2(p.x, p.z) > (WORLD.boundsRadius || 1000))) this._recover(p.energy <= 0 ? '帆能量耗盡' : '離開安全航域');
+      if (!p.grounded && (p.y < -55 || p.energy <= 0 || p.x*p.x+p.z*p.z > (WORLD.boundsRadius || 1000)**2)) this._recover(p.energy <= 0 ? '帆能量耗盡' : '離開安全航域');
     }
-    if (length2(p.vx, p.vz) > 0.5) p.heading = Math.atan2(p.vx, -p.vz);
+    if (p.vx*p.vx+p.vz*p.vz > 0.25) p.heading = Math.atan2(p.vx, -p.vz);
     if (s.stalls === oldStalls) s.distance += length2(p.x - oldX, p.z - oldZ);
     this._collect(); this._nearby(); this._score();
   }

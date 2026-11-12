@@ -15,8 +15,10 @@ export function packWinds(winds) {
   }
   return values;
 }
+export const LIFT=0, CHARGE=1, WIND_X=2, WIND_Z=3, BOOST=4, COUNT=5, DIRECTION_X=6, DIRECTION_Z=7, TIME=8, PHASE=9;
 const TYPES = ['thermal','tailwind','crosswind'];
-export function accumulateWinds(values, p, gate, dx, dz, elapsed, phase, tailwindModule, out, types) {
+export function accumulateWinds(values, p, gate, tailwindModule, out, types) {
+  const dx=out[DIRECTION_X],dz=out[DIRECTION_Z],elapsed=out[TIME],phase=out[PHASE];
   for (let n=0;n<values.length;n+=STRIDE) {
     if(gate>=0&&values[n+13]!==gate)continue;
     const y=values[n+2];if(p.y<y||p.y>y+values[n+5])continue;
@@ -30,21 +32,21 @@ export function accumulateWinds(values, p, gate, dx, dz, elapsed, phase, tailwin
     const weight=Math.max(0,1-Math.max(0,distance-radius*.65)/(radius*.35));
     if(weight<=0)continue;
     const type=values[n],name=TYPES[type];let seen=false;
-    for(let i=0;i<out.count;i++)if(types[i]===name){seen=true;break;}
-    if(!seen)types[out.count++]=name;
+    for(let i=0;i<out[COUNT];i++)if(types[i]===name){seen=true;break;}
+    if(!seen)types[out[COUNT]++]=name;
     if(type===0){
       const rise=(values[n+6]-p.y)*.38+1.7,cap=values[n+7];
-      out.lift=Math.max(out.lift,(rise < -1.2 ? -1.2 : rise>cap ? cap : rise)*weight);
-      out.charge=Math.max(out.charge,values[n+8]*weight);
+      out[LIFT]=Math.max(out[LIFT],(rise < -1.2 ? -1.2 : rise>cap ? cap : rise)*weight);
+      out[CHARGE]=Math.max(out[CHARGE],values[n+8]*weight);
     }else if(type===1){
       const dot=dx*values[n+10]+dz*values[n+11],alignment=dot>0?dot:0;
-      out.boost=Math.max(out.boost,values[n+7]*alignment*weight*(tailwindModule?1.75:1));
+      out[BOOST]=Math.max(out[BOOST],values[n+7]*alignment*weight*(tailwindModule?1.75:1));
       const rise=(values[n+6]-p.y)*.18+1.7,cap=values[n+9];
-      out.lift=Math.max(out.lift,(rise < -1.2 ? -1.2 : rise>cap ? cap : rise)*weight);
-      out.charge=Math.max(out.charge,values[n+8]*weight);
+      out[LIFT]=Math.max(out[LIFT],(rise < -1.2 ? -1.2 : rise>cap ? cap : rise)*weight);
+      out[CHARGE]=Math.max(out[CHARGE],values[n+8]*weight);
     }else{
       const wave=Math.sin(elapsed/values[n+12]*Math.PI*2+phase),pulse=wave>0?wave:0;
-      out.wx+=values[n+10]*values[n+7]*pulse*weight;out.wz+=values[n+11]*values[n+7]*pulse*weight;
+      out[WIND_X]+=values[n+10]*values[n+7]*pulse*weight;out[WIND_Z]+=values[n+11]*values[n+7]*pulse*weight;
     }
   }
 }

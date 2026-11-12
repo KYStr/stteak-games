@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { chromium } from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
 import { defaultSave } from '../../games/aetherwake/src/storage.js';
+import {instrumentBrowser} from './browser-instrumentation.mjs';
 import { browserEnvironment } from './browser-environment.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -34,7 +35,9 @@ try {
         args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
       try {
       for (const id of ['camp','reed','bridge','storm','archive','dawn']) {
+      if(process.env.AETHERWAKE_VISUAL_ISLANDS&&!process.env.AETHERWAKE_VISUAL_ISLANDS.split(',').includes(id))continue;
       const context = await browser.newContext({viewport});
+      await context.addInitScript(instrumentBrowser);
       try {
         // Seed after the old document's pagehide/beforeunload save has run.
         await context.addInitScript(({save,quality}) => {
@@ -55,6 +58,15 @@ try {
           await page.waitForFunction(()=>window.__aetherwake || !document.querySelector('#fatal').classList.contains('hidden'));
           assert.ok(await page.evaluate(()=>!!window.__aetherwake), 'WebGL game initialization must succeed');
           await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+          const budget=async phase=>{
+            const sample=await page.evaluate(()=>({raw:{...testDraw},peak:{...testDrawPeak},metrics:__aetherwake.metrics()}));
+            assert.equal(sample.metrics.drawCalls,sample.raw.calls,phase+' shadow-inclusive draw count');
+            assert.ok(Math.abs(sample.metrics.triangles-sample.raw.triangles)<1e-6,phase+' triangle count');
+            assert.ok(sample.raw.calls<=250&&sample.raw.triangles<=1500000);
+            assert.ok(sample.peak.calls<=250&&sample.peak.triangles<=1500000,phase+' complete-frame peak budget');
+            (report.fullFrameBudgets||=[]).push({viewport,quality,id,phase,...sample});
+          };
+          await budget('preparation');
           await page.locator('#continue').click();
           const settle = () => page.evaluate(() => new Promise(resolve => {
             let left=10; const next=()=>--left?requestAnimationFrame(next):resolve();
@@ -64,7 +76,7 @@ try {
             const file = path.join(output,`${viewport.width}-${quality}-${id}-${suffix}.png`);
             await page.screenshot({path:file}); report.screenshots.push(file);
           };
-          await settle(); await shot('ground');
+          await settle(); await shot('ground');await budget('ground');
           const before = await page.evaluate(()=>__aetherwake.metrics());
           // Three orbit angles plus both zoom directions, with successive frames
           // at each authored island to expose view-dependent depth shimmer.
@@ -75,7 +87,7 @@ try {
               await page.mouse.move(viewport.width*.5+140,viewport.height*.5+angle*8,{steps:3});
               await page.mouse.up({button:'right'});
               await page.mouse.wheel(0,angle===2?-220:110);
-              await settle(); if(capture) await shot(`orbit-${angle}`);
+              await settle();await budget(`orbit-${angle}`); if(capture) await shot(`orbit-${angle}`);
             }
           };
           await orbit(true);
@@ -89,6 +101,8 @@ try {
           assert.equal(after.textures,before.textures);
           assert.ok(after.drawCalls<=250 && after.triangles<=1500000);
           report.checks.push({viewport,quality,checkpoint:state.checkpoint,before,after});
+          await page.keyboard.press('Space');await settle();await budget('flight');
+          await writeFile(path.join(output,'visual.json'),JSON.stringify(report,null,2));
           console.log('PASS visual checkpoint',viewport.width,quality,id);
           await page.close();
       } finally { await context.close(); }
@@ -96,7 +110,7 @@ try {
       } finally { await browser.close(); browser=undefined; await browserEnv.dispose(); browserEnv=undefined; }
     }
   }
-  assert.equal(report.checks.length,(process.env.AETHERWAKE_VISUAL_WIDTH?1:2)*(process.env.AETHERWAKE_VISUAL_QUALITY?1:2)*6);
+  assert.equal(report.checks.length,(process.env.AETHERWAKE_VISUAL_WIDTH?1:2)*(process.env.AETHERWAKE_VISUAL_QUALITY?1:2)*(process.env.AETHERWAKE_VISUAL_ISLANDS?process.env.AETHERWAKE_VISUAL_ISLANDS.split(',').length:6));
   assert.deepEqual(report.errors,[]); assert.deepEqual(report.failures,[]);
   report.success = true;
 } catch (error) {

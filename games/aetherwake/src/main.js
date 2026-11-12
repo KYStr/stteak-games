@@ -8,22 +8,44 @@ import { AudioEngine } from "./audio.js";
 import { HostBridge } from "./bridge.js";
 import { TimingSamples } from "./timing.js";
 import { BUILD } from "./version.js";
+const textNodes=new Map();
 const $ = (s) => document.querySelector(s),
   show = (s, on = true) => $(s).classList.toggle("hidden", !on),
   text = (s, value) => {
-    if ($(s).textContent !== String(value)) $(s).textContent = value;
+    let cached=textNodes.get(s);
+    if(!cached){cached={element:$(s),value:undefined};textNodes.set(s,cached);}
+    if(cached.value!==value){cached.element.textContent=value;cached.value=value;}
   };
 const clock = (t) =>
   `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+const conditionsCache=new WeakMap();
 function sampleConditions(hint) {
+  if(conditionsCache.has(hint))return conditionsCache.get(hint);
   const items = [];
   if (hint.minSpeed) items.push(`速度 ≥${hint.minSpeed}m/s`);
   if (hint.maxSpeed) items.push(`速度 ≤${hint.maxSpeed}m/s`);
   if (hint.minEnergy) items.push(`能量 ≥${hint.minEnergy}%`);
   if (hint.maxVerticalSpeed) items.push(`升降 ≤${hint.maxVerticalSpeed}m/s`);
   if (hint.heading) items.push("順環上箭頭通過");
-  return items.join(" · ");
+  const description=items.join(" · ");conditionsCache.set(hint,description);return description;
 }
+const coarsePointer=matchMedia('(pointer: coarse)');
+let coarse=coarsePointer.matches;
+const pointerChanged=event=>{coarse=event.matches;};
+coarsePointer.addEventListener('change',pointerChanged);
+const routeById=new Map(WORLD.routes.map(route=>[route.id,route]));
+const courseById=new Map(WORLD.challenges.map(course=>[course.id,course]));
+const displayValues=new Map();
+function numericText(selector,value,prefix='',suffix='') {
+  if(displayValues.get(selector)===value)return;
+  displayValues.set(selector,value);text(selector,prefix+value+suffix);
+}
+const hudCache={hint:null,distance:-1,touch:null,grounded:null,braking:null,gliding:null,checkpoint:null,activated:-1,conditionHint:null,conditionNodes:[],conditionStates:new Int8Array(6),altitude:NaN,detailBand:NaN,cargo:NaN,seconds:-1,weatherSeconds:NaN};
+const mapIslandLabels=WORLD.islands.map((_,index)=>String(index+1));
+const mapScale=.48/(WORLD.mapScale||1),mapDash=[5,5],mapSolid=[];
+let mapCanvas,mapContext;
+const mapX=x=>mapCanvas.width*.3+x*mapScale;
+const mapZ=z=>mapCanvas.height*.6+z*mapScale;
 const escape = (s) =>
   String(s).replace(
     /[&<>"']/g,
@@ -56,6 +78,7 @@ let scene,
 const store = new SaveStore();
 const timing = new TimingSamples(["simulationMs", "sceneUpdateMs", "renderCpuMs", "hudMapMs", "rafIntervalMs", "applicationUpdateMs"]);
 const frames = new Float64Array(9000);
+let simulationSteps=0;
 let frameIndex = 0, frameSamples = 0, acknowledgedGlide = 0, queuedGlide = 0, warningLevel = 0;
 const audioSample = { speed: 0, energy: 100, wind: false };
 const timingSample = { simulationMs: 0, sceneUpdateMs: 0, renderCpuMs: 0, hudMapMs: 0, rafIntervalMs: 0, applicationUpdateMs: 0 };
@@ -150,7 +173,7 @@ function begin(resume = false) {
   notify(
     resume
       ? "已回到上次的安全落點。"
-      : matchMedia("(pointer: coarse)").matches
+      : coarse
         ? "先點展帆起跳，再用左搖桿沿地圖風線前進。"
         : "先按 Space 起跳，再沿地圖上的風線前進。",
   );
@@ -536,15 +559,15 @@ function updateHud() {
   const s = sim.state,
     p = s.player,
     objective = s.objective,
-    route = WORLD.routes.find((r) => r.id === objective.routeId),
+    route = routeById.get(objective.routeId),
     hint = s.challengeHint || s.trackedHint || s.surveyHint,
     navigation = hint || objective,
     distance = Math.round(length2(p.x - navigation.x, p.z - navigation.z)),
-    touch = matchMedia("(pointer: coarse)").matches,
+    touch = coarse,
     glideControl = touch ? "展帆鍵" : "Space",
     brakeControl = touch ? "減速鍵" : "Shift",
     interactControl = touch ? "互動鍵" : "E";
-  if (started) {
+  if (started && (hudCache.hint!==hint||hudCache.distance!==distance||hudCache.touch!==touch||hudCache.grounded!==p.grounded||hudCache.checkpoint!==s.checkpoint||hudCache.activated!==s.activated.length)) {
     text(
       "#objective",
       `${hint?.campaign ? `第 ${s.activeCampaignCircuit + 1} 航區 / 測風 ${hint.stage}/3 · ` : s.challengeHint || s.trackedHint ? `測風 ${hint.stage}/${hint.stageTotal} · ` : s.activated.length < 3 ? `${s.activated.length + 1}/3 · ` : "返航 · "}${hint?.stageName || hint?.name || objective.name}  ${distance}m`,
@@ -558,10 +581,7 @@ function updateHud() {
           : hint?.landing ? `抵島上空按住 ${brakeControl} 下降` : hint ? sampleConditions(hint) || "穿過前方觀測環，記錄風況" : `抵島上空按住 ${brakeControl} 下降`,
     );
   }
-  text(
-    "#region",
-    islandById(s.checkpoint).region + " / " + islandById(s.checkpoint).name,
-  );
+  if(hudCache.checkpoint!==s.checkpoint)text("#region",islandById(s.checkpoint).region+" / "+islandById(s.checkpoint).name);
   text(
     "#flight-mode",
     p.grounded
@@ -572,17 +592,18 @@ function updateHud() {
           ? "乘風滑翔"
           : `自由落體 · ${glideControl} 展帆`,
   );
-  text("#altitude", `${Math.round(p.y)} m 高度`);
-  text("#speed", `${Math.round(length2(p.vx, p.vz))} m/s`);
-  text("#clock", clock(s.elapsed));
+  numericText("#altitude",Math.round(p.y),""," m 高度");
+  numericText("#speed",Math.round(length2(p.vx,p.vz)),""," m/s");
+  const seconds=Math.floor(s.elapsed);
+  if(hudCache.seconds!==seconds){text("#clock",clock(seconds));hudCache.seconds=seconds;}
   text(
     "#flight-tip",
     touch
       ? "左搖桿移動 · 展帆切換 · 按住減速下降"
       : "Space 起跳／展帆　·　Shift 收帆減速　·　E 互動",
   );
-  text("#energy-value", `${Math.round(p.energy)}%`);
-  $("#energy-bar").style.width = `${p.energy}%`;
+  const energy=Math.round(p.energy);
+  if(displayValues.get("#energy-value")!==energy){numericText("#energy-value",energy,"","%");$("#energy-bar").style.width=energy+"%";}
   $(".energy-panel").classList.toggle("low", p.energy < 22);
   text(
     "#wind-label",
@@ -599,17 +620,15 @@ function updateHud() {
               : "風帶外 · 持續耗能",
   );
   const remaining = Math.max(0, EXPEDITION_LIMIT_SECONDS - s.activeSeconds);
-  text('#weather-clock', s.mode === 'exploration' ? '自由探索 · 不限時' : `天候 ${clock(remaining)}`);
+  const weatherSeconds=s.mode==='exploration'?-1:Math.floor(remaining);
+  if(hudCache.weatherSeconds!==weatherSeconds){text('#weather-clock',s.mode==='exploration'?'自由探索 · 不限時':`天候 ${clock(remaining)}`);hudCache.weatherSeconds=weatherSeconds;}
   $('#weather-clock').classList.toggle('weather-warning', s.mode === 'expedition' && remaining <= 300);
   const level = remaining <= 60 ? 2 : remaining <= 300 ? 1 : 0;
   if (s.status === 'running' && s.mode === 'expedition' && level > warningLevel) notify(level === 2 ? '天候窗口剩 1 分鐘：請盡快返航。' : '天候窗口剩 5 分鐘：可在設定轉為自由探索。');
   warningLevel = level;
-  text("#station-count", `觀測台 ${s.activated.length} / 3`);
-  text("#relic-count", `碎片 ${s.relics.length} / ${WORLD.relics.length}`);
-  text(
-    "#challenge-count",
-    `選修 ${s.challenges.length} / ${WORLD.challenges.length}`,
-  );
+  numericText("#station-count",s.activated.length,"觀測台 "," / 3");
+  numericText("#relic-count",s.relics.length,"碎片 "," / 12");
+  numericText("#challenge-count",s.challenges.length,"選修 "," / 6");
   text("#route-label", s.activeCampaignCircuit != null ? "必修巡測風廊" : s.activeChallenge ? "測風遠征航道" : s.trackedHint || s.surveyHint?.mainTransit ? "安全接駁風道" : s.routeStyle === "safe" ? "安全風道" : "穿雲捷徑");
   $("#route-toggle").disabled = !!s.trackedHint || !!s.surveyHint?.mainTransit || !!s.activeChallenge || s.activeCampaignCircuit != null;
   text(
@@ -625,7 +644,7 @@ function updateHud() {
       ? `${touch ? "" : "E · "}返回營地結算`
       : `${touch ? "" : "E · "}啟動觀測台`,
   );
-  const routeKey = objective.routeId + (s.surveyHint?.mainTransit ? ':connection' : '');
+  const routeKey = s.surveyHint?.mainTransit ? s.mainTransit : objective.routeId;
   if (lastRoute !== routeKey) {
     scene.setRoute(s.surveyHint?.mainTransit ? { waypoints: s.mainTransit, style: 'safe' } : route);
     lastRoute = routeKey;
@@ -635,28 +654,40 @@ function updateHud() {
   show("#guide", !guideHidden && !hint);
   if (hint) {
     const h = hint;
-    const carrying = s.activeChallenge ? ["crosswind", "stability"].includes(WORLD.challenges.find(c => c.id === s.activeChallenge)?.kind) : s.activated.length === 1;
+    const kind=courseById.get(s.activeChallenge)?.kind;
+    const carrying=s.activeChallenge?(kind==="crosswind"||kind==="stability"):s.activated.length===1;
     text("#course-kicker", h.mainTransit ? "主線安全接駁 · 觀測進度保留" : h.campaign ? "必修巡測 · 每段落島交付" : s.activeChallenge || s.trackedHint ? "選擇性測風遠征" : "主線觀測 · 不需停留等待");
-    text("#course-title", h.mainTransit ? `安全接駁 ${h.step}/${h.total}` : h.transit ? `安全接駁 ${h.transitStep}/${h.transitTotal}` : `${hint?.campaign ? `第 ${s.activeCampaignCircuit + 1} 航區 / 測風 ${hint.stage}/3 · ` : h.campaign || s.challengeHint || s.trackedHint ? `${h.stageName} · ` : "航線觀測 · "}${h.entry ? "前往入口" : `${h.step}/${h.total}`}`);
-    text(
+    if(hudCache.hint!==h)text("#course-title", h.mainTransit ? `安全接駁 ${h.step}/${h.total}` : h.transit ? `安全接駁 ${h.transitStep}/${h.transitTotal}` : `${hint?.campaign ? `第 ${s.activeCampaignCircuit + 1} 航區 / 測風 ${hint.stage}/3 · ` : h.campaign || s.challengeHint || s.trackedHint ? `${h.stageName} · ` : "航線觀測 · "}${h.entry ? "前往入口" : `${h.step}/${h.total}`}`);
+    const detailBand=p.y<h.y-h.radius?-1:p.y>h.y+h.radius?1:0,cargo=Math.round(s.cargoStability);
+    if(hudCache.hint!==h||hudCache.touch!==touch||hudCache.grounded!==p.grounded||hudCache.detailBand!==detailBand||hudCache.cargo!==cargo)text(
       "#course-detail",
       `${p.grounded && !h.landing ? `${glideControl} 展帆起航，${touch ? "左搖桿" : "WASD"} 對準金環。` : ""}${h.transit ? `沿風標前進，目標高度 ${Math.round(h.y)}m。抵島後進金環。` : h.entry ? h.instruction : h.landing ? `落到島中央，按 ${interactControl} 交付；已完成階段保留。` : `目標高度 ${Math.round(h.y)}m；${p.y < h.y - h.radius ? "保持展帆，沿青色風帶抬升。" : p.y > h.y + h.radius ? `按住 ${brakeControl} 降低高度。` : "高度已對準，穿過金環中央。"}`}${carrying && !h.entry && !h.transit ? ` 儀器穩定 ${Math.round(s.cargoStability)}%。` : ""}`,
     );
     const speed = length2(p.vx, p.vz);
-    const checks = [];
-    if (!h.landing) checks.push([Math.abs(p.y - h.y) < (h.radius || 15), `高度 ${Math.round(p.y)} / ${Math.round(h.y)}m`]);
-    if (h.minSpeed) checks.push([speed >= h.minSpeed, `速度 ≥${h.minSpeed}m/s`]);
-    if (h.maxSpeed) checks.push([speed <= h.maxSpeed, `速度 ≤${h.maxSpeed}m/s`]);
-    if (h.minEnergy) checks.push([p.energy >= h.minEnergy, `能量 ≥${h.minEnergy}%`]);
-    if (h.maxVerticalSpeed) checks.push([Math.abs(p.vy) <= h.maxVerticalSpeed, `升降 ≤${h.maxVerticalSpeed}m/s`]);
-    if (h.heading) {
-      const dot = (p.vx * h.heading.x + p.vz * h.heading.z) / Math.max(0.001, speed * length2(h.heading.x, h.heading.z));
-      checks.push([dot >= (h.heading.minDot ?? 0.5), "順箭頭入環"]);
+    if(hudCache.conditionHint!==h) {
+      const container=$('#gate-conditions');container.replaceChildren();hudCache.conditionNodes.length=0;hudCache.conditionStates.fill(-1);
+      const add=(kind,label)=>{const el=document.createElement('span');container.append(el);hudCache.conditionNodes.push({kind,label,el});};
+      if(!h.landing)add(0,'');
+      if(h.minSpeed)add(1,`速度 ≥${h.minSpeed}m/s`);
+      if(h.maxSpeed)add(2,`速度 ≤${h.maxSpeed}m/s`);
+      if(h.minEnergy)add(3,`能量 ≥${h.minEnergy}%`);
+      if(h.maxVerticalSpeed)add(4,`升降 ≤${h.maxVerticalSpeed}m/s`);
+      if(h.heading)add(5,'順箭頭入環');
+      hudCache.conditionHint=h;hudCache.altitude=NaN;
     }
-    const conditionHTML = checks.map(([ok, label]) => `<span class="${ok ? "met" : "unmet"}">${ok ? "✓" : "○"} ${label}</span>`).join("");
-    if ($("#gate-conditions").innerHTML !== conditionHTML) $("#gate-conditions").innerHTML = conditionHTML;
+    const altitude=Math.round(p.y);
+    for(let i=0;i<hudCache.conditionNodes.length;i++) {
+      const node=hudCache.conditionNodes[i],kind=node.kind;
+      const ok=kind===0?Math.abs(p.y-h.y)<(h.radius||15):kind===1?speed>=h.minSpeed:kind===2?speed<=h.maxSpeed:kind===3?p.energy>=h.minEnergy:kind===4?Math.abs(p.vy)<=h.maxVerticalSpeed:(p.vx*h.heading.x+p.vz*h.heading.z)/Math.max(.001,speed*length2(h.heading.x,h.heading.z))>=(h.heading.minDot??.5);
+      if(hudCache.conditionStates[i]!==Number(ok)||kind===0&&hudCache.altitude!==altitude){
+        node.el.className=ok?'met':'unmet';
+        node.el.textContent=(ok?'✓ ':'○ ')+(kind===0?`高度 ${altitude} / ${Math.round(h.y)}m`:node.label);
+        hudCache.conditionStates[i]=Number(ok);
+      }
+    }
+    hudCache.altitude=altitude;hudCache.detailBand=detailBand;hudCache.cargo=cargo;
   }
-  if (!guideHidden) {
+  if (!guideHidden && !hint) {
     let step, title, detail;
     const destination = islandById(objective.islandId);
     if (p.grounded && s.checkpoint === objective.islandId) {
@@ -704,15 +735,11 @@ function updateHud() {
     text("#guide-text", title);
     text("#guide-detail", detail);
   }
+  hudCache.hint=hint;hudCache.distance=distance;hudCache.touch=touch;hudCache.grounded=p.grounded;hudCache.checkpoint=s.checkpoint;hudCache.activated=s.activated.length;
   drawMap();
 }
 function drawMap() {
-  const c = $("#map"),
-    ctx = c.getContext("2d"),
-    s = sim.state,
-    scale = 0.48 / (WORLD.mapScale || 1),
-    px = (x) => c.width * 0.3 + x * scale,
-    pz = (z) => c.height * 0.6 + z * scale;
+  const c=mapCanvas,ctx=mapContext,s=sim.state,scale=mapScale,px=mapX,pz=mapZ;
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.strokeStyle = "#bfd3bd14";
   ctx.lineWidth = 1;
@@ -728,38 +755,29 @@ function drawMap() {
     ctx.lineTo(c.width, y);
     ctx.stroke();
   }
-  const course = WORLD.challenges.find(c => c.id === s.activeChallenge), stage = sim.campaignStage() || sim.courseStage(course);
-  const tracked = WORLD.challenges.find(c => c.id === s.trackedHint?.id);
-  const route = stage ? stage : s.surveyHint?.mainTransit ? { waypoints: [s.player, ...s.mainTransit.slice(s.mainTransitIndex)] } : tracked ? { waypoints: [s.player, ...s.transitWaypoints.slice(s.transitIndex), sim.courseEntry(tracked)] } : WORLD.routes.find((r) => r.id === s.objective.routeId);
-  if (route) {
-    ctx.strokeStyle = tracked || s.routeStyle === "safe" ? "#bcdfd0" : "#e6c17e";
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    route.waypoints.forEach((p, i) =>
-      i ? ctx.lineTo(px(p.x), pz(p.z)) : ctx.moveTo(px(p.x), pz(p.z)),
-    );
-    ctx.stroke();
-    ctx.setLineDash([]);
+  const course=courseById.get(s.activeChallenge),stage=sim.campaignStage()||sim.courseStage(course);
+  const tracked=courseById.get(s.trackedHint?.id);
+  const transit=s.surveyHint?.mainTransit?s.mainTransit:tracked?s.transitWaypoints:null;
+  const points=stage?stage.waypoints:transit||routeById.get(s.objective.routeId)?.waypoints;
+  if(points) {
+    ctx.strokeStyle=tracked||s.routeStyle==='safe'?'#bcdfd0':'#e6c17e';ctx.lineWidth=2;ctx.setLineDash(mapDash);ctx.beginPath();
+    const start=transit?(s.surveyHint?.mainTransit?s.mainTransitIndex:s.transitIndex):0;
+    if(transit)ctx.moveTo(px(s.player.x),pz(s.player.z));
+    for(let i=start;i<points.length;i++){const point=points[i];if(i===0&&!transit)ctx.moveTo(px(point.x),pz(point.z));else ctx.lineTo(px(point.x),pz(point.z));}
+    if(tracked){const entry=sim.courseEntry(tracked);ctx.lineTo(px(entry.x),pz(entry.z));}
+    ctx.stroke();ctx.setLineDash(mapSolid);
   }
-  WORLD.islands.forEach((i, index) => {
-    ctx.beginPath();
-    ctx.arc(px(i.x), pz(i.z), Math.max(5, i.radius * scale * 0.7), 0, Math.PI * 2);
-    ctx.fillStyle = s.activated.includes(i.id) ? "#cdb97855" : "#6e97836b";
-    ctx.fill();
-    ctx.strokeStyle = i.id === s.objective.islandId ? "#ffdc8e" : "#b3cdb061";
-    ctx.lineWidth = i.id === s.objective.islandId ? 2 : 1;
-    ctx.stroke();
-    ctx.fillStyle = "#f0e5ba";
-    ctx.font = "17px Segoe UI";
-    ctx.textAlign = "center";
-    ctx.fillText(index + 1, px(i.x), pz(i.z) + 6);
-  });
-  WORLD.relics.forEach((r) => {
-    if (s.relics.includes(r.id)) return;
-    ctx.fillStyle = "#eac277";
-    ctx.fillRect(px(r.x) - 2, pz(r.z) - 2, 4, 4);
-  });
+  for(let index=0;index<WORLD.islands.length;index++) {
+    const i=WORLD.islands[index];
+    ctx.beginPath();ctx.arc(px(i.x),pz(i.z),Math.max(5,i.radius*scale*.7),0,Math.PI*2);
+    ctx.fillStyle=s.activated.includes(i.id)?'#cdb97855':'#6e97836b';ctx.fill();
+    ctx.strokeStyle=i.id===s.objective.islandId?'#ffdc8e':'#b3cdb061';ctx.lineWidth=i.id===s.objective.islandId?2:1;ctx.stroke();
+    ctx.fillStyle='#f0e5ba';ctx.font='17px Segoe UI';ctx.textAlign='center';ctx.fillText(mapIslandLabels[index],px(i.x),pz(i.z)+6);
+  }
+  for(let i=0;i<WORLD.relics.length;i++) {
+    const r=WORLD.relics[i];if(s.relics.includes(r.id))continue;
+    ctx.fillStyle='#eac277';ctx.fillRect(px(r.x)-2,pz(r.z)-2,4,4);
+  }
   const target = s.challengeHint || s.trackedHint || s.surveyHint;
   if (target) {
     ctx.beginPath(); ctx.arc(px(target.x), pz(target.z), 6, 0, Math.PI * 2);
@@ -850,7 +868,7 @@ function tick(now) {
     let steps = 0;
     while (accumulator >= 1 / 60 && steps++ < 9) {
       const sample = input.read(scene.yaw), processingStart = performance.now();
-      sim.step(sample, 1 / 60);
+      sim.step(sample, 1 / 60);simulationSteps++;
       if (sample.glide) feedback.maxConsumptionProcessingMs = Math.max(feedback.maxConsumptionProcessingMs,performance.now()-processingStart);
       accumulator -= 1 / 60;
     }
@@ -882,6 +900,7 @@ function tick(now) {
   raf = requestAnimationFrame(tick);
 }
 async function initialize() {
+  mapCanvas=$("#map");mapContext=mapCanvas.getContext("2d");
   loaded = store.load();
   storageWarning(loaded.warning);
   loaded = loaded.save;
@@ -1026,7 +1045,8 @@ async function initialize() {
         const gl = scene.renderer.getContext(),
           debug = gl.getExtension("WEBGL_debug_renderer_info");
         return {
-          ...scene.metrics, feedback: { ...feedback },
+          ...scene.metrics,
+          simulationSteps, feedback: { ...feedback },
           phases: timing.summary(),
           camera: scene.inspectCamera(sim.player),
           frameCount,
@@ -1066,6 +1086,7 @@ async function initialize() {
     audio.setPaused(true);
   });
   window.addEventListener("beforeunload", () => {
+    coarsePointer.removeEventListener("change",pointerChanged);
     cancelAnimationFrame(raf);
     input.dispose();
     audio.dispose();

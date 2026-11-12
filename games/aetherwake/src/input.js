@@ -226,7 +226,7 @@ export class FlightInput {
       (this.keys.has("KeyS") || this.keys.has("ArrowDown") ? 1 : 0) -
       (this.keys.has("KeyW") || this.keys.has("ArrowUp") ? 1 : 0) +
       this.axes.z;
-    const n = Math.max(1, Math.hypot(x, z));
+    const n = Math.max(1, Math.sqrt(x*x+z*z));
     result.x = (x * Math.cos(yaw) + z * Math.sin(yaw)) / n;
     result.z = (z * Math.cos(yaw) - x * Math.sin(yaw)) / n;
     result.brake = this.touchBrake || this.keys.has('ShiftLeft') || this.keys.has('ShiftRight');

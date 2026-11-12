@@ -8,7 +8,7 @@ export class TimingSamples {
     this.index = 0;
   }
   push(sample) {
-    for (const name of this.names) this.samples[name][this.index] = sample[name];
+    for(let i=0;i<this.names.length;i++){const name=this.names[i];this.samples[name][this.index]=sample[name];}
     this.index = (this.index + 1) % this.capacity;
     this.count = Math.min(this.count + 1, this.capacity);
   }

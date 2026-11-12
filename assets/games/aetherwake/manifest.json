@@ -5,7 +5,7 @@
   "generatedAt": "2026-10-25",
   "runtimeGeometry": "The live game imports games/aetherwake/src/models.js. GLB exports retain the equivalent reusable meshes, rigs, UVs, PBR materials and five clips; no GLB network fetch is required for gameplay.",
   "audioRuntime": "Gesture-unlocked WebAudio loads six original WAV events with procedural fallback; environmental sound and the retained score are synthesised live.",
-  "totalRuntimeBytes": 5143526,
+  "totalRuntimeBytes": 4804726,
   "entries": [
     {
       "id": "aetherwake.island-1",
@@ -16,7 +16,7 @@
         "models/island-1.glb"
       ],
       "sha256": {
-        "models/island-1.glb": "c038a8f0c4f91a2ef3400a7266ebe5d78d69258676a9c80633e8b05db7d71153"
+        "models/island-1.glb": "611ea399003bdc697522ae69ff9afbb039939e61f79e3596cd247521a3b346cd"
       },
       "provenance": {
         "method": "original-procedural",
@@ -32,7 +32,7 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6362,
+        "triangles": 5741,
         "drawCalls": 11,
         "bones": 0,
         "dimensions": [
@@ -71,7 +71,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 334096,
+        "runtimeBytes": 274604,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -167,7 +167,7 @@
         "models/island-2.glb"
       ],
       "sha256": {
-        "models/island-2.glb": "e8368230d61540f29b3603e200e58a22b987b491230dcd1dcd6d300726cf7c0c"
+        "models/island-2.glb": "3e144be45e321ca5c5c5b329bdb298ecf81ef0c61bb082fb1aa12260a47240c0"
       },
       "provenance": {
         "method": "original-procedural",
@@ -183,7 +183,7 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6448,
+        "triangles": 5908,
         "drawCalls": 11,
         "bones": 0,
         "dimensions": [
@@ -222,7 +222,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 362808,
+        "runtimeBytes": 311096,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -317,7 +317,7 @@
         "models/island-3.glb"
       ],
       "sha256": {
-        "models/island-3.glb": "180301926498f001c6810d75d9bf1366763df92d30d9dae00d0750900cc6b458"
+        "models/island-3.glb": "0dc93b03b8b03e393ee4299a730ee4bc3cf067411643837bafd944e947af7c45"
       },
       "provenance": {
         "method": "original-procedural",
@@ -333,7 +333,7 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6138,
+        "triangles": 5598,
         "drawCalls": 11,
         "bones": 0,
         "dimensions": [
@@ -372,7 +372,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 323204,
+        "runtimeBytes": 271488,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -467,7 +467,7 @@
         "models/island-4.glb"
       ],
       "sha256": {
-        "models/island-4.glb": "79696850a22798045bc71b4f9f9becd7b389ced392797dc183265540d69afae2"
+        "models/island-4.glb": "59ced7b731b511d57f22b66f95c28f8ae73db125465fe09014b402bc74ff0017"
       },
       "provenance": {
         "method": "original-procedural",
@@ -483,7 +483,7 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 7858,
+        "triangles": 7183,
         "drawCalls": 12,
         "bones": 0,
         "dimensions": [
@@ -523,7 +523,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 426224,
+        "runtimeBytes": 361548,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -618,7 +618,7 @@
         "models/island-5.glb"
       ],
       "sha256": {
-        "models/island-5.glb": "b6273d93c468c67b143dccd48a271f9cbf45c671a1c678edf8baab0564172da8"
+        "models/island-5.glb": "f7c3bd5bf702742d21cc6a5b6d9dc013c9768cc2a687ad5b93e5db1230d10892"
       },
       "provenance": {
         "method": "original-procedural",
@@ -634,7 +634,7 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 6974,
+        "triangles": 6434,
         "drawCalls": 11,
         "bones": 0,
         "dimensions": [
@@ -673,7 +673,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 382964,
+        "runtimeBytes": 331248,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -768,7 +768,7 @@
         "models/island-6.glb"
       ],
       "sha256": {
-        "models/island-6.glb": "63890477f32cd9f14d8226f50b6e29e5d7b75d9e417f35b411feab46e155acdb"
+        "models/island-6.glb": "37b6d2e16faa2c1d14fe334dd1a57ceec6169d1fad8ed493b9469aebdab3ae44"
       },
       "provenance": {
         "method": "original-procedural",
@@ -784,7 +784,7 @@
         "up": "+Y",
         "forward": "+Z",
         "pivot": "ground-center",
-        "triangles": 8194,
+        "triangles": 7573,
         "drawCalls": 12,
         "bones": 0,
         "dimensions": [
@@ -824,7 +824,7 @@
         "animations": []
       },
       "budget": {
-        "runtimeBytes": 458408,
+        "runtimeBytes": 398920,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
