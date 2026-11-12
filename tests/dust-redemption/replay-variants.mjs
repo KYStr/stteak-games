@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
-import { encounterFor } from "../../games/dust-redemption/encounter-variants.js";
+import {
+  challengeKey,
+  encounterFor,
+} from "../../games/dust-redemption/encounter-variants.js";
 import { url, action, mode, snapshot, walk } from "./driver.mjs";
 import { completeMail } from "./campaign.mjs";
 export async function replayVariants(page, evidence, pass) {
@@ -43,8 +46,27 @@ export async function replayVariants(page, evidence, pass) {
       damage: sample.stats.damageTaken,
       activeSeconds: sample.challenge.activeSeconds,
     });
-    if (sample.player.hp < 65) await page.keyboard.press("KeyF");
-    await completeMail(page);
+    await writeFile(
+      `${evidence}/seeded-replay-encounters.json`,
+      JSON.stringify({ status: "running", runs }, null, 2),
+    );
+    await page.keyboard.press("Escape");
+    await mode(page, "paused");
+    await action(page, "abandon");
+    await mode(page, "hub");
+  }
+  const completedKeys = [];
+  for (const seed of seeds) {
+    await action(page, "brief", "[data-id=dry-mail]");
+    await page.locator("#loadout-seed").fill(String(seed));
+    await page.selectOption("#loadout-difficulty", "standard");
+    await page.selectOption("#loadout-weapon", "rifle");
+    await page.selectOption("#loadout-item", "medkit");
+    await action(page, "deploy");
+    await mode(page, "playing");
+    await completeMail(page, {
+      relief: seed === seeds[1] ? "shared-relief" : undefined,
+    });
     const result = (await snapshot(page)).profile;
     assert.equal(result.wallet, earned.wallet);
     assert.deepEqual(result.choices, earned.choices);
@@ -55,10 +77,18 @@ export async function replayVariants(page, evidence, pass) {
     const persisted = (await snapshot(page)).profile;
     assert.equal(persisted.challenges["dry-mail"].last.seed, seed);
     assert.equal(persisted.challenges["dry-mail"].last.difficulty, "standard");
-    assert.ok(
-      Object.keys(persisted.challenges["dry-mail"].records).length >=
-        runs.length,
+    completedKeys.push(challengeKey(persisted.challenges["dry-mail"].last));
+    for (const key of completedKeys)
+      assert.ok(
+        persisted.challenges["dry-mail"].records[key]?.attempts >= 1,
+        `persisted comparable seed record ${key}`,
+      );
+    assert.deepEqual(persisted.rewards, earned.rewards);
+    await writeFile(
+      `${evidence}/seed-${seed}-completed.json`,
+      JSON.stringify(persisted.challenges["dry-mail"], null, 2),
     );
+    await action(page, "hub");
   }
   assert.notDeepEqual(
     runs[0].sample.map((e) => e.rounds),
@@ -68,7 +98,6 @@ export async function replayVariants(page, evidence, pass) {
     `${evidence}/seeded-replay-encounters.json`,
     JSON.stringify(runs, null, 2),
   );
-  await action(page, "hub");
   pass(
     "two selected seeds: distinct measured reserves/cadence, actual-input completion, comparable records persist without story rewards",
   );

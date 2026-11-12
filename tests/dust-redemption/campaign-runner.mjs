@@ -7,7 +7,11 @@ const dir = process.env.DUST_EVIDENCE_DIR || "/tmp/dust-campaign";
 await mkdir(dir, { recursive: true });
 const b = await chromium.launch({
   executablePath: "/usr/bin/google-chrome",
-  args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+  args: [
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--autoplay-policy=no-user-gesture-required",
+  ],
 });
 const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
 p.setDefaultTimeout(120000);
@@ -15,6 +19,27 @@ process.once("SIGINT", async () => {
   await b.close();
   process.exit(130);
 });
+let observing = false;
+const heartbeat = setInterval(async () => {
+  if (observing) return;
+  observing = true;
+  try {
+    const d = await snapshot(p);
+    console.log(
+      "Progress",
+      d.mission,
+      d.mode,
+      Math.round(d.challenge?.activeSeconds || 0),
+      d.field?.onward?.index,
+      d.player?.x,
+      d.player?.z,
+    );
+    await writeFile(`${dir}/live-state.json`, JSON.stringify(d));
+  } catch {
+  } finally {
+    observing = false;
+  }
+}, 30000);
 p.on("pageerror", console.error);
 p.on("console", (m) => {
   if (m.type() === "error") console.error(m.text());
@@ -69,5 +94,6 @@ try {
   );
   process.exitCode = 1;
 } finally {
+  clearInterval(heartbeat);
   await b.close();
 }

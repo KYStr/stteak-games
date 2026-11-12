@@ -1,5 +1,5 @@
 import { createBoundsTracker } from "./collision-bounds.js";
-/** Original source-only supply scene. One borrowed Field cart/battery; no enemy spawns.
+/** Original procedural supply scene. One borrowed Field cart/battery; no enemy spawns.
  * All lengths are metres, +Y up, +Z forward. Controller owns events and finite transfers.
  */
 export function createPactProps(THREE, world, flow, { field, player } = {}) {
@@ -727,21 +727,25 @@ export function createPactProps(THREE, world, flow, { field, player } = {}) {
       stock: readStock(),
     };
   }
-  function readFeedSnapshot() {
+  const feedReadTip = new THREE.Vector3(),
+    feedReadContact = new THREE.Vector3();
+  function readFeedSnapshot(out = {}) {
     alive();
-    const value = {};
-    for (const [key, label] of [
-      ["military-feed", "military"],
-      ["civilian-feed", "civilian"],
-    ]) {
-      const lever = feed.parts[key],
-        tip = lever.localToWorld(new THREE.Vector3(0, 0.3, 0));
-      value[`${label}Angle`] = lever.rotation.z;
-      value[`${label}Powered`] =
-        tip.distanceTo(position(contactNodes[key])) < 0.015 &&
-        visible(powerLamps[key]);
-    }
-    return value;
+    const military = feed.parts["military-feed"],
+      civilian = feed.parts["civilian-feed"];
+    military.localToWorld(feedReadTip.set(0, 0.3, 0));
+    contactNodes["military-feed"].getWorldPosition(feedReadContact);
+    out.militaryAngle = military.rotation.z;
+    out.militaryPowered =
+      feedReadTip.distanceTo(feedReadContact) < 0.015 &&
+      visible(powerLamps["military-feed"]);
+    civilian.localToWorld(feedReadTip.set(0, 0.3, 0));
+    contactNodes["civilian-feed"].getWorldPosition(feedReadContact);
+    out.civilianAngle = civilian.rotation.z;
+    out.civilianPowered =
+      feedReadTip.distanceTo(feedReadContact) < 0.015 &&
+      visible(powerLamps["civilian-feed"]);
+    return out;
   }
   function setFeed(military, civilian) {
     alive();

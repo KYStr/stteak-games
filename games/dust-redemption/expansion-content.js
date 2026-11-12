@@ -1,5 +1,6 @@
+import { ONWARD, onwardTask, createOnwardProgress } from "./onward-content.js";
 /**
- * NEXT-BUILD AUTHORING DATA ONLY. This module is deliberately outside the frozen runtime.
+ * Shared runtime authoring data and deterministic fieldwork rules.
  * Original narrative/mechanism design, CC0-1.0. Positions are metres [x,z].
  * A correct menu answer alone MUST NOT complete a field task: record the physical steps first.
  * No task uses a minimum duration, forced idle timer, consumable key or permanent failure.
@@ -43,7 +44,8 @@ const movement = (id, geometry, axis, change) => ({
   change,
 });
 
-export const EXPANSION_VERSION = "fieldwork-authoring-1";
+export const LEGACY_EXPANSION_VERSION = "fieldwork-authoring-1";
+export const EXPANSION_VERSION = "fieldwork-onward-2";
 export const SUPPLIES = Object.freeze({
   ammo: {
     id: "ammo",
@@ -750,22 +752,24 @@ export const FIELD_WORK = {
               ],
             },
             "兩道脈衝向山外流去，訊息有了不受公司封鎖的出口。",
-            { requiredSteps: [
-          step(
-            "triangle-linked",
-            "三角輸入接三角出口",
-            "socket-match",
-            "line-a",
-            { socket: "triangle-public" },
-          ),
-          step(
-            "circle-linked",
-            "圓圈輸入接圓圈出口",
-            "socket-match",
-            "line-b",
-            { socket: "circle-families" },
-          ),
-            ] },
+            {
+              requiredSteps: [
+                step(
+                  "triangle-linked",
+                  "三角輸入接三角出口",
+                  "socket-match",
+                  "line-a",
+                  { socket: "triangle-public" },
+                ),
+                step(
+                  "circle-linked",
+                  "圓圈輸入接圓圈出口",
+                  "socket-match",
+                  "line-b",
+                  { socket: "circle-families" },
+                ),
+              ],
+            },
           ),
           choice(
             "company-square",
@@ -787,10 +791,24 @@ export const FIELD_WORK = {
             true,
             { flags: ["signal-roster-verified"] },
             "四個工號與收件碼已核對；選公開驛線或守軍停火線後，仍須實際發送、讀回覆並南側簽收。",
-            { requiredSteps: [
-              step("inspect-full-roster", "讀取本次四人完整名單", "inspect-part", "roster-sheet", { flowOnly: "signal-v1" }),
-              step("inspect-receiver-code", "核對本次收件員與批號", "inspect-part", "receiver-code-plate", { flowOnly: "signal-v1" }),
-            ] },
+            {
+              requiredSteps: [
+                step(
+                  "inspect-full-roster",
+                  "讀取本次四人完整名單",
+                  "inspect-part",
+                  "roster-sheet",
+                  { flowOnly: "signal-v1" },
+                ),
+                step(
+                  "inspect-receiver-code",
+                  "核對本次收件員與批號",
+                  "inspect-part",
+                  "receiver-code-plate",
+                  { flowOnly: "signal-v1" },
+                ),
+              ],
+            },
           ),
         ],
         solution: {
@@ -844,12 +862,12 @@ export const FIELD_WORK = {
             {
               tradeoff: "要完成兩處實體接點；保留低警戒。",
               requiredSteps: [
-          step(
-            "select-relay",
-            "在選擇器上指向送信路線",
-            "operate-part",
-            "relay-selector",
-          ),
+                step(
+                  "select-relay",
+                  "在選擇器上指向送信路線",
+                  "operate-part",
+                  "relay-selector",
+                ),
                 step(
                   "relay-west",
                   "手動接通西側中繼",
@@ -880,12 +898,12 @@ export const FIELD_WORK = {
             {
               tradeoff: "只操作一處接點；附近警戒提高。",
               requiredSteps: [
-          step(
-            "select-relay",
-            "在選擇器上指向送信路線",
-            "operate-part",
-            "relay-selector",
-          ),
+                step(
+                  "select-relay",
+                  "在選擇器上指向送信路線",
+                  "operate-part",
+                  "relay-selector",
+                ),
                 step(
                   "raise-mast",
                   "轉動手輪升起實體天線",
@@ -896,28 +914,62 @@ export const FIELD_WORK = {
             },
           ),
           choice(
-            "public-west-relay", "從西側掩體中繼送完整名單", true,
+            "public-west-relay",
+            "從西側掩體中繼送完整名單",
+            true,
             { flags: ["signal-public-west"] },
             "在西側一個真接點送出完整名單；仍須讀取本次回覆，再到南側簽收。",
-            { tradeoff: "東側木箱遮線；南北側翼仍開放。只操作此一中繼。", requiredSteps: [
-              step("relay-west", "手動接通西側中繼", "checkpoint-operate", "relay-west", { position: [-12, -11], radius: 1.7 }),
-            ] },
+            {
+              tradeoff: "東側木箱遮線；南北側翼仍開放。只操作此一中繼。",
+              requiredSteps: [
+                step(
+                  "relay-west",
+                  "手動接通西側中繼",
+                  "checkpoint-operate",
+                  "relay-west",
+                  { position: [-12, -11], radius: 1.7 },
+                ),
+              ],
+            },
           ),
           choice(
-            "public-south-relay", "從南側開闊中繼送完整名單", true,
+            "public-south-relay",
+            "從南側開闊中繼送完整名單",
+            true,
             { flags: ["signal-public-south"] },
             "在南側一個真接點送出完整名單；仍須讀取本次回覆，再到南側簽收。",
-            { tradeoff: "缺乏高掩體，但能預先看見追線守軍。只操作此一中繼。", requiredSteps: [
-              step("relay-south", "手動接通南側中繼", "checkpoint-operate", "relay-south", { position: [-12, -4], radius: 1.7 }),
-            ] },
+            {
+              tradeoff: "缺乏高掩體，但能預先看見追線守軍。只操作此一中繼。",
+              requiredSteps: [
+                step(
+                  "relay-south",
+                  "手動接通南側中繼",
+                  "checkpoint-operate",
+                  "relay-south",
+                  { position: [-12, -4], radius: 1.7 },
+                ),
+              ],
+            },
           ),
           choice(
-            "ceasefire-dispatch", "送出守軍調令，攜同一完整信袋南送", true,
+            "ceasefire-dispatch",
+            "送出守軍調令，攜同一完整信袋南送",
+            true,
             { flags: ["signal-ceasefire-dispatched"] },
             "調令已由實體發報鍵送出；接收員仍要本次回覆與同一信袋內的完整四人名單。",
-            { tradeoff: "既有查線守軍退到指定掩體；你必須親自帶同一信袋到南側。", requiredSteps: [
-              step("dispatch-order-sent", "按下真發報鍵送出第17號調令", "operate-part", "dispatch-key", { flowOnly: "signal-v1" }),
-            ] },
+            {
+              tradeoff:
+                "既有查線守軍退到指定掩體；你必須親自帶同一信袋到南側。",
+              requiredSteps: [
+                step(
+                  "dispatch-order-sent",
+                  "按下真發報鍵送出第17號調令",
+                  "operate-part",
+                  "dispatch-key",
+                  { flowOnly: "signal-v1" },
+                ),
+              ],
+            },
           ),
         ],
         solution: {
@@ -936,9 +988,17 @@ export const FIELD_WORK = {
       {
         id: "ledger-carriage",
         flowV1: {
-          description: "翻看夜班貨票與真車牌，提交票號、車號及批次；兩列資料都必須能互相支持。",
-          hints: ["原票正反面與現場車牌都可讀取。", "錯誤比對會逐欄說明矛盾，可立即修正。"],
-          choiceLabels: { "a17-314": "票號 A17／車號 314", "a17-341": "票號 A17／車號 341", "a71-314": "票號 A71／車號 314" },
+          description:
+            "翻看夜班貨票與真車牌，提交票號、車號及批次；兩列資料都必須能互相支持。",
+          hints: [
+            "原票正反面與現場車牌都可讀取。",
+            "錯誤比對會逐欄說明矛盾，可立即修正。",
+          ],
+          choiceLabels: {
+            "a17-314": "票號 A17／車號 314",
+            "a17-341": "票號 A17／車號 341",
+            "a71-314": "票號 A71／車號 314",
+          },
           stepLabels: { "align-serials": "將驗證框對準你選定的車牌" },
         },
         title: "把貨運票對到真正車廂",
@@ -1006,9 +1066,17 @@ export const FIELD_WORK = {
       {
         id: "ledger-carbon",
         flowV1: {
-          description: "對齊複寫頁並調整側光，將原付款壓痕、表面墨水與工名資料相互核對。",
-          hints: ["先對定位孔，再以側光讀原筆壓痕。", "收款人、批次與完整工名都要相符；不能只採信改寫後的墨水。"],
-          choiceLabels: { "manager-impression": "記錄側光下的原付款壓痕", "ink-only": "記錄表面墨水收款人", "rub-ink-away": "擦除墨水後再讀" },
+          description:
+            "對齊複寫頁並調整側光，將原付款壓痕、表面墨水與工名資料相互核對。",
+          hints: [
+            "先對定位孔，再以側光讀原筆壓痕。",
+            "收款人、批次與完整工名都要相符；不能只採信改寫後的墨水。",
+          ],
+          choiceLabels: {
+            "manager-impression": "記錄側光下的原付款壓痕",
+            "ink-only": "記錄表面墨水收款人",
+            "rub-ink-away": "擦除墨水後再讀",
+          },
         },
         title: "對齊複寫頁與付款憑證",
         position: [6, 14],
@@ -1080,9 +1148,16 @@ export const FIELD_WORK = {
       {
         id: "ledger-copy",
         flowV1: {
-          description: "原帳一直留在你的背包。唯一副本可交南西信差保管，或在月台先公開一頁並由帳房見證。",
-          hints: ["密封託付要把同一副本親自帶到南西奧林，10 旅費只在撤離結算一次。", "張貼一頁不決定原帳最終公開或封存；完整核證資料可使查驗退讓。"],
-          choiceLabels: { "sealed-courier": "同一副本交南西信差保管（少領 10 旅費）", "notice-copy": "原公告欄先貼一頁，由帳房見證" },
+          description:
+            "原帳一直留在你的背包。唯一副本可交南西信差保管，或在月台先公開一頁並由帳房見證。",
+          hints: [
+            "密封託付要把同一副本親自帶到南西奧林，10 旅費只在撤離結算一次。",
+            "張貼一頁不決定原帳最終公開或封存；完整核證資料可使查驗退讓。",
+          ],
+          choiceLabels: {
+            "sealed-courier": "同一副本交南西信差保管（少領 10 旅費）",
+            "notice-copy": "原公告欄先貼一頁，由帳房見證",
+          },
           stepLabels: { "deliver-envelope": "將同一副本帶到南西信差信袋" },
         },
         title: "替原帳留下一份副本",
@@ -1683,6 +1758,14 @@ export const FIELD_WORK = {
   },
 };
 
+for (const [id, chapter] of Object.entries(FIELD_WORK))
+  chapter.tasks.push(
+    onwardTask(
+      id,
+      chapter.tasks.map((t) => t.id),
+    ),
+  );
+
 const clone = (value) => JSON.parse(JSON.stringify(value));
 export function expansionFor(missionId) {
   return FIELD_WORK[missionId] || null;
@@ -1697,6 +1780,7 @@ export function createFieldState(missionId) {
     progress: {},
     mistakes: 0,
     effects: [],
+    onward: createOnwardProgress(),
   };
 }
 function findTask(state, taskId) {
@@ -1814,7 +1898,7 @@ export function fieldWorkComplete(state) {
   );
 }
 export function fieldPlacementPoints(missionId) {
-  const result = [];
+  const result = ONWARD[missionId].sites.map((site) => site.position);
   for (const task of FIELD_WORK[missionId].tasks) {
     result.push(task.position);
     for (const entry of [

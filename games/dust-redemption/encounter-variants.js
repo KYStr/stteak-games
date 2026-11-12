@@ -51,4 +51,4 @@ export function encounterFor(
   };
 }
 export const challengeKey = (row) =>
-  `${row.seed ?? STORY_SEED}:${row.encounterProfile ?? "patient-watch"}:${row.difficulty ?? "story"}:${row.stats.assisted ? "assist" : "manual"}:${row.stats.slowAim ? "slow" : "normal"}`;
+  `${row.seed ?? STORY_SEED}:${row.encounterProfile ?? "patient-watch"}:${row.difficulty ?? "story"}:${row.stats.assisted ? "assist" : "manual"}:${row.stats.slowAim ? "slow" : "normal"}${row.fieldworkVersion ? ":" + row.fieldworkVersion : ""}`;

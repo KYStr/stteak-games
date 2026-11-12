@@ -1,0 +1,542 @@
+{
+  "schema": 2,
+  "revision": 1,
+  "wallet": 75,
+  "choices": {},
+  "npcTrust": {
+    "mara": 2,
+    "silas": 1,
+    "inez": 0,
+    "orin": 1
+  },
+  "unlockedWeapons": [
+    "revolver",
+    "rifle"
+  ],
+  "equipment": {
+    "weapon": "revolver",
+    "item": "medkit"
+  },
+  "inventory": {
+    "medkit": 1,
+    "smoke": 1
+  },
+  "supplies": {
+    "ammo": 0,
+    "medicine": 0,
+    "smoke": 0
+  },
+  "completed": [
+    "dry-mail"
+  ],
+  "rewards": [
+    "dry-mail"
+  ],
+  "history": [
+    {
+      "missionId": "dry-mail",
+      "difficulty": "standard",
+      "seed": 17,
+      "encounterProfile": "rapid-relief",
+      "title": "沒有寄出的信",
+      "strategy": "nonlethal",
+      "replay": false,
+      "choice": null,
+      "choiceKey": null,
+      "stats": {
+        "shots": 0,
+        "hits": 0,
+        "activeWallSeconds": 103.5,
+        "activeSeconds": 39.8,
+        "accuracy": 0,
+        "damageTaken": 0,
+        "kills": 0,
+        "seconds": 111.9,
+        "reloads": 0,
+        "itemsUsed": 0,
+        "clues": 3,
+        "assisted": true,
+        "slowAim": false,
+        "weapon": "revolver"
+      },
+      "consequence": "診所與守衛建立互助；醫師信任 +2，額外報酬 +15。",
+      "choiceConsequence": null,
+      "fieldworkVersion": "fieldwork-authoring-1",
+      "fieldworkComplete": true,
+      "fieldChoices": {
+        "mail-seal": "three-notches",
+        "mail-switch": "siding",
+        "mail-unload": "secure-pallet"
+      },
+      "fieldResults": [
+        {
+          "taskId": "mail-seal",
+          "title": "核對三缺口鉛封",
+          "choiceId": "three-notches",
+          "label": "確認三缺口原封完整，剪開運輸鎖",
+          "message": "原封與貨單一致。運輸鎖解除，藥品仍保持封裝。",
+          "tradeoff": null,
+          "rewardDelta": 0
+        },
+        {
+          "taskId": "mail-switch",
+          "title": "扳動道岔，決定出貨線",
+          "choiceId": "siding",
+          "label": "走西側貨棚線：多繞一段，保留掩護",
+          "message": "貨棚支線接通。接下來要實際把箱子送過支線的兩處轉角。",
+          "tradeoff": "路程較長；不增加警戒，沿途可用貨棚遮擋。",
+          "rewardDelta": 0
+        },
+        {
+          "taskId": "mail-unload",
+          "title": "把藥箱移進卸貨安全區",
+          "choiceId": "secure-pallet",
+          "label": "扣好棧板鎖，保留完整藥箱",
+          "message": "完整藥箱已到卸貨區。你仍可選擇帶證據議和，或擊敗守軍取回通行物件。",
+          "tradeoff": null,
+          "rewardDelta": 0
+        }
+      ],
+      "fieldRewardDelta": 0,
+      "fieldPotentialRewardDelta": 0,
+      "missionFlow": {
+        "progress": {
+          "version": 2,
+          "missionId": "dry-mail",
+          "events": [
+            {
+              "id": "event-1",
+              "type": "evidence-observed",
+              "sourceId": "mail-manifest",
+              "recordId": "manifest-md417"
+            },
+            {
+              "id": "event-2",
+              "type": "evidence-observed",
+              "sourceId": "consignment-backplate",
+              "recordId": "crate-md417-original"
+            },
+            {
+              "id": "event-3",
+              "type": "evidence-observed",
+              "sourceId": "clinic-receiving-board",
+              "recordId": "clinic-authority-july"
+            },
+            {
+              "id": "event-4",
+              "type": "seal-verification-attempted",
+              "reasonId": "cross-source-match"
+            },
+            {
+              "id": "event-5",
+              "type": "allocation-proposed",
+              "decisionId": "handoff",
+              "choiceId": "mutual-aid"
+            },
+            {
+              "id": "event-6",
+              "type": "handoff-accepted",
+              "snapshot": {
+                "actorId": "mail-1",
+                "actorPosition": [
+                  -5.955501140830244,
+                  0.5535286349477408
+                ],
+                "playerPosition": [
+                  -6.076622630308935,
+                  2.2783449467070964
+                ],
+                "visible": true,
+                "alive": true,
+                "recordIds": [
+                  "manifest-md417",
+                  "clinic-authority-july",
+                  "crate-md417-original"
+                ]
+              }
+            },
+            {
+              "id": "event-7",
+              "type": "promise-relayed",
+              "playerPosition": [
+                7.698843794751702,
+                4.985384155684227
+              ],
+              "communicationSnapshot": {
+                "sourceId": "mail-dispatch-line",
+                "leverAngle": -0.55,
+                "connected": true,
+                "cableConnected": true
+              }
+            },
+            {
+              "id": "event-8",
+              "type": "cargo-picked-up",
+              "entityId": "medicine-consignment",
+              "playerPosition": [
+                -12.579855948180489,
+                9.436595145802794
+              ],
+              "cargoPosition": [
+                -13,
+                11
+              ]
+            },
+            {
+              "id": "event-9",
+              "type": "cargo-delivered",
+              "entityId": "medicine-consignment",
+              "playerPosition": [
+                -8.803852535455862,
+                -3.9396938179963596
+              ],
+              "cargoPosition": [
+                -8.997935354051101,
+                -2.8448892122839764
+              ],
+              "recipientId": "joint-aid-receiver"
+            }
+          ]
+        },
+        "result": {
+          "version": 2,
+          "missionId": "dry-mail",
+          "objectiveEntityId": "medicine-consignment",
+          "complete": true,
+          "verified": true,
+          "evidence": {
+            "mail-manifest": "manifest-md417",
+            "consignment-backplate": "crate-md417-original",
+            "clinic-receiving-board": "clinic-authority-july"
+          },
+          "missingEvidence": [],
+          "verificationMistakes": 0,
+          "proposedHandoff": "mutual-aid",
+          "handoffAccepted": true,
+          "handoffMethod": "negotiated",
+          "promiseRelayed": true,
+          "localChoices": {
+            "handoff": "mutual-aid"
+          },
+          "routeId": "aid-delivery",
+          "cargo": {
+            "holder": "joint-aid-receiver",
+            "position": [
+              -9,
+              -4
+            ],
+            "units": 0
+          },
+          "allocation": {
+            "clinic": 1,
+            "guard": 1
+          },
+          "receipt": {
+            "id": "dry-mail:v2:mutual-aid:receipt",
+            "title": "診療藥品交付回條",
+            "objectiveEntityId": "medicine-consignment",
+            "recipientId": "joint-aid-receiver",
+            "allocation": {
+              "clinic": 1,
+              "guard": 1
+            },
+            "grants": "extraction-clearance"
+          },
+          "response": {
+            "status": "prevented",
+            "reason": "mutual-aid-relayed",
+            "warned": false,
+            "activated": false,
+            "pickupSeen": true
+          },
+          "actors": {
+            "mail-1": {
+              "defeated": false,
+              "order": "hold"
+            },
+            "mail-2": {
+              "defeated": false,
+              "order": "hold"
+            },
+            "mail-3": {
+              "defeated": false,
+              "order": "hold"
+            },
+            "mail-4": {
+              "defeated": false,
+              "order": "hold"
+            }
+          },
+          "defeatedActors": [],
+          "communicationConnected": true,
+          "workerSafe": false,
+          "workerStatus": "waiting",
+          "workerCommand": "wait",
+          "workerPosition": [
+            4,
+            2
+          ],
+          "openedOptionalRoutes": [],
+          "rewardDelta": 0
+        }
+      },
+      "reward": 75,
+      "duplicate": false,
+      "ending": null
+    }
+  ],
+  "challenges": {},
+  "activeRun": null,
+  "safeSnapshot": null,
+  "lastResult": {
+    "missionId": "dry-mail",
+    "difficulty": "standard",
+    "seed": 17,
+    "encounterProfile": "rapid-relief",
+    "title": "沒有寄出的信",
+    "strategy": "nonlethal",
+    "replay": false,
+    "choice": null,
+    "choiceKey": null,
+    "stats": {
+      "shots": 0,
+      "hits": 0,
+      "activeWallSeconds": 103.5,
+      "activeSeconds": 39.8,
+      "accuracy": 0,
+      "damageTaken": 0,
+      "kills": 0,
+      "seconds": 111.9,
+      "reloads": 0,
+      "itemsUsed": 0,
+      "clues": 3,
+      "assisted": true,
+      "slowAim": false,
+      "weapon": "revolver"
+    },
+    "consequence": "診所與守衛建立互助；醫師信任 +2，額外報酬 +15。",
+    "choiceConsequence": null,
+    "fieldworkVersion": "fieldwork-authoring-1",
+    "fieldworkComplete": true,
+    "fieldChoices": {
+      "mail-seal": "three-notches",
+      "mail-switch": "siding",
+      "mail-unload": "secure-pallet"
+    },
+    "fieldResults": [
+      {
+        "taskId": "mail-seal",
+        "title": "核對三缺口鉛封",
+        "choiceId": "three-notches",
+        "label": "確認三缺口原封完整，剪開運輸鎖",
+        "message": "原封與貨單一致。運輸鎖解除，藥品仍保持封裝。",
+        "tradeoff": null,
+        "rewardDelta": 0
+      },
+      {
+        "taskId": "mail-switch",
+        "title": "扳動道岔，決定出貨線",
+        "choiceId": "siding",
+        "label": "走西側貨棚線：多繞一段，保留掩護",
+        "message": "貨棚支線接通。接下來要實際把箱子送過支線的兩處轉角。",
+        "tradeoff": "路程較長；不增加警戒，沿途可用貨棚遮擋。",
+        "rewardDelta": 0
+      },
+      {
+        "taskId": "mail-unload",
+        "title": "把藥箱移進卸貨安全區",
+        "choiceId": "secure-pallet",
+        "label": "扣好棧板鎖，保留完整藥箱",
+        "message": "完整藥箱已到卸貨區。你仍可選擇帶證據議和，或擊敗守軍取回通行物件。",
+        "tradeoff": null,
+        "rewardDelta": 0
+      }
+    ],
+    "fieldRewardDelta": 0,
+    "fieldPotentialRewardDelta": 0,
+    "missionFlow": {
+      "progress": {
+        "version": 2,
+        "missionId": "dry-mail",
+        "events": [
+          {
+            "id": "event-1",
+            "type": "evidence-observed",
+            "sourceId": "mail-manifest",
+            "recordId": "manifest-md417"
+          },
+          {
+            "id": "event-2",
+            "type": "evidence-observed",
+            "sourceId": "consignment-backplate",
+            "recordId": "crate-md417-original"
+          },
+          {
+            "id": "event-3",
+            "type": "evidence-observed",
+            "sourceId": "clinic-receiving-board",
+            "recordId": "clinic-authority-july"
+          },
+          {
+            "id": "event-4",
+            "type": "seal-verification-attempted",
+            "reasonId": "cross-source-match"
+          },
+          {
+            "id": "event-5",
+            "type": "allocation-proposed",
+            "decisionId": "handoff",
+            "choiceId": "mutual-aid"
+          },
+          {
+            "id": "event-6",
+            "type": "handoff-accepted",
+            "snapshot": {
+              "actorId": "mail-1",
+              "actorPosition": [
+                -5.955501140830244,
+                0.5535286349477408
+              ],
+              "playerPosition": [
+                -6.076622630308935,
+                2.2783449467070964
+              ],
+              "visible": true,
+              "alive": true,
+              "recordIds": [
+                "manifest-md417",
+                "clinic-authority-july",
+                "crate-md417-original"
+              ]
+            }
+          },
+          {
+            "id": "event-7",
+            "type": "promise-relayed",
+            "playerPosition": [
+              7.698843794751702,
+              4.985384155684227
+            ],
+            "communicationSnapshot": {
+              "sourceId": "mail-dispatch-line",
+              "leverAngle": -0.55,
+              "connected": true,
+              "cableConnected": true
+            }
+          },
+          {
+            "id": "event-8",
+            "type": "cargo-picked-up",
+            "entityId": "medicine-consignment",
+            "playerPosition": [
+              -12.579855948180489,
+              9.436595145802794
+            ],
+            "cargoPosition": [
+              -13,
+              11
+            ]
+          },
+          {
+            "id": "event-9",
+            "type": "cargo-delivered",
+            "entityId": "medicine-consignment",
+            "playerPosition": [
+              -8.803852535455862,
+              -3.9396938179963596
+            ],
+            "cargoPosition": [
+              -8.997935354051101,
+              -2.8448892122839764
+            ],
+            "recipientId": "joint-aid-receiver"
+          }
+        ]
+      },
+      "result": {
+        "version": 2,
+        "missionId": "dry-mail",
+        "objectiveEntityId": "medicine-consignment",
+        "complete": true,
+        "verified": true,
+        "evidence": {
+          "mail-manifest": "manifest-md417",
+          "consignment-backplate": "crate-md417-original",
+          "clinic-receiving-board": "clinic-authority-july"
+        },
+        "missingEvidence": [],
+        "verificationMistakes": 0,
+        "proposedHandoff": "mutual-aid",
+        "handoffAccepted": true,
+        "handoffMethod": "negotiated",
+        "promiseRelayed": true,
+        "localChoices": {
+          "handoff": "mutual-aid"
+        },
+        "routeId": "aid-delivery",
+        "cargo": {
+          "holder": "joint-aid-receiver",
+          "position": [
+            -9,
+            -4
+          ],
+          "units": 0
+        },
+        "allocation": {
+          "clinic": 1,
+          "guard": 1
+        },
+        "receipt": {
+          "id": "dry-mail:v2:mutual-aid:receipt",
+          "title": "診療藥品交付回條",
+          "objectiveEntityId": "medicine-consignment",
+          "recipientId": "joint-aid-receiver",
+          "allocation": {
+            "clinic": 1,
+            "guard": 1
+          },
+          "grants": "extraction-clearance"
+        },
+        "response": {
+          "status": "prevented",
+          "reason": "mutual-aid-relayed",
+          "warned": false,
+          "activated": false,
+          "pickupSeen": true
+        },
+        "actors": {
+          "mail-1": {
+            "defeated": false,
+            "order": "hold"
+          },
+          "mail-2": {
+            "defeated": false,
+            "order": "hold"
+          },
+          "mail-3": {
+            "defeated": false,
+            "order": "hold"
+          },
+          "mail-4": {
+            "defeated": false,
+            "order": "hold"
+          }
+        },
+        "defeatedActors": [],
+        "communicationConnected": true,
+        "workerSafe": false,
+        "workerStatus": "waiting",
+        "workerCommand": "wait",
+        "workerPosition": [
+          4,
+          2
+        ],
+        "openedOptionalRoutes": [],
+        "rewardDelta": 0
+      }
+    },
+    "reward": 75,
+    "duplicate": false,
+    "ending": null
+  }
+}

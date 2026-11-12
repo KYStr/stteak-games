@@ -1,58 +1,135 @@
+import { completeOnward } from "./onward.mjs";
 import assert from "node:assert/strict";
-import { walk, snapshot, action, mode } from "./driver.mjs";
+import { walk, snapshot, action, mode, waitForProgress } from "./driver.mjs";
 export async function completeMail(
   p,
-  { combat = false, route = "siding" } = {},
+  {
+    combat = false,
+    route = "siding",
+    onCarry,
+    relief,
+    handoff = "mutual-aid",
+    stopAfterProbe = false,
+  } = {},
 ) {
   await walk(p, { x: -16, z: 8 });
   await p.keyboard.press("KeyE");
   await mode(p, "clue");
   await action(p, "back-playing");
-  await walk(p, { x: -13, z: 11 });
+  const receivingBoard = (await snapshot(p)).colliders.find(
+    (b) => b.id === "clinic-receiving-board",
+  );
+  assert.ok(receivingBoard);
+  const boardApproach = { x: receivingBoard.x, z: receivingBoard.min.z - 0.5 };
+  await walk(p, boardApproach, 0.05);
   await p.keyboard.press("KeyE");
   await mode(p, "field");
   await action(p, "field-adjust", '[data-step="show-back"][data-delta="1"]');
   await action(p, "field-adjust", '[data-step="show-back"][data-delta="1"]');
-  await action(p, "field-focus", '[data-step="inspect-seal"]');
-  await action(p, "field-inspect", '[data-step="inspect-seal"]');
+  await inspect(p, "inspect-seal");
+  assert.ok(
+    (await snapshot(p)).missionFlow.status.evidence["consignment-backplate"],
+    "medicine backplate acquired",
+  );
   await captureWork(p, "medicine-seal");
   await action(p, "mission-observe", '[data-source="clinic-receiving-board"]');
+  if (
+    !(await snapshot(p)).missionFlow.status.evidence["clinic-receiving-board"]
+  ) {
+    const refusal = await p.locator("#overlay").innerText();
+    assert.match(refusal, /西側|走近/, "physical receiving-board refusal");
+    await action(p, "field-close");
+    await walk(p, boardApproach, 0.05);
+    await p.keyboard.press("KeyE");
+    await action(
+      p,
+      "mission-observe",
+      '[data-source="clinic-receiving-board"]',
+    );
+  }
+  assert.ok(
+    (await snapshot(p)).missionFlow.status.evidence["clinic-receiving-board"],
+    await p.locator("#overlay").innerText(),
+  );
   await action(p, "mission-verify", '[data-reason="cross-source-match"]');
-  await action(p, "mission-allocate", '[data-choice="mutual-aid"]');
+  await action(p, "mission-allocate", `[data-choice="${handoff}"]`);
   await action(p, "field-choice", '[data-choice="three-notches"]');
   assert.deepEqual((await snapshot(p)).field.state.completed, ["mail-seal"]);
   await action(p, "field-close");
   console.log("Mail: medicine verified");
-  const guard = (await snapshot(p)).enemies.find((e) => e.id === "mail-1");
-  await walk(p, { x: guard.x, z: guard.z + 1.6 }, 0.3);
-  await p.keyboard.press("KeyE");
-  await action(p, "mission-accept");
-  assert.equal((await snapshot(p)).missionFlow.status.handoffAccepted, true);
-  console.log("Mail: handoff negotiated");
+  if (combat) {
+    await defeatGuards(p);
+    await walk(p, { x: -13, z: 12.2 }, 0.1);
+    await p.keyboard.press("KeyE");
+    await action(p, "mission-reclaim");
+    assert.equal(
+      (await snapshot(p)).missionFlow.status.handoffMethod,
+      "reclaimed",
+    );
+    await action(p, "mission-close");
+  } else {
+    const guard = (await snapshot(p)).enemies.find((e) => e.id === "mail-1");
+    await walk(p, { x: guard.x, z: guard.z + 1.6 }, 0.3);
+    await p.keyboard.press("KeyE");
+    await action(p, "mission-accept");
+    assert.equal((await snapshot(p)).missionFlow.status.handoffAccepted, true);
+    console.log("Mail: handoff negotiated");
+  }
   await walk(p, { x: 16, z: 4 });
   await p.keyboard.press("KeyE");
   await action(p, "back-playing");
   await walk(p, { x: 6, z: 5 });
   await p.keyboard.press("KeyE");
   if ((await snapshot(p)).mode === "parley") {
-    await action(p, "mission-relay");
+    if (!combat && handoff === "mutual-aid") await action(p, "mission-relay");
     await action(p, "mission-close");
-    await walk(p, { x: 7.5, z: 5.8 }, 0.2);
+    await walk(p, { x: 7.1, z: 5.4 }, 0.05);
     await p.keyboard.press("KeyE");
   }
-  await action(p, "field-focus", '[data-step="inspect-track"]');
-  await action(p, "field-inspect", '[data-step="inspect-track"]');
+  await inspect(p, "inspect-track");
   await action(
     p,
     "field-adjust",
     `[data-step="throw-switch"][data-delta="${route === "siding" ? -1 : 1}"]`,
   );
   await action(p, "field-choice", `[data-choice="${route}"]`);
-  if (!(await snapshot(p)).missionFlow.status.promiseRelayed)
-    await action(p, "mission-relay");
   await action(p, "field-close");
-  console.log("Mail: siding set, truce relayed");
-  if (combat) await defeatGuards(p);
+  if (
+    !combat &&
+    handoff === "mutual-aid" &&
+    !(await snapshot(p)).missionFlow.status.promiseRelayed
+  ) {
+    await walk(p, { x: 7.1, z: 5.4 }, 0.05);
+    await p.keyboard.press("KeyE");
+    await action(p, "mission-relay");
+    const relay = await snapshot(p);
+    assert.equal(
+      relay.missionFlow.status.promiseRelayed,
+      true,
+      await p.locator("#overlay").innerText(),
+    );
+    await action(p, relay.mode === "field" ? "field-close" : "mission-close");
+  }
+  if (
+    !combat &&
+    handoff === "clinic-direct" &&
+    (await snapshot(p)).missionFlow.status.communicationConnected
+  ) {
+    await walk(p, { x: 7.1, z: 5.4 }, 0.05);
+    await p.keyboard.press("KeyE");
+    await action(p, "mission-disconnect");
+    const cut = await snapshot(p);
+    assert.equal(
+      cut.missionFlow.status.communicationConnected,
+      false,
+      await p.locator("#overlay").innerText(),
+    );
+    await action(p, cut.mode === "field" ? "field-close" : "mission-close");
+  }
+  console.log(
+    `Mail: route set; ${combat ? "reclaimed custody" : handoff === "mutual-aid" ? "accepted promise relayed" : "clinic-only allocation, communication cut"}`,
+  );
+
   await walk(p, { x: -15, z: -8 });
   await p.keyboard.press("KeyE");
   await action(p, "back-playing");
@@ -61,17 +138,22 @@ export async function completeMail(
   await action(p, "field-step", '[data-step="take-crate"]');
   const traversal = (await snapshot(p)).field.traversal;
   assert.equal(traversal.type, "carry");
+  if (onCarry) {
+    await onCarry(p);
+    if (stopAfterProbe) return;
+  }
   for (let i = 0; i < traversal.route.length; i++) {
     const [x, z] = traversal.route[i],
       offset = traversal.offset || { x: 0, z: 0 };
     await walk(p, { x: x - offset.x, z: z - offset.z }, 0.2);
-    await p.waitForFunction(
-      (index) => {
-        const t = dustDiagnostics().field.traversal;
-        return !t || t.index > index;
+    await waitForProgress(
+      p,
+      (d) => !d.field.traversal || d.field.traversal.index > i,
+      {
+        label: `cargo checkpoint ${i + 1}`,
+        simulationBudget: 30,
+        wallWatchdog: 600000,
       },
-      i,
-      { timeout: 15000 },
     );
   }
   console.log("Mail: same crate carried through the open gate");
@@ -81,6 +163,7 @@ export async function completeMail(
   await action(p, "field-close");
   await p.keyboard.press("KeyE");
   await action(p, "mission-confirm");
+  await completeOnward(p, relief);
   assert.equal((await snapshot(p)).secured, true);
   console.log("Mail: receipt secured");
   await walk(p, { x: -12, z: 17 });
@@ -123,9 +206,36 @@ async function open(p, id, position, approachRadius = position ? 0.4 : 1.8) {
   await captureWork(p, id);
 }
 async function inspect(p, step) {
+  const acquired = async () => {
+    const d = await snapshot(p);
+    return d.field.state.progress[d.field.active]?.includes(step);
+  };
   await action(p, "field-focus", `[data-step="${step}"]`);
+  await p.waitForTimeout(300);
   await action(p, "field-inspect", `[data-step="${step}"]`);
+  if (await acquired()) return;
+  const refusal = await p.locator("#overlay").innerText();
+  if (/背面/.test(refusal)) {
+    for (let i = 0; i < 4; i++)
+      await action(p, "field-view", '[data-delta="1"]');
+    await p.waitForTimeout(300);
+    await action(p, "field-inspect", `[data-step="${step}"]`);
+  } else if (/距離太遠/.test(refusal)) {
+    const d = await snapshot(p),
+      task = d.field.tasks.find((t) => t.id === d.field.active);
+    await action(p, "field-close");
+    await walk(p, { x: task.position.x, z: task.position.z }, 1.2);
+    await p.keyboard.press("KeyE");
+    await action(p, "field-focus", `[data-step="${step}"]`);
+    await p.waitForTimeout(300);
+    await action(p, "field-inspect", `[data-step="${step}"]`);
+  }
+  assert.ok(
+    await acquired(),
+    `Inspection ${step} refused: ${await p.locator("#overlay").innerText()}\n${JSON.stringify((await snapshot(p)).field)}`,
+  );
 }
+
 async function adjust(p, step, n = 1) {
   for (let i = 0; i < Math.abs(n); i++)
     await action(
@@ -148,7 +258,8 @@ async function close(p) {
   await action(p, "field-close");
   await mode(p, "playing");
 }
-async function extract(p) {
+async function extract(p, onwardChoice) {
+  await completeOnward(p, onwardChoice);
   const d = await snapshot(p),
     m = MISSIONS.find((m) => m.id === d.mission);
   assert.equal(d.secured, true);
@@ -198,7 +309,10 @@ export async function completeWater(p, route = "retain-bypass") {
   await p.keyboard.press("KeyE");
   await action(p, "water-confirm");
   assert.ok((await snapshot(p)).waterFlow.status.receipt);
-  await extract(p);
+  await extract(
+    p,
+    route === "civilian-boost" ? "household-priority" : undefined,
+  );
 }
 export async function completeSignal(p, channel = "ceasefire-line") {
   await clues(p);
@@ -323,7 +437,7 @@ export async function completeSignal(p, channel = "ceasefire-line") {
   await action(p, "signal-reply");
   await action(p, "signal-confirm");
   assert.ok((await snapshot(p)).signalFlow.status.receipt);
-  await extract(p);
+  await extract(p, channel === "public-dispatch" ? "exposed" : undefined);
 }
 export async function completeLedger(p, custody = "sealed-courier") {
   await clues(p);
@@ -366,9 +480,13 @@ export async function completeLedger(p, custody = "sealed-courier") {
   await action(p, "ledger-clearance");
   await action(p, "ledger-confirm");
   assert.ok((await snapshot(p)).ledgerFlow.status.receipt);
-  await extract(p);
+  await extract(p, custody === "notice-copy" ? "public" : undefined);
 }
-export async function completeNight(p, route = "west-ford") {
+export async function completeNight(
+  p,
+  route = "west-ford",
+  { onEscort, onwardProbe, stopAfterProbe = false } = {},
+) {
   await clues(p);
   await open(p, "night-route-plan");
   await inspect(p, "read-water");
@@ -398,6 +516,10 @@ export async function completeNight(p, route = "west-ford") {
   await action(p, "night-close");
   await open(p, "night-escort", { x: 13, z: -7.8 });
   await action(p, "field-step", "[data-step=group-follows]");
+  if (onEscort) {
+    await onEscort(p);
+    if (stopAfterProbe) return;
+  }
   for (
     let i = 0;
     i < NIGHT_FLOW["long-night"].routes[route].waypoints.length;
@@ -405,13 +527,26 @@ export async function completeNight(p, route = "west-ford") {
   ) {
     const point = NIGHT_FLOW["long-night"].routes[route].waypoints[i];
     await go(p, point, 1.5);
-    await p.waitForFunction(
-      (index) => {
-        const t = dustDiagnostics().field.traversal;
-        return !t || t.index > index;
+    const legStart = i
+      ? NIGHT_FLOW["long-night"].routes[route].waypoints[i - 1]
+      : point;
+    await waitForProgress(
+      p,
+      (d) => !d.field.traversal || d.field.traversal.index > i,
+      {
+        label: `escort ${route} leg ${i + 1}`,
+        escort: true,
+        simulationBudget:
+          Math.hypot(point[0] - legStart[0], point[1] - legStart[1]) / 2.4 + 20,
+        wallWatchdog: 600000,
+        progress: (d) =>
+          d.nightFlow.party.members.reduce(
+            (n, m) =>
+              n +
+              Math.hypot(m.position[0] - point[0], m.position[1] - point[1]),
+            0,
+          ),
       },
-      i,
-      { timeout: 90000 },
     );
     console.log(`Escort checkpoint ${i + 1}`);
     if (i === 1) {
@@ -446,7 +581,14 @@ export async function completeNight(p, route = "west-ford") {
   await p.keyboard.press("KeyE");
   await action(p, "night-receipt");
   assert.ok((await snapshot(p)).nightFlow.status.receipt);
-  await extract(p);
+  if (onwardProbe) {
+    await completeOnward(p, undefined, {
+      onEscort: onwardProbe,
+      stopAfterProbe: true,
+    });
+    return;
+  }
+  await extract(p, route === "east-ridge" ? "east-ridge" : undefined);
 }
 export async function completePact(p, siding = "negotiation-siding") {
   await clues(p);
@@ -499,13 +641,14 @@ export async function completePact(p, siding = "negotiation-siding") {
     const d = await snapshot(p),
       offset = d.field.traversal?.offset || { x: 0, z: 0 };
     await go(p, { x: route[i][0] - offset.x, z: route[i][1] - offset.z }, 0.1);
-    await p.waitForFunction(
-      (index) => {
-        const t = dustDiagnostics().field.traversal;
-        return !t || t.index > index;
+    await waitForProgress(
+      p,
+      (d) => !d.field.traversal || d.field.traversal.index > i,
+      {
+        label: `cargo checkpoint ${i + 1}`,
+        simulationBudget: 30,
+        wallWatchdog: 600000,
       },
-      i,
-      { timeout: 30000 },
     );
     console.log(`Cart checkpoint ${i + 1}`);
     if (i === 1) {
@@ -535,6 +678,18 @@ export async function completePact(p, siding = "negotiation-siding") {
   await go(p, [7.5, 3.4]);
   await p.keyboard.press("KeyE");
   await action(p, "pact-clearance", "[data-reason=safe-departure-and-hearing]");
+  await action(p, "pact-close");
+  await completeOnward(
+    p,
+    siding === "assault-siding" ? "road-reserve" : undefined,
+  );
+  assert.equal(
+    (await snapshot(p)).pactFlow.status.deed.carrier,
+    "deed-desk",
+    "audit precedes final deed handoff",
+  );
+  await go(p, [7.5, 3.4]);
+  await p.keyboard.press("KeyE");
   await action(p, "pact-handoff");
   assert.ok((await snapshot(p)).pactFlow.status.receipt);
   await extract(p);

@@ -10,7 +10,7 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 const vectorCache = new WeakMap();
@@ -363,6 +363,11 @@ export class NightSystem {
     const t =
       this.field.traversal?.task === this.escort ? this.field.traversal : null;
     if (!t) return;
+    if (
+      t.index <= this.status.checkpoint + 1 &&
+      t.paused === this.status.paused
+    )
+      return;
     const s = this.partySnapshot();
     if (t.index > this.status.checkpoint + 1) {
       if (t.index !== this.status.checkpoint + 2)
@@ -442,6 +447,7 @@ export class NightSystem {
     }
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     try {
       if (action === "field-close" || action === "field-view") return true;
       const task = this.field.active || this.field.traversal?.task;
@@ -508,7 +514,9 @@ export class NightSystem {
   }
   syncBridge() {
     if (!this.status.routeId) return;
-    const snapshot = this.props.readBrace();
+    const snapshot = this.props.readBrace(
+      (this.braceStatus ??= { endDistances: [0, 0] }),
+    );
     if (!snapshot) throw Error("無法讀取原斜撐與試重板。");
     if (
       this.pendingBridgeTest &&
@@ -517,7 +525,7 @@ export class NightSystem {
     ) {
       if (!this.testStart) throw Error("缺少實際試走起點。");
       this.dispatch("bridge-tested", {
-        snapshot,
+        snapshot: structuredClone(snapshot),
         fromPosition: this.testStart,
         playerPosition: point(this.player.position),
       });
@@ -526,10 +534,14 @@ export class NightSystem {
     } else if (
       (this.brace.touched.has("brace") || this.status.bridgeTested) &&
       this.near(this.flow.brace.position) &&
-      !same(this.lastBrace, snapshot)
+      (!this.lastBrace ||
+        this.lastBrace.angle !== snapshot.angle ||
+        this.lastBrace.boardHeight !== snapshot.boardHeight ||
+        this.lastBrace.endDistances[0] !== snapshot.endDistances[0] ||
+        this.lastBrace.endDistances[1] !== snapshot.endDistances[1])
     ) {
       this.dispatch("brace-observed", {
-        snapshot,
+        snapshot: structuredClone(snapshot),
         playerPosition: point(this.player.position),
       });
       this.lastBrace = structuredClone(snapshot);
@@ -643,7 +655,7 @@ export class NightSystem {
       this.flow.arrival.position,
       this.flow.arrival.playerRadius,
     );
-    if (!this.field.complete || this.field.pendingEffects.length)
+    if (!this.field.baseComplete || this.field.pendingEffects.length)
       throw Error("先完成原三工作並返回現場，結清一次工作效果。");
     const kills = this.callbacks.kills?.() ?? this.status.defeatedActors.length;
     if (
@@ -753,13 +765,7 @@ export class NightSystem {
     const next = cache.path[0];
     if (
       !next ||
-      !tacticalSegmentClear({
-        from,
-        to: next,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, next, colliders, 0.38)
     ) {
       if (next) delete enemy.nightPath;
       this.world.animate(enemy.actor, "idle");
@@ -778,6 +784,7 @@ export class NightSystem {
         colliders,
         0.38,
         23,
+        (enemy.moveOut ??= {}),
       );
       from.x = p.x;
       from.z = p.z;

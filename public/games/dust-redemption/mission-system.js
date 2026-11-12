@@ -11,7 +11,7 @@ import { createDepartureGuidance } from "./departure-guidance.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
   enemyWeaponRange,
 } from "./enemy-tactics.js";
@@ -533,7 +533,7 @@ export class MissionSystem {
           radius: this.flow.objective.pickupRadius,
         });
     }
-    if (this.complete && this.field.complete && !this.callbacks.secured()) {
+    if (this.complete && this.field.baseComplete && !this.callbacks.secured()) {
       const receiver = this.flow.recipients[this.status.receipt.recipientId];
       candidates.push({
         kind: "handoff",
@@ -740,7 +740,7 @@ export class MissionSystem {
       !near ||
       near.kind !== "handoff" ||
       !this.complete ||
-      !this.field.complete
+      !this.field.baseComplete
     ) {
       this.handoffPanel("需親自回到接收者旁確認交付。");
       return;
@@ -767,11 +767,7 @@ export class MissionSystem {
     this.dispatch("actor-defeated", { actorId: id });
   }
   moveActor(actor, target, speed, dt) {
-    const next = this.field.escortTarget(
-      actor,
-      target.clone(),
-      this.world.colliders,
-    );
+    const next = this.field.escortTarget(actor, target, this.world.colliders);
     const dx = next.x - actor.position.x,
       dz = next.z - actor.position.z,
       length = Math.hypot(dx, dz);
@@ -786,6 +782,8 @@ export class MissionSystem {
       (dz / length) * amount,
       this.world.colliders,
       0.3,
+      23,
+      (actor.fieldMoveOut ??= {}),
     );
     const walked = gap(actor.position, moved);
     actor.position.x = moved.x;
@@ -857,13 +855,7 @@ export class MissionSystem {
     const waypoint = cache.path[0];
     if (
       !waypoint ||
-      !tacticalSegmentClear({
-        from,
-        to: waypoint,
-        colliders,
-        radius,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, waypoint, colliders, radius)
     ) {
       if (waypoint) enemy.missionPath = null;
       this.world.animate(actor, "idle");
@@ -892,14 +884,16 @@ export class MissionSystem {
   }
   workerThreatAt(position, crouched = false) {
     if (this.callbacks.secured()) return null;
-    const target = position.clone();
+    const target = (this.workerThreatTarget ??= new THREE.Vector3()).copy(
+      position,
+    );
     target.y = crouched ? 0.65 : 1.05;
     for (const enemy of this.enemies) {
       const order = this.orders.get(enemy.id)?.order || "guard";
       if (
         enemy.hp <= 0 ||
         enemy.rounds === 0 ||
-        (!enemy.engaged && ["hold", "standby"].includes(order))
+        (!enemy.engaged && (order === "hold" || order === "standby"))
       )
         continue;
       if (
@@ -907,7 +901,9 @@ export class MissionSystem {
         enemyWeaponRange(enemy.type || "guard")
       )
         continue;
-      const from = enemy.actor.position.clone();
+      const from = (this.workerThreatSource ??= new THREE.Vector3()).copy(
+        enemy.actor.position,
+      );
       from.y += 1.35;
       if (!this.world.trace(from, target)) return enemy;
     }
@@ -993,7 +989,7 @@ export class MissionSystem {
       return;
     }
     const worker = this.props.worker,
-      safe = vector(this.flow.worker.safePosition);
+      safe = (this.workerSafe ??= vector(this.flow.worker.safePosition));
     const playerNearSafe =
       gap(this.player.position, safe) <= this.flow.worker.safeRadius;
     const target = playerNearSafe ? safe : this.player.position;
@@ -1001,14 +997,14 @@ export class MissionSystem {
       this.world.animate(worker, "idle");
       return;
     }
-    const options = {
-      from: worker.position,
-      to: target,
-      colliders: this.world.colliders,
+    const options = (this.workerOptions ??= {
       radius: 0.3,
       bounds: 23,
       maxDistance: 24,
-    };
+    });
+    options.from = worker.position;
+    options.to = target;
+    options.colliders = this.world.colliders;
     const geometry = tacticalGeometryKey(this.world.colliders, 0.3, 23);
     if (
       !this.workerGuide ||
@@ -1023,26 +1019,40 @@ export class MissionSystem {
       this.workerGuide = {
         geometry,
         goal: target.clone(),
-        path: proof.ok ? proof.path.slice(1) : [],
+        path: proof.ok ? proof.path : [],
+        index: 1,
       };
     }
     while (
-      this.workerGuide.path.length &&
-      gap(worker.position, this.workerGuide.path[0]) < 0.04
+      this.workerGuide.index < this.workerGuide.path.length &&
+      gap(worker.position, this.workerGuide.path[this.workerGuide.index]) < 0.04
     )
-      this.workerGuide.path.shift();
-    const next = this.workerGuide.path[0];
+      this.workerGuide.index++;
+    const next = this.workerGuide.path[this.workerGuide.index];
     let threat = null;
     if (next) {
-      const aim = new THREE.Vector3(next.x, 0, next.z);
+      const aim = (this.workerAim ??= new THREE.Vector3()).set(
+        next.x,
+        0,
+        next.z,
+      );
       const distance = gap(worker.position, aim);
       if (distance > 2)
         aim
           .copy(worker.position)
-          .lerp(new THREE.Vector3(next.x, 0, next.z), 2 / distance);
-      for (const fraction of [0.25, 0.5, 0.75, 1]) {
+          .lerp(
+            (this.workerWaypoint ??= new THREE.Vector3()).set(
+              next.x,
+              0,
+              next.z,
+            ),
+            2 / distance,
+          );
+      for (let sample = 1; sample <= 4; sample++) {
         threat = this.workerThreatAt(
-          worker.position.clone().lerp(aim, fraction),
+          (this.workerSample ??= new THREE.Vector3())
+            .copy(worker.position)
+            .lerp(aim, sample / 4),
         );
         if (threat) break;
       }
@@ -1099,7 +1109,7 @@ export class MissionSystem {
         this.warningPresented = true;
       }
     }
-    this.updateWorker(dt);
+    if (!this.field.onward?.workerOwned) this.updateWorker(dt);
     const departure = this.departure();
     const input = (this.departureInput ??= {});
     input.enabled = Boolean(departure?.target);
@@ -1112,10 +1122,8 @@ export class MissionSystem {
     this.props.setDepartureGuidance?.(this.departureState.chevrons);
   }
   departure() {
-    if (
-      !(this.status.receipt && this.field.complete && this.callbacks.secured())
-    )
-      return null;
+    if (!(this.status.receipt && this.field.baseComplete)) return null;
+    const isSecured = this.callbacks.secured();
     const route = this.flow.routes[this.status.routeId];
     if (!route) return null;
     const courtyard = this.props.group.userData.placement?.courtyard || {
@@ -1130,21 +1138,27 @@ export class MissionSystem {
       p.x <= courtyard.max[0] + 0.34 &&
       p.z >= courtyard.min[1] - 0.34 &&
       p.z <= courtyard.max[1] + 1.2;
-    if (inside)
-      return {
-        stage: "courtyard",
-        title: "回條已收妥 · 先走出庭院",
-        detail: "沿地面箭頭走過已開的庭院門。門口直接通行。",
-        target: { x: route.gatePosition[0], z: route.gatePosition[1] + 2 },
-      };
-    const exit = this.callbacks.exitPosition?.();
-    return {
-      stage: "extraction",
-      title: "帶著具名回條 · 返回南側撤離",
-      detail: "沿地面箭頭前往南側撤離圈，靠近後按 E 返回暮砂鎮。",
-      target: exit ? { x: exit[0], z: exit[1] } : null,
-    };
+    if (!inside && !isSecured) return null;
+    const descriptor = (this.departureDescriptor ??= {
+      target: { x: 0, z: 0 },
+    });
+    if (inside) {
+      descriptor.stage = "courtyard";
+      descriptor.title = "回條已收妥 · 先走出庭院";
+      descriptor.detail = "沿地面箭頭走過已開的庭院門。門口直接通行。";
+      descriptor.target.x = route.gatePosition[0];
+      descriptor.target.z = route.gatePosition[1] + 2;
+    } else {
+      const exit = this.callbacks.exitPosition?.();
+      descriptor.stage = "extraction";
+      descriptor.title = "帶著具名回條 · 返回南側撤離";
+      descriptor.detail = "沿地面箭頭前往南側撤離圈，靠近後按 E 返回暮砂鎮。";
+      descriptor.target.x = exit?.[0] ?? 0;
+      descriptor.target.z = exit?.[1] ?? 0;
+    }
+    return descriptor;
   }
+
   objective() {
     const missingFor = (id) => {
       const task = this.field.tasks.find((task) => task.id === id);
@@ -1181,7 +1195,7 @@ export class MissionSystem {
       if (missing) return `先查閱${missing}，再回原藥箱開始搬運。`;
       return `搬同一箱藥，穿過已開啟的庭院門，交給${this.flow.recipients[this.flow.decision.choices[this.status.localChoices.handoff].recipientId].title}。`;
     }
-    if (!this.field.complete) return "藥品已交付；在接收工作面板確認回條。";
+    if (!this.field.baseComplete) return "藥品已交付；在接收工作面板確認回條。";
     return "回接收者旁出示回條，完成停火協議或清場確認，再向南撤離。";
   }
   labels() {
@@ -1189,7 +1203,9 @@ export class MissionSystem {
     const add = (p, text) =>
       entries.push({ position: { x: p[0], y: 1.9, z: p[1] }, text });
     const leavingCourtyard = Boolean(
-      this.status.receipt && this.field.complete && this.callbacks.secured(),
+      this.status.receipt &&
+        this.field.baseComplete &&
+        this.callbacks.secured(),
     );
     if (!leavingCourtyard)
       add(
@@ -1207,7 +1223,7 @@ export class MissionSystem {
       else if (this.allGuardsDefeated())
         add(point(this.unload.cargo.position), "◇ 同一藥箱 · 清場接管");
     }
-    if (this.status.workerStatus !== "safe")
+    if (this.status.workerStatus !== "safe" && !this.field.onward?.workerOwned)
       add(
         point(this.props.worker.position),
         this.status.workerStatus === "following"
@@ -1218,7 +1234,10 @@ export class MissionSystem {
               : "搬運工 · 跟隨中"
           : "◇ 搬運工 · 原位停等（可選）",
       );
-    if (this.status.workerStatus === "following")
+    if (
+      this.status.workerStatus === "following" &&
+      !this.field.onward?.workerOwned
+    )
       add(this.flow.worker.safePosition, "◇ 搬運工安全處");
     if (this.workerThreat && this.status.workerStatus === "following") {
       const threat = this.enemies.find(
@@ -1238,7 +1257,11 @@ export class MissionSystem {
         ].position,
         this.complete ? "◇ 接收回條／通行協議" : "◇ 藥品接收處",
       );
-    if (leavingCourtyard && this.departure()?.stage === "courtyard") {
+    if (
+      this.status.receipt &&
+      this.field.baseComplete &&
+      this.departure()?.stage === "courtyard"
+    ) {
       const route = this.flow.routes[this.status.routeId];
       // Ground-level anchor ties the label to the actual opening.
       entries.push({

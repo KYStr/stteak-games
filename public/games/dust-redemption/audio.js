@@ -26,8 +26,10 @@ const LEVELS = {
   ui: 0.17,
 };
 // Original D-minor frontier motif. Sparse plucked harmonics over a warm drone.
-const NOTES = [146.83, 0, 220, 174.61, 0, 164.81, 146.83, 0,
-  130.81, 0, 196, 164.81, 0, 130.81, 110, 0];
+const NOTES = [
+  146.83, 0, 220, 174.61, 0, 164.81, 146.83, 0, 130.81, 0, 196, 164.81, 0,
+  130.81, 110, 0,
+];
 const clamp = (value) =>
   Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
 export class FrontierAudio {
@@ -76,12 +78,14 @@ export class FrontierAudio {
     if (this.context.state === "suspended")
       this.context.resume().catch(() => {});
     if (!this.loadPromise)
-      this.loadPromise = this.loadEffects().catch((error) => {
-        this.loadErrors.push(`load: ${error?.message || "failed"}`);
-      }).finally(() => {
-        if (!this.disposed && EFFECTS.some((name) => !this.buffers.has(name)))
-          this.loadPromise = null;
-      });
+      this.loadPromise = this.loadEffects()
+        .catch((error) => {
+          this.loadErrors.push(`load: ${error?.message || "failed"}`);
+        })
+        .finally(() => {
+          if (!this.disposed && EFFECTS.some((name) => !this.buffers.has(name)))
+            this.loadPromise = null;
+        });
   }
   async loadEffects() {
     const context = this.context;
@@ -130,11 +134,15 @@ export class FrontierAudio {
   }
   track(source, gain) {
     this.voices.add(source);
+    this.peakVoices = Math.max(this.peakVoices || 0, this.voices.size);
+    (this.voiceGains ??= new WeakMap()).set(source, gain);
     source.onended = () => {
       try {
         source.disconnect();
         gain.disconnect();
       } catch {}
+      source.onended = null;
+      this.voiceGains.delete(source);
       this.voices.delete(source);
     };
   }
@@ -219,7 +227,8 @@ export class FrontierAudio {
     const time = this.context?.currentTime || 0;
     if (time < this.nextBeat || !this.canPlay("music")) return;
     this.nextBeat = time + 0.68;
-    const beat = this.beat++, f = NOTES[beat % NOTES.length];
+    const beat = this.beat++,
+      f = NOTES[beat % NOTES.length];
     if (f) {
       this.tone(f * 2, 1.35, 0.1, "triangle", 0.998, "music");
       this.tone(f * 4, 0.4, 0.018, "sine", 1, "music");
@@ -238,10 +247,17 @@ export class FrontierAudio {
   }
   pause() {
     this.active = false;
-    for (const voice of this.voices)
+    for (const voice of this.voices) {
       try {
         voice.stop();
       } catch {}
+      voice.onended = null;
+      try {
+        voice.disconnect();
+        this.voiceGains?.get(voice)?.disconnect();
+      } catch {}
+      this.voiceGains?.delete(voice);
+    }
     this.voices.clear();
     if (this.context?.state !== "closed")
       this.context?.suspend().catch(() => {});

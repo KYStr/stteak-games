@@ -1,3 +1,4 @@
+import { ONWARD_VERSION, canonicalOnward } from "./onward-content.js";
 import { DIFFICULTIES } from "./challenge.js";
 import {
   STORY_SEED,
@@ -9,6 +10,7 @@ import { MISSIONS, NPCS, WEAPONS, ENDINGS, missionById } from "./content.js";
 import {
   FIELD_WORK,
   EXPANSION_VERSION,
+  LEGACY_EXPANSION_VERSION,
   validSupplies,
   supplyBonuses,
 } from "./expansion-content.js";
@@ -86,8 +88,11 @@ function sameData(a, b) {
   );
 }
 
-function summaryFromChoices(missionId, choices) {
-  const authored = FIELD_WORK[missionId];
+function summaryFromChoices(missionId, choices, legacy = false) {
+  const chapter = FIELD_WORK[missionId];
+  const authored = chapter && {
+    tasks: legacy ? chapter.tasks.filter((t) => !t.onward) : chapter.tasks,
+  };
   if (
     !authored ||
     !record(choices) ||
@@ -129,6 +134,7 @@ export function canonicalFieldwork(missionId, fieldState) {
     "progress",
     "mistakes",
     "effects",
+    "onward",
   ]);
   if (
     !authored ||
@@ -151,6 +157,9 @@ export function canonicalFieldwork(missionId, fieldState) {
     fieldState.mistakes > 100000
   )
     throw new Error("現場工作尚未全部完成，或進度資料無效。");
+  if (fieldState.onward?.version !== ONWARD_VERSION)
+    throw Error("新委託的續程證據版本不符；舊完成回條僅供歷史查閱。");
+  canonicalOnward(missionId, fieldState.onward);
   const summary = summaryFromChoices(missionId, fieldState.choices);
   const canonicalEffects = [];
   for (const task of authored.tasks) {
@@ -207,11 +216,41 @@ export function canonicalFieldwork(missionId, fieldState) {
     throw new Error("現場效果與合法選擇不符，未發放獎勵。");
   return {
     version: EXPANSION_VERSION,
+    onward: clone(fieldState.onward),
     ...summary,
     mistakes: fieldState.mistakes,
   };
 }
 
+function baseFieldChoices(choices) {
+  if (!choices) return choices;
+  return Object.fromEntries(
+    Object.entries(choices).filter(
+      ([id]) =>
+        !id.endsWith("-onward") &&
+        ![
+          "water-circuit",
+          "signal-chain",
+          "ledger-witnesses",
+          "night-rendezvous",
+          "pact-depots",
+        ].includes(id),
+    ),
+  );
+}
+function onwardStockMatchesCart(missionId, onward, pactFlow) {
+  if (missionId !== "dawn-pact" || !onward || onward.version < 5) return true;
+  const audit = onward.events?.at(-1)?.stock;
+  const cart = pactFlow?.result?.cart?.stock;
+  return Boolean(
+    audit &&
+      cart &&
+      audit.initial === 24 &&
+      audit.cart === cart.available &&
+      audit.issued === cart.issued &&
+      audit.sealed === cart.cover,
+  );
+}
 function validFieldRecord(row) {
   const keys = [
     "fieldworkVersion",
@@ -226,17 +265,30 @@ function validFieldRecord(row) {
     if (row.fieldworkComplete === false)
       return (
         row.fieldworkVersion === null &&
-        sameData(row.fieldChoices, {}) &&
+        sameData(baseFieldChoices(row.fieldChoices), {}) &&
         sameData(row.fieldResults, []) &&
         row.fieldRewardDelta === 0 &&
         row.fieldPotentialRewardDelta === 0
       );
     if (
       row.fieldworkComplete !== true ||
-      row.fieldworkVersion !== EXPANSION_VERSION
+      ![EXPANSION_VERSION, LEGACY_EXPANSION_VERSION].includes(
+        row.fieldworkVersion,
+      )
     )
       return false;
-    const canonical = summaryFromChoices(row.missionId, row.fieldChoices);
+    const canonical = summaryFromChoices(
+      row.missionId,
+      row.fieldChoices,
+      row.fieldworkVersion === LEGACY_EXPANSION_VERSION,
+    );
+    if (row.fieldworkVersion === EXPANSION_VERSION) {
+      canonicalOnward(row.missionId, row.onwardFlow);
+      const task = FIELD_WORK[row.missionId].tasks.find((t) => t.onward);
+      if (row.fieldChoices[task.id] !== row.onwardFlow.choice) return false;
+      if (!onwardStockMatchesCart(row.missionId, row.onwardFlow, row.pactFlow))
+        return false;
+    }
     const mission = missionById(row.missionId),
       storyChoice = mission.choice?.options.find(
         (option) => option.id === row.choice,
@@ -297,7 +349,7 @@ function validWaterFlowOutcome(row, expectedMissionId = row?.missionId) {
       ? defeated.length === 0 && result.guaranteePublished
       : defeated.length === Object.keys(result.actors).length) &&
     row.fieldworkComplete === true &&
-    sameData(row.fieldChoices, {
+    sameData(baseFieldChoices(row.fieldChoices), {
       "water-bypass": "bypass-downstream",
       "water-allocation": "two-two-one",
       "water-reserve": result.reserve.choiceId,
@@ -319,7 +371,7 @@ function validSignalFlowOutcome(row, expectedMissionId = row?.missionId) {
       ? result.defeatedActors.length === 0
       : result.defeatedActors.length === 5) &&
     row.fieldworkComplete === true &&
-    sameData(row.fieldChoices, result.fieldChoices)
+    sameData(baseFieldChoices(row.fieldChoices), result.fieldChoices)
   );
 }
 
@@ -337,7 +389,7 @@ function validLedgerFlowOutcome(row, expectedMissionId = row?.missionId) {
       ? result.defeatedActors.length === 0 && result.clearance
       : result.defeatedActors.length === 5) &&
     row.fieldworkComplete === true &&
-    sameData(row.fieldChoices, result.fieldChoices)
+    sameData(baseFieldChoices(row.fieldChoices), result.fieldChoices)
   );
 }
 
@@ -355,7 +407,7 @@ function validNightFlowOutcome(row, expectedMissionId = row?.missionId) {
       ? result.defeatedActors.length === 0 && result.clearance
       : result.defeatedActors.length === 6) &&
     row.fieldworkComplete === true &&
-    sameData(row.fieldChoices, result.fieldChoices)
+    sameData(baseFieldChoices(row.fieldChoices), result.fieldChoices)
   );
 }
 
@@ -373,7 +425,7 @@ function validPactFlowOutcome(row, expectedMissionId = row?.missionId) {
       ? result.defeatedActors.length === 0 && result.clearance
       : result.defeatedActors.length === 6) &&
     row.fieldworkComplete === true &&
-    sameData(row.fieldChoices, result.fieldChoices)
+    sameData(baseFieldChoices(row.fieldChoices), result.fieldChoices)
   );
 }
 
@@ -931,6 +983,8 @@ export function completeMission(profile, run, outcome = {}) {
     })
   )
     throw new Error("補給回條與實際傷亡、交械放行或同車保管選擇不符。");
+  if (field && !onwardStockMatchesCart(mission.id, field.onward, pactFlow))
+    throw new Error("兩庫續程核帳必須與同一車的實際發出、車存及封存數量一致。");
   const fieldDelta = field?.rewardDelta || 0;
   const stats = reportStats({
     ...outcome.stats,
@@ -953,6 +1007,7 @@ export function completeMission(profile, run, outcome = {}) {
     stats,
     consequence: mission.consequence[strategy],
     choiceConsequence: choice?.consequence || null,
+    onwardFlow: field?.onward || null,
     fieldworkVersion: field?.version || null,
     fieldworkComplete: Boolean(field),
     fieldChoices: field?.choices || {},

@@ -1,13 +1,13 @@
 import * as THREE from "./vendor/three.module.js";
 import { moveCircle, makeBox } from "./physics.js";
 import { createFieldProp } from "./field-props.js";
+import { EscortRouting } from "./escort-routing.js";
 import { tetherPosition } from "./cargo-tether.js";
 import {
   FIELD_WORK,
   createFieldState,
   recordFieldStep,
   applyFieldChoice,
-  fieldWorkComplete,
 } from "./expansion-content.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -177,6 +177,9 @@ export class FieldSystem {
     this.missionId = missionId;
     this.callbacks = callbacks;
     this.state = createFieldState(missionId);
+    this.updateState = { speedMultiplier: 1, objective: "" };
+    this.updateLabelState = {};
+    this.escortRouting = new EscortRouting(world.colliders);
     this.traversal = null;
     this.active = null;
     this.cameraSnapshot = null;
@@ -214,15 +217,32 @@ export class FieldSystem {
       unload.parts["medicine-crate"] = seal.object;
       unload.anchor = seal.object;
     }
+    for (const task of this.tasks) {
+      task.stepCache = this.currentSteps(task);
+      task.wheels = [];
+      for (const part of ["left-wheel", "right-wheel"]) {
+        const id = task.cargo?.userData.dynamicParts?.[part]?.node;
+        if (id) task.wheels.push(task.cargo.getObjectByName(id));
+      }
+      for (const member of task.members) this.escortRouting.prepare(member);
+    }
     this.group.updateMatrixWorld(true);
   }
   get complete() {
-    return fieldWorkComplete(this.state);
+    for (let i = 0; i < this.tasks.length; i++)
+      if (!this.done(this.tasks[i])) return false;
+    return true;
+  }
+  get baseComplete() {
+    for (let i = 0; i < this.tasks.length; i++)
+      if (!this.tasks[i].onward && !this.done(this.tasks[i])) return false;
+    return true;
   }
   get carrying() {
-    return Boolean(
-      this.traversal?.carrying || this.tasks.some((task) => task.carrying),
-    );
+    if (this.traversal?.carrying) return true;
+    for (let i = 0; i < this.tasks.length; i++)
+      if (this.tasks[i].carrying) return true;
+    return false;
   }
   get handsOccupied() {
     return this.carrying;
@@ -233,10 +253,13 @@ export class FieldSystem {
       : [];
   }
   available(task) {
-    return (
-      this.callbacks.available?.(task) !== false &&
-      (task.dependencies || []).every((id) => this.state.completed.includes(id))
-    );
+    if (this.callbacks.available?.(task) === false) return false;
+    if (task.onward && this.onward && !this.onward.ready) return false;
+    const dependencies = task.dependencies;
+    if (dependencies)
+      for (let i = 0; i < dependencies.length; i++)
+        if (!this.state.completed.includes(dependencies[i])) return false;
+    return true;
   }
   done(task) {
     return this.state.completed.includes(task.id);
@@ -306,10 +329,17 @@ export class FieldSystem {
     context.lineWidth = 8;
     context.strokeRect(4, 4, 504, 120);
     context.fillStyle = "#293d37";
-    context.font = "bold 43px sans-serif";
+    const lines = String(text).split("\n");
+    context.font = `bold ${Math.min(43, Math.floor(106 / lines.length))}px sans-serif`;
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillText(text, 256, 64, 480);
+    for (let i = 0; i < lines.length; i++)
+      context.fillText(
+        lines[i],
+        256,
+        12 + (i + 0.5) * (104 / lines.length),
+        480,
+      );
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     this.textures.add(texture);
@@ -524,6 +554,14 @@ export class FieldSystem {
     return node;
   }
   buildTask(task) {
+    if (task.onward) {
+      task.object = new THREE.Group();
+      task.object.position.copy(position(task.position));
+      this.group.add(task.object);
+      task.marker = this.marker(task.position, 0.8, 0xe6ca86);
+      task.anchor = task.marker;
+      return;
+    }
     const object = createFieldProp(
       baseKinds[task.id],
       this.world.graphics || THREE,
@@ -929,34 +967,33 @@ export class FieldSystem {
   }
 
   taskPoint(task) {
+    const onward = this.onward;
+    if (task.onward && onward?.step?.kind === "escort" && !onward.following)
+      return onward.members[Math.floor(onward.members.length / 2)].position;
     const object = task.anchor || task.object;
-    return object.getWorldPosition(new THREE.Vector3());
+    return object.getWorldPosition((task.pointScratch ??= new THREE.Vector3()));
   }
   interactionRadius(task, fallback = 2.5) {
     return this.callbacks.interactionRadius?.(task) ?? fallback;
   }
   getNearby(playerPosition) {
-    this.playerPosition = new THREE.Vector3(
+    (this.playerPosition ??= new THREE.Vector3()).set(
       playerPosition.x,
       playerPosition.y || 0,
       playerPosition.z,
     );
-    if (
-      this.traversal &&
-      distance(this.playerPosition, this.taskPoint(this.traversal.task)) <
-        this.interactionRadius(this.traversal.task)
-    )
-      return this.traversal.task;
-    return (
-      this.tasks
-        .filter((task) => !this.done(task) && this.available(task))
-        .map((task) => ({
-          task,
-          d: distance(this.playerPosition, this.taskPoint(task)),
-        }))
-        .filter((entry) => entry.d <= this.interactionRadius(entry.task))
-        .sort((a, b) => a.d - b.d)[0]?.task || null
-    );
+    let nearest = null,
+      best = Infinity;
+    for (let i = 0; i < this.tasks.length; i++) {
+      const task = this.tasks[i];
+      if (this.done(task) || !this.available(task)) continue;
+      const gap = distance(this.playerPosition, this.taskPoint(task));
+      if (gap <= this.interactionRadius(task) && gap < best) {
+        nearest = task;
+        best = gap;
+      }
+    }
+    return nearest;
   }
   saveCamera() {
     if (this.cameraSnapshot) return;
@@ -1054,6 +1091,10 @@ export class FieldSystem {
   renderPanel(message = "") {
     const task = this.active;
     if (!task) return;
+    if (task.onward && this.onward && !this.done(task)) {
+      this.onward.render(message);
+      return;
+    }
     if (this.done(task)) {
       this.callbacks.panel?.(
         `<div class="field-work"><p class="eyebrow">現場工作完成</p><h2>${escape(task.title)}</h2><p>${escape(message || "實體操作與方案已記錄。")}</p>${this.callbacks.extraControls?.(task) || ""}${this.button("close", "返回現場")}</div>`,
@@ -1384,6 +1425,7 @@ export class FieldSystem {
   }
 
   handle(action, dataset = {}) {
+    if (this.onward?.handle(action, dataset)) return true;
     if (!String(action).startsWith("field-")) return false;
     const task = this.active || this.traversal?.task;
     if (!task && action !== "field-close") return true;
@@ -1434,6 +1476,7 @@ export class FieldSystem {
     if (!option) return;
     if (this.callbacks.beforeChoice?.(task, option) === false) return;
     task.selectedChoice = id;
+    task.stepCache = this.currentSteps(task);
     for (const step of task.physicalSteps)
       if (
         [
@@ -1522,7 +1565,11 @@ export class FieldSystem {
     );
   }
   dropZoneReady(task, step) {
-    const goal = position(step.position),
+    const goal = (this.dropScratch ??= new THREE.Vector3()).set(
+        step.position[0],
+        0,
+        step.position[1],
+      ),
       radius = step.radius ?? 1.2;
     // Opening the placement panel must guarantee that placement can succeed.
     // Route checkpoints have separate allowances for occupied workbenches.
@@ -1563,13 +1610,19 @@ export class FieldSystem {
     return this.callbacks.route?.(task, step, route) || route;
   }
   checkpointRadius(step, goal, colliders = this.world.colliders) {
-    const obstacle = colliders.find(
-      (box) =>
+    let obstacle = null;
+    for (let i = 0; i < colliders.length; i++) {
+      const box = colliders[i];
+      if (
         goal.x >= box.min.x &&
         goal.x <= box.max.x &&
         goal.z >= box.min.z &&
-        goal.z <= box.max.z,
-    );
+        goal.z <= box.max.z
+      ) {
+        obstacle = box;
+        break;
+      }
+    }
     return step.kind === "carry-route" && obstacle
       ? Math.max(1.15, Math.hypot(obstacle.w, obstacle.d) / 2 + 0.65)
       : step.radius || 1.15;
@@ -1585,9 +1638,20 @@ export class FieldSystem {
     const owner = task.cargoOwner || task;
     // A page is lifted off its own tabletop. The desk still blocks the player,
     // but its floor proxy must not trap the small object above the surface.
-    return task.cargo !== owner.object
-      ? colliders.filter((box) => box !== owner.collider)
-      : colliders;
+    if (task.cargo === owner.object || !owner.collider) return colliders;
+    const cache = (task.colliderCache ??= {
+      source: null,
+      count: 0,
+      items: [],
+    });
+    if (cache.source !== colliders || cache.count !== colliders.length) {
+      cache.source = colliders;
+      cache.count = colliders.length;
+      cache.items.length = 0;
+      for (let i = 0; i < colliders.length; i++)
+        if (colliders[i] !== owner.collider) cache.items.push(colliders[i]);
+    }
+    return cache.items;
   }
   restoreCargoCollider(task) {
     const owner = task.cargoOwner || task,
@@ -2099,11 +2163,12 @@ export class FieldSystem {
     this.close();
   }
   interactTraversal(playerPosition) {
-    this.playerPosition = new THREE.Vector3(
+    (this.playerPosition ??= new THREE.Vector3()).set(
       playerPosition.x,
       playerPosition.y || 0,
       playerPosition.z,
     );
+    if (this.onward?.interact()) return true;
     const placement = this.tasks.find((task) => task.carrying);
     if (placement && this.reopenPlacement(placement)) return true;
     if (this.traversal) {
@@ -2156,107 +2221,12 @@ export class FieldSystem {
     }
   }
   escortTarget(member, target, colliders) {
-    // Visibility paths around inflated solid boxes preserve the same body radius
-    // used by moveCircle. Authored checkpoints may lie beside an occupied desk.
-    const margin = 0.27;
-    const boxes = colliders.map((b) => ({
-      minX: b.min.x - margin,
-      maxX: b.max.x + margin,
-      minZ: b.min.z - margin,
-      maxZ: b.max.z + margin,
-    }));
-    const inside = (p, b) =>
-      p.x > b.minX && p.x < b.maxX && p.z > b.minZ && p.z < b.maxZ;
-    for (const b of boxes)
-      if (inside(target, b)) {
-        const candidates = [
-          new THREE.Vector3(b.minX - 0.02, 0, target.z),
-          new THREE.Vector3(b.maxX + 0.02, 0, target.z),
-          new THREE.Vector3(target.x, 0, b.minZ - 0.02),
-          new THREE.Vector3(target.x, 0, b.maxZ + 0.02),
-        ];
-        candidates.sort(
-          (a, c) => distance(a, member.position) - distance(c, member.position),
-        );
-        target.copy(
-          candidates.find((p) => !boxes.some((box) => inside(p, box))) ||
-            candidates[0],
-        );
-      }
-    const clear = (a, b) =>
-      !boxes.some((box) => {
-        let lo = 0,
-          hi = 1;
-        for (const [axis, min, max] of [
-          ["x", box.minX, box.maxX],
-          ["z", box.minZ, box.maxZ],
-        ]) {
-          const d = b[axis] - a[axis];
-          if (Math.abs(d) < 1e-8) {
-            if (a[axis] <= min || a[axis] >= max) return false;
-          } else {
-            let p = (min - a[axis]) / d,
-              q = (max - a[axis]) / d;
-            if (p > q) [p, q] = [q, p];
-            lo = Math.max(lo, p);
-            hi = Math.min(hi, q);
-            if (lo >= hi) return false;
-          }
-        }
-        return lo < hi;
-      });
-    if (clear(member.position, target)) {
-      member.fieldPath = null;
-      return target;
-    }
-    const key = `${target.x.toFixed(2)},${target.z.toFixed(2)}`;
-    if (!member.fieldPath || member.fieldPath.key !== key) {
-      const nodes = [member.position.clone(), target.clone()];
-      for (const box of boxes)
-        for (const x of [box.minX - 0.03, box.maxX + 0.03])
-          for (const z of [box.minZ - 0.03, box.maxZ + 0.03]) {
-            const p = new THREE.Vector3(x, 0, z);
-            if (
-              Math.abs(x) < 22.7 &&
-              Math.abs(z) < 22.7 &&
-              !boxes.some((b) => inside(p, b))
-            )
-              nodes.push(p);
-          }
-      const costs = nodes.map(() => Infinity),
-        previous = nodes.map(() => -1),
-        open = new Set([0]);
-      costs[0] = 0;
-      while (open.size) {
-        let current = -1,
-          best = Infinity;
-        for (const i of open) {
-          const score = costs[i] + distance(nodes[i], target);
-          if (score < best) {
-            best = score;
-            current = i;
-          }
-        }
-        if (current === 1 || current < 0) break;
-        open.delete(current);
-        for (let i = 1; i < nodes.length; i++) {
-          const next = costs[current] + distance(nodes[current], nodes[i]);
-          if (next + 1e-6 < costs[i] && clear(nodes[current], nodes[i])) {
-            costs[i] = next;
-            previous[i] = current;
-            open.add(i);
-          }
-        }
-      }
-      const path = [];
-      if (Number.isFinite(costs[1]))
-        for (let i = 1; i > 0; i = previous[i]) path.unshift(nodes[i]);
-      member.fieldPath = { key, path };
-    }
-    const path = member.fieldPath.path;
-    while (path.length > 1 && distance(member.position, path[0]) < 0.12)
-      path.shift();
-    return path[0] || member.position;
+    return this.escortRouting.target(
+      member,
+      target,
+      colliders,
+      this.world.collisionRevision,
+    );
   }
   constrainMovement(previous, proposed) {
     let task = null;
@@ -2288,9 +2258,18 @@ export class FieldSystem {
       ? checked
       : previous;
   }
+  applyOnwardChoice(task, choice) {
+    const result = applyFieldChoice(this.state, task.id, choice);
+    this.state = result.state;
+    return result;
+  }
   update(dt, player, colliders = this.world.colliders) {
+    const out = this.updateState;
+    out.speedMultiplier = 1;
+    out.objective = "";
     const p = player.position || player;
     (this.playerPosition ??= new THREE.Vector3()).set(p.x, p.y || 0, p.z);
+    this.onward?.update(dt);
     const traversal = this.traversal;
     if (!traversal || traversal.paused) {
       let carried = null;
@@ -2321,20 +2300,22 @@ export class FieldSystem {
         }
         carried.cargo.position.y = 0.65;
         (this.lastPlayer ??= new THREE.Vector3()).copy(this.playerPosition);
-        const next = this.currentSteps(carried).find(
-          (step) => !this.recorded(carried, step),
-        );
-        return {
-          speedMultiplier: 0.8,
-          objective:
-            next?.kind === "carry-drop-zone" &&
-            this.dropZoneReady(carried, next)
-              ? "已到接收區 · E 開啟正式交付"
-              : "貨物跟隨中 · 靠近 ⚙ 標記繼續作業 · E 暫放",
-        };
+        let next = null;
+        const steps = carried.stepCache;
+        for (let i = 0; i < steps.length; i++)
+          if (!this.recorded(carried, steps[i])) {
+            next = steps[i];
+            break;
+          }
+        out.speedMultiplier = 0.8;
+        out.objective =
+          next?.kind === "carry-drop-zone" && this.dropZoneReady(carried, next)
+            ? "已到接收區 · E 開啟正式交付"
+            : "貨物跟隨中 · 靠近 ⚙ 標記繼續作業 · E 暫放";
+        return out;
       }
       (this.lastPlayer ??= new THREE.Vector3()).copy(this.playerPosition);
-      const state = (this.updateState ??= {});
+      const state = out;
       state.speedMultiplier = 1;
       state.objective = traversal?.paused
         ? traversal.type === "escort"
@@ -2358,7 +2339,9 @@ export class FieldSystem {
     let reached = false,
       blocked = false;
     if (traversal.type === "escort") {
-      for (const [i, member] of task.members.entries()) {
+      this.escortRouting.refresh(colliders, this.world.collisionRevision);
+      for (let i = 0; i < task.members.length; i++) {
+        const member = task.members[i];
         const leash = distance(member.position, this.playerPosition);
         if (leash > 6) {
           this.world.animate(member, "idle");
@@ -2388,7 +2371,7 @@ export class FieldSystem {
       }
       reached =
         distance(this.playerPosition, goal) < 3 &&
-        task.members.every((member) => distance(member.position, goal) < 1.2);
+        this.allMembersNear(task, goal, 1.2);
       task.anchor = task.members[1].object;
     } else if (traversal.carrying) {
       const cargo = task.cargo,
@@ -2417,10 +2400,8 @@ export class FieldSystem {
         const moved = distance(before, cargo.position);
         if (moved > 0.001) {
           cargo.rotation.y = Math.atan2(dx, dz);
-          for (const part of ["left-wheel", "right-wheel"]) {
-            const id = cargo.userData.dynamicParts?.[part]?.node;
-            if (id) cargo.getObjectByName(id).rotation.x += moved / 0.39;
-          }
+          for (let i = 0; i < task.wheels.length; i++)
+            task.wheels[i].rotation.x += moved / 0.39;
         }
       }
       cargo.position.y = traversal.type === "carry" ? 0.65 : 0;
@@ -2438,7 +2419,7 @@ export class FieldSystem {
     } else
       reached =
         distance(this.playerPosition, goal) < (traversal.step.radius || 1.2) &&
-        (!["overlap"].includes(traversal.type) ||
+        (traversal.type !== "overlap" ||
           (traversal.distanceTravelled > 0.15 &&
             distance(this.playerPosition, traversal.startPosition) > 0.15));
     if (reached) {
@@ -2459,7 +2440,7 @@ export class FieldSystem {
         this.active = task;
         this.focus(task, task.anchor || task.object);
         this.renderPanel("已抵達實體路點。請完成現場的放置／開關／確認步驟。");
-        return { speedMultiplier: 1 };
+        return out;
       }
     }
     this.group.updateMatrixWorld(true);
@@ -2471,61 +2452,116 @@ export class FieldSystem {
       distance(task.cargo.position, this.playerPosition) > 1.8
         ? 0.35
         : traversal.carrying
-          ? this.state.effects.find((e) => e.effect.carrySpeedMultiplier)
-              ?.effect.carrySpeedMultiplier || 0.8
+          ? this.carrySpeed()
           : 1;
-    const remaining = Math.ceil(distance(this.playerPosition, position(next)));
-    const lagging =
-      traversal.type === "escort" &&
-      task.members.some(
-        (member) => distance(member.position, this.playerPosition) > 6,
-      );
+    const remaining = Math.ceil(Math.hypot(p.x - next[0], p.z - next[1]));
+    let lagging = false;
+    if (traversal.type === "escort")
+      for (let i = 0; i < task.members.length; i++)
+        if (distance(task.members[i].position, this.playerPosition) > 6) {
+          lagging = true;
+          break;
+        }
     const cargoGap =
       traversal.carrying && task.cargo
         ? distance(task.cargo.position, this.playerPosition)
         : 0;
-    const guidance = blocked
-      ? "貨物受阻 · 回頭繞開障礙"
-      : lagging
-        ? "家屬停等中 · 靠近落後的人"
-        : cargoGap > 2.5
-          ? "貨物落後 · 靠近貨物重新帶路"
-          : traversal.carrying && remaining <= 2
-            ? "停在光圈旁，讓貨物跟上"
-            : traversal.carrying
-              ? "貨物跟隨中 · E 放下"
-              : "沿金色光圈前進";
-    return {
-      speedMultiplier: speed,
-      objective: `${traversal.type === "escort" ? "護送三位家屬" : traversal.type === "push" ? "推車" : traversal.type === "carry" ? "搬運" : "前往"} · 路點 ${Math.min(traversal.index + 1, traversal.route.length)} / ${traversal.route.length} · ${remaining} 公尺 · ${guidance}`,
-    };
+    const gapCategory =
+      cargoGap > 2.5 ? 2 : traversal.carrying && remaining <= 2 ? 1 : 0;
+    const label = this.updateLabelState;
+    if (
+      label.id !== task.id ||
+      label.type !== traversal.type ||
+      label.index !== traversal.index ||
+      label.count !== traversal.route.length ||
+      label.remaining !== remaining ||
+      label.blocked !== blocked ||
+      label.lagging !== lagging ||
+      label.gap !== gapCategory
+    ) {
+      const guidance = blocked
+        ? "貨物受阻 · 回頭繞開障礙"
+        : lagging
+          ? "家屬停等中 · 靠近落後的人"
+          : cargoGap > 2.5
+            ? "貨物落後 · 靠近貨物重新帶路"
+            : traversal.carrying && remaining <= 2
+              ? "停在光圈旁，讓貨物跟上"
+              : traversal.carrying
+                ? "貨物跟隨中 · E 放下"
+                : "沿金色光圈前進";
+      out.objective = `${traversal.type === "escort" ? "護送三位家屬" : traversal.type === "push" ? "推車" : traversal.type === "carry" ? "搬運" : "前往"} · 路點 ${Math.min(traversal.index + 1, traversal.route.length)} / ${traversal.route.length} · ${remaining} 公尺 · ${guidance}`;
+      label.id = task.id;
+      label.type = traversal.type;
+      label.index = traversal.index;
+      label.count = traversal.route.length;
+      label.remaining = remaining;
+      label.blocked = blocked;
+      label.lagging = lagging;
+      label.gap = gapCategory;
+      label.text = out.objective;
+    } else out.objective = label.text;
+    out.speedMultiplier = speed;
+    return out;
   }
+  allMembersNear(task, goal, radius) {
+    for (let i = 0; i < task.members.length; i++)
+      if (distance(task.members[i].position, goal) >= radius) return false;
+    return true;
+  }
+  carrySpeed() {
+    for (let i = 0; i < this.state.effects.length; i++) {
+      const speed = this.state.effects[i].effect.carrySpeedMultiplier;
+      if (speed) return speed;
+    }
+    return 0.8;
+  }
+
   labels() {
-    const labels = this.tasks
-      .filter((task) => !this.done(task) && this.available(task))
-      .map((task) => {
-        const p = this.taskPoint(task);
-        return {
-          position: { x: p.x, y: p.y + 1.9, z: p.z },
-          text: `⚙ ${task.title}${task.carrying ? " · 跟隨中" : task.cargoEverPicked && !this.done(task) ? " · 已放下，E 拿起" : ""}`,
-        };
-      });
+    const labels = (this.labelBuffer ??= []),
+      pool = (this.labelPool ??= []);
+    labels.length = 0;
+    const append = (this.appendLabel ??= (x, y, z, text) => {
+      const row = (pool[labels.length] ??= { position: {} });
+      row.position.x = x;
+      row.position.y = y;
+      row.position.z = z;
+      row.text = text;
+      labels.push(row);
+    });
+    for (let i = 0; i < this.tasks.length; i++) {
+      const task = this.tasks[i];
+      if (this.done(task) || !this.available(task)) continue;
+      const p = this.taskPoint(task),
+        category = task.carrying ? 1 : task.cargoEverPicked ? 2 : 0;
+      if (task.labelCategory !== category || task.labelTitle !== task.title) {
+        task.labelCategory = category;
+        task.labelTitle = task.title;
+        task.labelText = `⚙ ${task.title}${category === 1 ? " · 跟隨中" : category === 2 ? " · 已放下，E 拿起" : ""}`;
+      }
+      append(p.x, p.y + 1.9, p.z, task.labelText);
+    }
     if (this.traversal) {
       const t = this.traversal,
         p = t.route[Math.min(t.index, t.route.length - 1)];
-      labels.push({
-        position: { x: p[0], y: 0.6, z: p[1] },
-        text: t.paused
+      if (t.labelIndex !== t.index || t.labelPaused !== t.paused) {
+        t.labelIndex = t.index;
+        t.labelPaused = t.paused;
+        t.labelText = t.paused
           ? "停等中 · E 繼續"
-          : `路點 ${t.index + 1}/${t.route.length}`,
-      });
+          : `路點 ${t.index + 1}/${t.route.length}`;
+      }
+      append(p[0], 0.6, p[1], t.labelText);
       if (t.type === "escort")
-        t.task.members.forEach((member, i) =>
-          labels.push({
-            position: { x: member.position.x, y: 2.2, z: member.position.z },
-            text: `家屬 ${i + 1}/3${distance(member.position, this.playerPosition) > 6 ? " · 等你靠近" : ""}`,
-          }),
-        );
+        for (let i = 0; i < t.task.members.length; i++) {
+          const m = t.task.members[i],
+            lagging = distance(m.position, this.playerPosition) > 6;
+          if (m.labelLagging !== lagging) {
+            m.labelLagging = lagging;
+            m.labelText = `家屬 ${i + 1}/3${lagging ? " · 等你靠近" : ""}`;
+          }
+          append(m.position.x, 2.2, m.position.z, m.labelText);
+        }
     }
     return labels;
   }

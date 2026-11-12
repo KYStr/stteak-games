@@ -1,5 +1,5 @@
 /**
- * Original procedural frontier attachments; source-only until explicitly built.
+ * Original procedural frontier attachments; procedural until explicitly built.
  * Metres, +Y up, +Z facing. No textures, external models, DOM, timers or game state.
  * The injected World owns borrowed character textures; this view owns its clones.
  */
@@ -122,27 +122,48 @@ export function createMissionProps(THREE, world, flow) {
   departureChevrons.visible = false;
   group.add(departureChevrons);
   const departureMatrix = new THREE.Matrix4();
+  const departureDisplay = { visible: false, count: 0 };
+  const departureTransforms = new Float64Array(24).fill(NaN);
   function setDepartureGuidance(chevrons = []) {
     assertLive();
-    if (
-      !Array.isArray(chevrons) ||
-      !chevrons.every((p) => p && [p.x, p.z, p.yaw].every(Number.isFinite))
-    )
-      throw new TypeError("Pass finite departure chevrons");
+    if (!Array.isArray(chevrons))
+      throw TypeError("Pass finite departure chevrons");
+    for (let i = 0; i < chevrons.length; i++) {
+      const p = chevrons[i];
+      if (
+        !p ||
+        !Number.isFinite(p.x) ||
+        !Number.isFinite(p.z) ||
+        !Number.isFinite(p.yaw)
+      )
+        throw TypeError("Pass finite departure chevrons");
+    }
+    let changed = departureDisplay.count !== Math.min(8, chevrons.length);
     departureChevrons.count = Math.min(8, chevrons.length);
     departureChevrons.visible = departureChevrons.count > 0;
     for (let i = 0; i < departureChevrons.count; i++) {
       const p = chevrons[i];
+      if (
+        departureTransforms[i * 3] !== p.x ||
+        departureTransforms[i * 3 + 1] !== p.z ||
+        departureTransforms[i * 3 + 2] !== p.yaw
+      )
+        changed = true;
+      departureTransforms[i * 3] = p.x;
+      departureTransforms[i * 3 + 1] = p.z;
+      departureTransforms[i * 3 + 2] = p.yaw;
       departureMatrix.makeRotationY(p.yaw).setPosition(p.x, 0.035, p.z);
       departureChevrons.setMatrixAt(i, departureMatrix);
     }
-    departureChevrons.instanceMatrix.needsUpdate = true;
-    if (departureChevrons.count) departureChevrons.computeBoundingSphere();
-    return {
-      visible: departureChevrons.visible,
-      count: departureChevrons.count,
-    };
+    if (changed) {
+      departureChevrons.instanceMatrix.needsUpdate = true;
+      if (departureChevrons.count) departureChevrons.computeBoundingSphere();
+    }
+    departureDisplay.visible = departureChevrons.visible;
+    departureDisplay.count = departureChevrons.count;
+    return departureDisplay;
   }
+
   const part = (size, position, color = "wood", rotation = [0, 0, 0], tag) => ({
     size,
     position,

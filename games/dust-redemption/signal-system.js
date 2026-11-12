@@ -11,7 +11,7 @@ import { tetherPosition } from "./cargo-tether.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 
@@ -447,6 +447,7 @@ export class SignalSystem {
     }
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     this.pendingFieldTask = this.field.active || this.field.traversal?.task;
     const task = this.pendingFieldTask;
     if (!task || action === "field-close") return true;
@@ -907,9 +908,23 @@ export class SignalSystem {
       length = gap(from, target),
       amount = Math.min(Math.max(0, length - 0.65), dt * 4.6);
     if (amount <= 0) return;
-    const colliders = this.world.colliders.filter(
-        (b) => b !== this.props.pouchCollider,
-      ),
+    const cache = (this.pouchCollisionCache ??= {
+      source: null,
+      count: 0,
+      items: [],
+    });
+    if (
+      cache.source !== this.world.colliders ||
+      cache.count !== this.world.colliders.length
+    ) {
+      cache.source = this.world.colliders;
+      cache.count = this.world.colliders.length;
+      cache.items.length = 0;
+      for (let i = 0; i < cache.count; i++)
+        if (this.world.colliders[i] !== this.props.pouchCollider)
+          cache.items.push(this.world.colliders[i]);
+    }
+    const colliders = cache.items,
       steps = Math.max(1, Math.ceil(amount / 0.08));
     for (let i = 0; i < steps; i++) {
       const dx = target.x - from.x,
@@ -923,10 +938,15 @@ export class SignalSystem {
         colliders,
         0.3,
         23,
+        (this.pouchMoveOut ??= {}),
       );
+      const pose = (this.pouchPose ??= [0, 0, 0]);
+      pose[0] = moved.x;
+      pose[1] = Math.max(0.55, from.y - (dt * 2) / steps);
+      pose[2] = moved.z;
       this.props.setPouchPose(
-        [moved.x, Math.max(0.55, from.y - (dt * 2) / steps), moved.z],
-        { grounded: false },
+        pose,
+        (this.pouchPoseOptions ??= { grounded: false }),
       );
     }
   }
@@ -936,8 +956,8 @@ export class SignalSystem {
       this.flow.receiver.radius,
     );
     this.requireVisible(this.props.receiver.object);
-    if (!this.field.complete || this.field.pendingEffects.length)
-      throw Error("先完成三項工作並返回現場，結清原工作效果。");
+    if (!this.field.baseComplete || this.field.pendingEffects.length)
+      throw Error("先完成第一階段工作並返回現場，結清原工作效果。");
     const kills = this.callbacks.kills?.() ?? this.status.defeatedActors.length;
     if (
       kills !== this.status.defeatedActors.length ||
@@ -1086,13 +1106,7 @@ export class SignalSystem {
     const waypoint = cache.path[0];
     if (
       !waypoint ||
-      !tacticalSegmentClear({
-        from,
-        to: waypoint,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, waypoint, colliders, 0.38)
     ) {
       if (waypoint) delete enemy.signalPath;
       this.world.animate(enemy.actor, "idle");

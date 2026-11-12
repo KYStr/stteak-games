@@ -1,4 +1,4 @@
-/** Original source-only signal attachments. Metres, +Y up, +Z forward.
+/** Original procedural signal attachments. Metres, +Y up, +Z forward.
  * No rules imports, DOM, textures, clocks, input handlers or canonical success flags.
  * Bind the existing FieldSystem contacts; controller owns proximity, events and cargo motion.
  */
@@ -740,13 +740,15 @@ export function createSignalProps(THREE, world, flow) {
       : [position?.x, position?.y, position?.z];
     if (
       xyz.length !== 3 ||
-      !xyz.every(Number.isFinite) ||
+      !Number.isFinite(xyz[0]) ||
+      !Number.isFinite(xyz[1]) ||
+      !Number.isFinite(xyz[2]) ||
       typeof grounded !== "boolean"
     )
       throw TypeError(
         "Pouch pose requires actual [x,y,z] and grounded boolean",
       );
-    pouch.position.set(...xyz);
+    pouch.position.set(xyz[0], xyz[1], xyz[2]);
     bounds(pouchBox, pouch);
     if (grounded && !colliders.has(pouchBox)) {
       colliders.add(pouchBox);

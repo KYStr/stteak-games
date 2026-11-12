@@ -10,7 +10,7 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 
@@ -464,6 +464,7 @@ export class LedgerSystem {
     }
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     this.interactionNotice = null;
     if (action === "field-close") this.activeInteraction = null;
     this.pendingFieldTask = this.field.active || this.field.traversal?.task;
@@ -635,8 +636,8 @@ export class LedgerSystem {
       actor = this.receiverActor();
     this.requireNear(point(actor.position), def.radius);
     this.requireVisible(actor.object);
-    if (!this.field.complete || this.field.pendingEffects.length)
-      throw Error("先完成三項工作並返回現場，結清原副本工作效果。");
+    if (!this.field.baseComplete || this.field.pendingEffects.length)
+      throw Error("先完成第一階段工作並返回現場，結清原副本工作效果。");
     const kills = this.callbacks.kills?.() ?? this.status.defeatedActors.length;
     if (
       kills !== this.status.defeatedActors.length ||
@@ -929,13 +930,7 @@ export class LedgerSystem {
     const waypoint = cache.path[0];
     if (
       !waypoint ||
-      !tacticalSegmentClear({
-        from,
-        to: waypoint,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, waypoint, colliders, 0.38)
     ) {
       if (waypoint) delete enemy.ledgerPath;
       this.world.animate(enemy.actor, "idle");
@@ -954,6 +949,7 @@ export class LedgerSystem {
         colliders,
         0.38,
         23,
+        (enemy.moveOut ??= {}),
       );
       from.x = p.x;
       from.z = p.z;

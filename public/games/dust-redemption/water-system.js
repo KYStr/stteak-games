@@ -10,7 +10,7 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 
@@ -327,6 +327,7 @@ export class WaterSystem {
       : "這是獨立的一桶維修備水，不占五格主供水；左向維修槽，右向公用槽。";
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     this.pendingFieldTask =
       this.field.active || this.field.traversal?.task || null;
     const task = this.pendingFieldTask;
@@ -677,8 +678,8 @@ export class WaterSystem {
       this.toast("需親自回到選定接收者旁簽收。");
       return;
     }
-    if (!this.field.complete || this.field.pendingEffects.length) {
-      this.toast("先完成三項工作並返回現場，讓備水效果結清。");
+    if (!this.field.baseComplete || this.field.pendingEffects.length) {
+      this.toast("先完成第一階段工作並返回現場，讓備水效果結清。");
       return;
     }
     this.dispatch("supply-received", {
@@ -783,13 +784,7 @@ export class WaterSystem {
     const waypoint = cache.path[0];
     if (
       !waypoint ||
-      !tacticalSegmentClear({
-        from,
-        to: waypoint,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, waypoint, colliders, 0.38)
     ) {
       if (waypoint) enemy.waterPath = null;
       this.world.animate(actor, "idle");

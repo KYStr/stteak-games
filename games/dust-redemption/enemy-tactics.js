@@ -195,6 +195,27 @@ export function tacticalSegmentClear({
   );
 }
 
+// Each ordered actor retains the options used by its per-frame segment proof.
+export function cachedTacticalSegmentClear(
+  actor,
+  from,
+  to,
+  colliders,
+  radius = 0.38,
+) {
+  const options = (actor.segmentOptions ??= {
+    from: null,
+    to: null,
+    colliders: null,
+    radius,
+    bounds: 23,
+  });
+  options.from = from;
+  options.to = to;
+  options.colliders = colliders;
+  options.radius = radius;
+  return tacticalSegmentClear(options);
+}
 export function tacticalGeometryKey(colliders, radius = 0.38, bounds = 23) {
   if (
     !Number.isFinite(radius) ||

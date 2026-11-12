@@ -7,7 +7,9 @@ test("music project and manifests reproduce the runtime composition and unchange
     new URL("../../games/dust-redemption/audio.js", import.meta.url),
     "utf8",
   );
-  const notes = JSON.parse(src.match(/const NOTES = (\[[\s\S]*?\]);/)[1]);
+  const notes = JSON.parse(
+    src.match(/const NOTES = (\[[\s\S]*?\]);/)[1].replace(/,\s*\]$/, "]"),
+  );
   const docs = [
     "../../games/dust-redemption/assets/audio/manifest.json",
     "../../assets/games/dust-redemption/audio/manifest.json",

@@ -1,5 +1,5 @@
 import { createBoundsTracker } from "./collision-bounds.js";
-/** Original source-only night attachments. Metres, +Y up, +Z forward.
+/** Original procedural night attachments. Metres, +Y up, +Z forward.
  * No WaterProps state, NPC creation, event submission or movement controller.
  */
 export function createNightProps(THREE, world, flow) {
@@ -438,23 +438,23 @@ export function createNightProps(THREE, world, flow) {
       waterLevel: (top.y + 0.105) / 0.06,
     };
   }
-  function readBrace() {
+  const braceEnd = new THREE.Vector3(),
+    braceSocket = new THREE.Vector3();
+  function readBrace(out = { endDistances: [0, 0] }) {
     alive();
     if (!bound) throw Error("Bind Field first");
     const n = bound.brace.parts.brace,
       sockets = n.userData.fieldControl.endSockets;
     n.updateWorldMatrix(true, true);
     bound.brace.object.updateWorldMatrix(true, true);
-    const endDistances = [0.65, -0.65].map((y, i) =>
-      n
-        .localToWorld(new THREE.Vector3(0, y, 0))
-        .distanceTo(bound.brace.object.localToWorld(sockets[i].clone())),
-    );
-    return {
-      angle: n.rotation.z,
-      endDistances,
-      boardHeight: bound.brace.parts["test-board"].position.y,
-    };
+    for (let i = 0; i < 2; i++) {
+      n.localToWorld(braceEnd.set(0, i === 0 ? 0.65 : -0.65, 0));
+      bound.brace.object.localToWorld(braceSocket.copy(sockets[i]));
+      out.endDistances[i] = braceEnd.distanceTo(braceSocket);
+    }
+    out.angle = n.rotation.z;
+    out.boardHeight = bound.brace.parts["test-board"].position.y;
+    return out;
   }
   function readBridgeAngle() {
     alive();

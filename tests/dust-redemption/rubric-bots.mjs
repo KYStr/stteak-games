@@ -2,6 +2,7 @@
 // as earned story progress. No clock mutation, teleport or accelerated simulation.
 import assert from "node:assert/strict";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { writeFileSync } from "node:fs";
 import { spawn, execFileSync } from "node:child_process";
 import { chromium } from "/workspace/stteak8/tools/node_modules/playwright-core/index.mjs";
 import { MISSIONS } from "../../games/dust-redemption/content.js";
@@ -14,8 +15,15 @@ import { campaignFunctions } from "./campaign.mjs";
 import { url, port, snapshot, action, mode } from "./driver.mjs";
 const evidence = process.env.DUST_EVIDENCE_DIR || "/tmp/dust-rubric-bots";
 await mkdir(evidence, { recursive: true });
-let server, browser;
+let server,
+  browser,
+  page,
+  heartbeat,
+  cleaning,
+  interrupted = false;
 const report = {
+  status: "running",
+  started: new Date().toISOString(),
   errors: [],
   failedRequests: [],
   competent: [],
@@ -23,6 +31,39 @@ const report = {
   idle: null,
   stageMetrics: [],
 };
+const persist = () =>
+  writeFileSync(
+    `${evidence}/rubric-bots.json`,
+    JSON.stringify(report, null, 2),
+  );
+async function cleanup() {
+  if (cleaning) return cleaning;
+  cleaning = (async () => {
+    clearInterval(heartbeat);
+    await browser?.close();
+    if (server && server.exitCode === null) {
+      const stopped = new Promise((r) => server.once("exit", r));
+      server.kill();
+      await stopped;
+    }
+    report.cleanup = {
+      browserClosed: !browser?.isConnected(),
+      serverExited: !server || server.exitCode !== null,
+    };
+  })();
+  return cleaning;
+}
+for (const signal of ["SIGINT", "SIGTERM"])
+  process.once(signal, async () => {
+    interrupted = true;
+    report.status = "interrupted";
+    report.signal = signal;
+    persist();
+    await cleanup();
+    persist();
+    process.exit(signal === "SIGINT" ? 130 : 143);
+  });
+persist();
 async function install(page, profile) {
   await page.goto(url + "?touch=1");
   await mode(page, "title");
@@ -96,9 +137,13 @@ try {
   }
   browser = await chromium.launch({
     executablePath: "/usr/bin/google-chrome",
-    args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+    args: [
+      "--use-angle=swiftshader",
+      "--enable-unsafe-swiftshader",
+      "--autoplay-policy=no-user-gesture-required",
+    ],
   });
-  const page = await browser.newPage({
+  page = await browser.newPage({
     viewport: { width: 1280, height: 720 },
   });
   page.setDefaultTimeout(120000);
@@ -106,6 +151,26 @@ try {
   page.on("console", (m) => {
     if (m.type() === "error") report.errors.push(m.text());
   });
+  let reading = false;
+  heartbeat = setInterval(async () => {
+    if (reading || interrupted) return;
+    reading = true;
+    try {
+      const d = await snapshot(page);
+      report.current = {
+        mission: d.mission,
+        mode: d.mode,
+        activeSeconds: d.challenge?.activeSeconds,
+      };
+      persist();
+      console.log(
+        `Bot progress ${d.mission} ${d.mode}: ${Math.round(d.challenge?.activeSeconds || 0)} sim s`,
+      );
+    } catch {
+    } finally {
+      reading = false;
+    }
+  }, 30000);
   const before = [],
     after = [];
   await install(page, createProfile());
@@ -295,17 +360,14 @@ try {
     "random clearly underperforms competent",
   );
   assert.deepEqual(report.errors, []);
+  report.status = "passed";
 } catch (e) {
+  if (!interrupted) report.status = "failed";
   report.failure = e.stack;
   process.exitCode = 1;
   console.error(e);
 } finally {
-  await browser?.close();
-  if (server) {
-    const stopped = new Promise((r) => server.once("exit", r));
-    server.kill();
-    await stopped;
-  }
+  await cleanup();
   await writeFile(
     `${evidence}/rubric-bots.json`,
     JSON.stringify(report, null, 2),

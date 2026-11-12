@@ -4,8 +4,7 @@ import {
   tacticalGeometryKey,
   tacticalSegmentClear,
 } from "./enemy-tactics.js";
-
-// Presentation only: no actor positions, mission progress or collision mutate.
+// Presentation only. No actor, mission event, or collision is changed.
 export const DEPARTURE_GUIDANCE = Object.freeze({
   radius: 0.34,
   bounds: 23,
@@ -16,71 +15,25 @@ export const DEPARTURE_GUIDANCE = Object.freeze({
   spacing: 0.75,
   maxMarkers: 8,
 });
-const point = (p) => ({ x: p.x, z: p.z });
-const finite = (p) => p && Number.isFinite(p.x) && Number.isFinite(p.z);
 const gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
-
-function nearestSegment(position, path) {
-  let nearest = { distance: Infinity, index: 0 };
-  for (let i = 1; i < path.length; i++) {
-    const a = path[i - 1],
-      b = path[i];
-    const dx = b.x - a.x,
-      dz = b.z - a.z,
-      squared = dx * dx + dz * dz;
-    const t = squared
-      ? Math.max(
-          0,
-          Math.min(
-            1,
-            ((position.x - a.x) * dx + (position.z - a.z) * dz) / squared,
-          ),
-        )
-      : 0;
-    const distance = gap(position, { x: a.x + dx * t, z: a.z + dz * t });
-    if (distance < nearest.distance) nearest = { distance, index: i };
-  }
-  return nearest;
-}
-
-function markersAlong(path) {
-  const markers = [];
-  let wanted = DEPARTURE_GUIDANCE.firstMarker,
-    travelled = 0;
-  const total = path.slice(1).reduce((n, p, i) => n + gap(path[i], p), 0);
-  for (
-    let i = 1;
-    i < path.length && markers.length < DEPARTURE_GUIDANCE.maxMarkers;
-    i++
-  ) {
-    const a = path[i - 1],
-      b = path[i],
-      length = gap(a, b);
-    if (length < 1e-6) continue;
-    while (
-      wanted <= travelled + length &&
-      wanted <= total - 0.08 &&
-      markers.length < DEPARTURE_GUIDANCE.maxMarkers
-    ) {
-      const t = (wanted - travelled) / length;
-      markers.push({
-        x: a.x + (b.x - a.x) * t,
-        z: a.z + (b.z - a.z) * t,
-        yaw: Math.atan2(b.x - a.x, b.z - a.z),
-      });
-      wanted += DEPARTURE_GUIDANCE.spacing;
-    }
-    travelled += length;
-  }
-  return markers;
-}
-
-/** Inject the runtime's real moveCircle; source and packaged modules share it. */
+const finite = (p) => p && Number.isFinite(p.x) && Number.isFinite(p.z);
 export function createDepartureGuidance({ moveCircle } = {}) {
   if (typeof moveCircle !== "function")
-    throw new TypeError("Pass the real moveCircle");
+    throw TypeError("Pass the real moveCircle");
   let cache = null,
     revision = 0;
+  const options = {
+    from: { x: 0, z: 0 },
+    to: { x: 0, z: 0 },
+    colliders: null,
+    radius: 0.34,
+    bounds: 23,
+    maxDistance: 64,
+  };
+  const headOptions = { ...options, from: options.from, to: { x: 0, z: 0 } };
+  const walker = { x: 0, z: 0 },
+    moved = {},
+    nearest = { distance: Infinity, index: 0 };
   const hiddenState = {
     visible: false,
     reason: "disabled",
@@ -88,15 +41,77 @@ export function createDepartureGuidance({ moveCircle } = {}) {
     path: [],
     revision: 0,
   };
-  const hidden = (reason) => {
+  const state = {
+      visible: false,
+      reason: "route",
+      chevrons: [],
+      path: [],
+      revision: 0,
+    },
+    points = [],
+    markers = [];
+  for (let i = 0; i < 32; i++) points.push({ x: 0, z: 0 });
+  for (let i = 0; i < 8; i++) markers.push({ x: 0, z: 0, yaw: 0 });
+  function reset() {
+    cache = null;
+  }
+  function hidden(reason) {
     hiddenState.reason = reason;
     hiddenState.revision = revision;
     return hiddenState;
-  };
-  const reset = () => {
-    cache = null;
-  };
-  function update({ enabled = false, position, target, colliders } = {}) {
+  }
+  function nearestSegment(position, path) {
+    nearest.distance = Infinity;
+    nearest.index = 0;
+    for (let i = 1; i < path.length; i++) {
+      const a = path[i - 1],
+        b = path[i],
+        dx = b.x - a.x,
+        dz = b.z - a.z,
+        squared = dx * dx + dz * dz;
+      const t = squared
+        ? Math.max(
+            0,
+            Math.min(
+              1,
+              ((position.x - a.x) * dx + (position.z - a.z) * dz) / squared,
+            ),
+          )
+        : 0;
+      const distance = Math.hypot(
+        position.x - a.x - dx * t,
+        position.z - a.z - dz * t,
+      );
+      if (distance < nearest.distance) {
+        nearest.distance = distance;
+        nearest.index = i;
+      }
+    }
+  }
+  function clearHead(position, to, colliders) {
+    headOptions.from.x = position.x;
+    headOptions.from.z = position.z;
+    headOptions.to.x = to.x;
+    headOptions.to.z = to.z;
+    headOptions.colliders = colliders;
+    if (!tacticalSegmentClear(headOptions)) return false;
+    const dx = to.x - position.x,
+      dz = to.z - position.z,
+      count = Math.max(1, Math.ceil(Math.hypot(dx, dz) / 0.1));
+    walker.x = position.x;
+    walker.z = position.z;
+    for (let i = 0; i < count; i++) {
+      const x = walker.x + dx / count,
+        z = walker.z + dz / count;
+      moveCircle(walker, dx / count, dz / count, colliders, 0.34, 23, moved);
+      if (Math.hypot(moved.x - x, moved.z - z) > 1e-5) return false;
+      walker.x = moved.x;
+      walker.z = moved.z;
+    }
+    return true;
+  }
+  function update(input) {
+    const { enabled = false, position, target, colliders } = input || {};
     if (!enabled) {
       reset();
       return hidden("disabled");
@@ -105,30 +120,22 @@ export function createDepartureGuidance({ moveCircle } = {}) {
       reset();
       return hidden("invalid-input");
     }
-    const options = {
-      from: point(position),
-      to: point(target),
-      colliders,
-      radius: DEPARTURE_GUIDANCE.radius,
-      bounds: DEPARTURE_GUIDANCE.bounds,
-      maxDistance: DEPARTURE_GUIDANCE.maxDistance,
-    };
+    options.from.x = position.x;
+    options.from.z = position.z;
+    options.to.x = target.x;
+    options.to.z = target.z;
+    options.colliders = colliders;
     let geometry;
     try {
-      geometry = tacticalGeometryKey(colliders, options.radius, options.bounds);
+      geometry = tacticalGeometryKey(colliders, 0.34, 23);
     } catch {
       reset();
       return hidden("invalid-input");
     }
-    if (
-      gap(position, target) <= DEPARTURE_GUIDANCE.arrivalDistance &&
-      tacticalSegmentClear(options)
-    ) {
+    if (gap(position, target) <= 0.65 && tacticalSegmentClear(options)) {
       reset();
       return hidden("arrived");
     }
-    // A stationary player at an impossible route must not rebuild a visibility
-    // graph every frame. Moving again or changing any collider retries it.
     if (
       cache?.failedFrom &&
       cache.geometry === geometry &&
@@ -136,47 +143,29 @@ export function createDepartureGuidance({ moveCircle } = {}) {
       gap(cache.failedFrom, position) <= 0.1
     )
       return hidden("no-path");
-    let nearest = cache && nearestSegment(position, cache.path);
-    let remaining = nearest ? cache.path.slice(nearest.index) : [];
-    while (remaining.length && gap(position, remaining[0]) < 1e-6)
-      remaining.shift();
-    const length = remaining.reduce(
-      (total, p, i) => total + gap(i ? remaining[i - 1] : position, p),
-      0,
-    );
+    if (cache) nearestSegment(position, cache.path);
+    let index = cache ? nearest.index : 0;
+    while (
+      cache &&
+      index < cache.path.length &&
+      gap(position, cache.path[index]) < 1e-6
+    )
+      index++;
+    let remaining = 0;
+    if (cache)
+      for (let i = index; i < cache.path.length; i++)
+        remaining += gap(
+          i === index ? position : cache.path[i - 1],
+          cache.path[i],
+        );
     let replan =
       !cache ||
       cache.geometry !== geometry ||
       gap(cache.target, target) > 1e-6 ||
-      nearest.distance > DEPARTURE_GUIDANCE.deviationDistance ||
-      !remaining.length ||
-      length > options.maxDistance;
-    if (!replan) {
-      // Deviation changes this one segment even when the collider geometry is
-      // unchanged. A clear chord alone does not prove x-then-z movement around
-      // a box corner. Retain the already certified tail; certify only the head.
-      const head = cache.head;
-      if (
-        !head ||
-        gap(head.from, position) > 1e-9 ||
-        gap(head.to, remaining[0]) > 1e-9
-      ) {
-        const proof = certifyTacticalPath(
-          [point(position), remaining[0]],
-          {
-            ...options,
-            to: remaining[0],
-          },
-          moveCircle,
-        );
-        cache.head = {
-          from: point(position),
-          to: point(remaining[0]),
-          ok: proof.ok,
-        };
-      }
-      replan = !cache.head.ok;
-    }
+      nearest.distance > 0.45 ||
+      index >= cache.path.length ||
+      remaining > 64;
+    if (!replan) replan = !clearHead(position, cache.path[index], colliders);
     if (replan) {
       revision++;
       const proof = certifyTacticalPath(
@@ -186,25 +175,54 @@ export function createDepartureGuidance({ moveCircle } = {}) {
       );
       cache = {
         geometry,
-        target: point(target),
+        target: { x: target.x, z: target.z },
         path: proof.ok ? proof.path : [],
-        failedFrom: proof.ok ? null : point(position),
-        head: proof.ok
-          ? { from: point(position), to: point(proof.path[1]), ok: true }
-          : null,
+        failedFrom: proof.ok ? null : { x: position.x, z: position.z },
       };
       if (!proof.ok) return hidden("no-path");
-      remaining = cache.path.slice(1);
+      index = 1;
+      // Capacity grows only on a newly planned route, never ordinary stepping.
+      while (points.length < cache.path.length + 1) points.push({ x: 0, z: 0 });
     }
-    const path = [point(position), ...remaining.map(point)];
-    const chevrons = markersAlong(path);
-    return {
-      visible: chevrons.length > 0,
-      reason: "route",
-      chevrons,
-      path,
-      revision,
-    };
+    state.path.length = 0;
+    points[0].x = position.x;
+    points[0].z = position.z;
+    state.path.push(points[0]);
+    for (let i = index; i < cache.path.length; i++) {
+      const p = points[state.path.length];
+      p.x = cache.path[i].x;
+      p.z = cache.path[i].z;
+      state.path.push(p);
+    }
+    let total = 0;
+    for (let i = 1; i < state.path.length; i++)
+      total += gap(state.path[i - 1], state.path[i]);
+    let wanted = 0.55,
+      travelled = 0;
+    state.chevrons.length = 0;
+    for (let i = 1; i < state.path.length && state.chevrons.length < 8; i++) {
+      const a = state.path[i - 1],
+        b = state.path[i],
+        length = gap(a, b);
+      if (length < 1e-6) continue;
+      while (
+        wanted <= travelled + length &&
+        wanted <= total - 0.08 &&
+        state.chevrons.length < 8
+      ) {
+        const t = (wanted - travelled) / length,
+          p = markers[state.chevrons.length];
+        p.x = a.x + (b.x - a.x) * t;
+        p.z = a.z + (b.z - a.z) * t;
+        p.yaw = Math.atan2(b.x - a.x, b.z - a.z);
+        state.chevrons.push(p);
+        wanted += 0.75;
+      }
+      travelled += length;
+    }
+    state.visible = state.chevrons.length > 0;
+    state.revision = revision;
+    return state;
   }
   return { update, reset };
 }

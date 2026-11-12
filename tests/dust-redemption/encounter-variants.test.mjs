@@ -87,3 +87,19 @@ test("seed survives recovery and retry; comparable bests persist without duplica
   assert.ok(validateProfile(p));
   assert.deepEqual(normalizeProfile(p).challenges, p.challenges);
 });
+
+test("expanded and legacy fieldwork never share an action-time record key", () => {
+  const row = {
+    seed: 17,
+    encounterProfile: "rapid-relief",
+    difficulty: "standard",
+    stats: { assisted: true, slowAim: false },
+  };
+  const old = challengeKey(row);
+  assert.equal(old, "17:rapid-relief:standard:assist:normal");
+  assert.notEqual(
+    challengeKey({ ...row, fieldworkVersion: "fieldwork-authoring-1" }),
+    challengeKey({ ...row, fieldworkVersion: "fieldwork-onward-2" }),
+  );
+  assert.equal(challengeKey(row), old, "legacy keys remain readable unchanged");
+});

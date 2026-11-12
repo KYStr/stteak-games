@@ -11,7 +11,7 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 const vectorCache = new WeakMap();
@@ -128,7 +128,7 @@ export class PactSystem {
       "cargoColliders",
       (old) => (task, colliders) =>
         task === this.cart
-          ? old(task, colliders).filter((b) => b !== this.cart.collider)
+          ? this.withoutCart(old(task, colliders))
           : old(task, colliders),
     );
     wrap("moveSafe", (old) => (object, dx, dz, colliders, radius) => {
@@ -138,7 +138,7 @@ export class PactSystem {
         dx,
         dz,
         Math.atan2(dx, dz),
-        colliders.filter((b) => b !== this.cart.collider),
+        this.withoutCart(colliders),
       );
     });
     wrap("removeCargoCollider", (old) => (task) => {
@@ -401,9 +401,23 @@ export class PactSystem {
     }
     return "";
   }
+  withoutCart(colliders) {
+    const cache = (this.cartCollisionCache ??= {
+      source: null,
+      count: 0,
+      items: [],
+    });
+    if (cache.source !== colliders || cache.count !== colliders.length) {
+      cache.source = colliders;
+      cache.count = colliders.length;
+      cache.items.length = 0;
+      for (let i = 0; i < colliders.length; i++)
+        if (colliders[i] !== this.cart.collider) cache.items.push(colliders[i]);
+    }
+    return cache.items;
+  }
   syncFeed() {
-    this.props.update();
-    const s = this.props.readFeedSnapshot();
+    const s = this.props.readFeedSnapshot((this.feedStatus ??= {}));
     if (
       !this.status.feedCut &&
       !s.militaryPowered &&
@@ -412,7 +426,7 @@ export class PactSystem {
       this.near(this.flow.feed.position)
     )
       this.dispatch("feed-confirmed", {
-        feedSnapshot: s,
+        feedSnapshot: { ...s },
         playerPosition: point(this.player.position),
       });
   }
@@ -434,6 +448,7 @@ export class PactSystem {
     });
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     this.interactionNotice = null;
     this.pendingFieldTask = this.field.active || this.field.traversal?.task;
     const task = this.pendingFieldTask;
@@ -664,7 +679,9 @@ export class PactSystem {
   handoff() {
     this.requireDesk();
     if (!this.field.complete || this.field.pendingEffects.length)
-      throw Error("三項工作須實際完成並返回現場結清，才能盤點與領地契。");
+      throw Error(
+        "先完成第一階段與兩庫實體授權核帳，返回現場結清後才能領地契。",
+      );
     const kills = this.callbacks.kills?.();
     if (
       !Number.isInteger(kills) ||
@@ -796,7 +813,7 @@ export class PactSystem {
       return true;
     }
     if (
-      !["resupply", "withdraw"].includes(a.order) ||
+      (a.order !== "resupply" && a.order !== "withdraw") ||
       this.callbacks.secured?.() ||
       enemy.engaged ||
       enemy.suppressed > 0
@@ -860,13 +877,7 @@ export class PactSystem {
     const next = cache.path[0];
     if (
       !next ||
-      !tacticalSegmentClear({
-        from,
-        to: next,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, next, colliders, 0.38)
     ) {
       this.world.animate(enemy.actor, "idle");
       return;
@@ -884,6 +895,7 @@ export class PactSystem {
         colliders,
         0.38,
         23,
+        (enemy.moveOut ??= {}),
       );
       from.x = p.x;
       from.z = p.z;

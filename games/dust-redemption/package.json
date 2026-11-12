@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test ../../tests/games/dust-redemption/*.test.js",
+    "test": "node --test ../../tests/games/dust-redemption/*.test.js ../../tests/dust-redemption/*.test.mjs",
     "acceptance": "node ../../tests/dust-redemption/acceptance.mjs"
   },
   "dependencies": {

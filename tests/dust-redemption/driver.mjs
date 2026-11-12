@@ -1,3 +1,4 @@
+import { ProgressClock } from "./progress-clock.mjs";
 import assert from "node:assert/strict";
 import { planTacticalPath } from "../../games/dust-redemption/enemy-tactics.js";
 export const port = Number(process.env.DUST_PORT ?? 8102);
@@ -7,6 +8,73 @@ assert.ok(
 );
 export const url = `http://127.0.0.1:${port}/games/dust-redemption/`;
 export const snapshot = (p) => p.evaluate(() => dustDiagnostics());
+export function trailingFollowers(d, target) {
+  const members = d.field.onward?.following
+    ? d.field.onward.members
+    : d.field.traversal?.type === "escort"
+      ? d.nightFlow?.party.members
+      : null;
+  if (!members) return false;
+  const remaining = Math.hypot(d.player.x - target.x, d.player.z - target.z);
+  return members.some(
+    (m) =>
+      Math.hypot(m.position[0] - d.player.x, m.position[1] - d.player.z) > 4 &&
+      Math.hypot(m.position[0] - target.x, m.position[1] - target.z) >
+        remaining + 0.1,
+  );
+}
+export async function waitForProgress(page, predicate, options = {}) {
+  const initial = await snapshot(page),
+    mission = initial.mission;
+  const clock = new ProgressClock({
+    ...options,
+    stallEligible:
+      options.stallEligible ||
+      (options.escort
+        ? (d) =>
+            d.nightFlow.party.members.every(
+              (m) =>
+                Math.hypot(
+                  m.position[0] - d.player.x,
+                  m.position[1] - d.player.z,
+                ) <= 6,
+            )
+        : undefined),
+    valid(d) {
+      assert.equal(d.mission, mission, `${options.label}: wrong mission`);
+      assert.ok(
+        ["playing", "field"].includes(d.mode),
+        `${options.label}: unexpected modal ${d.mode}`,
+      );
+      if (options.escort) {
+        const members = d.nightFlow?.party.members;
+        assert.equal(
+          members?.length,
+          3,
+          `${options.label}: missing family member`,
+        );
+        assert.deepEqual(
+          members.map((m) => m.id).sort(),
+          initial.nightFlow.party.members.map((m) => m.id).sort(),
+        );
+      }
+      options.valid?.(d);
+    },
+  });
+  let lastLog = Date.now();
+  while (true) {
+    const d = await snapshot(page);
+    clock.observe(d);
+    if (predicate(d)) return d;
+    if (Date.now() - lastLog >= 30000) {
+      console.log(
+        `${options.label}: ${Math.round(clock.lastSim - clock.startSim)} simulated seconds progressed`,
+      );
+      lastLog = Date.now();
+    }
+    await page.waitForTimeout(500);
+  }
+}
 export async function click(p, selector) {
   const target = p.locator(selector).filter({ visible: true }).first();
   await target.waitFor({ state: "visible" });
@@ -69,7 +137,7 @@ function reachedSheet(d, target) {
     d.nightFlow.party.members.every((m) => m.state === "safe")
   );
 }
-export async function walk(p, target, radius = 1.6) {
+export async function walk(p, target, radius = 1.6, replans = 0) {
   let d = await snapshot(p);
   const from = d.player;
   // The attached cart moves with input. Keep its real collider in the game;
@@ -85,9 +153,8 @@ export async function walk(p, target, radius = 1.6) {
       z: target.z + Math.sin((i * Math.PI) / 12) * radius,
     })),
   ];
-  let path = null,
-    pathLength = Infinity;
-  for (const bodyRadius of [d.player.handsOccupied ? 0.8 : 0.35, 0.45, 0.35]) {
+  let path = null;
+  for (const bodyRadius of [d.player.handsOccupied ? 0.8 : 0.45, 0.4, 0.34]) {
     for (const to of candidates) {
       const candidate = planTacticalPath({
         from,
@@ -98,17 +165,11 @@ export async function walk(p, target, radius = 1.6) {
         maxDistance: 120,
       });
       if (candidate) {
-        const length = candidate
-          .slice(1)
-          .reduce(
-            (sum, v, i) =>
-              sum + Math.hypot(v.x - candidate[i].x, v.z - candidate[i].z),
-            0,
-          );
-        if (length < pathLength) {
-          path = candidate;
-          pathLength = length;
-        }
+        // Prefer the exact target, then the first reachable point inside the
+        // requested tolerance. Re-solving every candidate for a global minimum
+        // blocks the Node driver under shared CPU load without improving proof.
+        path = candidate;
+        break;
       }
     }
     if (path) break;
@@ -124,23 +185,29 @@ export async function walk(p, target, radius = 1.6) {
     await p.mouse.move(cx, cy);
     await p.mouse.down();
     try {
+      let previous = path[0];
       for (const waypoint of path.slice(1)) {
+        let lastMoveX = d.player.x,
+          lastMoveZ = d.player.z,
+          lastMoveSim = d.challenge.activeSeconds;
+
+        const clock = new ProgressClock({
+          label: "analog movement",
+          simulationBudget:
+            Math.hypot(waypoint.x - d.player.x, waypoint.z - d.player.z) / 2.4 +
+            30,
+        });
         for (let tries = 0; ; tries++) {
           d = await snapshot(p);
           if (reachedSheet(d, target)) return;
           assert.equal(d.mode, "playing");
           if (d.player.hp < 45 && d.stats.itemsUsed === 0)
             await p.keyboard.press("KeyF");
-          if (
-            d.field.traversal?.type === "escort" &&
-            d.nightFlow?.party.members.some(
-              (m) =>
-                Math.hypot(
-                  m.position[0] - d.player.x,
-                  m.position[1] - d.player.z,
-                ) > 4,
-            )
-          ) {
+          if (trailingFollowers(d, waypoint)) {
+            clock.observe(d);
+            lastMoveSim = d.challenge.activeSeconds;
+            lastMoveX = d.player.x;
+            lastMoveZ = d.player.z;
             await p.mouse.move(cx, cy);
             await p.waitForTimeout(180);
             continue;
@@ -148,22 +215,56 @@ export async function walk(p, target, radius = 1.6) {
           const dx = waypoint.x - d.player.x,
             dz = waypoint.z - d.player.z,
             gap = Math.hypot(dx, dz);
-          if (gap < 0.12) break;
-          assert.ok(
-            tries < 160,
-            `Analog movement stuck ${JSON.stringify(d.player)} heading ${JSON.stringify(waypoint)}`,
-          );
+          if (gap < 0.06) break;
+          clock.observe(d);
+          if (
+            Math.hypot(d.player.x - lastMoveX, d.player.z - lastMoveZ) > 0.025
+          ) {
+            lastMoveX = d.player.x;
+            lastMoveZ = d.player.z;
+            lastMoveSim = d.challenge.activeSeconds;
+          } else if (d.challenge.activeSeconds - lastMoveSim > 2) {
+            assert.ok(
+              replans < 2,
+              `Native movement stalled after replanning: ${JSON.stringify({ player: d.player, waypoint, target, colliders: d.colliders })}`,
+            );
+            // Release and re-acquire the real stick, briefly retrace the last
+            // certified segment, then plan again from current collision bounds.
+            await p.mouse.up();
+            await p.mouse.move(cx, cy);
+            await p.mouse.down();
+            const rx = previous.x - d.player.x,
+              rz = previous.z - d.player.z,
+              len = Math.hypot(rx, rz),
+              angle = Math.PI / 4 + (d.camera * Math.PI) / 2;
+            if (len > 0.05) {
+              await p.mouse.move(
+                cx +
+                  ((rx * Math.cos(angle) - rz * Math.sin(angle)) / len) *
+                    r *
+                    0.4,
+                cy +
+                  ((rx * Math.sin(angle) + rz * Math.cos(angle)) / len) *
+                    r *
+                    0.4,
+              );
+              await p.waitForTimeout(500);
+            }
+            await p.mouse.up();
+            return walk(p, target, radius, replans + 1);
+          }
           const a = Math.PI / 4 + (d.camera * Math.PI) / 2;
           const pressure = Math.min(
             d.field.traversal?.type === "push" ? 0.4 : 1,
-            Math.max(0.1, gap / 0.9),
+            Math.max(0.15, gap / 0.9),
           );
           await p.mouse.move(
             cx + ((dx * Math.cos(a) - dz * Math.sin(a)) / gap) * r * pressure,
             cy + ((dx * Math.sin(a) + dz * Math.cos(a)) / gap) * r * pressure,
           );
-          await p.waitForTimeout(Math.max(50, Math.min(220, (gap / 5) * 850)));
+          await p.waitForTimeout(Math.max(50, Math.min(120, (gap / 5) * 700)));
         }
+        previous = waypoint;
       }
     } finally {
       await p.mouse.up();
@@ -183,20 +284,28 @@ export async function walk(p, target, radius = 1.6) {
   }
   for (const waypoint of route) {
     let tries = 0;
+    const clock = new ProgressClock({
+      label: "keyboard movement",
+      simulationBudget:
+        Math.hypot(waypoint.x - d.player.x, waypoint.z - d.player.z) / 2.4 + 30,
+    });
     while (true) {
       d = await snapshot(p);
       if (reachedSheet(d, target)) return;
       assert.equal(d.mode, "playing", `Walking interrupted: ${d.mode}`);
       if (d.player.hp < 45 && d.stats.itemsUsed === 0)
         await p.keyboard.press("KeyF");
+      if (trailingFollowers(d, waypoint)) {
+        clock.observe(d);
+        await p.waitForTimeout(500);
+        continue;
+      }
       const dx = waypoint.x - d.player.x,
         dz = waypoint.z - d.player.z,
         gap = Math.hypot(dx, dz);
       if (gap < 0.26 || (tries > 12 && gap < 0.6)) break;
-      assert.ok(
-        ++tries < 180,
-        `Movement stuck at ${JSON.stringify(d.player)} heading ${JSON.stringify(waypoint)}`,
-      );
+      tries++;
+      clock.observe(d);
       const a = Math.PI / 4 + (d.camera * Math.PI) / 2,
         x = dx * Math.cos(a) - dz * Math.sin(a),
         z = dx * Math.sin(a) + dz * Math.cos(a),

@@ -2,7 +2,11 @@ import * as THREE from "./vendor/three.module.js";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
 import { clone } from "./vendor/SkeletonUtils.js";
 import { firstHit, makeBox } from "./physics.js";
-import { BuildingBatches, TracerBatch } from "./render-batches.js";
+import {
+  BuildingBatches,
+  TracerBatch,
+  FrameMeshSet,
+} from "./render-batches.js";
 
 const palettes = {
   station: { ground: 0xc19b68, sky: 0xcfb78e, rock: 0xb47950 },
@@ -75,7 +79,7 @@ export class World {
     this.traceResult = {};
     this.proxyResult = {};
     this.fadeHits = [];
-    this.fadedMeshes = new Set();
+    this.fadedMeshes = new FrameMeshSet();
     this.collisionRecords = new WeakMap();
     this.colliderState = new WeakMap();
     this.lastColliderArray = null;
@@ -196,9 +200,9 @@ export class World {
     this.camera.updateProjectionMatrix();
     this.orient();
   }
-  invalidate() {
+  invalidate(occlusion = false) {
     this.dirty = true;
-    this.occlusionKey = null;
+    if (occlusion) this.occlusionKey = null;
   }
   resizeBuffer(
     w = this.renderer.domElement.clientWidth,
@@ -247,10 +251,11 @@ export class World {
     if (value) this.camera.layers.disable(1);
     else this.camera.layers.enable(1);
     this.inspection = value;
+    this.occlusionKey = null;
     this.resizeBuffer();
   }
   orient() {
-    this.invalidate();
+    this.invalidate(true);
     const a = Math.PI / 4 + (this.cameraIndex * Math.PI) / 2;
     this.camera.position.set(Math.sin(a) * 42, 48, Math.cos(a) * 42);
     this.camera.lookAt(0, 0, 0);
@@ -335,7 +340,7 @@ export class World {
     for (const texture of maps) texture.dispose();
   }
   clear() {
-    this.invalidate();
+    this.invalidate(true);
     this.shadowTransforms.length = 0;
     this.textureEstimate = null;
     // Helpers own and detach their GPU resources before the generic scene sweep.
@@ -1194,6 +1199,8 @@ export class World {
       };
     }
     return {
+      effects: this.effects.length,
+      persistentGeometries: r.memory.geometries - (this.tracerBatch ? 1 : 0),
       drawCalls: r.render.calls,
       textureBytesEstimate: this.textureEstimate.bytes,
       visibleInstances,

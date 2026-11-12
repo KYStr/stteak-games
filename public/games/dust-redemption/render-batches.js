@@ -1,6 +1,23 @@
 const depthOrder = (a, b) => b.depth - a.depth || a.sequence - b.sequence;
 const buildingDepthOrder = (a, b) =>
   b.depth - a.depth || a.source.id - b.source.id;
+// Current-frame membership without allocating a fresh Set backing table on clear.
+export class FrameMeshSet {
+  constructor() {
+    this.marks = new WeakMap();
+    this.generation = 0;
+  }
+  clear() {
+    this.generation++;
+  }
+  add(mesh) {
+    this.marks.set(mesh, this.generation);
+    return this;
+  }
+  has(mesh) {
+    return this.marks.get(mesh) === this.generation;
+  }
+}
 /** Render-only batching. Original scene meshes remain the collision/fade authority. */
 export class BuildingBatches {
   constructor(THREE, buildings, parent) {
@@ -114,33 +131,57 @@ export class BuildingBatches {
     // Allocate colour once; subsequent frames only update existing storage.
     mesh.setColorAt(0, new T.Color(0xffffff));
     mesh.instanceColor.setUsage(T.DynamicDrawUsage);
-    const bucket = { mesh, inverse, members: [], sourceOrder: [], key: null };
+    const bucket = {
+      mesh,
+      inverse,
+      members: [],
+      count: 0,
+      sourceOrder: [],
+      orderCount: 0,
+      key: null,
+    };
     this.buckets.push(bucket);
     return bucket;
   }
   sync(hits, camera) {
     if (this.disposed) throw new Error("Building batch has been disposed");
-    for (const bucket of this.buckets) bucket.members.length = 0;
+    for (let i = 0; i < this.buckets.length; i++) this.buckets[i].count = 0;
     camera.updateMatrixWorld();
-    for (const record of this.records) {
+    for (let i = 0; i < this.records.length; i++) {
+      const record = this.records[i];
       if (hits.has(record.source)) {
         record.depth = this.projected.copy(record.center).project(camera).z;
-        this.faded[record.buildingIndex].members.push(record);
-      } else this.opaque.members.push(record);
+        const bucket = this.faded[record.buildingIndex];
+        bucket.members[bucket.count++] = record;
+      } else this.opaque.members[this.opaque.count++] = record;
     }
-    for (const bucket of this.faded) bucket.members.sort(buildingDepthOrder);
-    for (const bucket of this.buckets) {
+    for (let i = 0; i < this.faded.length; i++) {
+      const bucket = this.faded[i];
+      // Sort the active prefix without trimming/refilling its backing store.
+      for (let j = 1; j < bucket.count; j++) {
+        const record = bucket.members[j];
+        let k = j - 1;
+        while (k >= 0 && buildingDepthOrder(bucket.members[k], record) > 0) {
+          bucket.members[k + 1] = bucket.members[k];
+          k--;
+        }
+        bucket.members[k + 1] = record;
+      }
+    }
+    for (let i = 0; i < this.buckets.length; i++) {
+      const bucket = this.buckets[i];
       const order = (bucket.sourceOrder ??= []);
-      let changed = order.length !== bucket.members.length;
-      for (let i = 0; i < bucket.members.length && !changed; i++)
+      let changed = bucket.orderCount !== bucket.count;
+      for (let i = 0; i < bucket.count && !changed; i++)
         if (order[i] !== bucket.members[i].source) changed = true;
       if (!changed) continue;
-      order.length = bucket.members.length;
-      for (let i = 0; i < order.length; i++)
+      bucket.orderCount = bucket.count;
+      for (let i = 0; i < bucket.count; i++)
         order[i] = bucket.members[i].source;
-      bucket.mesh.count = bucket.members.length;
-      bucket.mesh.visible = bucket.members.length > 0;
-      for (const [index, record] of bucket.members.entries()) {
+      bucket.mesh.count = bucket.count;
+      bucket.mesh.visible = bucket.count > 0;
+      for (let index = 0; index < bucket.count; index++) {
+        const record = bucket.members[index];
         this.localMatrix.multiplyMatrices(bucket.inverse, record.worldMatrix);
         bucket.mesh.setMatrixAt(index, this.localMatrix);
         bucket.mesh.setColorAt(index, record.color);
@@ -287,7 +328,8 @@ export class TracerBatch {
       ordered.sort(depthOrder);
     }
     this.bounds.makeEmpty();
-    for (const [index, effect] of ordered.entries()) {
+    for (let index = 0; index < ordered.length; index++) {
+      const effect = ordered[index];
       p.array.set(effect.a, index * 6);
       p.array.set(effect.b, index * 6 + 3);
       const offset = index * 8;
