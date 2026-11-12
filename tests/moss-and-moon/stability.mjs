@@ -1,3 +1,5 @@
+import {installGeometryTracker,residencyDelta} from './geometry-tracker.mjs';
+import {activate,settledTravel} from './interactions.mjs';
 import { chromium } from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
 import assert from 'node:assert/strict';
 import { mkdir, writeFile, access } from 'node:fs/promises';
@@ -45,6 +47,7 @@ try {
   page.on('console',m=>{if(m.type()==='error') errors.push(m.text());});
   page.on('requestfailed',r=>failed.push(r.url()+': '+r.failure()?.errorText));
   page.on('response',r=>{if(r.status()>=400) failed.push(r.status()+' '+r.url());});
+  await installGeometryTracker(page);
   await page.goto(base);
   await page.locator('#start').click();
   await page.keyboard.press('Escape');
@@ -62,7 +65,10 @@ try {
         for(const attribute of element.attributes) void attribute.value;
     });
     await cdp.send('HeapProfiler.collectGarbage');
-    return {heap:await cdp.send('Runtime.getHeapUsage'),dom:await cdp.send('Memory.getDOMCounters'),
+    const residency=await page.evaluate(()=>window.__geometryTracker.snapshot());
+    const world=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world);
+    assert.equal(residency.length,world.geometries,"tracker matches Three r180 registration count");
+    return {residency,heap:await cdp.send('Runtime.getHeapUsage'),dom:await cdp.send('Memory.getDOMCounters'),
       runtime:await page.evaluate(()=>({diagnostics:window.mossDiagnostics(),pendingFrames:window.__pendingFrames(),
         liveNodes:document.querySelectorAll('*').length, html:document.documentElement.outerHTML}))};
   };
@@ -83,30 +89,60 @@ try {
     return results;
   };
   const canonicalGarden = async () => {
+    await settledTravel(page,'garden');
     for(let i=0;i<4;i++) {
-      if((await page.evaluate(()=>window.mossDiagnostics())).world.cameraTurn===0) break;
+      if((await page.evaluate(()=>window.mossDiagnostics({summary:true}))).world.cameraTurn===0) break;
       await page.keyboard.press('r');
     }
     await page.keyboard.press('1');
-    await page.locator('[data-open="journal"]').click();
-    await close();
-    await page.waitForTimeout(5000); // Let toasts, focus tasks and retired panel DOM settle equally.
+    await activate(page,'[data-open="journal"]');await close();
+    const before=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world);
+    await page.waitForFunction(({frame,signature})=>{const d=window.mossDiagnostics({summary:true}),w=d.world;
+      return !d.paused&&!d.transitioning&&!document.querySelector('#panel').open&&d.region==='garden'&&w.sceneRegion==='garden'&&
+        w.cameraTurn===0&&w.position[0]===0&&w.position[1]===0&&w.position[2]===5&&w.gridSignature===signature&&
+        w.quality==='auto'&&w.celebrating===0&&w.activeRenderedFrames>=frame+4;
+    },{frame:before.activeRenderedFrames,signature:before.gridSignature},{timeout:90000});
   };
-  report.transitions=[];
-  // Replay the UI-earned festival to warm all six authored resident skins as well as LODs.
-  await page.locator('[data-open="journal"]').click();
-  await page.locator('[data-festival]').click();
-  await page.waitForTimeout(1000);
-  await close();
-  // Warm both viewport buffers, every camera cutaway and each region before comparison.
-  for(let i=0;i<2;i++) report.transitions.push(...await transitions());
-  for(const viewport of [{width:1920,height:1080},{width:1280,height:720}]) {
-    await page.setViewportSize(viewport);
-    for(let i=0;i<4;i++) {await page.keyboard.press('r');await page.waitForTimeout(250);}
+  const resetImport=async()=>{
+    await activate(page,'.hud [data-open="settings"]');await activate(page,'[data-open="slots"]');
+    await activate(page,'[data-open="reset"]');await activate(page,'[data-reset-confirm]');
+    await activate(page,'.hud [data-open="settings"]');await page.locator('#import-file').setInputFiles(backup);
+    await page.waitForFunction(()=>window.mossDiagnostics({summary:true}).completedQuests===8);
+    await activate(page,'[data-resume]');
+  };
+  report.transitions=[];report.warmCycles=[];
+  report.warmAsset='moon-cottage authored geometry: transparent cutaway on region entry at camera-turn-2; rotating an existing baked cottage does not register its authored variant';
+  report.initial=await sample();
+  for(let cycle=0;cycle<3;cycle++) {
+    await activate(page,'[data-open="journal"]');await activate(page,'[data-festival]');
+    const celebrationFrame=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world.renderedFrames);
+    await page.waitForFunction(frame=>window.mossDiagnostics({summary:true}).world.renderedFrames>=frame+2,celebrationFrame);await close();
+    report.transitions.push(...await transitions());
+    for(const viewport of [{width:1920,height:1080},{width:1280,height:720}]) {
+      await page.setViewportSize(viewport);
+      for(let i=0;i<4;i++) {
+        await page.keyboard.press('r');
+        const frame=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world.renderedFrames);
+        await page.waitForFunction(frame=>window.mossDiagnostics({summary:true}).world.renderedFrames>=frame+2,frame);
+        if((await page.evaluate(()=>window.mossDiagnostics({summary:true}).world.cameraTurn))===2) {
+          // Re-entry constructs the cottage with an already-transparent cutaway
+          // material. Rotating an existing baked cottage alone misses this variant.
+          report.transitions.push(...await transitions());
+          const reentered=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world.renderedFrames);
+          await page.waitForFunction(frame=>window.mossDiagnostics({summary:true}).world.renderedFrames>=frame+2,reentered);
+        }
+      }
+    }
+    await resetImport();report.transitions.push(...await transitions());await canonicalGarden();
+    const snapshot=await sample(),previous=report.warmCycles.at(-1)?.snapshot||report.initial;
+    report.warmCycles.push({cycle,snapshot,delta:residencyDelta(previous.residency,snapshot.residency)});
+    await writeFile(artifacts+'/geometry-warmup.json',JSON.stringify(report.warmCycles,null,2));
+    console.log('Geometry warm cycle',cycle,snapshot.residency.length,report.warmCycles.at(-1).delta);
   }
-  await canonicalGarden();
-  await page.waitForTimeout(25000);
-  report.warmupMs=25000;
+  // Strict plateau after explicit asset/variant warming, never a permitted growth budget.
+  assert.deepEqual(report.warmCycles[2].delta.addedIds,[],'identity-audited warm residency plateaus');
+  assert.ok(report.warmCycles[0].snapshot.residency.some(g=>g.name==='moon-cottage'),'authored cottage cutaway explicitly resident before measurement');
+  await page.waitForTimeout(5000);
   report.before=await sample();
   report.machine={chrome:browser.version(),platform:os.platform(),arch:os.arch(),cpu:os.cpus()[0]?.model,
     cores:os.cpus().length,loadavg:os.loadavg(),autoplay:'Chrome default'};
@@ -136,14 +172,7 @@ try {
     report.fullRunRAF.push(...await page.evaluate(()=>window.__drainRafSamples()));
     console.log('Stability',Math.round((performance.now()-start)/1000)+'/'+duration/1000+' s');
   }
-  await page.locator('.hud [data-open="settings"]').click();
-  await page.locator('[data-open="slots"]').click();
-  await page.locator('[data-open="reset"]').click();
-  await page.locator('[data-reset-confirm]').click();
-  await page.locator('.hud [data-open="settings"]').click();
-  await page.locator('#import-file').setInputFiles(backup);
-  await page.waitForFunction(()=>window.mossDiagnostics().completedQuests===8);
-  await page.locator('[data-resume]').click();
+  await resetImport();
   report.durationMs=performance.now()-start;
   assert.ok(report.durationMs>=180000,'three monotonic minutes');
   // Return to the same region, viewport and warmed residency before GC comparison.
@@ -154,6 +183,7 @@ try {
   report.fullRunRAF.push(...await page.evaluate(()=>window.__drainRafSamples()));
   report.fullRunRAFStats=stats(report.fullRunRAF.map(s=>s.intervalMs));
   report.after=await sample();
+  report.residencyDelta=residencyDelta(report.before.residency,report.after.residency);
   report.segments=segments;
   report.movement=[1280,1920].map(width=>{
     const matching=segments.filter(s=>s.viewport.width===width), samples=matching.flatMap(s=>s.samples);
@@ -165,6 +195,10 @@ try {
   // Write all raw observations before assertions, including long intervals and failures.
   await writeFile(artifacts+'/stability.json',JSON.stringify(report,null,2));
   const {before,after}=report;
+  const canonicalBefore=before.runtime.diagnostics.world,canonicalAfter=after.runtime.diagnostics.world;
+  for(const field of ['sceneRegion','cameraTurn','position','quality','renderScale','gridSignature','framebuffer'])
+    assert.deepEqual(canonicalAfter[field],canonicalBefore[field],'equivalent rendered canonical '+field);
+  assert.ok(canonicalAfter.activeRenderedFrames>canonicalBefore.activeRenderedFrames);
   assert.equal(after.runtime.pendingFrames,1); assert.equal(before.runtime.pendingFrames,1);
   assert.equal(after.dom.jsEventListeners,before.dom.jsEventListeners);
   // DOM wrapper totals are retained for reference; live listener/RAF/GPU residency is gated.
@@ -182,6 +216,6 @@ try {
   await writeFile(artifacts+'/stability-failure.json',JSON.stringify({error:String(error),report,errors,failed},null,2));
   process.exitCode=1;
 } finally {
-  if(browser) await browser.close();
+  if(browser) {for(const c of browser.contexts())for(const p of c.pages())await p.evaluate(()=>window.__geometryTracker?.restore()).catch(()=>{});await browser.close();}
   if(server) server.kill('SIGTERM');
 }

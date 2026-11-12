@@ -26,8 +26,8 @@ import { createWorld } from "./world.js";
 import { createAudio } from "./audio.js";
 import { bridge } from "./bridge.js";
 
-const BUILD = "moss-and-moon-stteak8-r3",
-  VERSION = "1.3.0";
+const BUILD = "moss-and-moon-stteak8-r4",
+  VERSION = "1.4.0";
 const $ = (s) => document.querySelector(s),
   esc = (v) =>
     String(v ?? "").replace(
@@ -1213,10 +1213,11 @@ try {
     value: (options = {}) => ({
       buildId: BUILD,
       version: VERSION,
-      world: world.metrics(options.since),
+      world: world.metrics(options.since, options.summary),
       audio: sound.metrics(),
       campaign: state.campaign ? structuredClone(campaignMetrics(state.campaign)) : null,
-      record: loadRecords().best,
+      record: options.summary ? undefined : loadRecords().best,
+      panel: $("#panel").open ? panelName : null,
       transitioning,
       day: state.day,
       slot,

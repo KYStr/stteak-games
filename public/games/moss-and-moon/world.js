@@ -732,10 +732,11 @@ export function createWorld(canvas, callbacks) {
     );
   }
   function blocked(x, z) {
-    if (Math.hypot(x, z) > 8.7) return true;
+    if (x*x + z*z > 8.7*8.7) return true;
     for (let obstacleIndex=0;obstacleIndex<obstacles.length;obstacleIndex++) {
       const o=obstacles[obstacleIndex];
-      if (Math.hypot(x - o.x, z - o.z) < o.r + 0.18) return true;
+      const ox=x-o.x, oz=z-o.z, radius=o.r+0.18;
+      if (ox*ox + oz*oz < radius*radius) return true;
     }
     if (view === "garden" && state)
       for (let i = 0; i < 64; i++) {
@@ -1215,7 +1216,7 @@ export function createWorld(canvas, callbacks) {
             moving = true;
           } else {
             target = null;
-            path = [];
+            path.length = 0;
             arrival = null;
           }
         }
@@ -1336,8 +1337,8 @@ export function createWorld(canvas, callbacks) {
       down ? keys.add(key) : keys.delete(key);
     },
     animate,
-    metrics(since) {
-      const recent = Array.from(frames.subarray(0, Math.min(frameCount, frames.length)));
+    metrics(since, summary = false) {
+      const recent = summary ? [] : Array.from(frames.subarray(0, Math.min(frameCount, frames.length)));
       const sorted = [...recent].sort((a, b) => a - b);
       const stats = (buffer) => {
         const values = Array.from(buffer.subarray(0, Math.min(renderCount, buffer.length))).sort((a,b)=>a-b);
@@ -1354,7 +1355,7 @@ export function createWorld(canvas, callbacks) {
         plantRebuilds, staticStageRebuilds, staticVertexCapacity,
         staticBufferBytes: stagePositions.byteLength + stageColors.byteLength,
         textureBytesBound: 16 * 1024 * 1024,
-        update:stats(updates), submission:stats(submissions), completion:stats(completions),
+        update:summary ? undefined : stats(updates), submission:summary ? undefined : stats(submissions), completion:summary ? undefined : stats(completions),
         totalUpdateMs, totalSubmissionMs, activeRenderedFrames:renderCount,
         framebuffer: { width:canvas.width, height:canvas.height },
         lightweight,
@@ -1368,7 +1369,8 @@ export function createWorld(canvas, callbacks) {
         triangles: renderer.info.render.triangles,
         geometries: renderer.info.memory.geometries,
         textures: renderer.info.memory.textures,
-        cameraTurn,
+        cameraTurn, enabled, heldKeyCount:keys.size, pathLength:path.length,
+        target:target ? target.toArray() : null, gridSignature, celebrating,
         sceneRegion:view,
         position: player.position.toArray(),
         dpr: renderer.getPixelRatio(),

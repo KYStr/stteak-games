@@ -1,3 +1,4 @@
+import {activate,settledTravel,movementProbe} from './interactions.mjs';
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {chromium} from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
@@ -48,8 +49,13 @@ try {
   const acknowledged=await page.locator('#travel-status').evaluate(el=>({busy:document.querySelector('#world').getAttribute('aria-busy'),text:el.textContent}));
   report.feedback.push({region,acknowledged});
   if(await page.locator("#travel-status").isVisible()) await page.screenshot({path:artifacts+"/transition-"+region+".png"});
-  await page.waitForFunction(()=>!window.mossDiagnostics().transitioning);
+  await settledTravel(page,region);
   assert.equal((await diag()).region,region);
+ }
+ report.movement=[];
+ for(let repeat=0;repeat<2;repeat++) {
+  await page.keyboard.press("Escape");await activate(page, '#panel [data-open="help"]');await page.keyboard.press("Escape");
+  report.movement.push(await movementProbe(page));
  }
  // Hold only the transition's paint boundary, preserving real canvas/UI frames.
  await page.evaluate(()=>window.__holdTravel=true);

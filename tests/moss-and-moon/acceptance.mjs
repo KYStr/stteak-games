@@ -1,3 +1,4 @@
+import {activate, settledTravel, movementProbe, actionabilityState} from "./interactions.mjs";
 import assert from "node:assert/strict";
 import { measureMovement, assertBudget } from "./performance.mjs";
 import os from "node:os";
@@ -48,6 +49,8 @@ try {
     };
   });
   await context.addInitScript(() => {
+    window.__inputLog=[];
+    for(const kind of ["keydown","keyup"])addEventListener(kind,e=>{window.__inputLog.push({kind,key:e.key,time:performance.now()});if(window.__inputLog.length>100)window.__inputLog.shift();},true);
     window.__pageShows = [];
     addEventListener("pageshow", e => window.__pageShows.push({persisted:e.persisted,time:performance.now()}));
   });
@@ -83,7 +86,8 @@ try {
   };
   const open = async (name) => {
     await close();
-    await p.locator(`[data-open="${name}"]`).first().click();
+    await p.waitForFunction(()=>!window.mossDiagnostics({summary:true}).transitioning);
+    await activate(p, `[data-open="${name}"]`);
   };
   const grid = async () => {
     await open("journal");
@@ -287,15 +291,11 @@ try {
     await p.waitForFunction(()=>window.mossDiagnostics().audio.state==='running');
   };
   await pausedPicker();
-  const beforeMove = (await diagnostic()).world.position;
-  await p.locator('#world').focus();
-  await p.keyboard.down('d');
-  await p.waitForFunction(before=>window.mossDiagnostics().world.position.some((v,i)=>v!==before[i]),beforeMove,{timeout:15000});
-  await p.keyboard.up('d');
-  const afterMove = (await diagnostic()).world.position;
-  assert.notDeepEqual(afterMove,beforeMove);
-  await p.waitForTimeout(150);
-  assert.deepEqual((await diagnostic()).world.position,afterMove);
+  report.movementRegressions=[];
+  for(let repeat=0;repeat<2;repeat++) {
+    if(repeat)await pausedPicker();
+    report.movementRegressions.push(await movementProbe(p));
+  }
   await p.keyboard.press('q'); const turn = (await diagnostic()).world.cameraTurn;
   await p.keyboard.press('r'); assert.equal((await diagnostic()).world.cameraTurn,(turn+1)%4);
   // Re-enter the placement dialog through a paused grid (without selecting furniture again).
@@ -348,25 +348,25 @@ try {
   for (const region of ["forest", "brook", "ridge"]) {
     const transitionStart = performance.now();
     await open("map");
-    await p.locator(`#panel [data-region="${region}"]`).click();
+    await activate(p, `#panel [data-region="${region}"]`);
     const transitionMs = performance.now()-transitionStart;
-    await p.waitForFunction(()=>!window.mossDiagnostics().transitioning);
-    await p.waitForTimeout(500);
+    await settledTravel(p,region);
     await p.screenshot({path:artifacts+`/${region}-1280.png`});
     report.exploration.push({region,transitionMs,world:(await diagnostic()).world});
-    await p.locator(`[data-gather="${region}"]`).click();
-    await p.locator('[data-open="fieldguide"]').click();
+    await activate(p, `[data-gather="${region}"]`);
+    await activate(p, '[data-open="fieldguide"]');
     for (const d of DISCOVERIES.filter((d) => d.region === region)) {
       const locator = p.locator(`[data-discover="${d.id}"]`);
       if (await locator.count()) await locator.click();
     }
-    await p.locator(`[data-open="puzzle:${region}"]`).click();
+    await activate(p, `[data-open="puzzle:${region}"]`);
     const puzzle = PUZZLES.find((q) => q.region === region);
     await p
       .locator(`[data-puzzle="${puzzle.id}"][data-answer="${puzzle.answer}"]`)
       .click();
     await close();
-    await p.locator('[data-region="garden"]').first().click();
+    await activate(p, '[data-region="garden"]');
+    await settledTravel(p,"garden");
   }
   assert.equal((await snapshot()).discoveries.length, 12);
   assert.equal((await snapshot()).puzzles.length, 3);
@@ -402,11 +402,11 @@ try {
   await plant("starcap", [19]);
   // Craft a real item and place it in the garden as well.
   await open("craft");
-  await p.locator('[data-craft="make-lantern"]').click();
+  await activate(p, '[data-craft="make-lantern"]');
   assert.ok((await snapshot()).stats.crafted >= 1);
   await close();
   await open("journal");
-  await p.locator("[data-festival]").click();
+  await activate(p, "[data-festival]");
   assert.equal((await snapshot()).festival, true);
   assert.match(await p.locator("#panel-title").textContent(), /月光/);
   await p.screenshot({ path: artifacts + "/festival-1280.png" });
@@ -583,6 +583,7 @@ try {
   console.error("FAIL Moss & Moon acceptance:", e);
   if (browser) {
     const pages = browser.contexts().flatMap((c) => c.pages());
+    if(pages[0])report.failureState=await actionabilityState(pages[0]).catch(()=>null);
     if (pages[0])
       await pages[0]
         .screenshot({ path: artifacts + "/failure.png" })

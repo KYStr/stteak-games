@@ -291,7 +291,9 @@ function staticModel(id, builder, collider, extra = {}) {
     raw.userData.gridPlaceable =
       id.startsWith("plant-") || id.startsWith("decoration-");
     builder(raw);
-    modelCache.set(id, mergedGeometry(raw));
+    const geometry = mergedGeometry(raw);
+    geometry.name = id;
+    modelCache.set(id, geometry);
   }
   const group = new THREE.Group();
   group.name = id;
@@ -844,7 +846,9 @@ export function createCharacter(index = 0) {
         3,
       );
     }
-    modelCache.set(id, mergedGeometry(g, true));
+    const geometry = mergedGeometry(g, true);
+    geometry.name = id;
+    modelCache.set(id, geometry);
   }
   const group = new THREE.Group();
   group.name = id;
@@ -2005,6 +2009,7 @@ export function lightweightVariant(geometry, material) {
   const key = material.color?.getHexString() || "ffffff";
   if (variants.has(key)) return variants.get(key);
   const g = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+  g.name = geometry.name + "-baked-" + key;
   g.computeVertexNormals();
   const n = g.attributes.normal, colors = g.attributes.color;
   const base = material.color || new THREE.Color(1, 1, 1);

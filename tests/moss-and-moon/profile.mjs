@@ -1,4 +1,5 @@
 // Performance-only populated fixture. Never evidence of earning a campaign win.
+import {quietProfiles} from './quiet-profile.mjs';
 import {chromium} from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
 import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -26,7 +27,7 @@ try {
  report.fixedBefore=await page.evaluate(()=>window.mossDiagnostics());
  await cdp.send('HeapProfiler.startSampling',{samplingInterval:512,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});
  await page.locator('#world').focus();await page.keyboard.down('d');const adaptStart=performance.now();
- while((await page.evaluate(()=>window.mossDiagnostics().world.renderScale))>.7501&&performance.now()-adaptStart<90000)await page.waitForTimeout(1000);
+ while((await page.evaluate(()=>window.mossDiagnostics({summary:true}).world.renderScale))>.7501&&performance.now()-adaptStart<90000)await page.waitForTimeout(1000);
  await page.keyboard.up('d');
  report.fixedAfter=await page.evaluate(()=>window.mossDiagnostics());
  const {profile:fixedProfile}=await cdp.send('HeapProfiler.stopSampling');await writeFile(artifacts+'/allocation-fixed.json',JSON.stringify(fixedProfile));
@@ -36,6 +37,7 @@ try {
  function walk(n){if(n.selfSize&&n.callFrame.url.includes('/moss-and-moon/')&&!n.callFrame.url.includes('/vendor/'))report.fixedAllocation.push({bytes:n.selfSize,frame:n.callFrame});for(const child of n.children)walk(child);}
  walk(fixedProfile.head);
  assert.ok(!report.fixedAllocation.some(r=>/appendStage|rebuildStaticStage/.test(r.frame.functionName)),'zero static vertex-array allocation during framebuffer-only adaptation');
+ report.hotLoop=await quietProfiles(page,cdp,artifacts);
  for(const quality of ['auto','high']) {
    await page.locator('[data-open="settings"]').click();await page.locator('[data-setting="quality"]').selectOption(quality);await page.locator('[data-resume]').click();
    for(let i=0;i<4;i++) {const before=await page.evaluate(()=>window.mossDiagnostics());await page.keyboard.press('r');const after=await page.evaluate(()=>window.mossDiagnostics());assert.ok(after.world.staticStageRebuilds-before.world.staticStageRebuilds<=1);report.views.push({quality,world:after.world});await page.screenshot({path:artifacts+"/"+quality+"-view-"+after.world.cameraTurn+".png"});}
