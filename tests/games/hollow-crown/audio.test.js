@@ -174,3 +174,10 @@ test('disposing before a gesture never creates an AudioContext or fetches sounds
   sound.dispose(); await sound.unlock(); await sound.resume();
   assert.equal(contexts.length, 0); assert.equal(requests.length, 0); assert.equal(sound.active, false);
 }));
+
+test('mute cancels scheduled ramps and reaches zero without advancing the audio clock',()=>{
+ const calls=[],parameter=()=>({value:.7,cancelScheduledValues(t){calls.push(['cancel',t]);},setValueAtTime(v,t){calls.push(['immediate',v,t]);},setTargetAtTime(v,t,c){calls.push(['ramp',v,t,c]);}});
+ const sound=new Soundscape(settings,()=>{});sound.ctx={currentTime:12.5};sound.music={gain:parameter()};sound.fx={gain:parameter()};
+ sound.update({...settings,muted:true});assert.equal(sound.music.gain.value,0);assert.equal(sound.fx.gain.value,0);assert.deepEqual(calls,[['cancel',12.5],['cancel',12.5],['immediate',0,12.5],['immediate',0,12.5]]);
+ calls.length=0;sound.update({...settings,muted:false});assert.deepEqual(calls,[['cancel',12.5],['cancel',12.5],['ramp',.35,12.5,.04],['ramp',.7,12.5,.02]]);
+});

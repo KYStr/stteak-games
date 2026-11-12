@@ -17,6 +17,7 @@ try{
   await page.goto(url);await ready();
   report.camp=await page.locator('.camp-panel').evaluate(el=>({height:el.clientHeight,content:el.scrollHeight}));
   assert.ok(report.camp.content<=report.camp.height+2,'camp choices and instructions fit at 1280×720');
+  assert.ok(await page.locator('.camp-panel').evaluate(el=>{const r=el.getBoundingClientRect();return el.scrollTop===0&&[...el.querySelectorAll('.menu-main button,.menu-links button,.subnote:last-child')].every(n=>{const b=n.getBoundingClientRect();return b.top>=r.top&&b.bottom<=r.bottom;});}),'all camp actions and control note are visible without scrolling');
   assert.equal(await page.locator('button.primary').evaluate(el=>el===document.activeElement),true);
   await shot('camp-1280');await page.setViewportSize({width:1920,height:1080});await shot('camp-1920');
   await page.setViewportSize({width:390,height:844});await shot('camp-mobile');

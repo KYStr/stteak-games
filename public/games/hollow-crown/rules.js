@@ -22,9 +22,15 @@ const topologyPool=new Map(),NAV_RADII=Object.freeze([ARENA.playerRadius,.4,.42,
 const EDGES = ['attackPressed','attackReleased','dodge'];
 const SEEK_OFFSETS = [0,.65,-.65,1.2,-1.2,Math.PI*.5];
 function scratch(state){let s=runScratch.get(state);if(!s){s={pending:{},controls:{moveX:0,moveZ:0,aimX:undefined,aimZ:undefined,autoAim:false,attackHeld:false,block:false,attackPressed:false,attackReleased:false,dodge:false},segment:{shape:'line',width:.18},origin:{x:0,z:0},living:[]};runScratch.set(state,s);}return s;}
-export function clearInputEdges(state){const work=runScratch.get(state);if(work)for(const key of EDGES)work.pending[key]=false;state.pendingInput=null;}
-function committedCount(state){let n=0;for(const e of state.enemies)if(e.hp>0&&!ENEMIES[e.type].ranged&&(e.state==='telegraph'||e.state==='attack'))n++;return n;}
-function allDefeated(enemies){for(const e of enemies)if(e.hp>0)return false;return true;}
+// The cross-room topology LRU belongs to an expedition. Returning to camp releases
+// its graph buffers; a new expedition still warms its actual entrance normally.
+export function releaseRun(state){
+  topologyPool.clear();if(!state)return;runScratch.delete(state);if(state.room)topologies.delete(state.room);
+  for(let i=0;i<(state.enemies?.length||0);i++)navigation.delete(state.enemies[i]);
+}
+export function clearInputEdges(state){const work=runScratch.get(state);if(work)for(let i=0;i<EDGES.length;i++)work.pending[EDGES[i]]=false;state.pendingInput=null;}
+function committedCount(state){let n=0;for(let i=0;i<state.enemies.length;i++){const e=state.enemies[i];if(e.hp>0&&!ENEMIES[e.type].ranged&&(e.state==='telegraph'||e.state==='attack'))n++;}return n;}
+function allDefeated(enemies){for(let i=0;i<enemies.length;i++)if(enemies[i].hp>0)return false;return true;}
 function compact(items){let n=0;for(let i=0;i<items.length;i++)if(items[i].life>0)items[n++]=items[i];items.length=n;}
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -33,7 +39,7 @@ const distance = (a, b) => length(a.x - b.x, a.z - b.z);
 const heading = (x, z) => Math.atan2(x, z);
 const difference = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 const copy = value => JSON.parse(JSON.stringify(value));
-const byId = (list, id) => list.find(item => item.id === id);
+const byId = (list,id) => {for(let i=0;i<list.length;i++)if(list[i].id===id)return list[i];};
 const uid = state => ++state.serial;
 const event = (state, type, data = {}) => { state.events.push({ type, ...data }); };
 const effect = (state, type, x, z, extra = {}) => state.effects.push({ id: uid(state), type, x, z, life: .45, ...extra });
@@ -102,7 +108,6 @@ function spawnWave(state, types) {
   state.wave++;
 }
 
-const EMPTY_TARGETS=Object.freeze([]);
 export function createObjective(state){
  const spec=state.challenge==='crown-pilgrimage'&&state.room.id!=='crown-arena'?OBJECTIVES[state.roomIndex]:null;
  if(!spec)return null;
@@ -117,9 +122,10 @@ export function createObjective(state){
 function objectiveDone(state){const o=state.objective;return !o||o.kind==='clear'||o.kind==='crossfire'||o.completed===o.targets.length;}
 function updateObjective(state,dt){
  const o=state.objective;if(!o)return;
- if(o.kind==='beacons')for(const t of o.targets)if(!t.done&&distance(t,state.player)<=1.6){
-  let safe=true;for(const e of state.enemies)if(e.hp>0&&distance(e,t)<3){safe=false;break;}
+ if(o.kind==='beacons')for(let ti=0;ti<o.targets.length;ti++){const t=o.targets[ti];if(!t.done&&distance(t,state.player)<=1.6){
+  let safe=true;for(let ei=0;ei<state.enemies.length;ei++){const e=state.enemies[ei];if(e.hp>0&&distance(e,t)<3){safe=false;break;}}
   if(safe){t.progress=Math.min(o.chargeRequired,t.progress+dt);if(t.progress>=o.chargeRequired){t.done=true;o.completed++;state.player.energy=Math.min(state.player.maxEnergy,state.player.energy+15);event(state,'objective',{text:`燈台已點燃 · ${o.completed}/2`});effect(state,'parry',t.x,t.z);}}
+ }
  }
  if(!o.attack)return;
  o.timer-=dt;if(o.timer>0)return;
@@ -189,14 +195,14 @@ function circleOverlaps(x, z, radius, obstacle) {
 }
 
 export function blocked(room, x, z, radius = 0) {
-  if(!room)return false;for(const o of room.obstacles)if(circleOverlaps(x,z,Math.max(.001,radius),o))return true;return false;
+  if(!room)return false;for(let i=0;i<room.obstacles.length;i++)if(circleOverlaps(x,z,Math.max(.001,radius),room.obstacles[i]))return true;return false;
 }
 
 function pushOut(room, actor, radius) {
   actor.x = clamp(actor.x, ARENA.min + radius, ARENA.max - radius);
   actor.z = clamp(actor.z, ARENA.min + radius, ARENA.max - radius);
   for (let iteration = 0; iteration < 3; iteration++) {
-    for (const obstacle of room.obstacles) {
+    for (let obstacleIndex=0;obstacleIndex<room.obstacles.length;obstacleIndex++) {const obstacle=room.obstacles[obstacleIndex];
       if (!circleOverlaps(actor.x, actor.z, radius, obstacle)) continue;
       if (Number.isFinite(obstacle.r)) {
         const dx = actor.x - obstacle.x, dz = actor.z - obstacle.z, d = length(dx, dz) || 1;
@@ -332,7 +338,7 @@ function updatePlayer(state, input, dt) {
   if (Number.isFinite(input.aimX) && Number.isFinite(input.aimZ) && length(input.aimX - p.x, input.aimZ - p.z) > .05) {
     if (!p.attack && p.action !== 'dodge') p.angle = heading(input.aimX - p.x, input.aimZ - p.z);
   } else if (input.autoAim) {
-    let target=null,nearest=Infinity;for(const e of state.enemies){const d=distance(p,e);if(e.hp>0&&d<nearest&&lineClear(state.room,p.x,p.z,e.x,e.z)){target=e;nearest=d;}}for(const t of state.objective?.targets||EMPTY_TARGETS){const d=distance(p,t);if(state.objective.kind==='seals'&&!t.done&&d<nearest&&sealVisible(state.room,p,t)){target=t;nearest=d;}}
+    let target=null,nearest=Infinity;for(let ei=0;ei<state.enemies.length;ei++){const e=state.enemies[ei];const d=distance(p,e);if(e.hp>0&&d<nearest&&lineClear(state.room,p.x,p.z,e.x,e.z)){target=e;nearest=d;}}for(let ti=0;ti<(state.objective?.targets.length||0);ti++){const t=state.objective.targets[ti];const d=distance(p,t);if(state.objective.kind==='seals'&&!t.done&&d<nearest&&sealVisible(state.room,p,t)){target=t;nearest=d;}}
     if (target && !p.attack && p.action !== 'dodge') p.angle = heading(target.x - p.x, target.z - p.z);
     else if (ml > .05) p.angle = heading(mx, mz);
   } else if (ml > .05 && !AIM_LOCK_ACTIONS.includes(p.action)) p.angle = heading(mx, mz);
@@ -370,11 +376,12 @@ function updatePlayer(state, input, dt) {
   if (p.attack) {
     const attack = p.attack; const oldAge = attack.age; attack.age += dt;
     if (attack.age >= attack.activeStart && oldAge <= attack.activeEnd) {
-      for(const t of state.objective?.targets||EMPTY_TARGETS)if(state.objective.kind==='seals'&&!t.done&&!attack.hitIds.includes(t.id)&&shapeHits(attack,t,.65)&&sealVisible(state.room,attack,t)){
+      for(let ti=0;ti<(state.objective?.targets.length||0);ti++){const t=state.objective.targets[ti];if(state.objective.kind==='seals'&&!t.done&&!attack.hitIds.includes(t.id)&&shapeHits(attack,t,.65)&&sealVisible(state.room,attack,t)){
         attack.hitIds.push(t.id);t.hp=Math.max(0,t.hp-attack.damage);effect(state,'hit',t.x,t.z);event(state,'hit',{material:'stone'});
         if(t.hp===0){t.done=true;state.objective.completed++;const obstacle=state.room.obstacles.find(o=>o.sealId===t.id);if(obstacle){state.room.obstacles.splice(state.room.obstacles.indexOf(obstacle),1);state.room.revision++;topologies.delete(state.room);}state.pendingWaves.push(['soldier','spear']);event(state,'objective',{text:'封印已破 · 兩名守衛即將增援'});}
       }
-      for (const enemy of state.enemies) {
+      }
+      for (let ei=0;ei<state.enemies.length;ei++) {const enemy=state.enemies[ei];
         if (enemy.hp <= 0 || attack.hitIds.includes(enemy.id)) continue;
         if (shapeHits(attack, enemy) && lineClear(state.room, attack.x, attack.z, enemy.x, enemy.z)) {
           attack.hitIds.push(enemy.id); damageEnemy(state, enemy, attack.damage, attack.charged ? 'charge' : 'light');
@@ -439,7 +446,7 @@ function seek(state, enemy, dx, dz, dt, flee = false) {
     if (next) angle = heading(next.x - enemy.x, next.z - enemy.z);
   }
   const preferred = enemy.id.charCodeAt(enemy.id.length - 1) % 2 ? 1 : -1;
-  for (const value of SEEK_OFFSETS) {const offset=value*preferred;
+  for (let i=0;i<SEEK_OFFSETS.length;i++) {const offset=SEEK_OFFSETS[i]*preferred;
     const x = enemy.x + Math.sin(angle + offset) * speed, z = enemy.z + Math.cos(angle + offset) * speed;
     if (!blocked(state.room, x, z, spec.radius + .05) && x > ARENA.min + spec.radius && x < ARENA.max - spec.radius && z > ARENA.min + spec.radius && z < ARENA.max - spec.radius) {
       move(state, enemy, x - enemy.x, z - enemy.z, spec.radius); break;
@@ -506,7 +513,7 @@ function updateEnemy(state, enemy, dt) {
 }
 
 function updateProjectiles(state, dt) {
-  for (const projectile of state.projectiles) {
+  for (let pi=0;pi<state.projectiles.length;pi++) {const projectile=state.projectiles[pi];
     if (projectile.life <= 0) continue;
     const oldX = projectile.x, oldZ = projectile.z;
     projectile.x += Math.sin(projectile.angle) * projectile.speed * dt;
@@ -524,12 +531,12 @@ function updateProjectiles(state, dt) {
 
 const movableEnemy = enemy => !COMMITTED_STATES.includes(enemy.state);
 function separateActors(state) {
-  const living=scratch(state).living;living.length=0;for(const e of state.enemies)if(e.hp>0)living.push(e);
+  const living=scratch(state).living;let livingCount=0;for(let i=0;i<state.enemies.length;i++)if(state.enemies[i].hp>0)living[livingCount++]=state.enemies[i];for(let i=livingCount;i<living.length;i++)living[i]=null;
   const movable = movableEnemy;
   for (let iteration = 0; iteration < 2; iteration++) {
-    for (let i = 0; i < living.length; i++) {
+    for (let i = 0; i < livingCount; i++) {
       const a = living[i];
-      for (let j = i + 1; j < living.length; j++) {
+      for (let j = i + 1; j < livingCount; j++) {
         const b = living[j], dx = b.x - a.x, dz = b.z - a.z, d = length(dx, dz), minimum = a.radius + b.radius + .04;
         if (d >= minimum || !movable(a) && !movable(b)) continue;
         const nx = d > .0001 ? dx / d : 1, nz = d > .0001 ? dz / d : 0;
@@ -557,7 +564,7 @@ const TUTORIAL_MESSAGES=Object.freeze([
 function updateTutorial(state) {
   const tutorial = state.tutorial;
   if (!tutorial || tutorial.done) return;
-  let complete=false;switch(tutorial.step){case 0:complete=tutorial.distance>1.5;break;case 1:complete=state.stats.damageDealt>0;break;case 2:complete=state.stats.dodges>0;break;case 3:complete=state.stats.parries>0;break;case 4:complete=true;for(const e of state.enemies)if(e.hp>0)complete=false;}
+  let complete=false;switch(tutorial.step){case 0:complete=tutorial.distance>1.5;break;case 1:complete=state.stats.damageDealt>0;break;case 2:complete=state.stats.dodges>0;break;case 3:complete=state.stats.parries>0;break;case 4:complete=true;for(let i=0;i<state.enemies.length;i++)if(state.enemies[i].hp>0)complete=false;}
   if (complete) {
     tutorial.step++;
     tutorial.text = TUTORIAL_MESSAGES[tutorial.step] || '試煉完成。回到營地選擇路線，開始你的守誓之旅。';
@@ -567,7 +574,7 @@ function updateTutorial(state) {
     }
     if (tutorial.step >= 5) { tutorial.done = true; finishRun(state, true, 'tutorial'); }
   }
-  if (tutorial.step < 4) for (const enemy of state.enemies) if (enemy.hp <= 0) { enemy.hp = 12; enemy.state = 'idle'; enemy.timer = .8; }
+  if (tutorial.step < 4) for (let i=0;i<state.enemies.length;i++){const enemy=state.enemies[i];if (enemy.hp <= 0) { enemy.hp = 12; enemy.state = 'idle'; enemy.timer = .8; }}
 }
 
 function makeRewards(state) {
@@ -642,11 +649,11 @@ function finishRun(state, won, reason) {
 function advance(state, input, dt) {
   if (!ACTIVE_PHASES.includes(state.phase)) return;
   state.time += dt; state.roomElapsed += dt;
-  for (const item of state.effects) item.life -= dt;
+  for (let i=0;i<state.effects.length;i++)state.effects[i].life-=dt;
   compact(state.effects);if(state.effects.length>90)state.effects.splice(0,state.effects.length-90);
   updatePlayer(state, input, dt);
   separateActors(state);
-  for (const enemy of state.enemies) {
+  for (let ei=0;ei<state.enemies.length;ei++) {const enemy=state.enemies[ei];
     if (!ACTIVE_PHASES.includes(state.phase)) break;
     updateEnemy(state, enemy, dt);
   }
@@ -670,15 +677,15 @@ export function step(state, input = EMPTY_INPUT, dt = 1 / 60) {
   if (!state || !Number.isFinite(dt) || dt <= 0 || state.paused || !ACTIVE_PHASES.includes(state.phase)) return state;
   const elapsed = Math.min(dt, .5), count = Math.ceil(elapsed / .02), slice = elapsed / count;
   const work=scratch(state),pending=work.pending;
-  for(const key of EDGES)pending[key]=Boolean(pending[key]||input[key]);
+  for(let i=0;i<EDGES.length;i++){const key=EDGES[i];pending[key]=Boolean(pending[key]||input[key]);}
   let edgesConsumed = false;
   for (let i = 0; i < count; i++) {
     const frozen = Math.min(slice, Math.max(0, state.hitStop || 0));
     state.hitStop = Math.max(0, (state.hitStop || 0) - frozen);
     if (slice - frozen <= .000001) continue;
-    const controls=work.controls;controls.moveX=input.moveX;controls.moveZ=input.moveZ;controls.aimX=input.aimX;controls.aimZ=input.aimZ;controls.autoAim=input.autoAim;controls.attackHeld=input.attackHeld;controls.block=input.block;for(const key of EDGES)controls[key]=!edgesConsumed&&pending[key];
+    const controls=work.controls;controls.moveX=input.moveX;controls.moveZ=input.moveZ;controls.aimX=input.aimX;controls.aimZ=input.aimZ;controls.autoAim=input.autoAim;controls.attackHeld=input.attackHeld;controls.block=input.block;for(let ei=0;ei<EDGES.length;ei++){const key=EDGES[ei];controls[key]=!edgesConsumed&&pending[key];}
     advance(state, controls, slice - frozen);
-    edgesConsumed=true;for(const key of EDGES)pending[key]=false;
+    edgesConsumed=true;for(let ei=0;ei<EDGES.length;ei++)pending[EDGES[ei]]=false;
   }
   return state;
 }

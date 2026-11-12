@@ -21,7 +21,7 @@ export async function harness(){
     let ready=false;for(let i=0;i<50;i++){if(server.exitCode!==null)throw Error(`Server failed on port ${port}`);try{if((await fetch(url)).ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,100));}
     if(!ready)throw Error('Server did not start');
     const {chromium}=await import(process.env.PLAYWRIGHT_PATH||'/workspace/stteak8/tools/node_modules/playwright-core/index.mjs');
-    browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+    browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
     return {browser,cleanup};
   }catch(e){await cleanup();throw e;}
 }

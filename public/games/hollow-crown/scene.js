@@ -7,6 +7,7 @@ import { RenderBudget } from './render-budget.js';
 import { WarningCueView } from './warning-cue-view.js'; // 公開扇形的只讀呈現守門，不接simulation。
 import { createKit, KIT_VERSION } from './assets/models/kit.js';
 const ONE_SHOT_ACTIONS=Object.freeze(['light','attack','hurt','dodge','death','recover']);
+const EMPTY_ARRAY=Object.freeze([]);
 const ACTIVE_PHASES=Object.freeze(['combat','tutorial']);
 
 
@@ -54,14 +55,18 @@ export class SceneView {
     canvas.addEventListener('webglcontextlost',this.onContextLost);canvas.addEventListener('webglcontextrestored',this.onContextRestored);
     this.objectiveMarkers=[];this.hazardActor={id:'objective-hazard',state:'idle',attack:null};
     for(let i=0;i<2;i++){const group=new THREE.Group(),ring=this.makeRing(1.38,1.6,0x94d9d3,.8),core=new THREE.Mesh(this.ownGeometry(new THREE.OctahedronGeometry(.5)),this.ownMaterial(new THREE.MeshBasicMaterial({color:0xffd39b,wireframe:true})));ring.rotation.x=-Math.PI/2;core.position.y=.8;group.add(ring,core);this.scene.add(group);this.objectiveMarkers.push({group,ring,core});}
-    // Warm every finite geometry template before interactive startup; no network work is hidden.
+    // Initialize each finite model and its declared animation bindings once before play.
+    // Every warmed rig is the same bounded pool later borrowed by real encounters.
     if(this.rigidStream)this.rigidStream.mesh.visible=false;
     for(const room of [...ROOMS,BOSS_ROOM]){this.buildRoom(room);this.renderer.render(this.scene,this.camera);}
-    for(const type of ['infantry','lancer','arbalest','cinderbug','shieldguard','crown','bellwarden']){const count=type==='crown'||type==='bellwarden'?1:4;for(let i=0;i<count;i++)this.createActor('warm-'+i,type);if(!this.softwareRenderer)this.updateActorBatches();for(let i=0;i<count;i++)this.removeActor('warm-'+i);}
+    for(const type of ['infantry','lancer','arbalest','cinderbug','shieldguard','crown','bellwarden']){const count=type==='crown'||type==='bellwarden'?1:4;for(let i=0;i<count;i++){const actor=this.createActor('warm-'+i,type);for(const action of Object.values(actor.actions)){action.reset().play();actor.mixer.update(1/60);actor.mixer.stopAllAction();}}if(!this.softwareRenderer)this.updateActorBatches();for(let i=0;i<count;i++)this.removeActor('warm-'+i);}
     this.buildRoom(ROOMS[0]);
     if(this.rigidStream)this.rigidStream.mesh.visible=false;
-    // Upload the fixed objective-marker pool before the retained baseline as well.
-    this.renderer.render(this.scene,this.camera);
+    // These shared shapes are otherwise first uploaded by a real bolt and enemy damage.
+    // Warm only the two combat-owned shapes, then detach without disposing them.
+    const warmBolt=new THREE.Mesh(this.boltGeometry,this.boltMaterial),warmHealth=new THREE.Mesh(this.healthGeometry,this.healthBackMaterial);
+    warmBolt.frustumCulled=false;warmHealth.frustumCulled=false;this.scene.add(warmBolt,warmHealth);
+    this.renderer.render(this.scene,this.camera);this.scene.remove(warmBolt,warmHealth);
     this.resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>this.resize()):null;this.resizeObserver?.observe(canvas);this.setQuality(this.preferredQuality); // 初次由品質套用帶一次resize，原觀察器仍保留。
   }
   ownGeometry(g){this.extraGeometries.push(g);return g;}
@@ -129,9 +134,9 @@ export class SceneView {
     this.sparkDummy=new THREE.Object3D();
     this.effectGeometry=this.ownGeometry(new THREE.OctahedronGeometry(.11,0));this.effectMaterial=this.ownMaterial(new THREE.MeshBasicMaterial({color:0xffbd75,transparent:true,opacity:.85}));
     this.sparkBatch=new THREE.InstancedMesh(this.effectGeometry,this.effectMaterial,196);this.sparkBatch.frustumCulled=false;this.scene.add(this.sparkBatch);
-    this.boltGeometry=this.ownGeometry(new THREE.ConeGeometry(.065,.7,4));this.boltMaterial=this.ownMaterial(this.simpleMaterial({color:0xffc28d,emissive:0xb54724,emissiveIntensity:.8,metalness:.5,roughness:.4}));
+    this.boltGeometry=this.ownGeometry(new THREE.ConeGeometry(.065,.7,4));this.boltGeometry.name='shared-crossbow-bolt';this.boltMaterial=this.ownMaterial(this.simpleMaterial({color:0xffc28d,emissive:0xb54724,emissiveIntensity:.8,metalness:.5,roughness:.4}));
     this.contactGeometry=this.ownGeometry(new THREE.CircleGeometry(.6,20));this.contactMaterial=this.ownMaterial(new THREE.MeshBasicMaterial({color:0x040c10,transparent:true,opacity:.27,depthWrite:false}));
-    this.healthGeometry=this.ownGeometry(new THREE.PlaneGeometry(1,1));this.healthBackMaterial=this.ownMaterial(new THREE.MeshBasicMaterial({color:0x071218,transparent:true,opacity:.8,depthTest:false,depthWrite:false}));this.healthFrontMaterial=this.ownMaterial(new THREE.MeshBasicMaterial({color:0xee9869,depthTest:false,depthWrite:false}));
+    this.healthGeometry=this.ownGeometry(new THREE.PlaneGeometry(1,1));this.healthGeometry.name='shared-actor-health-plane';this.healthBackMaterial=this.ownMaterial(new THREE.MeshBasicMaterial({color:0x071218,transparent:true,opacity:.8,depthTest:false,depthWrite:false}));this.healthFrontMaterial=this.ownMaterial(new THREE.MeshBasicMaterial({color:0xee9869,depthTest:false,depthWrite:false}));
     this.puddleGeometry=this.ownGeometry(new THREE.CylinderGeometry(1,1,.014,24));this.puddleMaterial=this.ownMaterial(this.simpleMaterial({color:0x578797,metalness:.45,roughness:.22,transparent:true,opacity:.24,depthWrite:false}));
     this.emberVeinGeometry=this.ownGeometry(new THREE.BoxGeometry(.035,.012,1));this.emberVeinMaterial=this.ownMaterial(this.simpleMaterial({color:0xa85b34,emissive:0xc64d1f,emissiveIntensity:.7,roughness:.8}));
     this.rubblePositions=[[-9.8,0,-7],[9.8,0,-5],[-9.7,0,5],[9.8,0,7],[-7,0,-10],[6,0,-10],[-6,0,10],[7,0,10]];
@@ -215,7 +220,10 @@ export class SceneView {
     a.health.position.set(a.previousX,a.type==='crown'?3.2:a.type==='bellwarden'?3: a.type==='cinderbug'?1.1:2,a.previousZ);a.health.quaternion.copy(this.camera.quaternion);a.healthFront.scale.x=.71*hp;a.healthFront.position.x=-.355*(1-hp);
     if(isPlayer){this.playerMarker.position.set(a.previousX,.035,a.previousZ);this.facingMarker.position.set(a.previousX+Math.sin(finite(data.angle))*.93,.07,a.previousZ+Math.cos(finite(data.angle))*.93);this.facingMarker.rotation.z=-finite(data.angle);this.playerMarker.material.opacity=data.invuln>0?.45:.85;}
   }
-  removeActor(id){const a=this.actors.get(id);if(!a)return;a.mixer.stopAllAction();this.scene.remove(a.group,a.health,a.contact);this.actors.delete(id);const index=this.actorList.indexOf(a);if(index>=0)this.actorList.splice(index,1);const key=a.type+':'+a.skin;let pool=this.actorPool.get(key);if(!pool){pool=[];this.actorPool.set(key,pool);}if(pool.length<8)pool.push(a);else a.mixer.uncacheRoot(a.group);}
+  recycleActors(enemies){
+    for(let i=this.actorList.length-1;i>=0;i--){const actor=this.actorList[i];if(actor.id==='player')continue;let present=false;for(let j=0;j<enemies.length;j++)if(String(enemies[j].id)===actor.id){present=true;break;}if(!present)this.removeActor(actor.id);}
+  }
+  removeActor(id){const a=this.actors.get(id);if(!a)return;a.mixer.stopAllAction();a.lastAttack=null;this.scene.remove(a.group,a.health,a.contact);this.actors.delete(id);const index=this.actorList.indexOf(a);if(index>=0)this.actorList.splice(index,1);const key=a.type+':'+a.skin;let pool=this.actorPool.get(key);if(!pool){pool=[];this.actorPool.set(key,pool);}if(pool.length<8)pool.push(a);else a.mixer.uncacheRoot(a.group);}
   updateActorBatches(){
     if(this.rigidStream){this.rigidStream.update(this.actorList);return;}
     for(const batch of this.batchList)batch.count=0;
@@ -237,7 +245,7 @@ export class SceneView {
   pruneWarning(w,id){if(id!=='objective-hazard'&&!this.actors.has(id)){this.scene.remove(w.group);this.disposeWarning(w);this.warningGroups.delete(id);}}
   pruneProjectile(obj,id){if(obj.userData.stamp!==this.liveStamp){this.scene.remove(obj);this.projectileGroups.delete(id);}}
   pruneEffect(record,id){if(record.stamp!==this.liveStamp)this.effectGroups.delete(id);}
-  disposeWarning(w){w.group.traverse(n=>{if(n.isInstancedMesh)n.dispose();});w.geometries.forEach(g=>g.dispose());w.material.dispose();w.outlineMaterial.dispose();}
+  disposeWarning(w){w.group.traverse(n=>{if(n.isInstancedMesh)n.dispose();});w.geometries.forEach(g=>g.dispose());w.material.dispose();w.tickMaterial?.dispose();w.outlineMaterial.dispose();}
   warning(enemy,cueEligible=false) { // 非單教學場景不建立新提示幾何快取。
     const attack=enemy.attack;const visible=enemy.state==='telegraph'||enemy.state==='attack';const id=String(enemy.id);let record=this.warningGroups.get(id);
     if(!attack||!visible){if(record){record.group.visible=false;record.cueKind='none';}return;} // 無實際公開警示就清語義，不讀倒數。
@@ -252,25 +260,28 @@ export class SceneView {
       geometries.push(geometry);const material=new THREE.MeshBasicMaterial({color:0xec8858,transparent:true,opacity:.27,depthWrite:false,depthTest:false,side:THREE.DoubleSide,forceSinglePass:true});const fill=new THREE.Mesh(geometry,material);fill.renderOrder=10;group.add(fill);
       const outlineGeometry=new THREE.EdgesGeometry(geometry,45);geometries.push(outlineGeometry);const outline=new THREE.LineSegments(outlineGeometry,new THREE.LineBasicMaterial({color:0xffc99c,transparent:true,opacity:.75,depthTest:false,depthWrite:false}));outline.renderOrder=11;group.add(outline);
       // Attack zones have both edges and a repeating warning tick pattern, never color alone.
-      const tickGeo=new THREE.BoxGeometry(.08,.015,.22);geometries.push(tickGeo);const tick=new THREE.InstancedMesh(tickGeo,material,shape==='line'?6:16),dummy=new THREE.Object3D();
-      for(let i=0;i<tick.count;i++){if(shape==='line'){dummy.position.set((i%2?1:-1)*width*.44,.02,range*(.2+Math.floor(i/2)*.27));dummy.rotation.y=0;}else{const a=shape==='cone'?(-angle/2+i/15*angle):i/16*Math.PI*2;dummy.position.set(Math.sin(a)*(shape==='cone'?range:radius)*.92,.02,Math.cos(a)*(shape==='cone'?range:radius)*.92);dummy.rotation.y=a;}dummy.updateMatrix();tick.setMatrixAt(i,dummy.matrix);}tick.renderOrder=12;group.add(tick);this.scene.add(group);record={group,geometries,material,outlineMaterial:outline.material,signature,shape};this.warningGroups.set(id,record);if(cueEligible)this.warningCue.attach(record,fill,outline,tick); // 只讀三個實際警示物件，快取含全部tick。
+      const tickGeo=new THREE.BoxGeometry(.08,.015,.22);geometries.push(tickGeo);const tickMaterial=material.clone(),tick=new THREE.InstancedMesh(tickGeo,tickMaterial,shape==='line'?6:16),dummy=new THREE.Object3D();
+      for(let i=0;i<tick.count;i++){if(shape==='line'){dummy.position.set((i%2?1:-1)*width*.44,.02,range*(.2+Math.floor(i/2)*.27));dummy.rotation.y=0;}else{const a=shape==='cone'?(-angle/2+i/15*angle):i/16*Math.PI*2;dummy.position.set(Math.sin(a)*(shape==='cone'?range:radius)*.92,.02,Math.cos(a)*(shape==='cone'?range:radius)*.92);dummy.rotation.y=a;}dummy.updateMatrix();tick.setMatrixAt(i,dummy.matrix);}tick.renderOrder=12;group.add(tick);this.scene.add(group);record={group,geometries,material,tickMaterial,outlineMaterial:outline.material,signature,shape};this.warningGroups.set(id,record);if(cueEligible)this.warningCue.attach(record,fill,outline,tick); // 只讀三個實際警示物件，快取含全部tick。
     }
     if(cueEligible&&record.cue===undefined)this.warningCue.attach(record,...record.group.children); // 曾在其他場景建立的同形幾何只在首次合格教學快取。
     record.attackRef=attack;record.cueKind=enemy.state==='attack'?'strike':'windup'; // 與下一行原可見材質階段同源，不推最佳反擊時機。
-    record.group.visible=true;record.group.position.set(finite(attack.x,finite(enemy.x)),.045,finite(attack.z,finite(enemy.z)));record.group.rotation.y=finite(attack.heading,finite(enemy.angle));record.material.opacity=enemy.state==='attack'?.46:.22+.08*Math.sin(this.elapsed*12);record.material.color.set(enemy.state==='attack'?0xffb377:0xe77c50);
+    record.group.visible=true;record.group.position.set(finite(attack.x,finite(enemy.x)),.045,finite(attack.z,finite(enemy.z)));record.group.rotation.y=finite(attack.heading,finite(enemy.angle));record.material.opacity=enemy.state==='attack'?.46:.22+.08*Math.sin(this.elapsed*12);record.material.color.set(enemy.state==='attack'?0xffb377:0xe77c50);record.tickMaterial.opacity=record.material.opacity;record.tickMaterial.color.copy(record.material.color);
   }
   render(state={},dt=1/60,cueEnabled=false) { // 第三參數只控制普通提示，不改step或輸入。
     this.warningCue.invalidate(); // 每幀立即丟棄前次receipt，不能跨幀追認。
     if(this.disposed||this.contextLost)return null;const start=performance.now();const rawDt=finite(dt,1/60);dt=clamp(rawDt,0,.1);this.elapsed+=dt;const settings=state.settings||{};const shakeEnabled=settings.shake===true&&!settings.reducedMotion&&!state.paused&&rawDt>0&&ACTIVE_PHASES.includes(state.phase);if(settings.quality&&settings.quality!==this.preferredQuality)this.setQuality(settings.quality); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
     this.buildRoom(state.room,state.phase);
     const p=state.player||{x:0,z:3,angle:Math.PI,hp:100,maxHp:100};let player=this.actors.get('player');if(player&&player.skin!==p.skin){this.removeActor('player');player=null;}if(!player)player=this.createActor('player','guardian',p.skin);this.animateActor(player,p,dt,true);if(state.phase==='camp')player.group.rotation.y=-.42;
-    const stamp=++this.liveStamp|| (this.liveStamp=1);player.stamp=stamp;for(const e of state.enemies||[]){const id=String(e.id);let a=this.actors.get(id);const type=ALIASES[e.type]||e.type||'infantry';if(a&&a.type!==type){this.removeActor(id);a=null;}if(!a)a=this.createActor(id,type);a.stamp=stamp;this.animateActor(a,e,dt);this.warning(e,state.phase==='tutorial'&&state.enemies.length===1);} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
-    for(let i=this.actorList.length-1;i>=0;i--)if(this.actorList[i].stamp!==stamp)this.removeActor(this.actorList[i].id);
+    // Return the outgoing wave before borrowing its replacements. Dead authoritative
+    // actors stay until the rules remove them, preserving their death animation.
+    const enemies=state.enemies||EMPTY_ARRAY;
+    this.recycleActors(enemies);
+    const stamp=++this.liveStamp|| (this.liveStamp=1);player.stamp=stamp;for(let enemyIndex=0;enemyIndex<enemies.length;enemyIndex++){const e=enemies[enemyIndex];const id=String(e.id);let a=this.actors.get(id);const type=ALIASES[e.type]||e.type||'infantry';if(a&&a.type!==type){this.removeActor(id);a=null;}if(!a)a=this.createActor(id,type);a.stamp=stamp;this.animateActor(a,e,dt);this.warning(e,state.phase==='tutorial'&&state.enemies.length===1);} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
     const objective=state.objective;
     for(let i=0;i<2;i++){const m=this.objectiveMarkers[i],t=objective?.targets[i];m.group.visible=!!t&&state.phase==='combat';if(t){m.group.position.set(t.x,.06,t.z);m.core.rotation.y=objective.kind==='seals'?Math.PI/4:0;m.core.scale.setScalar(t.done?.35:1);m.core.position.y=t.done?.2:.8;m.ring.material.color.set(t.done?0x94d9d3:0xffd39b);m.ring.scale.setScalar(objective.kind==='beacons'?.4+.6*t.progress/objective.chargeRequired:.75);}}
     this.hazardActor.state=state.phase==='combat'?(objective?.phase||'idle'):'idle';this.hazardActor.attack=objective?.attack;if(this.hazardActor.attack)this.warning(this.hazardActor);else {const w=this.warningGroups.get('objective-hazard');if(w){this.scene.remove(w.group);this.disposeWarning(w);this.warningGroups.delete('objective-hazard');}}
     this.warningGroups.forEach(this.pruneWarning,this);
-    for(const b of state.projectiles||[]){const id=String(b.id);let obj=this.projectileGroups.get(id);if(!obj){obj=new THREE.Mesh(this.boltGeometry,this.boltMaterial);obj.name='physical-crossbow-bolt';this.scene.add(obj);this.projectileGroups.set(id,obj);}obj.userData.stamp=stamp;obj.position.set(finite(b.x),.68,finite(b.z));obj.rotation.set(Math.PI/2,0,-finite(b.angle));}
+    for(let bi=0;bi<(state.projectiles?.length||0);bi++){const b=state.projectiles[bi];const id=String(b.id);let obj=this.projectileGroups.get(id);if(!obj){obj=new THREE.Mesh(this.boltGeometry,this.boltMaterial);obj.name='physical-crossbow-bolt';this.scene.add(obj);this.projectileGroups.set(id,obj);}obj.userData.stamp=stamp;obj.position.set(finite(b.x),.68,finite(b.z));obj.rotation.set(Math.PI/2,0,-finite(b.angle));}
     this.projectileGroups.forEach(this.pruneProjectile,this);
     let sparkCount=0;const effects=state.effects;
     for(let ei=Math.max(0,(effects?.length||0)-28);ei<(effects?.length||0);ei++){const e=effects[ei];const id=String(e.id);let record=this.effectGroups.get(id);if(!record){if(shakeEnabled)this.queueCameraShake(e.type);record={start:Math.max(.05,finite(e.life,.4))};this.effectGroups.set(id,record);}record.stamp=stamp;const t=clamp(1-finite(e.life,0)/record.start,0,1);
@@ -282,11 +293,11 @@ export class SceneView {
     this.updateCameraShake(dt,shakeEnabled);const shake=this.cameraShake.offset;
     const cameraY=this.camera.position.y+((camp&&this.aspect>=1?14:23)-this.camera.position.y)*smooth;this.camera.position.set(this.focus.x+shake.x,cameraY,this.focus.z+22+shake.z);this.camera.lookAt(this.focus.x+shake.x,0,this.focus.z+shake.z);this.camera.updateMatrixWorld();
     const playerPoint=this.playerPoint.set(finite(p.x),.9,finite(p.z)).project(this.camera);
-    for(const o of this.obstacles){const point=this.projectPoint.copy(o.group.position);point.y=o.height*.55;point.project(this.camera);const occluded=o.group.position.z>finite(p.z)-.3&&Math.abs(point.x-playerPoint.x)<.07+o.w/28&&Math.abs(point.y-playerPoint.y)<.09+o.height/20;const alpha=occluded?.24:1;for(const m of o.materials){m.opacity+=(alpha-m.opacity)*Math.min(1,dt*12);m.depthWrite=m.opacity>.97;}}
+    for(let oi=0;oi<this.obstacles.length;oi++){const o=this.obstacles[oi];const point=this.projectPoint.copy(o.group.position);point.y=o.height*.55;point.project(this.camera);const occluded=o.group.position.z>finite(p.z)-.3&&Math.abs(point.x-playerPoint.x)<.07+o.w/28&&Math.abs(point.y-playerPoint.y)<.09+o.height/20;const alpha=occluded?.24:1;for(let mi=0;mi<o.materials.length;mi++){const m=o.materials[mi];m.opacity+=(alpha-m.opacity)*Math.min(1,dt*12);m.depthWrite=m.opacity>.97;}}
     const dustCount=this.quality==='low'?10:38;this.dust.count=dustCount;for(let i=0;i<dustCount;i++){const t=settings.reducedMotion?0:this.elapsed;this.dustDummy.position.set(Math.sin(i*5.31)*10+Math.sin(t*.25+i)*.3,((t*.18+i*.39)%4)+.3,Math.cos(i*8.77)*10);this.dustDummy.rotation.set(i+t*.2,i,i);this.dustDummy.scale.setScalar(.5+(i%4)*.3);this.dustDummy.updateMatrix();this.dust.setMatrixAt(i,this.dustDummy.matrix);}this.dust.instanceMatrix.needsUpdate=true;
     this.updateActorBatches();const cueRecord=state.phase==='tutorial'&&state.enemies?.length===1?this.warningGroups.get(String(state.enemies[0].id)):null; // 僅單教學警示，ID不離開view。
     const cueToken=this.warningCue.begin(cueRecord,cueEnabled);let cue=null; // token只涵蓋下一個主render呼叫。
-    try{this.renderer.render(this.scene,this.camera);if(cueToken){this.healthBacks.length=0;for(const actor of this.actorList)this.healthBacks.push(actor.health.children[0]);cue=this.warningCue.finish(cueToken,this.healthBacks);}}finally{this.warningCue.invalidate();} // renderer錯誤照原路拋出，只有helper計算降級。
+    try{this.renderer.render(this.scene,this.camera);if(cueToken){for(let i=0;i<this.actorList.length;i++)this.healthBacks[i]=this.actorList[i].health.children[0];this.healthBacks.length=this.actorList.length;cue=this.warningCue.finish(cueToken,this.healthBacks);}}finally{this.warningCue.invalidate();} // renderer錯誤照原路拋出，只有helper計算降級。
     const renderMs=performance.now()-start;this.frames.push(rawDt*1000);this.renderTimes.push(renderMs);this.frameCount++;return cue; // 返回只讀呈現候選，非GPU像素證明。
   }
   recordFrame(ms){if(this.budget.record(ms))this.resize();}
@@ -312,5 +323,5 @@ export class SceneView {
     const textureBytes=this.kit.shared.textures.reduce((n,t)=>n+(t.image?.width||0)*(t.image?.height||0)*4*(t.generateMipmaps?4/3:1),0),shadow=this.sun.shadow.map;
     return{engine:'three@0.180.0',kitVersion:KIT_VERSION,quality:this.quality,frameSamples:this.frames.length,frameP95Ms:percentile('dt'),frameAvgMs:this.frames.length?Number((this.frames.toArray().reduce((n,f)=>n+f,0)/this.frames.length).toFixed(2)):null,renderScale:this.budget.scale,softwareRenderer:this.softwareRenderer,renderSubmitP95Ms:percentile('renderMs'),drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,textureMemoryBytes:Math.round(textureBytes),renderTargetColorMemoryBytes:shadow?shadow.width*shadow.height*4:0,memoryIsEstimate:true,activeRigs:this.actors.size,activeBones:[...this.actorList].reduce((n,a)=>{a.group.traverse(o=>{if(o.isBone)n++;});return n;},0),pointLights:1,directionalLights:2,shadowMaps:this.quality==='high'?1:0,shadowResolution:this.quality==='high'?1024:0,transparentEffects:this.effectGroups.size,instancedMeshes:instances,contextLost:!!this.contextLost,drawingBuffer:[this.canvas.width,this.canvas.height],rendererInfo:this.renderer.getContext().getParameter(this.renderer.getContext().RENDERER)};
   }
-  dispose(){this.warningCue.invalidate();this.options.onCueClear?.();if(this.disposed)return;this.disposed=true;this.resizeObserver?.disconnect();this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('webglcontextrestored',this.onContextRestored);for(const id of [...this.actors.keys()])this.removeActor(id);for(const w of this.warningGroups.values()){w.geometries.forEach(g=>g.dispose());w.material.dispose();w.outlineMaterial.dispose();}for(const o of this.obstacles)for(const m of o.materials)m.dispose();this.scene.traverse(n=>{if(n.isInstancedMesh)n.dispose();});this.extraGeometries.forEach(g=>g.dispose());this.extraMaterials.forEach(m=>m.dispose());this.staticRoot.userData.bakedGeometry?.dispose();this.decorationRoot.userData.bakedGeometry?.dispose();for(const parts of this.actorGeometryCache.values())parts.forEach(p=>p.geometry.dispose());this.rigidStream?.dispose();this.kit.dispose();this.scene.clear();this.renderer.dispose();this.actorPool.clear();this.healthBacks.length=0;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+  dispose(){this.warningCue.invalidate();this.options.onCueClear?.();if(this.disposed)return;this.disposed=true;this.resizeObserver?.disconnect();this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('webglcontextrestored',this.onContextRestored);for(const id of [...this.actors.keys()])this.removeActor(id);for(const w of this.warningGroups.values())this.disposeWarning(w);for(const o of this.obstacles)for(const m of o.materials)m.dispose();this.scene.traverse(n=>{if(n.isInstancedMesh)n.dispose();});this.extraGeometries.forEach(g=>g.dispose());this.extraMaterials.forEach(m=>m.dispose());this.staticRoot.userData.bakedGeometry?.dispose();this.decorationRoot.userData.bakedGeometry?.dispose();for(const parts of this.actorGeometryCache.values())parts.forEach(p=>p.geometry.dispose());this.rigidStream?.dispose();this.kit.dispose();this.scene.clear();this.renderer.dispose();this.actorPool.clear();this.healthBacks.length=0;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 }

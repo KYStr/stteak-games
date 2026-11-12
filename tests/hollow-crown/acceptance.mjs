@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
+import {heapOwners} from './heap-owners.mjs';
 import {installPilot} from './browser-pilot.js';
 import {url,artifact,harness} from './test-config.mjs';
 const KEY='stteak.hollow-crown.v1';
@@ -9,7 +10,10 @@ const snapshot=()=>page.evaluate(()=>hollowCrownDiagnostics.snapshot());
 const wait=(fn,timeout=20000)=>page.waitForFunction(fn,null,{timeout});
 const shot=async name=>page.screenshot({path:artifact(name+'.png')});
 const sleep=ms=>page.waitForTimeout(ms);
-async function boot(){await page.goto(url);await wait(()=>!!window.hollowCrownDiagnostics);await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().render.frameSamples>2);}
+async function setupInventory(){await page.evaluate(async()=>{const {SceneView}=await import('./scene.js');let view;const original=SceneView.prototype.render;SceneView.prototype.render=function(state,dt,cue){view=this;return original.call(this,state,dt,cue);};window.sceneInventoryReady=()=>!!view;window.sceneInventory=()=>{const geometries=new Map(),add=(g,owner)=>{if(!g)return;let record=geometries.get(g.uuid);if(!record){record={uuid:g.uuid,name:g.name,type:g.type,owners:[],uploaded:!!g._listeners?.dispose?.some(fn=>fn.name==='onGeometryDispose')};geometries.set(g.uuid,record);}record.owners.push(owner);};view.scene.traverse(n=>add(n.geometry,n.name||n.type));for(let i=0;i<view.extraGeometries.length;i++)add(view.extraGeometries[i],'owned['+i+']');for(const [key,parts]of view.actorGeometryCache)for(const part of parts)add(part.geometry,'actor-template:'+key);for(const [key,parts]of view.propGeometryCache)for(const part of parts)add(part.geometry,'prop-template:'+key);return{pools:Object.fromEntries([...view.actorPool].map(([key,pool])=>[key,pool.length])),actorTemplates:view.actorGeometryCache.size,propTemplates:view.propGeometryCache.size,geometries:[...geometries.values()],warnings:view.warningGroups.size,projectiles:view.projectileGroups.size,effects:view.effectGroups.size,liveActors:view.actorList.length};};});await wait(()=>window.sceneInventoryReady());}
+async function boot(){await page.goto(url);await wait(()=>!!window.hollowCrownDiagnostics);await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().render.frameSamples>2);await setupInventory();}
+async function heapSnapshot(name){const chunks=[];const onChunk=({chunk})=>chunks.push(chunk);cdp.on('HeapProfiler.addHeapSnapshotChunk',onChunk);try{await cdp.send('HeapProfiler.takeHeapSnapshot',{reportProgress:false});await writeFile(artifact(name+'.heapsnapshot'),chunks.join(''));}finally{cdp.off('HeapProfiler.addHeapSnapshotChunk',onChunk);}}
+async function inventory(){return page.evaluate(()=>window.sceneInventory());}
 async function memory(){await cdp.send('HeapProfiler.collectGarbage');const {metrics}=await cdp.send('Performance.getMetrics'),dom=await cdp.send('Memory.getDOMCounters');return{heap:metrics.find(x=>x.name==='JSHeapUsedSize')?.value,...dom};}
 async function seed(value){await page.evaluate(({KEY,value})=>{localStorage.clear();localStorage.setItem(KEY,JSON.stringify(value));},{KEY,value});await boot();}
 try{
@@ -24,6 +28,7 @@ try{
   assert.equal(await page.locator('[data-config="challenge"]').inputValue(),'crown-pilgrimage');
   report.materialAudit=await page.evaluate(async()=>{const {SceneView}=await import('./scene.js');return new Promise(resolve=>{const original=SceneView.prototype.render;let frames=0;SceneView.prototype.render=function(...args){const result=original.apply(this,args);if(++frames<4)return result;SceneView.prototype.render=original;const findings=[];this.scene.traverse(o=>{if(!o.isMesh||!o.visible||!o.material)return;const m=o.material,p=this.renderer.properties.get(m),g=o.geometry;const fields={instancing:o.isInstancedMesh===true,skinning:o.isSkinnedMesh===true,vertexTangents:!!g.attributes.tangent&&(!!m.normalMap||m.anisotropy>0),morphTargets:!!g.morphAttributes.position,morphNormals:!!g.morphAttributes.normal,morphColors:!!g.morphAttributes.color,vertexAlphas:m.vertexColors===true&&!!g.attributes.color&&g.attributes.color.itemSize===4};const mismatch=Object.entries(fields).filter(([k,v])=>p[k]!==undefined&&p[k]!==v);if(mismatch.length)findings.push({object:o.name,material:m.name,type:m.type,mismatch,stored:Object.fromEntries(Object.keys(fields).map(k=>[k,p[k]]))});});resolve(findings);return result;};});});console.log('MATERIAL_AUDIT '+JSON.stringify(report.materialAudit));
 
+
   check('fresh startup, no audio before gesture, full expedition is available');
   await page.click('[data-action="settings"]');assert.equal(await page.getAttribute('#overlay','role'),'dialog');
   await page.locator('[data-setting="music"]').evaluate(el=>{el.value='.2';el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));});
@@ -34,7 +39,7 @@ try{
   check('settings persist, reversible mute, dialog focus containment and Escape navigation');
   await page.click('[data-action="tutorial"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.buffers===17);
   await installPilot(page);await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().run?.phase==='result',120000);
-  let s=await snapshot();assert.equal(s.run.tutorial.done,true);assert.equal(s.profile.tutorialDone,true);await shot('tutorial-complete');await page.evaluate(()=>acceptancePilot.stop());
+  let s=await snapshot();assert.equal(s.run.tutorial.done,true);assert.equal(s.profile.tutorialDone,true);assert.match(await page.locator('.results').innerText(),/5 \/ 5/);assert.match(await page.locator('.results').innerText(),/試煉完成/);assert.doesNotMatch(await page.locator('.results').innerText(),/普通房完成/);await shot('tutorial-complete');await page.evaluate(()=>acceptancePilot.stop());
   check('tutorial completes using movement, light attack, dodge, timed guard and defeat');
   await page.click('[data-action="begin"]');await page.keyboard.down('KeyD');await sleep(600);await page.keyboard.up('KeyD');s=await snapshot();assert.ok(s.run.player.x>1);
   const runId=s.runId,seedNumber=s.run.seed;await page.keyboard.press('j');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().run.stats.attacks>0);
@@ -44,7 +49,7 @@ try{
   await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.context==='running');check('real movement and attacks, blur pause, suspended audio resume, reload and room-entry restore');
   await page.evaluate(()=>{window.activeRaf={raw:[],windows:[],last:performance.now(),active:true};function sample(t){const p=activeRaf;if(!p.active)return;if(document.body.dataset.menu==='false')p.raw.push(t-p.last);p.last=t;requestAnimationFrame(sample);}requestAnimationFrame(sample);});
   await page.keyboard.press('Escape');await page.click('[data-action="leave-confirm"]');await page.click('[data-action="confirm"]');await sleep(1000);
-  const before=await memory(),beforeSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());await page.click('[data-action="continue"]');
+  const before=await memory(),beforeSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());report.beforeInventory=await inventory();await writeFile(artifact('retention-before-inventory.json'),JSON.stringify(report.beforeInventory,null,2));await heapSnapshot('retention-before');await page.click('[data-action="continue"]');
   const soakStart=performance.now(),performanceWindows=[];await installPilot(page);
   let lastLog=performance.now();const bossCaptures=new Set();report.bossCaptures=[];
   while(performance.now()-soakStart<3600000){
@@ -52,7 +57,7 @@ try{
     if(performance.now()-lastLog>15000){console.log(`PLAY room=${s.run.roomIndex+1} phase=${s.run.phase} hp=${s.run.player.hp.toFixed(0)} time=${s.run.time.toFixed(0)}`);lastLog=performance.now();}
     if(s.run.phase==='result')break;
   }
-  s=await snapshot();assert.equal(s.run.result?.won,true,'Twin Crown keyboard pilot must win');assert.equal(s.run.roomHistory.length,14);assert.equal(bossCaptures.size,4,'both phases of both crowns captured');assert.equal(s.profile.wins,1);assert.ok(s.profile.skins.includes('cinder'));await shot('twin-crown-victory');
+  s=await snapshot();assert.equal(s.run.result?.won,true,'Twin Crown keyboard pilot must win');assert.match(await page.locator('.results').innerText(),/12 \/ 12/);assert.equal(s.run.roomHistory.length,14);assert.equal(bossCaptures.size,4,'both phases of both crowns captured');assert.equal(s.profile.wins,1);assert.ok(s.profile.skins.includes('cinder'));await shot('twin-crown-victory');
   report.functionalPilot={limitation:"Reads exact threat countdowns; functional smoke only, no build/depth credit",time:s.run.time,kills:s.run.stats.kills,hits:s.run.stats.hits,rooms:s.run.roomHistory};check('full twelve-room / two-boss expedition wins through keyboard input and settles once');
   await page.evaluate(()=>acceptancePilot.stop());await page.click('[data-action="replay"]');assert.equal((await snapshot()).run.seed,seedNumber);assert.notEqual((await snapshot()).runId,runId);
   // Continue live combat for at least three wall-clock minutes including the completed run.
@@ -74,10 +79,13 @@ try{
   await page.evaluate(()=>acceptancePilot.stop());await sleep(200);assert.equal(await page.evaluate(()=>pendingGameRaf()),1,'one game RAF after sampler and controller stop');check('restart and >=3 minute bounded-memory/listener run');
   for(let i=0;i<10;i++){await page.keyboard.press('Escape');await page.click('[data-action="restart-confirm"]');await page.click('[data-action="confirm"]');await sleep(200);assert.equal(await page.evaluate(()=>pendingGameRaf()),1);}
   await page.keyboard.press('Escape');await page.click('[data-action="leave-confirm"]');await page.click('[data-action="confirm"]');await sleep(1000);
-  const retained=await memory(),afterSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());
+  const retained=await memory(),afterSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());report.afterInventory=await inventory();await writeFile(artifact('retention-after-inventory.json'),JSON.stringify(report.afterInventory,null,2));await heapSnapshot('retention-after');report.heapOwners=await heapOwners(artifact('retention-before.heapsnapshot'),artifact('retention-after.heapsnapshot'));await writeFile(artifact('retention-owners.json'),JSON.stringify(report.heapOwners,null,2));
   report.restartAudit={restarts:10,pendingRaf:await page.evaluate(()=>pendingGameRaf()),memory:retained};
-  report.retention={method:'Finite prop/actor templates prewarmed before interactive; identical camp before expedition and after ten restarts. All pool bytes are resident at baseline.',before,after:retained,growth:(retained.heap-before.heap)/before.heap,beforeRender:beforeSameScene.render,afterRender:afterSameScene.render};
-  assert.ok(report.retention.growth<.10,'Retained heap growth must be <10%');assert.equal(retained.jsEventListeners,before.jsEventListeners);assert.equal(afterSameScene.render.geometries,beforeSameScene.render.geometries);assert.equal(afterSameScene.render.textures,beforeSameScene.render.textures);assert.equal(await page.evaluate(()=>pendingGameRaf()),1);check('full expedition and ten restarts retain <10% heap and identical resources/listeners/RAF');
+  report.retention={method:'Finite prop/actor templates prewarmed before interactive; identical camp before expedition and after ten restarts. Inventory and heap snapshots identify actual persistent owners; peak metrics are recorded separately.',before,after:retained,growth:(retained.heap-before.heap)/before.heap,beforeRender:beforeSameScene.render,afterRender:afterSameScene.render};
+  // Keep every retention assertion and its original measurements. Report failures
+  // after independent lifecycle checks so one performance miss cannot hide them.
+  const validateRetention=()=>{assert.ok(report.retention.growth<.10,'Retained heap growth must be <10%');assert.equal(retained.jsEventListeners,before.jsEventListeners);assert.equal(afterSameScene.render.geometries,beforeSameScene.render.geometries);assert.equal(afterSameScene.render.textures,beforeSameScene.render.textures);assert.equal(report.restartAudit.pendingRaf,1);check('full expedition and ten restarts retain <10% heap and identical resources/listeners/RAF');};
+  console.log('RETENTION '+JSON.stringify({growth:report.retention.growth,beforeGeometries:beforeSameScene.render.geometries,afterGeometries:afterSameScene.render.geometries,listeners:retained.jsEventListeners,pendingRaf:report.restartAudit.pendingRaf}));
   await page.click('[data-action="continue"]');
   await page.keyboard.press('Escape');await shot('pause-1280');
   await page.setViewportSize({width:1920,height:1080});await sleep(400);await shot('pause-1920');
@@ -92,6 +100,6 @@ try{
   await page.evaluate(KEY=>{localStorage.setItem(KEY,'[]');localStorage.setItem(KEY+'.backup','[]');},KEY);await boot();assert.equal((await snapshot()).profile.runs,0);assert.match(await page.locator('#save-notice').innerText(),/重建/);check('corrupt primary backup recovery and malformed-array safe rebuild');
   await page.emulateMedia({reducedMotion:'reduce'});await seed(null);assert.equal((await snapshot()).profile.settings.reducedMotion,true);check('system reduced-motion preference');
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);check('zero uncaught errors, console errors or failed HTTP requests');
-  report.passed=true;
+  validateRetention();report.passed=true;
 }catch(e){report.passed=false;report.failure=e.stack;report.snapshot=page?await snapshot().catch(()=>null):null;report.metrics=page?await page.evaluate(()=>hollowCrownDiagnostics.metrics()).catch(()=>null):null;console.error(e);if(page)await shot('failure').catch(()=>{});process.exitCode=1;
 }finally{report.checks=checks;report.errors=errors;report.failedRequests=requests;await writeFile(artifact(report.passed?'acceptance.json':`failure-${Date.now()}.json`),JSON.stringify(report,null,2)+'\n');await runner?.cleanup();}

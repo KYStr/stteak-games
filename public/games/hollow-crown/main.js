@@ -1,7 +1,7 @@
 import { NumericRing } from './ring-buffer.js';
 import { SceneView } from './scene.js';
 import { WarningCueUI } from './warning-cue-ui.js'; // 一般玩家的公開提示文字與形狀。
-import { clearInputEdges, combineModifiers, createRun, step, chooseReward, enterRoom, checkpoint, restoreRun, startTutorial, chooseStory } from './rules.js';
+import { releaseRun, clearInputEdges, combineModifiers, createRun, step, chooseReward, enterRoom, checkpoint, restoreRun, startTutorial, chooseStory } from './rules.js';
 import { chapterName, objectiveInstruction, journeyPlan, crownType, ROOMS, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, STORIES, DIFFICULTIES, ENEMIES } from './content.js';
 import { SaveStore, settleRun } from './storage.js';
 import { Controls } from './input.js';
@@ -16,7 +16,7 @@ const TEXT_INPUT_TAGS=Object.freeze(['INPUT','SELECT','TEXTAREA']);
 const ACTIVE_PHASES=Object.freeze(['combat','tutorial']);
 
 
-const BUILD='stteak8-hollow-crown-r3', VERSION='1.3.0'; // 只消除品質與尺寸重複提交的新候選，不回填run75原因。
+const BUILD='stteak8-hollow-crown-r4', VERSION='1.4.0'; // 只消除品質與尺寸重複提交的新候選，不回填run75原因。
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let renderUnavailable=false; // Context loss is reload-only; never resume unverified graphics.
 let store;try{store=new SaveStore();}catch{store=new SaveStore({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});}
@@ -89,7 +89,7 @@ function renderPanel(name){
     const r=run?.result||{},tutorial=!!run?.tutorial;
     const won=tutorial?run.tutorial.done:r.won;
     const talents=r.talents||run?.talents||[];
-    return `<section class="panel">${panelHeader(tutorial?'THE FIRST OATH':won?'THE CROWN RETURNS':'AN OATH, UNFINISHED',tutorial?'你已學會守誓':won?'王冠歸於餘燼':'火熄了，誓言還在','camp')}<p class="lead">${esc(tutorial?'你已完成移動、輕刺、閃避與精準格擋。預設巡禮有三章十二房：守住燈台、穿越交火、刺破封印，再挑戰兩位王座守衛；營地也能選六房或四房的短程誓約。':r.ending||(won?'你拾起長槍走入晨光，將名字與故事帶回營地。':'下一輪試著保持長槍距離，在預警落下前側移。'))}</p>${!won?`<p class="result-reason">最後受擊：${esc(sourceName(r.reason)||'生命耗盡')}</p>`:''}<div class="results"><div><strong>${(Array.isArray(r.rooms)?r.rooms.filter(x=>x.id!=='crown-arena').length:r.rooms)??run?.stats?.rooms??0} / ${journeyPlan(run).rooms}</strong><small>普通房完成</small></div><div><strong>${r.parries??run?.stats?.parries??0}</strong><small>成功反擊</small></div><div><strong>${r.hits??run?.stats?.hits??0}</strong><small>受擊次數</small></div><div><strong>${formatTime(r.time??run?.time??0)}</strong><small>本輪時間</small></div></div><div class="result-loadout">${talents.map(id=>`<span class="chip">${esc(TALENTS.find(t=>t.id===id)?.name||id)}</span>`).join('')}</div><p class="subnote">${tutorial?'練習不結算長期獎勵。':`種子 ${esc(r.seed??config.seed)} · ${journeyPlan(r).crowns===2?'雙冠王道':esc(ROUTES.find(x=>x.id===(r.route||config.route))?.name)} · ${esc(CHALLENGES.find(x=>x.id===config.challenge)?.name)}`}<br>${!tutorial?`傷害來源：${Object.entries(r.damageSources||run.stats?.damageSources||{}).map(([id,n])=>esc((sourceName(id))+' '+Math.round(n))).join(' · ')||'本輪無受傷'}。`:'可在營地反覆練習，或調整練習窗口。'}</p><div class="panel-actions"><button class="primary" data-action="${tutorial?'begin':'replay'}">${tutorial?'開始正式遠征':'相同種子再試'}</button><button data-action="new">${tutorial?'換條路線':'換一輪新旅途'}</button></div></section>`;
+    return `<section class="panel">${panelHeader(tutorial?'THE FIRST OATH':won?'THE CROWN RETURNS':'AN OATH, UNFINISHED',tutorial?'你已學會守誓':won?'王冠歸於餘燼':'火熄了，誓言還在','camp')}<p class="lead">${esc(tutorial?'你已完成移動、輕刺、閃避與精準格擋。預設巡禮有三章十二房：守住燈台、穿越交火、刺破封印，再挑戰兩位王座守衛；營地也能選六房或四房的短程誓約。':r.ending||(won?'你拾起長槍走入晨光，將名字與故事帶回營地。':'下一輪試著保持長槍距離，在預警落下前側移。'))}</p>${!won?`<p class="result-reason">最後受擊：${esc(sourceName(r.reason)||'生命耗盡')}</p>`:''}<div class="results"><div><strong>${tutorial?Math.min(5,run.tutorial.step):(Array.isArray(r.rooms)?r.rooms.filter(x=>x.id!=='crown-arena').length:r.rooms)??run?.stats?.rooms??0} / ${tutorial?5:journeyPlan(run).rooms}</strong><small>${tutorial?'試煉完成':'普通房完成'}</small></div><div><strong>${r.parries??run?.stats?.parries??0}</strong><small>成功反擊</small></div><div><strong>${r.hits??run?.stats?.hits??0}</strong><small>受擊次數</small></div><div><strong>${formatTime(r.time??run?.time??0)}</strong><small>本輪時間</small></div></div><div class="result-loadout">${talents.map(id=>`<span class="chip">${esc(TALENTS.find(t=>t.id===id)?.name||id)}</span>`).join('')}</div><p class="subnote">${tutorial?'練習不結算長期獎勵。':`種子 ${esc(r.seed??config.seed)} · ${journeyPlan(r).crowns===2?'雙冠王道':esc(ROUTES.find(x=>x.id===(r.route||config.route))?.name)} · ${esc(CHALLENGES.find(x=>x.id===config.challenge)?.name)}`}<br>${!tutorial?`傷害來源：${Object.entries(r.damageSources||run.stats?.damageSources||{}).map(([id,n])=>esc((sourceName(id))+' '+Math.round(n))).join(' · ')||'本輪無受傷'}。`:'可在營地反覆練習，或調整練習窗口。'}</p><div class="panel-actions"><button class="primary" data-action="${tutorial?'begin':'replay'}">${tutorial?'開始正式遠征':'相同種子再試'}</button><button data-action="new">${tutorial?'換條路線':'換一輪新旅途'}</button></div></section>`;
   }
   if(name==='confirm')return `<section class="panel" style="max-width:500px">${panelHeader('A NEW OATH','離開目前旅途？','cancel-confirm')}<p class="lead">${confirmAction==='camp'?'目前房間的入口存檔會保留，下次可以繼續。':'目前這輪進度將被新遠征取代；已解鎖內容與設定保留。'}</p><div class="panel-actions"><button data-action="cancel-confirm">留下</button><button class="primary" data-action="confirm">${confirmAction==='camp'?'回到營地':'開始新旅途'}</button></div></section>`;
   return '';
@@ -104,7 +104,7 @@ function buildComparison(id,replaceId){
   return Object.keys(before).filter(k=>before[k]!==after[k]).map(k=>`${labels[k]} ${format(k,before[k])} → ${format(k,after[k])}`).join(' · ')||'此替換保留相同數值';
 }
 function schoolName(s){return {mobility:'機動',counter:'反擊',burn:'燃燒'}[s]||'回復／餘燼';}
-function sourceName(id){return ENEMIES[id]?.name||Object.values(ENEMIES).flatMap(x=>x.moves||[]).find(m=>m.id===id)?.name||id||'敵人';}
+function sourceName(id){if(id==='training-hazard')return '場地交火';return ENEMIES[id]?.name||Object.values(ENEMIES).flatMap(x=>x.moves||[]).find(m=>m.id===id)?.name||id||'敵人';}
 function updateConfigNote(){const route=$('overlay').querySelector('[data-config=route]');if(route)route.disabled=journeyPlan(config).crowns===2;const count=$('journey-count');if(count)count.textContent=`${journeyPlan(config).rooms} + ${journeyPlan(config).crowns}`;const el=document.getElementById('config-note');if(el)el.textContent=[STARTING_TALENTS.find(t=>t.id===config.startTalent)?.description,DIFFICULTIES.find(t=>t.id===config.difficulty)?.description,CHALLENGES.find(t=>t.id===config.challenge)?.description].join(' ');}
 function formatTime(time){return `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')}`;}
 let confirmAction='begin',confirmReturn='camp';
@@ -135,7 +135,7 @@ function resume(){
   if(renderUnavailable)return;
   if(!run)return;paused=false;controls?.clear();sound.resume();bridge.state('running');lastPhase='';setOverlay('');syncPhase();$('world').focus();
 }
-function goCamp(){if(renderUnavailable)return;if(run&&run.phase!=='result'&&!run.tutorial)safeCheckpoint();run=null;paused=false;setOverlay('camp');sound.setTheme('camp');sound.resume();bridge.state('ready');}
+function goCamp(){if(renderUnavailable)return;if(run&&run.phase!=='result'&&!run.tutorial)safeCheckpoint();releaseRun(run);run=null;paused=false;setOverlay('camp');sound.setTheme('camp');sound.resume();bridge.state('ready');}
 function syncPhase(){
   if(!run)return;
   const phase=run.phase;if(phase===lastPhase)return;lastPhase=phase;
@@ -148,15 +148,51 @@ function syncPhase(){
     persist();setOverlay('result');sound.setTheme('camp');bridge.state('paused');
   }
 }
-function updateVisibility(){clearWarningCue();$('journey').hidden=true;$('action-feedback').hidden=true;const playing=!!run&&run.phase!=='result';$('hud').hidden=!playing;$('loadout').hidden=!playing;$('combat-tip').hidden=!playing||!!overlay;$('touch-controls').hidden=!playing||!!overlay||!touchActive;$('tutorial').hidden=!run?.tutorial||!!overlay||run.phase==='result';if(overlay)$('boss-hud').hidden=true;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
-function updateHud(){if(!run)return;const obj=run.objective;const tip=$('combat-tip');if(obj){tip.textContent=objectiveInstruction(obj)+(obj.targets.length?` · ${obj.completed}/${obj.targets.length}`:'')+(obj.attack&&!obj.mastered?` · ${obj.attack.name}`:'');}else tip.textContent='清除守衛 → 選擇餘燼 → 前往王座';const p=run.player;$('hp-text').textContent=`${Math.ceil(p.hp)} / ${p.maxHp}`;$('hp-fill').style.width=`${100*Math.max(0,p.hp)/p.maxHp}%`;$('energy-fill').style.width=`${100*p.energy/p.maxEnergy}%`;$('energy-text').textContent=Math.floor(p.energy);$('room-name').textContent=run.room.name;$('chapter').textContent=run.tutorial?'守誓者的試煉':run.roomIndex>=journeyPlan(run).rooms?`第 ${run.roomIndex-journeyPlan(run).rooms+1} 頂王冠 / ${journeyPlan(run).crowns}`:`${journeyPlan(run).acts>1?`${chapterName(run)} · `:''}第 ${Number(run.roomIndex)+1} 房 / ${journeyPlan(run).rooms}`;
-  const alive=run.enemies.filter(e=>e.hp>0);$('room-status').textContent=run.tutorial?'跟隨下方引導，失誤可繼續練習':`${run.room.id==='crown-arena'?'王座守衛':`${run.waveArrival!=null?'增援抵達前 · ':''}第 ${run.wave} / ${run.wave+run.pendingWaves.length} 波 · ${alive.length} 位敵人`} · ${formatTime(run.time)} · ${profile.settings.autoAim?'自動鎖定':'手動瞄準'}`;
-  $('journey').hidden=!!overlay||!!run.tutorial;const journeyKey=run.challenge+':'+run.roomIndex;if($('journey').dataset.progress!==journeyKey){$('journey').dataset.progress=journeyKey;$('journey').innerHTML=`<span class="eyebrow">${journeyPlan(run).acts>1?chapterName(run):journeyPlan(run).crowns===2?'雙冠遠征':esc(ROUTES.find(r=>r.id===run.route)?.name)} · 歸還王冠</span><div class="journey-nodes ${journeyPlan(run).acts>1?'extended':''}">${Array.from({length:journeyPlan(run).rooms+journeyPlan(run).crowns},(_,i)=>i<journeyPlan(run).rooms?String(i+1):'冠').map((name,i)=>`<span class="${run.roomIndex>i?'done':run.roomIndex===i?'current':''}" aria-label="${i>=journeyPlan(run).rooms?'王座':'第 '+(i+1)+' 房'}${run.roomIndex>i?'已完成':run.roomIndex===i?'進行中':''}">${run.roomIndex>i?'✓':name}</span>`).join('')}</div><small>${esc(objectiveInstruction(run.objective))}</small>`;}
-  const charging=p.heldTime>.34&&!p.attack,ready=p.heldTime>=.65;const actionText=charging?(ready?'蓄力就緒 · 放開刺擊':'蓄力中 · 繼續按住'):p.action==='block'?'格擋中 · 移動減速':p.action==='dodge'?'閃避 · 無敵時間':p.energy<24?'精力不足 · 輕刺不耗能':'';
-  $('action-feedback').hidden=!!overlay||!actionText;$('action-feedback').dataset.ready=String(ready);$('action-label').textContent=actionText;$('charge-fill').style.width=`${Math.min(100,p.heldTime/.65*100)}%`;$('charge-track').hidden=!charging;
-  const list=(run.talents||p.talents||[]).join(',');if($('loadout').dataset.ids!==list){$('loadout').dataset.ids=list;$('loadout').innerHTML=list.split(',').filter(Boolean).map(id=>`<span class="chip">${esc(TALENTS.find(t=>t.id===id)?.name||id)}</span>`).join('');}
-  if(run.tutorial){$('tutorial-copy').innerHTML=`<strong>試煉 ${Number(run.tutorial.step)+1} / 5</strong>　${esc(run.tutorial.text)}<small>J／左鍵刺擊 · K／右鍵格擋 · Space 閃避 · Esc 設定練習窗口</small>`;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
-  const boss=alive.find(e=>ENEMIES[e.type]?.boss);$('boss-hud').hidden=!boss||!!overlay;if(boss){$('boss-name').textContent=`${ENEMIES[boss.type]?.name} · 第 ${boss.phase||1} 階段`;$('boss-fill').style.width=`${boss.hp/boss.maxHp*100}%`;$('boss-move').textContent=boss.state==='telegraph'?`⚠ ${boss.attack?.name||'即將出招'} — 讓出危險區`:boss.state==='recover'?'破綻 · 現在刺擊':'讀取他的動作';}
+function updateVisibility(){document.body.dataset.tutorial=String(Boolean(run?.tutorial&&!overlay&&run.phase!=='result'));clearWarningCue();$('journey').hidden=true;$('action-feedback').hidden=true;const playing=!!run&&run.phase!=='result';$('hud').hidden=!playing;$('loadout').hidden=!playing;$('combat-tip').hidden=!playing||!!overlay;$('touch-controls').hidden=!playing||!!overlay||!touchActive;$('tutorial').hidden=!run?.tutorial||!!overlay||run.phase==='result';if(overlay)$('boss-hud').hidden=true;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+// DOM writes and formatting happen only when the displayed value changes. The
+// cache contains primitives, never an obsolete run/room/enemy reference.
+const hudTalentIds=[];
+const hudNodes=Object.create(null),hudValues=Object.create(null),hudStrings=Object.create(null);
+function hudNode(id){return hudNodes[id]||(hudNodes[id]=$(id));}
+function hudText(id,text){if(hudStrings[id]!==text){hudStrings[id]=text;hudNode(id).textContent=text;}}
+function hudHidden(id,hidden){const node=hudNode(id);if(node.hidden!==hidden)node.hidden=hidden;}
+function hudWidth(id,value){if(hudValues[id]!==value){hudValues[id]=value;hudNode(id).style.width=value+'%';}}
+function updateHud(){
+  if(!run)return;
+  const p=run.player,obj=run.objective,plan=journeyPlan(run);
+  if(!hudValues.tipInitialized||hudValues.objectiveKind!==obj?.kind||hudValues.completed!==obj?.completed||hudValues.targetCount!==obj?.targets.length||hudValues.attackName!==obj?.attack?.name||hudValues.mastered!==obj?.mastered){
+    hudValues.tipInitialized=true;hudValues.objectiveKind=obj?.kind;hudValues.completed=obj?.completed;hudValues.targetCount=obj?.targets.length;hudValues.attackName=obj?.attack?.name;hudValues.mastered=obj?.mastered;
+    hudText('combat-tip',obj?objectiveInstruction(obj)+(obj.targets.length?` · ${obj.completed}/${obj.targets.length}`:'')+(obj.attack&&!obj.mastered?` · ${obj.attack.name}`:''):'清除守衛 → 選擇餘燼 → 前往王座');
+  }
+  const hp=Math.ceil(p.hp);if(hudValues.hp!==hp||hudValues.maxHp!==p.maxHp){hudValues.hp=hp;hudValues.maxHp=p.maxHp;hudText('hp-text',`${hp} / ${p.maxHp}`);}
+  hudWidth('hp-fill',100*Math.max(0,p.hp)/p.maxHp);hudWidth('energy-fill',100*p.energy/p.maxEnergy);
+  const energy=Math.floor(p.energy);if(hudValues.energy!==energy){hudValues.energy=energy;hudText('energy-text',String(energy));}
+  hudText('room-name',run.room.name);
+  if(hudValues.chapterIndex!==run.roomIndex||hudValues.challenge!==run.challenge||hudValues.training!==!!run.tutorial){
+    hudValues.chapterIndex=run.roomIndex;hudValues.challenge=run.challenge;hudValues.training=!!run.tutorial;
+    hudText('chapter',run.tutorial?'守誓者的試煉':run.roomIndex>=plan.rooms?`第 ${run.roomIndex-plan.rooms+1} 頂王冠 / ${plan.crowns}`:`${plan.acts>1?`${chapterName(run)} · `:''}第 ${Number(run.roomIndex)+1} 房 / ${plan.rooms}`);
+  }
+  let alive=0,boss=null;for(let i=0;i<run.enemies.length;i++){const e=run.enemies[i];if(e.hp>0){alive++;if(!boss&&ENEMIES[e.type]?.boss)boss=e;}}
+  const seconds=Math.floor(run.time),arriving=run.waveArrival!=null;
+  if(hudValues.seconds!==seconds||hudValues.alive!==alive||hudValues.wave!==run.wave||hudValues.waves!==run.pendingWaves.length||hudValues.arriving!==arriving||hudValues.autoAim!==profile.settings.autoAim||hudValues.statusRoom!==run.room.id){
+    hudValues.seconds=seconds;hudValues.alive=alive;hudValues.wave=run.wave;hudValues.waves=run.pendingWaves.length;hudValues.arriving=arriving;hudValues.autoAim=profile.settings.autoAim;hudValues.statusRoom=run.room.id;
+    hudText('room-status',run.tutorial?'跟隨下方引導，失誤可繼續練習':`${run.room.id==='crown-arena'?'王座守衛':`${arriving?'增援抵達前 · ':''}第 ${run.wave} / ${run.wave+run.pendingWaves.length} 波 · ${alive} 位敵人`} · ${formatTime(run.time)} · ${profile.settings.autoAim?'自動鎖定':'手動瞄準'}`);
+  }
+  hudHidden('journey',!!overlay||!!run.tutorial);if(hudValues.journeyChallenge!==run.challenge||hudValues.journeyIndex!==run.roomIndex||hudValues.journeyRoute!==run.route){hudValues.journeyChallenge=run.challenge;hudValues.journeyIndex=run.roomIndex;hudValues.journeyRoute=run.route;$('journey').innerHTML=`<span class="eyebrow">${journeyPlan(run).acts>1?chapterName(run):journeyPlan(run).crowns===2?'雙冠遠征':esc(ROUTES.find(r=>r.id===run.route)?.name)} · 歸還王冠</span><div class="journey-nodes ${journeyPlan(run).acts>1?'extended':''}">${Array.from({length:journeyPlan(run).rooms+journeyPlan(run).crowns},(_,i)=>i<journeyPlan(run).rooms?String(i+1):'冠').map((name,i)=>`<span class="${run.roomIndex>i?'done':run.roomIndex===i?'current':''}" aria-label="${i>=journeyPlan(run).rooms?'王座':'第 '+(i+1)+' 房'}${run.roomIndex>i?'已完成':run.roomIndex===i?'進行中':''}">${run.roomIndex>i?'✓':name}</span>`).join('')}</div><small>${esc(objectiveInstruction(run.objective))}</small>`;}
+  const charging=p.heldTime>.34&&!p.attack,ready=p.heldTime>=.65;
+  const actionText=charging?(ready?'蓄力就緒 · 放開刺擊':'蓄力中 · 繼續按住'):p.action==='block'?'格擋中 · 移動減速':p.action==='dodge'?'閃避 · 無敵時間':p.energy<24?'精力不足 · 輕刺不耗能':'';
+  hudHidden('action-feedback',!!overlay||!actionText);
+  if(hudNode('action-feedback').dataset.ready!==String(ready))hudNode('action-feedback').dataset.ready=String(ready);
+  hudText('action-label',actionText);hudWidth('charge-fill',Math.min(100,p.heldTime/.65*100));hudHidden('charge-track',!charging);
+  const talents=run.talents||p.talents;let talentChanged=hudTalentIds.length!==talents.length;for(let i=0;i<talents.length;i++)if(hudTalentIds[i]!==talents[i]){hudTalentIds[i]=talents[i];talentChanged=true;}if(talentChanged){hudTalentIds.length=talents.length;const list=talents.join(',');$('loadout').innerHTML=list.split(',').filter(Boolean).map(id=>`<span class="chip">${esc(TALENTS.find(t=>t.id===id)?.name||id)}</span>`).join('');}
+  if(run.tutorial&&(hudValues.tutorialStep!==run.tutorial.step||hudValues.tutorialText!==run.tutorial.text)){
+    hudValues.tutorialStep=run.tutorial.step;hudValues.tutorialText=run.tutorial.text;
+    $('tutorial-copy').innerHTML=`<strong>試煉 ${Number(run.tutorial.step)+1} / 5</strong>　${esc(run.tutorial.text)}<small>J／左鍵刺擊 · K／右鍵格擋 · Space 閃避 · Esc 設定練習窗口</small>`;
+  }
+  hudHidden('boss-hud',!boss||!!overlay);
+  if(boss){if(hudValues.bossType!==boss.type||hudValues.bossPhase!==boss.phase){hudValues.bossType=boss.type;hudValues.bossPhase=boss.phase;hudText('boss-name',`${ENEMIES[boss.type]?.name} · 第 ${boss.phase||1} 階段`);}hudWidth('boss-fill',boss.hp/boss.maxHp*100);
+    if(hudValues.bossState!==boss.state||hudValues.bossMove!==boss.attack?.name){hudValues.bossState=boss.state;hudValues.bossMove=boss.attack?.name;hudText('boss-move',boss.state==='telegraph'?`⚠ ${boss.attack?.name||'即將出招'} — 讓出危險區`:boss.state==='recover'?'破綻 · 現在刺擊':'讀取他的動作');}
+  }
 }
 
 $('overlay').addEventListener('click',e=>{
