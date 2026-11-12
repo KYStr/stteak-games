@@ -15,7 +15,15 @@ import {
 } from "./enemy-tactics.js";
 
 const point = (p) => [p.x, p.z];
-const vector = (p) => new THREE.Vector3(p[0], 0, p[1]);
+const vectorCache = new WeakMap();
+const vector = (p) => {
+  let v = vectorCache.get(p);
+  if (!v || v.x !== p[0] || v.z !== p[1]) {
+    v = new THREE.Vector3(p[0], 0, p[1]);
+    vectorCache.set(p, v);
+  }
+  return v;
+};
 const gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const esc = (s) =>
   String(s ?? "").replace(
@@ -229,47 +237,43 @@ export class WaterSystem {
         throw new Error(`Unimplemented water effect: ${effect.type}`);
     }
   }
+  addOccupant(id, position, radius) {
+    if (!position || this.occupantSeen.has(position)) return;
+    this.occupantSeen.add(position);
+    let record = this.occupantRecords.get(position);
+    if (!record) {
+      record = { id, position, radius };
+      this.occupantRecords.set(position, record);
+    }
+    record.id = id;
+    record.radius = radius;
+    this.occupantBuffer.push(record);
+  }
   occupants() {
-    const entries = [
-      { id: "player", position: this.player.position, radius: 0.34 },
-    ];
-    const seen = new Set([this.player.position]);
+    this.occupantBuffer ??= [];
+    this.occupantSeen ??= new Set();
+    this.occupantRecords ??= new WeakMap();
+    this.occupantBuffer.length = 0;
+    this.occupantSeen.clear();
+    this.addOccupant("player", this.player.position, 0.34);
     for (const enemy of this.enemies) {
-      const position = enemy.actor?.position;
-      if (!position || seen.has(position)) continue;
-      seen.add(position);
-      if (enemy.hp <= 0) continue;
-      entries.push({ id: enemy.id, position, radius: 0.38 });
-    }
-    for (const actor of this.world.actors || []) {
-      if (
-        !actor.position ||
-        seen.has(actor.position) ||
-        actor.object?.visible === false
-      )
+      if (enemy.hp <= 0) {
+        if (enemy.actor?.position) this.occupantSeen.add(enemy.actor.position);
         continue;
-      seen.add(actor.position);
-      entries.push({
-        id: actor.object?.name || actor.name || "npc",
-        position: actor.position,
-        radius: 0.34,
-      });
+      }
+      this.addOccupant(enemy.id, enemy.actor?.position, 0.38);
     }
-    for (const task of this.field.tasks) {
-      if (
-        !task.cargo ||
-        task.cargo.visible === false ||
-        seen.has(task.cargo.position)
-      )
-        continue;
-      seen.add(task.cargo.position);
-      entries.push({
-        id: `${task.id}-cargo`,
-        position: task.cargo.position,
-        radius: 0.55,
-      });
-    }
-    return entries;
+    for (const actor of this.world.actors || [])
+      if (actor.object?.visible !== false)
+        this.addOccupant(
+          actor.object?.name || actor.name || "npc",
+          actor.position,
+          0.34,
+        );
+    for (const task of this.field.tasks)
+      if (task.cargo && task.cargo.visible !== false)
+        this.addOccupant(`${task.id}-cargo`, task.cargo.position, 0.55);
+    return this.occupantBuffer;
   }
   moveReserve(position) {
     const task = this.reserve;
@@ -803,6 +807,8 @@ export class WaterSystem {
         ((dz / length) * amount) / steps,
         colliders,
         0.38,
+        23,
+        (enemy.moveOut ??= {}),
       );
       from.x = moved.x;
       from.z = moved.z;

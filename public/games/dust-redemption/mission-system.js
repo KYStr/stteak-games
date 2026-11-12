@@ -17,7 +17,15 @@ import {
 } from "./enemy-tactics.js";
 
 const point = (p) => [p.x, p.z];
-const vector = (p) => new THREE.Vector3(p[0], 0, p[1]);
+const vectorCache = new WeakMap();
+const vector = (p) => {
+  let v = vectorCache.get(p);
+  if (!v || v.x !== p[0] || v.z !== p[1]) {
+    v = new THREE.Vector3(p[0], 0, p[1]);
+    vectorCache.set(p, v);
+  }
+  return v;
+};
 const gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const guardTitle = (id) =>
   ({
@@ -873,6 +881,8 @@ export class MissionSystem {
         ((dz / length) * amount) / steps,
         colliders,
         radius,
+        23,
+        (enemy.moveOut ??= {}),
       );
       from.x = moved.x;
       from.z = moved.z;
@@ -1091,14 +1101,14 @@ export class MissionSystem {
     }
     this.updateWorker(dt);
     const departure = this.departure();
+    const input = (this.departureInput ??= {});
+    input.enabled = Boolean(departure?.target);
+    input.position = this.player.position;
+    input.target = departure?.target;
+    input.colliders = this.world.colliders;
     this.departureState = (this.departureGuidance ??= createDepartureGuidance({
       moveCircle,
-    })).update({
-      enabled: Boolean(departure?.target),
-      position: this.player.position,
-      target: departure?.target,
-      colliders: this.world.colliders,
-    });
+    })).update(input);
     this.props.setDepartureGuidance?.(this.departureState.chevrons);
   }
   departure() {

@@ -1,3 +1,10 @@
+import { DIFFICULTIES } from "./challenge.js";
+import {
+  STORY_SEED,
+  validSeed,
+  encounterFor,
+  challengeKey,
+} from "./encounter-variants.js";
 import { MISSIONS, NPCS, WEAPONS, ENDINGS, missionById } from "./content.js";
 import {
   FIELD_WORK,
@@ -19,13 +26,29 @@ import {
   validWaterFlowRequirement,
 } from "./water-flow.js";
 
-import { signalFlowRecord, validSignalFlowRecord, validSignalFlowRequirement } from "./signal-flow.js";
+import {
+  signalFlowRecord,
+  validSignalFlowRecord,
+  validSignalFlowRequirement,
+} from "./signal-flow.js";
 
-import { ledgerFlowRecord, validLedgerFlowRecord, validLedgerFlowRequirement } from "./ledger-flow.js";
+import {
+  ledgerFlowRecord,
+  validLedgerFlowRecord,
+  validLedgerFlowRequirement,
+} from "./ledger-flow.js";
 
-import { nightFlowRecord, validNightFlowRecord, validNightFlowRequirement } from "./night-flow.js";
+import {
+  nightFlowRecord,
+  validNightFlowRecord,
+  validNightFlowRequirement,
+} from "./night-flow.js";
 
-import { pactFlowRecord, validPactFlowRecord, validPactFlowRequirement } from "./pact-flow.js";
+import {
+  pactFlowRecord,
+  validPactFlowRecord,
+  validPactFlowRequirement,
+} from "./pact-flow.js";
 
 export const PROFILE_SCHEMA = 2;
 export const CHOICE_VALUES = Object.freeze({
@@ -240,11 +263,16 @@ function validFieldRecord(row) {
 function validMissionFlowOutcome(row, expectedMissionId = row?.missionId) {
   if (!validMissionFlowRecord(row)) return false;
   if (!Object.hasOwn(row, "missionFlow")) return true;
-  const result = row.missionFlow.result, defeated = result.defeatedActors;
-  if (result.version === 2 && (
-    (row.strategy === "combat" && defeated.length !== 4) ||
-    (row.strategy === "nonlethal" && result.localChoices.handoff === "mutual-aid" && !result.promiseRelayed)
-  )) return false;
+  const result = row.missionFlow.result,
+    defeated = result.defeatedActors;
+  if (
+    result.version === 2 &&
+    ((row.strategy === "combat" && defeated.length !== 4) ||
+      (row.strategy === "nonlethal" &&
+        result.localChoices.handoff === "mutual-aid" &&
+        !result.promiseRelayed))
+  )
+    return false;
   return (
     row.missionId === expectedMissionId &&
     ["nonlethal", "combat"].includes(row.strategy) &&
@@ -282,11 +310,17 @@ function validSignalFlowOutcome(row, expectedMissionId = row?.missionId) {
   if (!validSignalFlowRecord(row)) return false;
   if (!Object.hasOwn(row, "signalFlow")) return true;
   const result = row.signalFlow.result;
-  return row.missionId === expectedMissionId &&
+  return (
+    row.missionId === expectedMissionId &&
     ["nonlethal", "combat"].includes(row.strategy) &&
-    Number.isInteger(row.stats?.kills) && row.stats.kills === result.defeatedActors.length &&
-    (row.strategy === "nonlethal" ? result.defeatedActors.length === 0 : result.defeatedActors.length === 5) &&
-    row.fieldworkComplete === true && sameData(row.fieldChoices, result.fieldChoices);
+    Number.isInteger(row.stats?.kills) &&
+    row.stats.kills === result.defeatedActors.length &&
+    (row.strategy === "nonlethal"
+      ? result.defeatedActors.length === 0
+      : result.defeatedActors.length === 5) &&
+    row.fieldworkComplete === true &&
+    sameData(row.fieldChoices, result.fieldChoices)
+  );
 }
 
 /** Original custody and local copy scope never settle the permanent ledger choice. */
@@ -294,11 +328,17 @@ function validLedgerFlowOutcome(row, expectedMissionId = row?.missionId) {
   if (!validLedgerFlowRecord(row)) return false;
   if (!Object.hasOwn(row, "ledgerFlow")) return true;
   const result = row.ledgerFlow.result;
-  return row.missionId === expectedMissionId &&
+  return (
+    row.missionId === expectedMissionId &&
     ["nonlethal", "combat"].includes(row.strategy) &&
-    Number.isInteger(row.stats?.kills) && row.stats.kills === result.defeatedActors.length &&
-    (row.strategy === "nonlethal" ? result.defeatedActors.length === 0 && result.clearance : result.defeatedActors.length === 5) &&
-    row.fieldworkComplete === true && sameData(row.fieldChoices, result.fieldChoices);
+    Number.isInteger(row.stats?.kills) &&
+    row.stats.kills === result.defeatedActors.length &&
+    (row.strategy === "nonlethal"
+      ? result.defeatedActors.length === 0 && result.clearance
+      : result.defeatedActors.length === 5) &&
+    row.fieldworkComplete === true &&
+    sameData(row.fieldChoices, result.fieldChoices)
+  );
 }
 
 /** Same three family members must physically arrive; local escort never changes story. */
@@ -306,11 +346,17 @@ function validNightFlowOutcome(row, expectedMissionId = row?.missionId) {
   if (!validNightFlowRecord(row)) return false;
   if (!Object.hasOwn(row, "nightFlow")) return true;
   const result = row.nightFlow.result;
-  return row.missionId === expectedMissionId &&
+  return (
+    row.missionId === expectedMissionId &&
     ["nonlethal", "combat"].includes(row.strategy) &&
-    Number.isInteger(row.stats?.kills) && row.stats.kills === result.defeatedActors.length &&
-    (row.strategy === "nonlethal" ? result.defeatedActors.length === 0 && result.clearance : result.defeatedActors.length === 6) &&
-    row.fieldworkComplete === true && sameData(row.fieldChoices, result.fieldChoices);
+    Number.isInteger(row.stats?.kills) &&
+    row.stats.kills === result.defeatedActors.length &&
+    (row.strategy === "nonlethal"
+      ? result.defeatedActors.length === 0 && result.clearance
+      : result.defeatedActors.length === 6) &&
+    row.fieldworkComplete === true &&
+    sameData(row.fieldChoices, result.fieldChoices)
+  );
 }
 
 /** Same finite supply cart and deed; final story choices remain at extraction. */
@@ -318,11 +364,17 @@ function validPactFlowOutcome(row, expectedMissionId = row?.missionId) {
   if (!validPactFlowRecord(row)) return false;
   if (!Object.hasOwn(row, "pactFlow")) return true;
   const result = row.pactFlow.result;
-  return row.missionId === expectedMissionId &&
+  return (
+    row.missionId === expectedMissionId &&
     ["nonlethal", "combat"].includes(row.strategy) &&
-    Number.isInteger(row.stats?.kills) && row.stats.kills === result.defeatedActors.length &&
-    (row.strategy === "nonlethal" ? result.defeatedActors.length === 0 && result.clearance : result.defeatedActors.length === 6) &&
-    row.fieldworkComplete === true && sameData(row.fieldChoices, result.fieldChoices);
+    Number.isInteger(row.stats?.kills) &&
+    row.stats.kills === result.defeatedActors.length &&
+    (row.strategy === "nonlethal"
+      ? result.defeatedActors.length === 0 && result.clearance
+      : result.defeatedActors.length === 6) &&
+    row.fieldworkComplete === true &&
+    sameData(row.fieldChoices, result.fieldChoices)
+  );
 }
 
 export function createProfile() {
@@ -483,6 +535,12 @@ export function validateProfile(profile, depth = 0) {
   if (profile.activeRun !== null) {
     const run = profile.activeRun;
     if (
+      (run.difficulty !== undefined &&
+        !Object.hasOwn(DIFFICULTIES, run.difficulty)) ||
+      (run.seed !== undefined && !validSeed(run.seed))
+    )
+      return false;
+    if (
       !run ||
       typeof run.id !== "string" ||
       run.id.length > 100 ||
@@ -499,7 +557,15 @@ export function validateProfile(profile, depth = 0) {
         : MISSIONS[profile.completed.length]?.id !== run.missionId
     )
       return false;
-    if (!validMissionFlowRequirement(run) || !validWaterFlowRequirement(run) || !validSignalFlowRequirement(run) || !validLedgerFlowRequirement(run) || !validNightFlowRequirement(run) || !validPactFlowRequirement(run)) return false;
+    if (
+      !validMissionFlowRequirement(run) ||
+      !validWaterFlowRequirement(run) ||
+      !validSignalFlowRequirement(run) ||
+      !validLedgerFlowRequirement(run) ||
+      !validNightFlowRequirement(run) ||
+      !validPactFlowRequirement(run)
+    )
+      return false;
     if (run.before && !validateProfile(run.before, depth + 1)) return false;
     if (
       run.requireFieldwork !== undefined &&
@@ -531,6 +597,8 @@ export function normalizeProfile(profile) {
   if (next.activeRun?.before)
     next.activeRun.before = normalizeProfile(next.activeRun.before);
   if (next.activeRun) {
+    next.activeRun.difficulty ??= "story";
+    next.activeRun.seed ??= STORY_SEED;
     next.activeRun.requireFieldwork = next.activeRun.requireFieldwork ?? false;
     next.activeRun.supplyBonuses = supplyBonuses(next.safeSnapshot);
   }
@@ -543,6 +611,9 @@ export function reportStats(stats = {}) {
   return {
     shots,
     hits,
+    activeWallSeconds:
+      Math.round(bounded(stats.activeWallSeconds, 0, 86400) * 10) / 10,
+    activeSeconds: Math.round(bounded(stats.activeSeconds, 0, 86400) * 10) / 10,
     accuracy: shots ? Math.round((hits / shots) * 1000) / 10 : 0,
     damageTaken: Math.round(bounded(stats.damageTaken, 0, 100000) * 10) / 10,
     kills: integer(stats.kills, 0, 1000),
@@ -567,8 +638,11 @@ export function beginMission(profile, missionId, options = {}) {
   const flowRequirement = Object.hasOwn(options, "missionFlowVersion")
     ? { missionFlowVersion: options.missionFlowVersion }
     : {};
-  if (!validMissionFlowRequirement({ missionId, ...flowRequirement }) ||
-      (Object.hasOwn(options, "missionFlowVersion") && options.missionFlowVersion !== CURRENT_MISSION_FLOW[missionId]?.version))
+  if (
+    !validMissionFlowRequirement({ missionId, ...flowRequirement }) ||
+    (Object.hasOwn(options, "missionFlowVersion") &&
+      options.missionFlowVersion !== CURRENT_MISSION_FLOW[missionId]?.version)
+  )
     throw new Error("委託交接流程版本無效。");
   const waterRequirement = Object.hasOwn(options, "waterFlowVersion")
     ? { waterFlowVersion: options.waterFlowVersion }
@@ -576,19 +650,23 @@ export function beginMission(profile, missionId, options = {}) {
   if (!validWaterFlowRequirement({ missionId, ...waterRequirement }))
     throw new Error("供水流程版本無效。");
   const signalRequirement = Object.hasOwn(options, "signalFlowVersion")
-    ? { signalFlowVersion: options.signalFlowVersion } : {};
+    ? { signalFlowVersion: options.signalFlowVersion }
+    : {};
   if (!validSignalFlowRequirement({ missionId, ...signalRequirement }))
     throw new Error("電報流程版本無效。");
   const ledgerRequirement = Object.hasOwn(options, "ledgerFlowVersion")
-    ? { ledgerFlowVersion: options.ledgerFlowVersion } : {};
+    ? { ledgerFlowVersion: options.ledgerFlowVersion }
+    : {};
   if (!validLedgerFlowRequirement({ missionId, ...ledgerRequirement }))
     throw new Error("黑帳流程版本無效。");
   const nightRequirement = Object.hasOwn(options, "nightFlowVersion")
-    ? { nightFlowVersion: options.nightFlowVersion } : {};
+    ? { nightFlowVersion: options.nightFlowVersion }
+    : {};
   if (!validNightFlowRequirement({ missionId, ...nightRequirement }))
     throw new Error("護送流程版本無效。");
   const pactRequirement = Object.hasOwn(options, "pactFlowVersion")
-    ? { pactFlowVersion: options.pactFlowVersion } : {};
+    ? { pactFlowVersion: options.pactFlowVersion }
+    : {};
   if (!validPactFlowRequirement({ missionId, ...pactRequirement }))
     throw new Error("補給流程版本無效。");
   if (
@@ -612,6 +690,10 @@ export function beginMission(profile, missionId, options = {}) {
     !["medkit", "smoke"].includes(item)
   )
     throw new Error("裝備選項無效。");
+  const difficulty = options.difficulty ?? "standard",
+    seed = options.seed ?? STORY_SEED;
+  if (!Object.hasOwn(DIFFICULTIES, difficulty) || !validSeed(seed))
+    throw new Error("難度或挑戰種子無效。");
   const before = clone(profile);
   before.activeRun = null;
   before.safeSnapshot = null;
@@ -620,6 +702,8 @@ export function beginMission(profile, missionId, options = {}) {
     id,
     missionId,
     replay,
+    difficulty,
+    seed,
     weapon,
     item,
     requireFieldwork: options.requireFieldwork ?? false,
@@ -707,9 +791,12 @@ export function completeMission(profile, run, outcome = {}) {
     throw new Error("本次委託必須完成藥品實際交付才能結算。");
   if (hasMissionProgress && !record(outcome.missionProgress))
     throw new Error("交接流程事件格式無效。");
-  if (profile.activeRun.missionFlowVersion !== undefined &&
-      (profile.activeRun.missionFlowVersion !== CURRENT_MISSION_FLOW[mission.id]?.version ||
-       outcome.missionProgress?.version !== profile.activeRun.missionFlowVersion))
+  if (
+    profile.activeRun.missionFlowVersion !== undefined &&
+    (profile.activeRun.missionFlowVersion !==
+      CURRENT_MISSION_FLOW[mission.id]?.version ||
+      outcome.missionProgress?.version !== profile.activeRun.missionFlowVersion)
+  )
     throw new Error("舊版現場必須回安全入口重新開始；本次交接流程不可降級。");
   const flow = hasMissionProgress
     ? missionFlowRecord(mission.id, outcome.missionProgress)
@@ -724,7 +811,9 @@ export function completeMission(profile, run, outcome = {}) {
       missionFlow: flow,
     })
   )
-    throw new Error("交接事件與實際擊殺統計不符，或未完成查驗者接受、共同醫護傳達或清場接管。");
+    throw new Error(
+      "交接事件與實際擊殺統計不符，或未完成查驗者接受、共同醫護傳達或清場接管。",
+    );
   const hasWaterProgress = Object.hasOwn(outcome, "waterProgress");
   // Persisted requirements cannot be downgraded through the caller's run object.
   if (profile.activeRun.waterFlowVersion !== undefined && !hasWaterProgress)
@@ -747,46 +836,100 @@ export function completeMission(profile, run, outcome = {}) {
       waterFlow,
     })
   )
-    throw new Error("供水事件與實際擊殺統計、非致命保證、清場或備水現場選擇不符。");
+    throw new Error(
+      "供水事件與實際擊殺統計、非致命保證、清場或備水現場選擇不符。",
+    );
   const hasSignalProgress = Object.hasOwn(outcome, "signalProgress");
   if (profile.activeRun.signalFlowVersion !== undefined && !hasSignalProgress)
     throw new Error("本次委託必須完成本次電報與完整名單收件才能結算。");
   if (hasSignalProgress && !record(outcome.signalProgress))
     throw new Error("電報流程事件格式無效。");
-  const signalFlow = hasSignalProgress ? signalFlowRecord(mission.id, outcome.signalProgress) : null;
-  if (signalFlow && !field) throw new Error("電報收件必須同時提交三項現場工作證據。");
-  if (signalFlow && !validSignalFlowOutcome({ missionId: mission.id, strategy, stats: outcome.stats,
-      fieldworkComplete: Boolean(field), fieldChoices: field?.choices, signalFlow }))
+  const signalFlow = hasSignalProgress
+    ? signalFlowRecord(mission.id, outcome.signalProgress)
+    : null;
+  if (signalFlow && !field)
+    throw new Error("電報收件必須同時提交三項現場工作證據。");
+  if (
+    signalFlow &&
+    !validSignalFlowOutcome({
+      missionId: mission.id,
+      strategy,
+      stats: outcome.stats,
+      fieldworkComplete: Boolean(field),
+      fieldChoices: field?.choices,
+      signalFlow,
+    })
+  )
     throw new Error("電報收件與實際傷亡、完整名單或現場路線選擇不符。");
   const hasLedgerProgress = Object.hasOwn(outcome, "ledgerProgress");
   if (profile.activeRun.ledgerFlowVersion !== undefined && !hasLedgerProgress)
     throw new Error("本次委託必須完成原帳核證與唯一副本保管交接才能結算。");
   if (hasLedgerProgress && !record(outcome.ledgerProgress))
     throw new Error("黑帳流程事件格式無效。");
-  const ledgerFlow = hasLedgerProgress ? ledgerFlowRecord(mission.id, outcome.ledgerProgress) : null;
-  if (ledgerFlow && !field) throw new Error("黑帳保管交接必須同時提交三項現場工作證據。");
-  if (ledgerFlow && !validLedgerFlowOutcome({ missionId: mission.id, strategy, stats: outcome.stats,
-      fieldworkComplete: Boolean(field), fieldChoices: field?.choices, ledgerFlow }))
+  const ledgerFlow = hasLedgerProgress
+    ? ledgerFlowRecord(mission.id, outcome.ledgerProgress)
+    : null;
+  if (ledgerFlow && !field)
+    throw new Error("黑帳保管交接必須同時提交三項現場工作證據。");
+  if (
+    ledgerFlow &&
+    !validLedgerFlowOutcome({
+      missionId: mission.id,
+      strategy,
+      stats: outcome.stats,
+      fieldworkComplete: Boolean(field),
+      fieldChoices: field?.choices,
+      ledgerFlow,
+    })
+  )
     throw new Error("黑帳收據與實際傷亡、核證放行或副本保管選擇不符。");
   const hasNightProgress = Object.hasOwn(outcome, "nightProgress");
   if (profile.activeRun.nightFlowVersion !== undefined && !hasNightProgress)
-    throw new Error("本次委託必須讓同三位家屬實際抵達南側，取得護送回條才能結算。");
+    throw new Error(
+      "本次委託必須讓同三位家屬實際抵達南側，取得護送回條才能結算。",
+    );
   if (hasNightProgress && !record(outcome.nightProgress))
     throw new Error("護送流程事件格式無效。");
-  const nightFlow = hasNightProgress ? nightFlowRecord(mission.id, outcome.nightProgress) : null;
-  if (nightFlow && !field) throw new Error("護送到達回條必須同時提交三項現場工作證據。");
-  if (nightFlow && !validNightFlowOutcome({ missionId: mission.id, strategy, stats: outcome.stats,
-      fieldworkComplete: Boolean(field), fieldChoices: field?.choices, nightFlow }))
+  const nightFlow = hasNightProgress
+    ? nightFlowRecord(mission.id, outcome.nightProgress)
+    : null;
+  if (nightFlow && !field)
+    throw new Error("護送到達回條必須同時提交三項現場工作證據。");
+  if (
+    nightFlow &&
+    !validNightFlowOutcome({
+      missionId: mission.id,
+      strategy,
+      stats: outcome.stats,
+      fieldworkComplete: Boolean(field),
+      fieldChoices: field?.choices,
+      nightFlow,
+    })
+  )
     throw new Error("護送回條與實際傷亡、文件放行或三人路線選擇不符。");
   const hasPactProgress = Object.hasOwn(outcome, "pactProgress");
   if (profile.activeRun.pactFlowVersion !== undefined && !hasPactProgress)
-    throw new Error("本次委託必須完成同一補給車、有限庫存盤點與地契交接才能結算。");
+    throw new Error(
+      "本次委託必須完成同一補給車、有限庫存盤點與地契交接才能結算。",
+    );
   if (hasPactProgress && !record(outcome.pactProgress))
     throw new Error("補給流程事件格式無效。");
-  const pactFlow = hasPactProgress ? pactFlowRecord(mission.id, outcome.pactProgress) : null;
-  if (pactFlow && !field) throw new Error("補給地契回條必須同時提交三項現場工作證據。");
-  if (pactFlow && !validPactFlowOutcome({ missionId: mission.id, strategy, stats: outcome.stats,
-      fieldworkComplete: Boolean(field), fieldChoices: field?.choices, pactFlow }))
+  const pactFlow = hasPactProgress
+    ? pactFlowRecord(mission.id, outcome.pactProgress)
+    : null;
+  if (pactFlow && !field)
+    throw new Error("補給地契回條必須同時提交三項現場工作證據。");
+  if (
+    pactFlow &&
+    !validPactFlowOutcome({
+      missionId: mission.id,
+      strategy,
+      stats: outcome.stats,
+      fieldworkComplete: Boolean(field),
+      fieldChoices: field?.choices,
+      pactFlow,
+    })
+  )
     throw new Error("補給回條與實際傷亡、交械放行或同車保管選擇不符。");
   const fieldDelta = field?.rewardDelta || 0;
   const stats = reportStats({
@@ -795,6 +938,13 @@ export function completeMission(profile, run, outcome = {}) {
   });
   const result = {
     missionId: mission.id,
+    difficulty: profile.activeRun.difficulty ?? "story",
+    seed: profile.activeRun.seed ?? STORY_SEED,
+    encounterProfile: encounterFor(
+      mission.id,
+      profile.activeRun.seed ?? STORY_SEED,
+      profile.activeRun.difficulty ?? "story",
+    ).profile,
     title: mission.title,
     strategy,
     replay: run.replay,
@@ -830,6 +980,26 @@ export function completeMission(profile, run, outcome = {}) {
     next.challenges[mission.id] = {
       attempts: (previous?.attempts || 0) + 1,
       last: result,
+      records: {
+        ...(previous?.records || {}),
+        [challengeKey(result)]: {
+          attempts:
+            (previous?.records?.[challengeKey(result)]?.attempts || 0) + 1,
+          bestActiveSeconds: Math.min(
+            previous?.records?.[challengeKey(result)]?.bestActiveSeconds ??
+              Infinity,
+            stats.activeSeconds,
+          ),
+          bestAccuracy: Math.max(
+            previous?.records?.[challengeKey(result)]?.bestAccuracy || 0,
+            stats.accuracy,
+          ),
+          leastDamage: Math.min(
+            previous?.records?.[challengeKey(result)]?.leastDamage ?? Infinity,
+            stats.damageTaken,
+          ),
+        },
+      },
       bestAccuracy: Math.max(previous?.bestAccuracy || 0, stats.accuracy),
       leastDamage: Math.min(
         previous?.leastDamage ?? Infinity,

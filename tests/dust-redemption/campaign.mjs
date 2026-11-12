@@ -244,7 +244,7 @@ export async function completeSignal(p, channel = "ceasefire-line") {
   } else {
     await action(p, "signal-branch", "[data-connected=false]");
     await close(p);
-    await go(p, [-12, -2.7], .1);
+    await go(p, [-12, -2.7], 0.1);
     await p.keyboard.press("KeyE");
     await action(
       p,
@@ -252,8 +252,9 @@ export async function completeSignal(p, channel = "ceasefire-line") {
       "[data-endpoint=relay-south][data-connected=true]",
     );
     await action(p, "signal-send", "[data-content=full-roster]");
-    const original = (await snapshot(p)).signalFlow.status.transmission
-      .messageId;
+    const sent = (await snapshot(p)).signalFlow;
+    const original = sent.status.transmission.messageId;
+    const revision = sent.status.transmission.revision;
     await action(
       p,
       "signal-connect",
@@ -261,6 +262,15 @@ export async function completeSignal(p, channel = "ceasefire-line") {
     );
     assert.equal((await snapshot(p)).signalFlow.status.transmission, null);
     assert.equal((await snapshot(p)).signalFlow.reply, null);
+    const disconnected = (await snapshot(p)).signalFlow;
+    assert.equal(disconnected.status.reply, null);
+    assert.deepEqual(disconnected.physicalReply, {
+      paperCount: 0,
+      lampAngle: 0,
+      pending: false,
+    });
+    assert.ok(disconnected.status.revision > revision);
+    assert.equal(disconnected.status.localChoices.channel, "public-dispatch");
     await action(
       p,
       "signal-connect",
@@ -271,8 +281,35 @@ export async function completeSignal(p, channel = "ceasefire-line") {
       (await snapshot(p)).signalFlow.status.transmission.messageId,
       original,
     );
-    await action(p, "signal-submit-relay");
+    // A second reachable front approach must retain the same switch contract.
     await action(p, "signal-close");
+    await go(p, [-12.8, -2.8], 0.1);
+    await p.keyboard.press("KeyE");
+    const second = (await snapshot(p)).signalFlow.status.transmission.messageId;
+    await action(
+      p,
+      "signal-connect",
+      "[data-endpoint=relay-south][data-connected=false]",
+    );
+    assert.equal((await snapshot(p)).signalFlow.status.transmission, null);
+    assert.deepEqual((await snapshot(p)).signalFlow.physicalReply, {
+      paperCount: 0,
+      lampAngle: 0,
+      pending: false,
+    });
+    await action(
+      p,
+      "signal-connect",
+      "[data-endpoint=relay-south][data-connected=true]",
+    );
+    await action(p, "signal-send", "[data-content=full-roster]");
+    assert.notEqual(
+      (await snapshot(p)).signalFlow.status.transmission.messageId,
+      second,
+    );
+    await action(p, "signal-submit-relay");
+    await done(p, "signal-relay");
+    await close(p);
   }
   await go(p, [-10, 15.5]);
   if (channel === "ceasefire-line")
@@ -309,7 +346,7 @@ export async function completeLedger(p, custody = "sealed-courier") {
   await choose(p, "manager-impression");
   await done(p, "ledger-carbon");
   await close(p);
-  await open(p, "ledger-copy", { x: 11, z: -5.7 }, .1);
+  await open(p, "ledger-copy", { x: 11, z: -5.7 }, 0.1);
   await action(p, "ledger-custody", `[data-choice="${custody}"]`);
   await adjust(p, "press-copy", 1);
   await action(p, "field-step", "[data-step=collect-copy]");
@@ -398,9 +435,14 @@ export async function completeNight(p, route = "west-ford") {
   }
   await mode(p, "field");
   await action(p, "field-step", "[data-step=group-safe]");
+  if ((await snapshot(p)).mode === "playing") {
+    await go(p, NIGHT_FLOW["long-night"].arrival.position, 0.5);
+    await mode(p, "field");
+  }
   await choose(p, "count-three");
   await done(p, "night-escort");
   await close(p);
+  await go(p, NIGHT_FLOW["long-night"].arrival.position, 0.8);
   await p.keyboard.press("KeyE");
   await action(p, "night-receipt");
   assert.ok((await snapshot(p)).nightFlow.status.receipt);
@@ -500,18 +542,20 @@ export async function completePact(p, siding = "negotiation-siding") {
 export async function prematureExtraction(p) {
   await p.keyboard.press("KeyE");
   const d = await snapshot(p);
-  if(d.mission === "long-night"){
+  if (d.mission === "long-night") {
     // The arrival desk shares this exit and intentionally gets first refusal.
-    await mode(p, "parley");await action(p, "night-receipt");
+    await mode(p, "parley");
+    await action(p, "night-receipt");
     assert.match(await p.locator("#overlay").innerText(), /先完成原三工作/);
     assert.equal((await snapshot(p)).nightFlow.status.receipt, null);
     await action(p, "night-close");
-  }else{
+  } else {
     await mode(p, "withdraw");
     assert.match(await p.locator("#overlay").innerText(), /目標尚未完成/);
     await action(p, "back-playing");
   }
-  await mode(p, "playing");assert.equal((await snapshot(p)).secured, false);
+  await mode(p, "playing");
+  assert.equal((await snapshot(p)).secured, false);
 }
 
 export const campaignFunctions = [

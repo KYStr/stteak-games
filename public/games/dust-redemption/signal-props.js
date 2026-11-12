@@ -594,7 +594,16 @@ export function createSignalProps(THREE, world, flow) {
         "signal-relay",
         true,
       );
+      // Borrowed meshes keep their real FieldSystem records. The separate
+      // dispatch jack belongs to this apparatus too; never allow other scenery.
+      const interaction = new Set();
+      for (const object of [root, contactNode])
+        object.traverse((node) => {
+          const collider = world.solidBoxes.get(node);
+          if (collider) interaction.add(collider);
+        });
       bindings.set(id, {
+        interactionColliders: Object.freeze([...interaction]),
         root,
         knife,
         socket,
@@ -763,21 +772,40 @@ export function createSignalProps(THREE, world, flow) {
       localBounds = new THREE.Box3()
         .setFromObject(pouch)
         .applyMatrix4(pouch.matrixWorld.clone().invert()),
-      receivingBounds = localBounds.clone().applyMatrix4(
-        receiver.object.matrixWorld.clone().multiply(
-          new THREE.Matrix4().makeTranslation(...localPose.toArray()),
+      receivingBounds = localBounds
+        .clone()
+        .applyMatrix4(
+          receiver.object.matrixWorld
+            .clone()
+            .multiply(
+              new THREE.Matrix4().makeTranslation(...localPose.toArray()),
+            ),
         ),
-      ),
       steps = Math.max(1, Math.ceil(start.distanceTo(target) / 0.08));
     for (let i = 0; i <= steps; i++) {
       const position = start.clone().lerp(target, i / steps),
         box = receivingBounds.clone().translate(position.sub(target));
-      if (Math.max(Math.abs(box.min.x), Math.abs(box.max.x), Math.abs(box.min.z), Math.abs(box.max.z)) > 23)
+      if (
+        Math.max(
+          Math.abs(box.min.x),
+          Math.abs(box.max.x),
+          Math.abs(box.min.z),
+          Math.abs(box.max.z),
+        ) > 23
+      )
         throw Error("收件員持袋位置越出現場邊界，請返回可交接的位置。");
-      if (world.colliders.some((b) => b !== pouchBox &&
-        box.min.x < b.max.x - 1e-6 && box.max.x > b.min.x + 1e-6 &&
-        box.min.y < b.max.y - 1e-6 && box.max.y > b.min.y + 1e-6 &&
-        box.min.z < b.max.z - 1e-6 && box.max.z > b.min.z + 1e-6))
+      if (
+        world.colliders.some(
+          (b) =>
+            b !== pouchBox &&
+            box.min.x < b.max.x - 1e-6 &&
+            box.max.x > b.min.x + 1e-6 &&
+            box.min.y < b.max.y - 1e-6 &&
+            box.max.y > b.min.y + 1e-6 &&
+            box.min.z < b.max.z - 1e-6 &&
+            box.max.z > b.min.z + 1e-6,
+        )
+      )
         throw Error("信袋到奧林手邊的交接路徑被擋住，請從收件台前靠近。");
     }
     return target.toArray();
@@ -786,7 +814,9 @@ export function createSignalProps(THREE, world, flow) {
     const target = preparePouchTransfer();
     if (pouch.parent === receiver.object) return readPouch();
     receiver.object.attach(pouch);
-    pouch.position.copy(receiver.object.worldToLocal(new THREE.Vector3(...target)));
+    pouch.position.copy(
+      receiver.object.worldToLocal(new THREE.Vector3(...target)),
+    );
     pouch.quaternion.identity();
     pouch.scale.set(1, 1, 1);
     bounds(pouchBox, pouch);
@@ -936,6 +966,12 @@ export function createSignalProps(THREE, world, flow) {
     setTraceBranch,
     readTraceBranchAngle,
     connectEndpoint,
+    endpointInteractionColliders(id) {
+      alive();
+      const binding = bindings.get(id);
+      if (!binding) throw new Error(`Unknown signal endpoint: ${id}`);
+      return binding.interactionColliders;
+    },
     readEndpoint,
     pressKey,
     readKeyAngle,
@@ -949,6 +985,13 @@ export function createSignalProps(THREE, world, flow) {
     clearReply,
     update,
     readReply,
+    replyState() {
+      return {
+        paperCount: replyPaper.count,
+        lampAngle: lamp.rotation.z,
+        pending: Boolean(pendingReply),
+      };
+    },
     dispose,
   };
 }

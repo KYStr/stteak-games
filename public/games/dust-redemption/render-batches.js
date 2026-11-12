@@ -1,3 +1,6 @@
+const depthOrder = (a, b) => b.depth - a.depth || a.sequence - b.sequence;
+const buildingDepthOrder = (a, b) =>
+  b.depth - a.depth || a.source.id - b.source.id;
 /** Render-only batching. Original scene meshes remain the collision/fade authority. */
 export class BuildingBatches {
   constructor(THREE, buildings, parent) {
@@ -14,8 +17,12 @@ export class BuildingBatches {
           !source.isMesh ||
           source.geometry.type !== "BoxGeometry" ||
           Array.isArray(material) ||
-          !(material.isMeshLambertMaterial ||
-            (material.isMeshStandardMaterial && material.roughness === 0.94 && material.metalness === 0)) ||
+          !(
+            material.isMeshLambertMaterial ||
+            (material.isMeshStandardMaterial &&
+              material.roughness === 0.94 &&
+              material.metalness === 0)
+          ) ||
           material.emissive.getHex() !== 0 ||
           material.map ||
           material.normalMap ||
@@ -78,7 +85,9 @@ export class BuildingBatches {
     mesh.name = name;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.instanceMatrix.setUsage(material.transparent ? T.DynamicDrawUsage : T.StaticDrawUsage);
+    mesh.instanceMatrix.setUsage(
+      material.transparent ? T.DynamicDrawUsage : T.StaticDrawUsage,
+    );
     mesh.count = 0;
     mesh.visible = false;
     // A faded batch sorts near its own building, not at the world origin.
@@ -119,15 +128,16 @@ export class BuildingBatches {
         this.faded[record.buildingIndex].members.push(record);
       } else this.opaque.members.push(record);
     }
-    for (const bucket of this.faded)
-      bucket.members.sort(
-        (a, b) => b.depth - a.depth || a.source.id - b.source.id,
-      );
+    for (const bucket of this.faded) bucket.members.sort(buildingDepthOrder);
     for (const bucket of this.buckets) {
-      const key = bucket.members.map((record) => record.source.id).join(",");
-      if (key === bucket.key) continue;
-      bucket.key = key;
-      bucket.sourceOrder = bucket.members.map((record) => record.source);
+      const order = (bucket.sourceOrder ??= []);
+      let changed = order.length !== bucket.members.length;
+      for (let i = 0; i < bucket.members.length && !changed; i++)
+        if (order[i] !== bucket.members[i].source) changed = true;
+      if (!changed) continue;
+      order.length = bucket.members.length;
+      for (let i = 0; i < order.length; i++)
+        order[i] = bucket.members[i].source;
       bucket.mesh.count = bucket.members.length;
       bucket.mesh.visible = bucket.members.length > 0;
       for (const [index, record] of bucket.members.entries()) {
@@ -160,6 +170,8 @@ export class TracerBatch {
   constructor(THREE, parent, initialCapacity = 32) {
     this.THREE = THREE;
     this.effects = [];
+    this.pool = [];
+    this.ordered = [];
     this.capacity = 0;
     this.disposed = false;
     this.color = new THREE.Color();
@@ -212,25 +224,41 @@ export class TracerBatch {
   add(a, b, color = 0xffd69a) {
     if (this.disposed) throw new Error("Tracer batch has been disposed");
     this.color.set(color);
-    this.effects.push({
-      a: [a.x, a.y, a.z],
-      b: [b.x, b.y, b.z],
-      color: [this.color.r, this.color.g, this.color.b],
-      time: 0.1,
-      alpha: 0.85,
-      sequence: this.sequence++,
+    const effect = this.pool.pop() || {
+      a: [0, 0, 0],
+      b: [0, 0, 0],
+      color: [0, 0, 0],
+      time: 0,
+      alpha: 0,
+      sequence: 0,
       depth: 0,
-    });
+    };
+    effect.a[0] = a.x;
+    effect.a[1] = a.y;
+    effect.a[2] = a.z;
+    effect.b[0] = b.x;
+    effect.b[1] = b.y;
+    effect.b[2] = b.z;
+    effect.color[0] = this.color.r;
+    effect.color[1] = this.color.g;
+    effect.color[2] = this.color.b;
+    effect.time = 0.1;
+    effect.alpha = 0.85;
+    effect.sequence = this.sequence++;
+    effect.depth = 0;
+    this.effects.push(effect);
     this.ensureCapacity(this.effects.length);
     this.upload();
   }
   update(dt, camera = this.camera) {
     this.camera = camera;
+    if (!this.effects.length && !this.mesh.visible) return;
     let kept = 0;
     for (const effect of this.effects) {
       effect.time -= dt;
       effect.alpha = Math.max(0, effect.time * 8);
       if (effect.time > 0) this.effects[kept++] = effect;
+      else this.pool.push(effect);
     }
     this.effects.length = kept;
     this.upload();
@@ -242,7 +270,9 @@ export class TracerBatch {
     // Three sorts each original Line by its bounding-sphere centre, then ID.
     // Match that order inside this batch; other transparent draws cannot be
     // interleaved between individual segments of a single draw.
-    const ordered = this.effects.slice();
+    const ordered = this.ordered;
+    ordered.length = this.effects.length;
+    for (let i = 0; i < ordered.length; i++) ordered[i] = this.effects[i];
     if (this.camera) {
       this.camera.updateMatrixWorld();
       for (const effect of ordered)
@@ -254,16 +284,17 @@ export class TracerBatch {
           )
           .applyMatrix4(this.mesh.parent.matrixWorld)
           .project(this.camera).z;
-      ordered.sort((a, b) => b.depth - a.depth || a.sequence - b.sequence);
+      ordered.sort(depthOrder);
     }
     this.bounds.makeEmpty();
     for (const [index, effect] of ordered.entries()) {
       p.array.set(effect.a, index * 6);
       p.array.set(effect.b, index * 6 + 3);
-      c.array.set(
-        [...effect.color, effect.alpha, ...effect.color, effect.alpha],
-        index * 8,
-      );
+      const offset = index * 8;
+      c.array[offset] = c.array[offset + 4] = effect.color[0];
+      c.array[offset + 1] = c.array[offset + 5] = effect.color[1];
+      c.array[offset + 2] = c.array[offset + 6] = effect.color[2];
+      c.array[offset + 3] = c.array[offset + 7] = effect.alpha;
       this.bounds.expandByPoint(this.projected.fromArray(effect.a));
       this.bounds.expandByPoint(this.projected.fromArray(effect.b));
     }
@@ -275,6 +306,7 @@ export class TracerBatch {
     this.mesh.visible = this.effects.length > 0;
   }
   clear() {
+    for (const effect of this.effects) this.pool.push(effect);
     this.effects.length = 0;
     this.upload();
   }

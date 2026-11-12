@@ -47,6 +47,31 @@ export async function regressions(page, pass) {
     weapon: "rifle",
     item: "smoke",
   });
+  // Withdrawal is a dismissible sheet, not a second pause stack.
+  const safe = await snapshot(page);
+  await page.keyboard.press("KeyE");
+  await mode(page, "withdraw");
+  await page.keyboard.press("Escape");
+  await mode(page, "playing");
+  const returned = await snapshot(page);
+  assert.deepEqual(returned.profile, safe.profile);
+  assert.equal(returned.player.x, safe.player.x);
+  assert.equal(returned.player.z, safe.player.z);
+  assert.equal(returned.player.firing, false);
+  assert.equal(returned.player.aiming, false);
+  assert.equal(
+    await page
+      .locator("#overlay")
+      .evaluate((n) => n.classList.contains("hidden")),
+    true,
+  );
+  assert.equal(await page.evaluate(() => document.activeElement.id), "world");
+  await page.keyboard.press("Escape");
+  await mode(page, "paused");
+  await action(page, "resume");
+  pass(
+    "withdraw Escape dismisses once, preserves snapshot and position, releases input, normal pause still works",
+  );
   for (const back of ["button", "Escape"]) {
     await page.keyboard.press("Escape");
     await mode(page, "paused");
@@ -182,8 +207,17 @@ export async function audioSignal(page, pass) {
         peak: Math.max(...data.map(Math.abs)),
       };
     });
-  await page.waitForTimeout(1000);
-  assert.ok((await signal()).rms > 0, "music output after real gesture");
+  const audible = async () => {
+    // The authored 16-beat motif contains rests. Sample across several beats;
+    // one quiet analyser frame is not evidence of a failed resume.
+    const deadline = Date.now() + 6000;
+    while (Date.now() < deadline) {
+      if ((await signal()).rms > 0) return true;
+      await page.waitForTimeout(120);
+    }
+    return false;
+  };
+  assert.ok(await audible(), "music output after real gesture");
   await action(page, "settings");
   for (const bus of ["music", "sfx"]) {
     await page.locator(`[data-setting=${bus}]`).fill("0");
@@ -198,8 +232,7 @@ export async function audioSignal(page, pass) {
   await page.locator("[data-setting=sfx]").fill("0.65");
   await page.locator("[data-setting=sfx]").dispatchEvent("input");
   await action(page, "close-sheet");
-  await page.waitForTimeout(800);
-  assert.ok((await signal()).rms > 0);
+  assert.ok(await audible(), "unmuted music returns across the motif's rests");
   pass(
     "continuous analyser: real music signal, both buses muted to zero, restored nonzero",
   );

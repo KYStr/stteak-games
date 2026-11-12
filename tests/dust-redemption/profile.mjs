@@ -61,13 +61,23 @@ try {
         }
         requestAnimationFrame(sample);
       });
+      const beforeUpdate = (await snapshot(page)).performance.updateTotals;
       await client.send("Profiler.start");
+      if (moving)
+        await client.send("HeapProfiler.startSampling", {
+          samplingInterval: 32768,
+          includeObjectsCollectedByMajorGC: true,
+          includeObjectsCollectedByMinorGC: true,
+        });
       for (let i = 0; i < 10; i++) {
         if (moving) await page.keyboard.down(i % 2 ? "KeyA" : "KeyD");
         await page.waitForTimeout(1500);
         if (moving) await page.keyboard.up(i % 2 ? "KeyA" : "KeyD");
       }
       const { profile: cpu } = await client.send("Profiler.stop");
+      const allocation = moving
+        ? (await client.send("HeapProfiler.stopSampling")).profile
+        : null;
       const metrics = await client.send("Performance.getMetrics");
       const intervals = await page.evaluate(() => {
         window.__measuring = false;
@@ -76,11 +86,37 @@ try {
       const state = await snapshot(page);
       const name = `${process.env.DUST_PROFILE_PHASE || "baseline"}-${id}-${moving ? "moving" : "stationary"}`;
       await writeFile(`${dir}/${name}.cpuprofile`, JSON.stringify(cpu));
+      if (allocation)
+        await writeFile(
+          `${dir}/${name}-allocation.heapprofile`,
+          JSON.stringify(allocation),
+        );
+      const total = state.performance.updateTotals,
+        histogram = total.histogram.map(
+          (n, i) => n - beforeUpdate.histogram[i],
+        ),
+        count = total.count - beforeUpdate.count;
+      let sum = 0,
+        p95 = Infinity;
+      for (let i = 0; i < histogram.length - 1; i++) {
+        sum += histogram[i];
+        if (sum >= count * 0.95) {
+          p95 = (i + 1) * total.binMs;
+          break;
+        }
+      }
+      const update = {
+        samples: count,
+        meanMs: (total.totalMs - beforeUpdate.totalMs) / count,
+        p95Ms: p95,
+      };
+      console.log("UPDATE", name, JSON.stringify(update));
       await writeFile(
         `${dir}/${name}.json`,
         JSON.stringify(
           {
             fixture: true,
+            update,
             intervals,
             metrics,
             render: state.render,

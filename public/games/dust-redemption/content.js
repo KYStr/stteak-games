@@ -818,3 +818,32 @@ export function dialogueFor(
     }
   return lines;
 }
+
+export const STANDARD_DEADLINES = Object.freeze([600, 660, 720, 780, 840, 900]);
+export const ENCOUNTER_PROFILES = Object.freeze([
+  Object.freeze({
+    id: "patient-watch",
+    name: "耐心守望",
+    description: "守軍維持原瞄準與射擊間隔；備彈充足。",
+    recovery: 1,
+    warning: 1,
+    reserve: 1,
+  }),
+  Object.freeze({
+    id: "rapid-relief",
+    name: "快速輪替",
+    description: "射擊恢復快一成，瞄準預告延長 15%。",
+    recovery: 0.9,
+    warning: 1.15,
+    reserve: 1,
+  }),
+  Object.freeze({
+    id: "scarce-ammunition",
+    name: "彈藥短缺",
+    description:
+      "守軍備彈為七成，恢復快一成；最後礦車的二十四發原庫存保持不變。",
+    recovery: 0.9,
+    warning: 1,
+    reserve: 0.7,
+  }),
+]);

@@ -3,7 +3,16 @@ import { spawn, execFileSync } from "node:child_process";
 import { mkdir, writeFile, readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { chromium } from "/workspace/stteak8/tools/node_modules/playwright-core/index.mjs";
-import { url, port, start, walk, snapshot, action, mode } from "./driver.mjs";
+import {
+  url,
+  port,
+  start,
+  walk,
+  snapshot,
+  action,
+  mode,
+  click,
+} from "./driver.mjs";
 import {
   completeMail,
   campaignFunctions,
@@ -11,6 +20,7 @@ import {
 } from "./campaign.mjs";
 import { regressions, audioSignal } from "./regressions.mjs";
 import { performanceGate } from "./performance.mjs";
+import { replayVariants, resultPresentation } from "./replay-variants.mjs";
 import { alternateRoutes } from "./alternatives.mjs";
 import { MISSIONS } from "../../games/dust-redemption/content.js";
 import { endingFor } from "../../games/dust-redemption/rules.js";
@@ -210,7 +220,9 @@ try {
   assert.equal((await snapshot(page)).audio.state, "uninitialized");
   await page.screenshot({ path: `${evidence}/title-1280.png` });
   await action(page, "settings");
-  await page.locator("[data-setting=reduced]").check();
+  if (!(await page.locator("[data-setting=reduced]").isChecked()))
+    await click(page, "[data-setting=reduced]");
+  assert.equal(await page.locator("[data-setting=reduced]").isChecked(), true);
   await page.locator("[data-setting=music]").fill("0.25");
   await page.locator("[data-setting=music]").dispatchEvent("input");
   await action(page, "close-sheet");
@@ -293,6 +305,7 @@ try {
   await mode(page, "playing");
   await prematureExtraction(page);
   await completeMail(page);
+  await resultPresentation(page, evidence, "dry-mail");
   assert.equal((await snapshot(page)).profile.completed[0], "dry-mail");
   assert.equal((await snapshot(page)).profile.activeRun, null);
   await page.screenshot({ path: `${evidence}/contract-result.png` });
@@ -321,6 +334,7 @@ try {
     await mode(page, "playing");
     await prematureExtraction(page);
     await campaignFunctions[i](page);
+    await resultPresentation(page, evidence, m.id);
     const d = await snapshot(page);
     assert.deepEqual(
       d.profile.completed,
@@ -372,6 +386,7 @@ try {
   pass(
     "continuous new-profile six-contract ending and alternate-equipment replay preserve story/wallet",
   );
+  await replayVariants(page, evidence, pass);
   await alternateRoutes(page, evidence, pass);
   await page.goto(url);
   await mode(page, "title");

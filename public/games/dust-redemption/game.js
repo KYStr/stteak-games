@@ -1,3 +1,10 @@
+import {
+  DIFFICULTIES,
+  createClock,
+  tickClock,
+  clockText,
+} from "./challenge.js";
+import { STORY_SEED, encounterFor } from "./encounter-variants.js";
 import * as THREE from "./vendor/three.module.js";
 import { World } from "./world.js";
 import { FrontierAudio } from "./audio.js";
@@ -39,7 +46,7 @@ import {
   fieldPlacementPoints,
 } from "./expansion-content.js";
 
-export const BUILD = "dust-redemption-r2-20261110";
+export const BUILD = "dust-redemption-r3-20261112";
 const sceneFlowFor = (id) =>
   MISSION_FLOW[id]
     ? MissionSystem
@@ -105,6 +112,8 @@ const audio = new FrontierAudio(),
   storage = createStorage(),
   loaded = storage.load();
 let profile = loaded.profile;
+let missionClock = null,
+  encounter = null;
 let lastSaveResult = null;
 const defaults = {
   music: 0.3,
@@ -192,9 +201,12 @@ let previousMode = "hub",
   frameSamples = 0,
   frameSum = 0,
   lastTime = 0;
-let lastHudTime = 0, updateTimeIndex = 0, purchaseReadyAt = 0, deathAnimationUntil = 0;
+let lastHudTime = 0,
+  updateTimeIndex = 0,
+  purchaseReadyAt = 0,
+  deathAnimationUntil = 0;
 const updateTimes = new Float32Array(1800);
-const updateHistogram = new Float64Array(256);
+const updateHistogram = new Float64Array(10001);
 let updateTotalMs = 0;
 let clueSet = new Set(),
   transitionTime = 0,
@@ -245,17 +257,27 @@ function button(action, label, cls = "", data = "") {
 }
 function panel(html, cls = "") {
   world?.invalidate();
-  const previousControl = cls === "field-work" && overlay.contains?.(document.activeElement)
-    ? { ...document.activeElement.dataset } : null;
+  const previousControl =
+    cls === "field-work" && overlay.contains?.(document.activeElement)
+      ? { ...document.activeElement.dataset }
+      : null;
   overlay.classList.toggle("field-view", cls === "field-work");
   document.body.classList.toggle("field-view", cls === "field-work");
   overlay.innerHTML = `<section class="panel ${cls}" role="dialog" aria-modal="true" aria-label="荒塵之旅選單">${html}</section>`;
   overlay.classList.remove("hidden");
   clearInputs();
   queueMicrotask(() => {
-    const matching = previousControl && [...overlay.querySelectorAll("button:not(:disabled)")]
-      .find(node => Object.keys(previousControl).every(key => node.dataset[key] === previousControl[key]));
-    (matching || overlay.querySelector("button:not(:disabled), input, select, summary"))?.focus({ preventScroll: true });
+    const matching =
+      previousControl &&
+      [...overlay.querySelectorAll("button:not(:disabled)")].find((node) =>
+        Object.keys(previousControl).every(
+          (key) => node.dataset[key] === previousControl[key],
+        ),
+      );
+    (
+      matching ||
+      overlay.querySelector("button:not(:disabled), input, select, summary")
+    )?.focus({ preventScroll: true });
   });
 }
 function hide() {
@@ -274,7 +296,10 @@ function clearInputs() {
     const pointer = mousePointerId;
     mousePointerId = null;
     if (pointer !== null) {
-      try { if (canvas.hasPointerCapture?.(pointer)) canvas.releasePointerCapture(pointer); } catch {}
+      try {
+        if (canvas.hasPointerCapture?.(pointer))
+          canvas.releasePointerCapture(pointer);
+      } catch {}
     }
     const releaseFire = [...firePointers];
     firePointers.clear();
@@ -287,8 +312,11 @@ function clearInputs() {
     const fireButton = $("touch-fire");
     for (const pointer of releaseFire) {
       try {
-        if (fireButton.hasPointerCapture?.(pointer)) fireButton.releasePointerCapture(pointer);
-      } catch { /* All sources were cleared before capture callbacks. */ }
+        if (fireButton.hasPointerCapture?.(pointer))
+          fireButton.releasePointerCapture(pointer);
+      } catch {
+        /* All sources were cleared before capture callbacks. */
+      }
     }
   } finally {
     clearingInputs = false;
@@ -319,7 +347,8 @@ function showSaveResult(saved) {
   lastSaveResult = saved;
   for (const node of overlay.querySelectorAll("[data-save-status]"))
     node.textContent = saved.message;
-  const retryHadFocus = document.activeElement?.hasAttribute?.("data-save-retry");
+  const retryHadFocus =
+    document.activeElement?.hasAttribute?.("data-save-retry");
   for (const node of overlay.querySelectorAll("[data-save-retry]"))
     node.disabled = saved.ok;
   if (saved.ok && retryHadFocus)
@@ -531,6 +560,37 @@ function briefing(id) {
                   : dialogueFor(m, profile, "briefing"),
     )}<div class="route-map"><b>兩條進入路線</b>${SCENES[m.scene].routes.map((r) => `<p>${r.name} — ${r.description}</p>`).join("")}</div></div><div><p>${esc(m.summary)}</p><div class="banner">${MISSION_FLOW[m.id] ? "核驗同一箱藥 → 擬定分配提案 → 親身交涉或清場取回 → 扳道岔並運送 → 出示交付回條。互助方案須接通原接點並傳達承諾；斷線可停止查驗，也會暫時阻斷傳話。最後南側撤離。" : "現場先完成三項 ⚙ 作業：觀察機關、動手操作，並完成搬運或護送。集齊三個 ◆ 線索可到北方議和，也可擊敗守軍取物。最後返回南側 ◇ 撤離。"}</div><p><label for="loadout-weapon">攜帶武器</label></p><select id="loadout-weapon">${profile.unlockedWeapons.map((id) => `<option value="${id}" ${profile.equipment.weapon === id ? "selected" : ""}>${WEAPONS[id].name} · ${WEAPONS[id].description}</option>`).join("")}</select><p><label for="loadout-item">一件補給</label></p><select id="loadout-item"><option value="medkit">繃帶 · F 恢復 40 生命（一次）</option><option value="smoke">煙罐 · F 降低附近守軍警戒 8 秒（一次）</option></select><p class="meta">${replay ? "重玩獨立快照：不改故事選擇、不重複發獎。" : "安全快照會在出發時保存；失敗不倒扣旅費。"}</p></div></div><div class="actions">${button("deploy", "騎馬前往 " + SCENES[m.scene].name, "primary")}${button("hub", "返回鎮上")}${button("help", "操作說明")}</div>`,
   );
+  $("loadout-item").insertAdjacentHTML(
+    "afterend",
+    `<p><label for="loadout-difficulty">委託難度</label></p><select id="loadout-difficulty">${Object.entries(
+      DIFFICULTIES,
+    )
+      .map(
+        ([id, name]) =>
+          `<option value="${id}" ${id === "standard" ? "selected" : ""}>${name}</option>`,
+      )
+      .join(
+        "",
+      )}</select><p class="meta">標準／艱難只計現場行動時間；時限到達會失敗，可從安全入口重試。閱讀、機關視窗、暫停不計時。故事模式無時限。</p><p><label for="loadout-seed">挑戰種子</label></p><input id="loadout-seed" type="number" min="0" max="4294967295" step="1" value="${STORY_SEED}" ${replay ? "" : "readonly"}>${replay ? '<button type="button" id="new-encounter">換一組挑戰</button>' : ""}<p class="meta" id="encounter-preview"></p>`,
+  );
+  const preview = () => {
+    const seed = Number($("loadout-seed").value);
+    try {
+      const e = encounterFor(m.id, seed, $("loadout-difficulty").value),
+        clock = createClock(m.id, $("loadout-difficulty").value);
+      $("encounter-preview").textContent =
+        `種子 ${seed} · ${e.name}：${e.description} ${clock.deadlineSeconds === null ? "故事模式無時限" : "委託時限 " + clockText(clock.deadlineSeconds)}。`;
+      overlay.querySelector('[data-action="deploy"]').disabled = false;
+    } catch {
+      $("encounter-preview").textContent = "請輸入 0–4294967295 的整數種子。";
+      overlay.querySelector('[data-action="deploy"]').disabled = true;
+    }
+  };
+  $("loadout-seed").oninput = preview;
+  $("loadout-difficulty").onchange = preview;
+
+  briefing.preview = preview;
+  preview();
   const supplies = supplyBonuses(profile);
   if (PACT_FLOW[m.id]) {
     overlay.querySelector(".columns > div:last-child .banner").textContent =
@@ -579,6 +639,8 @@ function deploy() {
   const m = selectedMission;
   if (!m) return;
   const result = beginMission(profile, m.id, {
+    difficulty: $("loadout-difficulty").value,
+    seed: Number($("loadout-seed").value),
     weapon: $("loadout-weapon").value,
     item: $("loadout-item").value,
     replay: profile.completed.includes(m.id),
@@ -645,6 +707,12 @@ function startMission(m, activeRun) {
     entrySaveResult = save();
     if (upgrading) toast(entry.notice);
   }
+  missionClock = createClock(m.id, run.difficulty ?? "story");
+  encounter = encounterFor(
+    m.id,
+    run.seed ?? STORY_SEED,
+    run.difficulty ?? "story",
+  );
   weapon = WEAPONS[run.weapon];
   hp = 100;
   ammo = weapon.magazine;
@@ -690,6 +758,11 @@ function startMission(m, activeRun) {
   player = world.actor("hero", ...m.entry, run.weapon);
   enemies = m.enemies.map((e, i) => ({
     ...e,
+    ...encounter.enemies[i],
+    muzzleFrom: {},
+    muzzleTo: {},
+    moveOut: {},
+    sightCache: {},
     actor: world.actor(`enemy-${e.type}`, ...e.position),
     hp: e.type === "shotgun" ? 110 : 90,
     alert: 0,
@@ -702,7 +775,7 @@ function startMission(m, activeRun) {
     start: [...e.position],
     heading: i,
     shotCount: 0,
-    rounds: e.type === "sniper" ? 16 : 30,
+    rounds: encounter.enemies[i].rounds,
     magazine: e.type === "sniper" ? 4 : 6,
     reloading: 0,
   }));
@@ -805,6 +878,8 @@ function retry() {
   if (!mission || !run) return;
   const m = mission,
     options = {
+      difficulty: run.difficulty ?? "story",
+      seed: run.seed ?? STORY_SEED,
       weapon: run.weapon,
       item: run.item,
       replay: run.replay,
@@ -1116,7 +1191,12 @@ function showResult() {
   );
   overlay
     .querySelector(".stat-grid")
-    .insertAdjacentHTML("afterend", fieldResultRows(r) + missionResultRows(r));
+    .insertAdjacentHTML(
+      "afterend",
+      `<p class="meta">${esc(DIFFICULTIES[r.difficulty ?? "story"])} · 行動 ${clockText(s.activeSeconds || 0)} · 種子 ${r.seed ?? STORY_SEED} · ${esc(encounterFor(r.missionId, r.seed ?? STORY_SEED, r.difficulty ?? "story").name)}</p>` +
+        fieldResultRows(r) +
+        missionResultRows(r),
+    );
   if (r.replay) {
     overlay
       .querySelector(".banner")
@@ -1218,7 +1298,7 @@ function missionResultRows(result) {
           cancelled: "切線或停火取消尚未領取的補給",
           neutralized: "領補給守軍已被擊倒，沒有替補",
         }[pact.response.status] || pact.response.status;
-    return `<details class="field-results" open><summary>同車庫存與地契交接回條</summary><p>${esc(bay.title)} · 原二十四發：可交涉 ${stock.available}、已領 ${stock.issued}、掩體封存 ${stock.cover}。<br>軍用線已切斷，民生水醫線仍供電。${pact.localChoices.lighting === "darken-approach" ? "同一電池移入回收槽，探照燈熄滅。" : result.replay ? "完整電池留在原接點；本次重玩不發放二十旅費。" : "完整電池留在原接點；原工作的二十旅費只結算一次，已計入總額。"}</p><p>守軍回應：${esc(response)}。${pact.clearance ? "六名既有守軍已實際交械。" : "六名既有守軍已清場。"}<br>伊妮絲見證 · 回條 ${esc(pact.receipt.id)} · 同一地契已收入玩家背包。</p><small>${result.replay ? "本次挑戰的交接紀錄，不改故事、信任與旅費。" : "物資盤點、地契與簽收紀錄已記入本分頁的委託紀錄。"} 側線與燈光不代替明日制度的永久選擇；本地流程不另發獎。</small></details>`;
+    return `<details class="field-results" open><summary>同車庫存與地契交接回條</summary><p>${esc(bay.title)} · 原二十四發：可交涉 ${stock.available}、已領 ${stock.issued}、掩體封存 ${stock.cover}。<br>軍用線已切斷，民生水醫線仍供電。${pact.localChoices.lighting === "darken-approach" ? "同一電池移入回收槽，探照燈熄滅。" : result.replay ? "完整電池留在原接點；本次重玩不發放二十旅費。" : "完整電池留在原接點；原工作的二十旅費只結算一次，已計入總額。"}</p><p>守軍回應：${esc(response)}。${pact.clearance ? "六名既有守軍已實際交械。" : "六名既有守軍已清場。"}<br>伊妮絲見證 · 物資與地契交接回條已簽收 · 同一地契已收入玩家背包。</p><small>${result.replay ? "本次挑戰的交接紀錄，不改故事、信任與旅費。" : "物資盤點、地契與簽收紀錄已記入本分頁的委託紀錄。"} 側線與燈光不代替明日制度的永久選擇；本地流程不另發獎。</small></details>`;
   }
   const night = result.nightFlow?.result;
   if (night) {
@@ -1236,7 +1316,7 @@ function missionResultRows(result) {
           cancelled: "有效放行取消繞行，存活的塔洛返回原崗",
           neutralized: "塔洛已被擊倒，沒有替補",
         }[night.response.status] || night.response.status;
-    return `<details class="field-results" open><summary>三名家屬的南側到達回條</summary><p>${names.map(esc).join("、")}，同三人均已抵達南側集合處。<br>${night.routeId === "west-ford" ? "西側淺灘與末段便橋：斜撐試重與連動開橋均已完成，沿途使用實際遮蔽。" : "東側岩脊開口：經較直接的暴露通路，三人沿原隊伍路線到達。"}</p><p>文件：${night.clearance ? "有效放行已核對" : "未取得放行，六名既有守軍已清場"}。守軍回應：${esc(response)}。<br>回條 ${esc(night.receipt.id)} · ${esc(night.receipt.title)}。</p><small>${result.replay ? "本次挑戰的護送紀錄，不改原故事、信任與旅費。" : "三人到達與同一份文件已記入本分頁的委託紀錄。"} 到達回條直接承接南側撤離，局部流程不另發獎。</small></details>`;
+    return `<details class="field-results" open><summary>三名家屬的南側到達回條</summary><p>${names.map(esc).join("、")}，同三人均已抵達南側集合處。<br>${night.routeId === "west-ford" ? "西側淺灘與末段便橋：斜撐試重與連動開橋均已完成，沿途使用實際遮蔽。" : "東側岩脊開口：經較直接的暴露通路，三人沿原隊伍路線到達。"}</p><p>文件：${night.clearance ? "有效放行已核對" : "未取得放行，六名既有守軍已清場"}。守軍回應：${esc(response)}。<br>${esc(night.receipt.title)}。</p><small>${result.replay ? "本次挑戰的護送紀錄，不改原故事、信任與旅費。" : "三人到達與同一份文件已記入本分頁的委託紀錄。"} 到達回條直接承接南側撤離，局部流程不另發獎。</small></details>`;
   }
   const ledger = result.ledgerFlow?.result;
   if (ledger) {
@@ -1250,7 +1330,7 @@ function missionResultRows(result) {
         cancelled: "完整核證取消查驗",
         neutralized: "查驗守軍已被擊倒",
       }[ledger.response.status] || ledger.response.status;
-    return `<details class="field-results" open><summary>副本保管與原帳通行回條</summary><p>${sealed ? "密封託付 · 同一副本交南西奧林保管；原工作只收一次 10 旅費，已計入總額。" : "先公開一頁 · 同一副本張貼東側原公告欄，帳房具名見證；保管費用 0 旅費。"}</p><p>原帳一直由玩家背包保管，隨具名回條南撤。<br>批次 ${esc(ledger.receipt.batch)} · 回條 ${esc(ledger.receipt.id)} · 簽收者 ${sealed ? "奧林" : "帳房"}。守軍回應：${esc(response)}。</p><small>${result.replay ? "本次挑戰的保管紀錄，不改原故事、信任與旅費。" : "具名回條已記入本分頁的委託紀錄。"} 公示一頁不等於永久公開原帳；原帳的公開／封存仍依撤離時的選擇。本地流程不另發獎。</small></details>`;
+    return `<details class="field-results" open><summary>副本保管與原帳通行回條</summary><p>${sealed ? "密封託付 · 同一副本交南西奧林保管；原工作只收一次 10 旅費，已計入總額。" : "先公開一頁 · 同一副本張貼東側原公告欄，帳房具名見證；保管費用 0 旅費。"}</p><p>原帳一直由玩家背包保管，隨具名回條南撤。<br>批次 ${esc(ledger.receipt.batch)} · 原帳通行與副本保管回條已簽收 · 簽收者 ${sealed ? "奧林" : "帳房"}。守軍回應：${esc(response)}。</p><small>${result.replay ? "本次挑戰的保管紀錄，不改原故事、信任與旅費。" : "具名回條已記入本分頁的委託紀錄。"} 公示一頁不等於永久公開原帳；原帳的公開／封存仍依撤離時的選擇。本地流程不另發獎。</small></details>`;
   }
   const signal = result.signalFlow?.result;
   if (signal) {
@@ -1266,7 +1346,19 @@ function missionResultRows(result) {
         cancelled: "追線支路切斷，查驗取消",
         neutralized: "查線守軍已被擊倒",
       }[signal.response.status] || signal.response.status;
-    return `<details class="field-results" open><summary>奧林簽收的完整名單回條</summary><p>${channel === "public-dispatch" ? `公開驛線 · ${esc(endpoint?.title || "所選中繼")}；四人名單經本次回覆核對。` : "守軍停火線 · 調令傳送與同一信袋親送南側，兩件事均已完成。"}</p><p>M17：${signal.receipt.memberIds.map(esc).join("、")}，共四人。<br>本次訊息 ${esc(signal.receipt.messageId)} · 接線版本 ${signal.receipt.revision}。守軍回應：${esc(response)}；追線支路${signal.traceConnected ? "接通" : "已切斷"}。</p><small>${result.replay ? "本次挑戰的收件紀錄；不改原故事、信任與旅費。" : "具名回條已記入本分頁的委託紀錄。"} 本地收件不另加重複獎勵。</small></details>`;
+    return `<details class="field-results" open><summary>奧林簽收的完整名單回條</summary><p>${channel === "public-dispatch" ? `公開驛線 · ${esc(endpoint?.title || "所選中繼")}；四人名單經本次回覆核對。` : "守軍停火線 · 調令傳送與同一信袋親送南側，兩件事均已完成。"}</p><p>M17：${signal.receipt.memberIds
+      .map((id) => {
+        const roster = SIGNAL_FLOW["last-signal"].roster,
+          index = roster.memberIds.indexOf(id);
+        return esc(
+          index < 0
+            ? "名單成員"
+            : `${id.replace("worker-", "")} ${roster.names[index]}`,
+        );
+      })
+      .join(
+        "、",
+      )}，共四人。<br>本次發送與南側回覆已核對一致。守軍回應：${esc(response)}；追線支路${signal.traceConnected ? "接通" : "已切斷"}。</p><small>${result.replay ? "本次挑戰的收件紀錄；不改原故事、信任與旅費。" : "具名回條已記入本分頁的委託紀錄。"} 本地收件不另加重複獎勵。</small></details>`;
   }
   const water = result.waterFlow?.result;
   if (water) {
@@ -1437,41 +1529,68 @@ function controlSelector(node) {
   if (!node) return null;
   if (node.id) return `#${CSS.escape(node.id)}`;
   if (!overlay.contains(node)) return null;
-  const attributes = [...node.attributes].filter(a => a.name.startsWith("data-"));
-  if (attributes.length) return node.tagName.toLowerCase() + attributes.map(a => `[${a.name}="${CSS.escape(a.value)}"]`).join("");
+  const attributes = [...node.attributes].filter((a) =>
+    a.name.startsWith("data-"),
+  );
+  if (attributes.length)
+    return (
+      node.tagName.toLowerCase() +
+      attributes.map((a) => `[${a.name}="${CSS.escape(a.value)}"]`).join("")
+    );
   return null;
 }
 function captureOverlayState() {
   return {
-    parent: pauseReturn, mode, html: overlay.innerHTML,
+    parent: pauseReturn,
+    mode,
+    html: overlay.innerHTML,
     hidden: overlay.classList.contains("hidden"),
     focus: controlSelector(document.activeElement),
     scroll: overlay.querySelector(".panel")?.scrollTop || 0,
-    forms: [...overlay.querySelectorAll("input, select, textarea")].map((node, index) => ({
-      index, selector: controlSelector(node), value: node.value, checked: node.checked,
-      selected: node.multiple ? [...node.selectedOptions].map(o => o.value) : null,
-    })),
-    details: [...overlay.querySelectorAll("details")].map(node => node.open),
+    forms: [...overlay.querySelectorAll("input, select, textarea")].map(
+      (node, index) => ({
+        index,
+        selector: controlSelector(node),
+        value: node.value,
+        checked: node.checked,
+        selected: node.multiple
+          ? [...node.selectedOptions].map((o) => o.value)
+          : null,
+      }),
+    ),
+    details: [...overlay.querySelectorAll("details")].map((node) => node.open),
   };
 }
 function restoreOverlayState(saved) {
   overlay.innerHTML = saved.html;
   const forms = overlay.querySelectorAll("input, select, textarea");
   for (const state of saved.forms || []) {
-    const node = (state.selector && overlay.querySelector(state.selector)) || forms[state.index];
+    const node =
+      (state.selector && overlay.querySelector(state.selector)) ||
+      forms[state.index];
     if (!node) continue;
     node.value = state.value;
     if (typeof state.checked === "boolean") node.checked = state.checked;
-    if (state.selected) for (const option of node.options) option.selected = state.selected.includes(option.value);
+    if (state.selected)
+      for (const option of node.options)
+        option.selected = state.selected.includes(option.value);
   }
-  overlay.querySelectorAll("details").forEach((node, i) => { node.open = saved.details?.[i] || false; });
+  overlay.querySelectorAll("details").forEach((node, i) => {
+    node.open = saved.details?.[i] || false;
+  });
   overlay.classList.toggle("hidden", saved.hidden);
   overlay.classList.toggle("field-view", mode === "field");
   document.body.classList.toggle("field-view", mode === "field");
   clearInputs();
   queueMicrotask(() => {
     const invoking = saved.focus && document.querySelector(saved.focus);
-    const target = saved.hidden ? canvas : invoking && !invoking.disabled ? invoking : overlay.querySelector("button:not(:disabled), input, select, summary");
+    const target = saved.hidden
+      ? canvas
+      : invoking && !invoking.disabled
+        ? invoking
+        : overlay.querySelector(
+            "button:not(:disabled), input, select, summary",
+          );
     target?.focus({ preventScroll: true });
     const panel = overlay.querySelector(".panel");
     if (panel) panel.scrollTop = saved.scroll || 0;
@@ -1479,10 +1598,32 @@ function restoreOverlayState(saved) {
   world?.invalidate();
 }
 let audioPolicyMode = null;
-const audibleModes = new Set(["title", "hub", "briefing", "supplies", "journal", "result", "ending", "playing", "town-walk", "town-dialogue", "transition", "field", "clue", "parley", "extraction"]);
+const audibleModes = new Set([
+  "title",
+  "hub",
+  "briefing",
+  "supplies",
+  "journal",
+  "result",
+  "ending",
+  "playing",
+  "town-walk",
+  "town-dialogue",
+  "transition",
+  "field",
+  "clue",
+  "parley",
+  "extraction",
+]);
 function syncAudioForMode() {
   audioPolicyMode = mode;
-  const active = Boolean(audio.context) && (audibleModes.has(mode) || (mode === "dead" && performance.now() < deathAnimationUntil)) && foreground && !document.hidden && !contextLost;
+  const active =
+    Boolean(audio.context) &&
+    (audibleModes.has(mode) ||
+      (mode === "dead" && performance.now() < deathAnimationUntil)) &&
+    foreground &&
+    !document.hidden &&
+    !contextLost;
   if (active) {
     if (!audio.active || audio.context?.state === "suspended") audio.resume();
   } else audio.pause();
@@ -1548,22 +1689,34 @@ function resume() {
 }
 function failure(reason) {
   if (done || mode !== "playing") return;
+  const timeout = missionClock?.failureReason === "deadline";
+  if (missionClock && !missionClock.failureReason)
+    missionClock.failureReason = "combat";
   mode = "dead";
   deathAnimationUntil = performance.now() + 900;
-  $("hp").textContent = "0";
-  $("hp-fill").style.width = "0%";
+  $("hp").textContent = String(Math.ceil(hp));
+  $("hp-fill").style.width = `${hp}%`;
   audio.play("hurt");
   clearInputs();
   world.animate(player, "down");
   panel(
-    `<p class="eyebrow">A ROAD YOU CAN TAKE AGAIN</p><h2>倒在荒塵裡</h2><p>${reason}</p><div class="banner">任務前快照完整保留：旅費、選擇與物品不會被倒扣。換一條路、利用掩體或帶上繃帶再試。</div><div class="actions">${button("retry", "立即重試", "primary")}${button("abandon", "回鎮上換裝備")}</div>`,
+    `<p class="eyebrow">A ROAD YOU CAN TAKE AGAIN</p><h2>${timeout ? "委託逾時" : "倒在荒塵裡"}</h2><p>${reason}</p><div class="banner">任務前快照完整保留：旅費、選擇與物品不會被倒扣。換一條路、利用掩體或帶上繃帶再試。</div><div class="actions">${button("retry", "立即重試", "primary")}${button("abandon", "回鎮上換裝備")}</div>`,
   );
 }
 function handsOccupied() {
   return Boolean(field?.handsOccupied || missionSystem?.handsOccupied);
 }
+const playerStep = {
+  proposed: {},
+  moved: {},
+  final: {},
+  muzzle: {},
+  local: new THREE.Vector3(),
+};
 function constrainedPlayerStep(previous, dx, dz) {
-  const proposed = { x: previous.x + dx, z: previous.z + dz };
+  const proposed = playerStep.proposed;
+  proposed.x = previous.x + dx;
+  proposed.z = previous.z + dz;
   const limited =
     missionSystem?.constrainMove?.(previous, proposed) || proposed;
   const moved = moveCircle(
@@ -1571,16 +1724,21 @@ function constrainedPlayerStep(previous, dx, dz) {
     limited.x - previous.x,
     limited.z - previous.z,
     world.colliders,
+    0.34,
+    23,
+    playerStep.moved,
   );
   const constrained = field?.constrainMovement(previous, moved) || moved;
   // Axis sliding must not stretch the signal tether. Do not introduce a second
   // diagonal collision path after sliding: an invalid end point stays at previous.
+  const finalX = constrained.x,
+    finalZ = constrained.z;
   const verified =
     missionSystem?.constrainMove?.(previous, constrained) || constrained;
-  return Math.hypot(verified.x - constrained.x, verified.z - constrained.z) <=
-    1e-8
-    ? constrained
-    : { x: previous.x, z: previous.z };
+  const accepted = Math.hypot(verified.x - finalX, verified.z - finalZ) <= 1e-8;
+  playerStep.final.x = accepted ? finalX : previous.x;
+  playerStep.final.z = accepted ? finalZ : previous.z;
+  return playerStep.final;
 }
 function reloadWeapon() {
   if (
@@ -1656,7 +1814,7 @@ function useItem() {
   stats.itemsUsed++;
   audio.play("ui");
 }
-function muzzle(entity, isPlayer = false) {
+function muzzle(entity, isPlayer = false, out = {}) {
   const p = entity.position;
   let x = p.x,
     z = p.z,
@@ -1677,9 +1835,13 @@ function muzzle(entity, isPlayer = false) {
       y = 1.35;
     }
   }
-  return { x, y, z };
+  out.x = x;
+  out.y = y;
+  out.z = z;
+  return out;
 }
 function shoot() {
+  world.syncCollisionMatrices(true);
   if (vaultMotion || handsOccupied()) return;
   if (secured && strategy === "nonlethal") return;
   if (mode !== "playing" || cooldown > 0 || reload > 0) return;
@@ -1797,9 +1959,29 @@ function updateEnemies(dt) {
       dist = Math.hypot(p.x - pp.x, p.z - pp.z);
     e.timer -= dt;
     e.suppressed = Math.max(0, e.suppressed - dt);
-    const to = muzzle(player, true),
-      from = muzzle(e.actor);
-    const visible = !world.trace(from, to);
+    const to = muzzle(player, true, e.muzzleTo),
+      from = muzzle(e.actor, false, e.muzzleFrom);
+    const sight = e.sightCache,
+      revision = world.collisionRevision;
+    if (
+      sight.ax !== from.x ||
+      sight.ay !== from.y ||
+      sight.az !== from.z ||
+      sight.bx !== to.x ||
+      sight.by !== to.y ||
+      sight.bz !== to.z ||
+      sight.revision !== revision
+    ) {
+      sight.visible = !world.trace(from, to);
+      sight.ax = from.x;
+      sight.ay = from.y;
+      sight.az = from.z;
+      sight.bx = to.x;
+      sight.by = to.y;
+      sight.bz = to.z;
+      sight.revision = revision;
+    }
+    const visible = sight.visible;
     e.alert = Math.max(0, e.alert - dt * 0.2);
     if (
       (dist < fieldEffects.detectionRadius || fieldEffects.exposure > 0) &&
@@ -1841,28 +2023,26 @@ function updateEnemies(dt) {
     p.y = 0;
     e.actor.object.rotation.y = Math.atan2(pp.x - p.x, pp.z - p.z);
     if (e.windup <= 0 || e.suppressed > 0) {
-      const tactical = updateEnemyTactics(
-        e.tactics,
-        {
-          id: e.id,
-          type: e.type,
-          position: p,
-          threat: pp,
-          underFire: e.engaged === true,
-          suppressed: e.suppressed,
-          rounds: e.rounds,
-          enabled: true,
-          now: elapsed,
-          colliders: world.colliders,
-          radius: 0.38,
-          bounds: 23,
-        },
-        {
+      const view = (e.tacticalView ??= {}),
+        adapters = (e.tacticalAdapters ??= {
           trace: (a, b) => world.trace(a, b),
           moveCircle,
           planPath: planTacticalPath,
-        },
-      );
+          mutable: true,
+        });
+      view.id = e.id;
+      view.type = e.type;
+      view.position = p;
+      view.threat = pp;
+      view.underFire = e.engaged === true;
+      view.suppressed = e.suppressed;
+      view.rounds = e.rounds;
+      view.enabled = true;
+      view.now = elapsed;
+      view.colliders = world.colliders;
+      view.radius = 0.38;
+      view.bounds = 23;
+      const tactical = updateEnemyTactics(e.tactics, view, adapters);
       e.tactics = tactical.state;
       if (tactical.announcement) {
         // A movement cue; firing still requires the separate 0.95/1.25s aim line.
@@ -1958,10 +2138,10 @@ function updateEnemies(dt) {
             return;
           }
         }
-        e.timer = e.type === "sniper" ? 4.5 : e.type === "shotgun" ? 2.5 : 2.8;
+        e.timer = e.recoverySeconds;
       }
     } else if (visible && dist < enemyWeaponRange(e.type) && e.timer <= 0) {
-      e.windup = e.type === "sniper" ? 1.25 : 0.95;
+      e.windup = e.warningSeconds;
       const spread = e.type === "sniper" ? 0.08 : 0.22;
       e.aimTarget = {
         x: to.x + Math.sin((e.shotCount + 1) * 13.7 + e.heading) * spread,
@@ -1991,6 +2171,8 @@ function moveEnemy(e, x, z, speed, dt) {
         ((dz / length) * amount) / steps,
         world.colliders,
         0.38,
+        23,
+        e.moveOut,
       );
       p.x = next.x;
       p.z = next.z;
@@ -2058,10 +2240,10 @@ function movement(dt) {
     );
   else if (length > 0.1) player.object.rotation.y = Math.atan2(dx, dz);
   if (player.visual) {
-    const peek = muzzle(player, true);
+    const peek = muzzle(player, true, playerStep.muzzle);
     player.object.updateMatrixWorld();
     const local = player.object.worldToLocal(
-      new THREE.Vector3(peek.x, 0, peek.z),
+      playerStep.local.set(peek.x, 0, peek.z),
     );
     player.visual.position.x = local.x;
     player.visual.position.z = local.z;
@@ -2145,14 +2327,13 @@ function measureWorldLabel(label, maxWidth) {
   const barWidth = label.enemy
     ? Math.min(36, Math.max(0, Number(label.hp) || 0) * 0.3)
     : 0;
-  return {
-    ...measured,
-    width: Math.max(measured.width, barWidth),
-    height: measured.lines.length * lineHeight + (label.enemy ? 8 : 0),
-    barWidth,
-  };
+  const out = (measured.output ??= { ...measured });
+  out.width = Math.max(measured.width, barWidth);
+  out.height = measured.lines.length * lineHeight + (label.enemy ? 8 : 0);
+  out.barWidth = barWidth;
+  return out;
 }
-function layoutWorldLabels(items, width, height, reserved = []) {
+function layoutWorldLabels(items, width, height, reserved = [], output = null) {
   if (
     !Number.isFinite(width) ||
     !Number.isFinite(height) ||
@@ -2160,119 +2341,178 @@ function layoutWorldLabels(items, width, height, reserved = []) {
     height <= 12
   )
     return [];
-  const margin = 6,
-    gap = 5,
-    placed = [],
-    clamp = (n, low, high) => Math.max(low, Math.min(high, n)),
-    overlaps = (a, b) =>
-      a.x < b.x + b.width + gap &&
-      a.x + a.width + gap > b.x &&
-      a.y < b.y + b.height + gap &&
-      a.y + a.height + gap > b.y;
-  // Keep the player's identity attached to their head, then reserve enemy
-  // health bars. Other labels use nearby free space and a leader.
-  const ordered = items
-    .map((item, index) => ({ ...item, index }))
-    .sort(
-      (a, b) =>
-        Number(Boolean(b.player)) - Number(Boolean(a.player)) ||
-        Number(Boolean(b.enemy)) - Number(Boolean(a.enemy)) ||
-        a.index - b.index,
-    );
-  for (const item of ordered) {
-    const a = item.anchor,
-      w = item.width,
-      h = item.height;
-    if (
-      ![a.x, a.y, w, h].every(Number.isFinite) ||
-      w <= 0 ||
-      h <= 0 ||
-      a.x < 0 ||
-      a.x > width ||
-      a.y < 0 ||
-      a.y > height ||
-      w > width - margin * 2 ||
-      h > height - margin * 2
-    )
-      continue;
-    const candidates = [],
-      seen = new Set(),
-      add = (x, y) => {
-        if (candidates.length >= 256) return;
-        x = clamp(Math.round(x), margin, width - margin - w);
-        y = clamp(Math.round(y), margin, height - margin - h);
-        const key = `${x}:${y}`;
-        if (seen.has(key)) return;
-        seen.add(key);
-        candidates.push({
-          x,
-          y,
-          width: w,
-          height: h,
-          cost: (x + w / 2 - a.x) ** 2 + (y + h - a.y) ** 2,
-        });
-      };
-    add(a.x - w / 2, a.y - h);
-    const obstacles = [...reserved, ...placed].filter((p) => [p.x, p.y, p.width, p.height].every(Number.isFinite) && p.width > 0 && p.height > 0),
-      clear = (c) => !obstacles.some((p) => overlaps(c, p)),
-      nearest = () => {
-        candidates.sort((a, b) => a.cost - b.cost || b.y - a.y || a.x - b.x);
-        return candidates.find(clear);
-      };
-    let rect = clear(candidates[0]) ? candidates[0] : null;
-    if (!rect) {
-      // Edges of occupied rectangles give close, deterministic alternatives.
-      for (const p of obstacles) {
-        add(a.x - w / 2, p.y + p.height + gap);
-        add(a.x - w / 2, p.y - gap - h);
-        add(p.x - gap - w, a.y - h);
-        add(p.x + p.width + gap, a.y - h);
-        // Near a HUD edge a legal adjacent slot may require both axes to move.
-        add(p.x - gap - w, p.y + p.height + gap);
-        add(p.x + p.width + gap, p.y + p.height + gap);
-        add(p.x - gap - w, p.y - gap - h);
-        add(p.x + p.width + gap, p.y - gap - h);
-      }
-      rect = nearest();
-    }
-    if (!rect) {
-      // Bounded shelf fallback handles dense clusters without a relaxation loop.
-      for (
-        let y = margin;
-        y + h <= height - margin && candidates.length < 256;
-        y += h + gap
+  const placed = output || [],
+    margin = 6,
+    gap = 5;
+  placed.length = 0;
+  const pool = (placed.pool ??= []);
+  // Numeric candidate buffers replace hundreds of transient objects, string keys
+  // and sorting per name. Only the winning rectangle becomes a record.
+  const xs = (layoutWorldLabels.xs ??= new Float64Array(256)),
+    ys = (layoutWorldLabels.ys ??= new Float64Array(256));
+  for (let priority = 2; priority >= 0; priority--)
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
+      if ((item.player ? 2 : item.enemy ? 1 : 0) !== priority) continue;
+      const a = item.anchor,
+        w = item.width,
+        h = item.height;
+      if (
+        !Number.isFinite(a.x + a.y + w + h) ||
+        w <= 0 ||
+        h <= 0 ||
+        a.x < 0 ||
+        a.x > width ||
+        a.y < 0 ||
+        a.y > height ||
+        w > width - 12 ||
+        h > height - 12
       )
-        for (
-          let x = margin;
-          x + w <= width - margin && candidates.length < 256;
-          x += w + gap
-        )
-          add(x, y);
-      rect = nearest();
+        continue;
+      let count = 0,
+        best = -1,
+        bestCost = Infinity;
+      // First try the old rectangle translated with its anchor. Only collisions
+      // need the candidate search. This keeps labels steady while actors move.
+      const old = item.previous;
+      for (let phase = 0; phase < 3 && best < 0; phase++) {
+        let limit = 1;
+        if (phase === 1) limit = (reserved.length + placed.length) * 8;
+        if (phase === 2)
+          limit = Math.min(
+            256,
+            Math.ceil((width - 12) / (w + gap)) *
+              Math.ceil((height - 12) / (h + gap)),
+          );
+        for (let candidate = 0; candidate < limit && count < 256; candidate++) {
+          let x = a.x - w / 2,
+            y = a.y - h;
+          if (phase === 0 && old) {
+            x = old.x + a.x - old.anchorX;
+            y = old.y + a.y - old.anchorY;
+          }
+          if (phase === 1) {
+            const n = Math.floor(candidate / 8),
+              side = candidate % 8,
+              obstacle =
+                n < reserved.length ? reserved[n] : placed[n - reserved.length];
+            if (side === 0 || side >= 4)
+              y =
+                side === 0 || side === 4 || side === 5
+                  ? obstacle.y + obstacle.height + gap
+                  : obstacle.y - gap - h;
+            if (side === 1) y = obstacle.y - gap - h;
+            if (side === 2 || side === 4 || side === 6)
+              x = obstacle.x - gap - w;
+            if (side === 3 || side === 5 || side === 7)
+              x = obstacle.x + obstacle.width + gap;
+          }
+          if (phase === 2) {
+            const columns = Math.max(
+              1,
+              Math.floor((width - 12 + gap) / (w + gap)),
+            );
+            x = margin + (candidate % columns) * (w + gap);
+            y = margin + Math.floor(candidate / columns) * (h + gap);
+          }
+          x = Math.max(margin, Math.min(width - margin - w, Math.round(x)));
+          y = Math.max(margin, Math.min(height - margin - h, Math.round(y)));
+          let duplicate = false;
+          for (let n = 0; n < count; n++)
+            if (xs[n] === x && ys[n] === y) {
+              duplicate = true;
+              break;
+            }
+          if (duplicate) continue;
+          xs[count] = x;
+          ys[count] = y;
+          const current = count++;
+          let clear = true;
+          for (let n = 0; n < reserved.length + placed.length; n++) {
+            const r =
+              n < reserved.length ? reserved[n] : placed[n - reserved.length];
+            if (
+              r.width > 0 &&
+              r.height > 0 &&
+              x < r.x + r.width + gap &&
+              x + w + gap > r.x &&
+              y < r.y + r.height + gap &&
+              y + h + gap > r.y
+            ) {
+              clear = false;
+              break;
+            }
+          }
+          if (!clear) continue;
+          const cost = (x + w / 2 - a.x) ** 2 + (y + h - a.y) ** 2;
+          if (
+            cost < bestCost ||
+            (cost === bestCost &&
+              (y > ys[best] || (y === ys[best] && x < xs[best])))
+          ) {
+            best = current;
+            bestCost = cost;
+          }
+        }
+      }
+      if (best < 0) continue;
+      const row = (pool[placed.length] ??= {});
+      row.text = item.text;
+      row.lines = item.lines;
+      row.width = w;
+      row.height = h;
+      row.anchor = a;
+      row.player = item.player;
+      row.enemy = item.enemy;
+      row.lineHeight = item.lineHeight;
+      row.barWidth = item.barWidth;
+      row.id = item.id;
+      row.index = index;
+      row.x = xs[best];
+      row.y = ys[best];
+      row.leader = Math.hypot(xs[best] + w / 2 - a.x, ys[best] + h - a.y) > 2;
+      placed.push(row);
     }
-    // A physically full viewport cannot fit every label; never overprint a reserved health bar.
-    if (!rect) continue;
-    placed.push({
-      ...item,
-      ...rect,
-      leader: Math.hypot(rect.x + w / 2 - a.x, rect.y + h - a.y) > 2,
-    });
-  }
-  return placed.sort((a, b) => a.index - b.index);
+  return placed.sort((layoutWorldLabels.order ??= (a, b) => a.index - b.index));
 }
 // Geometry is measured only in ResizeObserver's post-layout delivery. Rendering
 // reads this cache; text, visibility and viewport changes do not read layout.
 function createHudLayoutCache(doc, win) {
-  const ids = ["hud", "objective", "combat-hud", "field-map", "move-pad", "aim-pad", "touch-interact", "touch-reload", "touch-vault", "touch-item", "touch-fire", "toast", "context"],
-    entries = ids.map((id) => ({ id, element: doc.getElementById(id), offset: { x: 0, y: 0 }, rect: null })).filter((e) => e.element),
+  const ids = [
+      "hud",
+      "objective",
+      "combat-hud",
+      "field-map",
+      "move-pad",
+      "aim-pad",
+      "touch-interact",
+      "touch-reload",
+      "touch-vault",
+      "touch-item",
+      "touch-fire",
+      "toast",
+      "context",
+    ],
+    entries = ids
+      .map((id) => ({
+        id,
+        element: doc.getElementById(id),
+        offset: { x: 0, y: 0 },
+        rect: null,
+      }))
+      .filter((e) => e.element),
     canvas = doc.getElementById("world");
   const cache = { entries, revision: 0, closed: false, dirty: true };
   const invalidate = () => {
     if (cache.closed) return;
-    cache.dirty = true; cache.revision++;
+    cache.dirty = true;
+    cache.revision++;
     // Request a fresh post-layout delivery even if a text/class change keeps
     // the same dimensions. Do not force a synchronous layout to refresh it.
-    if (canvas) { observer.unobserve(canvas); observer.observe(canvas); }
+    if (canvas) {
+      observer.unobserve(canvas);
+      observer.observe(canvas);
+    }
   };
   const measure = () => {
     if (cache.closed) return;
@@ -2280,10 +2520,18 @@ function createHudLayoutCache(doc, win) {
     // Batch every read before any notification/label write.
     const next = entries.map((entry) => {
       const r = entry.element.getBoundingClientRect();
-      return { x: r.left - origin.left - entry.offset.x, y: r.top - origin.top - entry.offset.y, width: r.width, height: r.height };
+      return {
+        x: r.left - origin.left - entry.offset.x,
+        y: r.top - origin.top - entry.offset.y,
+        width: r.width,
+        height: r.height,
+      };
     });
-    entries.forEach((entry, i) => { entry.rect = next[i]; });
-    cache.dirty = false; cache.revision++;
+    entries.forEach((entry, i) => {
+      entry.rect = next[i];
+    });
+    cache.dirty = false;
+    cache.revision++;
     cache.onMeasure?.(); // All DOM reads above are finished before these writes.
   };
   const observer = new win.ResizeObserver(measure);
@@ -2292,23 +2540,39 @@ function createHudLayoutCache(doc, win) {
   win.addEventListener("resize", invalidate);
   cache.invalidate = invalidate;
   cache.snapshot = () => {
-    if (cache.closed || doc.body?.classList.contains("field-view")) return { fixed: [], notices: [] };
-    const fixed = [], notices = [];
+    if (cache.closed || doc.body?.classList.contains("field-view"))
+      return { fixed: [], notices: [] };
+    const fixed = [],
+      notices = [];
     for (const entry of entries) {
       const r = entry.rect;
       if (!r || r.width <= 0 || r.height <= 0) continue;
-      if (entry.id === "toast" && !entry.element.classList.contains("show")) continue;
-      if (["context", "objective"].includes(entry.id) && !entry.element.textContent) continue;
-      if (entry.id === "combat-hud" && entry.element.style.display === "none") continue;
-      if (/^(move-pad|aim-pad|touch-)/.test(entry.id) && !doc.body?.classList.contains("touch")) continue;
-      if (["toast", "context"].includes(entry.id)) notices.push({ ...r, id: entry.id });
+      if (entry.id === "toast" && !entry.element.classList.contains("show"))
+        continue;
+      if (
+        ["context", "objective"].includes(entry.id) &&
+        !entry.element.textContent
+      )
+        continue;
+      if (entry.id === "combat-hud" && entry.element.style.display === "none")
+        continue;
+      if (
+        /^(move-pad|aim-pad|touch-)/.test(entry.id) &&
+        !doc.body?.classList.contains("touch")
+      )
+        continue;
+      if (["toast", "context"].includes(entry.id))
+        notices.push({ ...r, id: entry.id });
       else fixed.push({ ...r });
     }
     return { fixed, notices };
   };
   cache.apply = (placed) => {
-    for (const entry of entries.filter((e) => ["toast", "context"].includes(e.id))) {
-      const p = placed.find((r) => r.id === entry.id), r = entry.rect;
+    for (const entry of entries.filter((e) =>
+      ["toast", "context"].includes(e.id),
+    )) {
+      const p = placed.find((r) => r.id === entry.id),
+        r = entry.rect;
       if (!p || !r) continue;
       const offset = { x: p.x - r.x, y: p.y - r.y };
       if (offset.x !== entry.offset.x || offset.y !== entry.offset.y) {
@@ -2317,11 +2581,21 @@ function createHudLayoutCache(doc, win) {
       }
     }
   };
-  cache.dispose = () => { cache.closed = true; cache.onMeasure = null; observer.disconnect(); win.removeEventListener("resize", invalidate); };
+  cache.dispose = () => {
+    cache.closed = true;
+    cache.onMeasure = null;
+    observer.disconnect();
+    win.removeEventListener("resize", invalidate);
+  };
   return cache;
 }
 function hudLayoutCache() {
-  if (typeof document === "undefined" || typeof window === "undefined" || !window.ResizeObserver) return null;
+  if (
+    typeof document === "undefined" ||
+    typeof window === "undefined" ||
+    !window.ResizeObserver
+  )
+    return null;
   return (hudLayoutCache.value ??= createHudLayoutCache(document, window));
 }
 function setHudHTML(id, html) {
@@ -2338,9 +2612,16 @@ function setHudText(id, text) {
   hudLayoutCache.value?.invalidate();
 }
 function projectActorReservations(actors, camera, width, height) {
-  const cache = (projectActorReservations.cache ??= new WeakMap()), result = [];
+  const cache = (projectActorReservations.cache ??= new WeakMap()),
+    result = [];
   for (const actor of actors || []) {
-    if (!actor.object || actor.object.visible === false || actor.visual?.visible === false || !actor.position) continue;
+    if (
+      !actor.object ||
+      actor.object.visible === false ||
+      actor.visual?.visible === false ||
+      !actor.position
+    )
+      continue;
     const visualRoot = actor.visual || actor.object;
     let bounds = cache.get(actor);
     if (!bounds) {
@@ -2353,45 +2634,117 @@ function projectActorReservations(actors, camera, width, height) {
       const inverse = visualRoot.matrixWorld.clone().invert();
       // Sample current vertices once; do not reuse a skinned boundingBox that
       // another CPU query may have cached before the bind matrices were ready.
-      bounds = actor.visual ? new THREE.Box3().setFromObject(actor.visual, true).applyMatrix4(inverse) : new THREE.Box3();
+      bounds = actor.visual
+        ? new THREE.Box3()
+            .setFromObject(actor.visual, true)
+            .applyMatrix4(inverse)
+        : new THREE.Box3();
       const height = Math.max(1.85, actor.colliderHeight || 0);
-      bounds.union(new THREE.Box3(new THREE.Vector3(-.54, 0, -.54), new THREE.Vector3(.54, height + .2, .54)).applyMatrix4(actor.object.matrixWorld).applyMatrix4(inverse));
-      bounds.expandByScalar(.12);
+      bounds.union(
+        new THREE.Box3(
+          new THREE.Vector3(-0.54, 0, -0.54),
+          new THREE.Vector3(0.54, height + 0.2, 0.54),
+        )
+          .applyMatrix4(actor.object.matrixWorld)
+          .applyMatrix4(inverse),
+      );
+      bounds.expandByScalar(0.12);
       cache.set(actor, bounds);
     }
     visualRoot.updateWorldMatrix(true, false);
-    const projected = [];
-    for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
-      const p = new THREE.Vector3(x, y, z).applyMatrix4(visualRoot.matrixWorld).project(camera);
-      projected.push(p);
+    let x = Infinity,
+      y = Infinity,
+      right = -Infinity,
+      bottom = -Infinity,
+      near = 0,
+      far = 0;
+    const p = (projectActorReservations.vector ??= new THREE.Vector3());
+    for (let i = 0; i < 8; i++) {
+      p.set(
+        i & 1 ? bounds.max.x : bounds.min.x,
+        i & 2 ? bounds.max.y : bounds.min.y,
+        i & 4 ? bounds.max.z : bounds.min.z,
+      )
+        .applyMatrix4(visualRoot.matrixWorld)
+        .project(camera);
+      if (p.z < -1) near++;
+      if (p.z > 1) far++;
+      const sx = (p.x * 0.5 + 0.5) * width,
+        sy = (-p.y * 0.5 + 0.5) * height;
+      x = Math.min(x, sx);
+      y = Math.min(y, sy);
+      right = Math.max(right, sx);
+      bottom = Math.max(bottom, sy);
     }
-    if (projected.every((p) => p.z < -1) || projected.every((p) => p.z > 1)) continue;
-    const xs = projected.map((p) => (p.x * .5 + .5) * width), ys = projected.map((p) => (-p.y * .5 + .5) * height);
-    const x = Math.min(...xs), y = Math.min(...ys), right = Math.max(...xs), bottom = Math.max(...ys);
-    if (![x, y, right, bottom].every(Number.isFinite) || right < 0 || bottom < 0 || x > width || y > height) continue;
+    if (
+      near === 8 ||
+      far === 8 ||
+      !Number.isFinite(x + y + right + bottom) ||
+      right < 0 ||
+      bottom < 0 ||
+      x > width ||
+      y > height
+    )
+      continue;
     result.push({ x, y, width: right - x, height: bottom - y, actor });
   }
   return result;
 }
 function labelLeaderReservations(labels) {
-  return labels.filter((label) => label.leader).map((label) => {
-    const x = Math.max(label.x, Math.min(label.x + label.width, label.anchor.x)),
-      y = Math.max(label.y, Math.min(label.y + label.height, label.anchor.y)),
-      padding = 2;
-    return { x: Math.min(x, label.anchor.x) - padding, y: Math.min(y, label.anchor.y) - padding,
-      width: Math.abs(x - label.anchor.x) + padding * 2, height: Math.abs(y - label.anchor.y) + padding * 2 };
-  });
+  return labels
+    .filter((label) => label.leader)
+    .map((label) => {
+      const x = Math.max(
+          label.x,
+          Math.min(label.x + label.width, label.anchor.x),
+        ),
+        y = Math.max(label.y, Math.min(label.y + label.height, label.anchor.y)),
+        padding = 2;
+      return {
+        x: Math.min(x, label.anchor.x) - padding,
+        y: Math.min(y, label.anchor.y) - padding,
+        width: Math.abs(x - label.anchor.x) + padding * 2,
+        height: Math.abs(y - label.anchor.y) + padding * 2,
+      };
+    });
 }
 function layoutHudNotifications(notices, width, height, fixed, actors) {
-  const items = notices.map((n) => ({ ...n, anchor: { x: n.x + n.width / 2, y: n.y + n.height } }));
-  const placed = [];
-  for (const item of items) {
-    let rect = layoutWorldLabels([item], width, height, [...fixed, ...actors, ...placed])[0];
-    // In an overfull viewport keep the notice readable and fixed HUD clear even
-    // when avoiding every body is physically impossible. Never shrink its text.
-    rect ||= layoutWorldLabels([item], width, height, [...fixed, ...placed])[0];
+  const placed = (layoutHudNotifications.placed ??= []),
+    models = (layoutHudNotifications.models ??= []),
+    buffers = (layoutHudNotifications.buffers ??= []),
+    input = (layoutHudNotifications.input ??= []),
+    reserved = (layoutHudNotifications.reserved ??= []);
+  placed.length = 0;
+  for (let i = 0; i < notices.length; i++) {
+    const n = notices[i],
+      item = (models[i] ??= { anchor: {} });
+    item.id = n.id;
+    item.x = n.x;
+    item.y = n.y;
+    item.width = n.width;
+    item.height = n.height;
+    item.anchor.x = n.x + n.width / 2;
+    item.anchor.y = n.y + n.height;
+    reserved.length = 0;
+    for (let j = 0; j < fixed.length; j++) reserved.push(fixed[j]);
+    for (let j = 0; j < actors.length; j++) reserved.push(actors[j]);
+    for (let j = 0; j < placed.length; j++) reserved.push(placed[j]);
+    input[0] = item;
+    const work = (buffers[i] ??= []);
+    let rect = layoutWorldLabels(input, width, height, reserved, work)[0];
+    if (!rect) {
+      reserved.length = 0;
+      for (let j = 0; j < fixed.length; j++) reserved.push(fixed[j]);
+      for (let j = 0; j < placed.length; j++) reserved.push(placed[j]);
+      rect = layoutWorldLabels(input, width, height, reserved, work)[0];
+    }
     if (rect) placed.push(rect);
-    else placed.push({ ...item, x: Math.max(6, Math.min(width - item.width - 6, item.x)), y: Math.max(6, Math.min(height - item.height - 6, item.y)), limited: true });
+    else {
+      item.x = Math.max(6, Math.min(width - item.width - 6, item.x));
+      item.y = Math.max(6, Math.min(height - item.height - 6, item.y));
+      item.limited = true;
+      placed.push(item);
+    }
   }
   return placed;
 }
@@ -2401,80 +2754,231 @@ function renderWorldLabels(labels) {
   const width = viewport.x,
     height = viewport.y,
     maxWidth = Math.max(1, Math.min(280, width - 12));
-  const projected = labels
-    .map((label) => {
-      const p = new THREE.Vector3(
-        label.position.x,
-        label.position.y ?? 1.8,
-        label.position.z,
-      ).project(world.camera);
-      return {
-        ...label,
-        ...measureWorldLabel(label, maxWidth),
-        anchor: {
-          x: (p.x * 0.5 + 0.5) * width,
-          y: (-0.5 * p.y + 0.5) * height,
-        },
-        depth: p.z,
-      };
-    })
-    .filter((label) => label.depth >= -1 && label.depth <= 1);
-  const cache = hudLayoutCache(), hud = cache?.snapshot() || { fixed: [], notices: [] },
-    actorBoxes = projectActorReservations(world.actors, world.camera, width, height),
-    placed = layoutWorldLabels(projected, width, height, [...hud.fixed, ...actorBoxes]),
+  const cache = hudLayoutCache();
+  const input = (renderWorldLabels.input ??= []),
+    actorInput = (renderWorldLabels.actorInput ??= []);
+  let changed =
+    renderWorldLabels.width !== width ||
+    renderWorldLabels.height !== height ||
+    renderWorldLabels.camera !== world.cameraRevision ||
+    renderWorldLabels.hud !== cache?.revision ||
+    input.length !== labels.length ||
+    actorInput.length !== world.actors.length;
+  for (let i = 0; i < labels.length; i++) {
+    const l = labels[i],
+      old = (input[i] ??= {}),
+      x = Math.round(l.position.x * 50),
+      z = Math.round(l.position.z * 50),
+      y = l.position.y ?? 1.8;
+    if (
+      old.text !== l.text ||
+      old.x !== x ||
+      old.z !== z ||
+      old.y !== y ||
+      old.hp !== l.hp ||
+      old.player !== l.player ||
+      old.enemy !== l.enemy
+    )
+      changed = true;
+    old.text = l.text;
+    old.x = x;
+    old.z = z;
+    old.y = y;
+    old.hp = l.hp;
+    old.player = l.player;
+    old.enemy = l.enemy;
+  }
+  input.length = labels.length;
+  for (let i = 0; i < world.actors.length; i++) {
+    const a = world.actors[i],
+      old = (actorInput[i] ??= {}),
+      x = Math.round(a.position.x * 50),
+      z = Math.round(a.position.z * 50),
+      heading = Math.round(a.object.rotation.y * 50);
+    if (
+      old.x !== x ||
+      old.z !== z ||
+      old.heading !== heading ||
+      old.object !== a.object ||
+      old.visible !== a.object.visible
+    )
+      changed = true;
+    old.x = x;
+    old.z = z;
+    old.heading = heading;
+    old.object = a.object;
+    old.visible = a.object.visible;
+  }
+  actorInput.length = world.actors.length;
+  if (!changed) return;
+  renderWorldLabels.width = width;
+  renderWorldLabels.height = height;
+  renderWorldLabels.camera = world.cameraRevision;
+  renderWorldLabels.hud = cache?.revision;
+  const projected = [],
+    models = (renderWorldLabels.models ??= []);
+  const v = (renderWorldLabels.vector ??= new THREE.Vector3());
+  for (let i = 0; i < labels.length; i++) {
+    const label = labels[i],
+      model = (models[i] ??= { anchor: {} });
+    v.set(label.position.x, label.position.y ?? 1.8, label.position.z).project(
+      world.camera,
+    );
+    const metrics = measureWorldLabel(label, maxWidth);
+    if (
+      model.text !== label.text ||
+      model.width !== metrics.width ||
+      model.height !== metrics.height
+    )
+      model.previous = null;
+    Object.assign(model, label, metrics);
+    model.anchor.x = (v.x * 0.5 + 0.5) * width;
+    model.anchor.y = (-v.y * 0.5 + 0.5) * height;
+    if (v.z >= -1 && v.z <= 1) projected.push(model);
+  }
+  const hud = cache?.snapshot() || { fixed: [], notices: [] },
+    actorBoxes = projectActorReservations(
+      world.actors,
+      world.camera,
+      width,
+      height,
+    ),
+    placed = layoutWorldLabels(
+      projected,
+      width,
+      height,
+      [...hud.fixed, ...actorBoxes],
+      (renderWorldLabels.placed ??= []),
+    ),
     // Names and their original-anchor leaders remain legible before notices move.
     labelReservations = [...placed, ...labelLeaderReservations(placed)],
-    notices = layoutHudNotifications(hud.notices, width, height, [...hud.fixed, ...labelReservations], actorBoxes),
+    notices = layoutHudNotifications(
+      hud.notices,
+      width,
+      height,
+      [...hud.fixed, ...labelReservations],
+      actorBoxes,
+    ),
     reserved = [...hud.fixed, ...notices, ...actorBoxes];
   if (cache) cache.onMeasure = () => renderWorldLabels(labels);
   cache?.apply(notices);
-  const key = JSON.stringify([
-      reserved.map((r) => [r.x, r.y, r.width, r.height].map((n) => Number(n.toFixed(1)))),
-      width,
-      height,
-      projected.map((l) => [
-        l.text,
-        l.lines,
-        l.enemy,
-        l.player,
-        l.barWidth,
-        l.width,
-        l.height,
-        l.anchor.x.toFixed(1),
-        l.anchor.y.toFixed(1),
-      ]),
-    ]),
-    target = $("labels");
-  if (renderWorldLabels.key === key && renderWorldLabels.target === target)
-    return;
-  const leaders = placed
-      .filter((l) => l.leader)
-      .map((l) => {
-        const x = Math.max(l.x, Math.min(l.x + l.width, l.anchor.x)),
-          y = Math.max(l.y, Math.min(l.y + l.height, l.anchor.y));
-        return `<path d="M${l.anchor.x.toFixed(1)},${l.anchor.y.toFixed(1)} L${x.toFixed(1)},${y.toFixed(1)}"/><circle cx="${l.anchor.x.toFixed(1)}" cy="${l.anchor.y.toFixed(1)}" r="1.5"/>`;
-      })
-      .join("");
-  target.innerHTML = `${leaders ? `<svg aria-hidden="true" width="${width}" height="${height}" style="position:absolute;inset:0;pointer-events:none" stroke="#efe8d7" stroke-opacity=".65" fill="#efe8d7" fill-opacity=".8" stroke-width="1">${leaders}</svg>` : ""}${placed.map((l) => `<div class="world-label ${l.player ? "player" : l.enemy ? "enemy" : ""}" style="left:${l.x}px;top:${l.y}px;width:${l.width}px;transform:none;line-height:${l.lineHeight}px;text-align:center">${l.lines.map(esc).join("<br>")}${l.enemy ? `<div class="bar" style="width:${l.barWidth}px"></div>` : ""}</div>`).join("")}`;
-  renderWorldLabels.key = key;
-  renderWorldLabels.target = target;
+  const target = $("labels"),
+    nodes = (renderWorldLabels.nodes ??= []);
+  if (renderWorldLabels.target !== target || !target.querySelector("svg")) {
+    target.replaceChildren();
+    nodes.length = 0;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("aria-hidden", "true");
+    svg.style.cssText = "position:absolute;inset:0;pointer-events:none";
+    svg.setAttribute("stroke", "#efe8d7");
+    svg.setAttribute("stroke-opacity", ".65");
+    svg.setAttribute("fill", "none");
+    target.append(svg);
+    renderWorldLabels.svg = svg;
+    renderWorldLabels.target = target;
+  }
+  renderWorldLabels.svg.setAttribute("width", width);
+  renderWorldLabels.svg.setAttribute("height", height);
+  for (let i = 0; i < placed.length; i++) {
+    const l = placed[i];
+    let node = nodes[i];
+    if (!node) {
+      const div = document.createElement("div"),
+        bar = document.createElement("div"),
+        text = document.createElement("span"),
+        path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      div.append(text, bar);
+      bar.className = "bar";
+      target.append(div);
+      renderWorldLabels.svg.append(path);
+      node = nodes[i] = { div, text, bar, path };
+    }
+    node.div.hidden = false;
+    const className = `world-label ${l.player ? "player" : l.enemy ? "enemy" : ""}`;
+    if (node.div.className !== className) node.div.className = className;
+    const css = `left:${l.x}px;top:${l.y}px;width:${l.width}px;transform:none;line-height:${l.lineHeight}px;text-align:center`;
+    if (node.css !== css) {
+      node.div.style.cssText = css;
+      node.css = css;
+    }
+    const text = l.lines.join("\n");
+    if (node.text.textContent !== text) {
+      node.text.textContent = text;
+      node.text.style.whiteSpace = "pre";
+    }
+    node.bar.hidden = !l.enemy;
+    node.bar.style.width = l.barWidth + "px";
+    node.path.style.display = l.leader ? "" : "none";
+    if (l.leader)
+      node.path.setAttribute(
+        "d",
+        `M${l.anchor.x},${l.anchor.y} L${Math.max(l.x, Math.min(l.x + l.width, l.anchor.x))},${Math.max(l.y, Math.min(l.y + l.height, l.anchor.y))}`,
+      );
+    const source = projected[l.index];
+    if (source)
+      Object.assign((source.previous ??= {}), {
+        x: l.x,
+        y: l.y,
+        anchorX: l.anchor.x,
+        anchorY: l.anchor.y,
+      });
+  }
+  for (let i = placed.length; i < nodes.length; i++) {
+    nodes[i].div.hidden = true;
+    nodes[i].path.style.display = "none";
+  }
+}
+const hudLabelBuffer = [],
+  hudLabelPool = [],
+  enemyLabelNames = {
+    guard: "警戒",
+    flanker: "↔ 側翼",
+    shotgun: "近攻",
+    sniper: "◎ 狙擊",
+  };
+function addHudLabel(
+  x,
+  y,
+  z,
+  text,
+  enemy = false,
+  player = false,
+  hp = undefined,
+) {
+  const i = hudLabelBuffer.length,
+    l = (hudLabelPool[i] ??= { position: {} });
+  l.position.x = x;
+  l.position.y = y;
+  l.position.z = z;
+  l.text = text;
+  l.enemy = enemy;
+  l.player = player;
+  l.hp = hp;
+  hudLabelBuffer.push(l);
 }
 function updateHud() {
   if (mode === "playing") {
     setHudText("hp", Math.ceil(hp));
     const hpWidth = `${hp}%`;
-    if ($("hp-fill").style.width !== hpWidth) $("hp-fill").style.width = hpWidth;
+    if ($("hp-fill").style.width !== hpWidth)
+      $("hp-fill").style.width = hpWidth;
     setHudHTML("ammo", `${ammo} <span>/ ${reserve}</span>`);
-    setHudText("reload-state", handsOccupied()
-      ? "雙手搬運 · 先放下再換彈／開火"
-      : reload > 0
-        ? `換彈 ${reload.toFixed(1)}s`
-        : "R 換彈");
-    setHudText("cover-state", cover
-      ? aiming || firing
-        ? "探頭 · 暴露中"
-        : "掩體 · 已縮回"
-      : "自由移動");
+    setHudText(
+      "reload-state",
+      handsOccupied()
+        ? "雙手搬運 · 先放下再換彈／開火"
+        : reload > 0
+          ? `換彈 ${reload.toFixed(1)}s`
+          : "R 換彈",
+    );
+    setHudText(
+      "cover-state",
+      cover
+        ? aiming || firing
+          ? "探頭 · 暴露中"
+          : "掩體 · 已縮回"
+        : "自由移動",
+    );
     const workRemaining = field && !field.complete;
     const nextObjective = missionSystem
       ? missionSystem.objective()
@@ -2495,6 +2999,7 @@ function updateHud() {
       : `<b>◆ 證據 ${clueSet.size}/3　·　守軍 ${enemies.filter((e) => e.hp > 0).length}</b><small>${nextObjective}</small>`;
     if (!secured && field)
       objectiveHTML += `<small>⚙ 現場作業 ${field.state.completed.length}/3 · ${esc(fieldObjective || "靠近 ⚙ 標記按 E")}</small>`;
+    objectiveHTML += `<small>${missionClock?.deadlineSeconds === null ? "故事 · 無時限" : "委託時限 " + clockText(missionClock?.remainingSeconds || 0)} · ${encounter?.name || ""}</small>`;
     const near = nearby();
     if (
       !secured &&
@@ -2576,21 +3081,23 @@ function updateHud() {
                       neutralized: "待命守軍已被擊倒，沒有後續增援。",
                     }
       )[missionSystem.status.response.status];
-      if (responseText)
-        objectiveHTML += `<small>${responseText}</small>`;
+      if (responseText) objectiveHTML += `<small>${responseText}</small>`;
     }
     setHudHTML("objective", objectiveHTML);
-    setHudText("context", near
-      ? `E　${near.title}${near.type === "exit" && !secured ? "（未完成，可安全撤回）" : ""}`
-      : cover
-        ? "右鍵探頭 · 左鍵射擊 · E 離開掩體"
-        : departure?.stage === "courtyard"
-          ? "移動穿過已開門口 · 沿地面箭頭離院"
-          : world.colliders.some(
-                (b) => b.h < 2.2 && coverDistance(player.position, b) < 1.2,
-              )
-            ? "E　進入掩體"
-            : "");
+    setHudText(
+      "context",
+      near
+        ? `E　${near.title}${near.type === "exit" && !secured ? "（未完成，可安全撤回）" : ""}`
+        : cover
+          ? "右鍵探頭 · 左鍵射擊 · E 離開掩體"
+          : departure?.stage === "courtyard"
+            ? "移動穿過已開門口 · 沿地面箭頭離院"
+            : world.colliders.some(
+                  (b) => b.h < 2.2 && coverDistance(player.position, b) < 1.2,
+                )
+              ? "E　進入掩體"
+              : "",
+    );
     $("status-note").textContent =
       smoke > 0
         ? `煙罐掩護 ${smoke.toFixed(0)} 秒`
@@ -2598,93 +3105,131 @@ function updateHud() {
           ? "補給已使用"
           : `F　${run.item === "medkit" ? "繃帶恢復生命" : "煙罐遮蔽警戒"} · 一次`;
   } else if (mode === "town-walk") {
-    setHudHTML("objective", "<b>暮砂鎮 · 走訪四位居民</b><small>靠近居民按 E。Esc 可回到委託簿。</small>");
-    setHudText("context", sceneLabels.some(
-      (n) =>
-        Math.hypot(
-          n.position.x - player.position.x,
-          n.position.z - player.position.z,
-        ) < 3,
-    )
-      ? "E　交談"
-      : "");
+    setHudHTML(
+      "objective",
+      "<b>暮砂鎮 · 走訪四位居民</b><small>靠近居民按 E。Esc 可回到委託簿。</small>",
+    );
+    setHudText(
+      "context",
+      sceneLabels.some(
+        (n) =>
+          Math.hypot(
+            n.position.x - player.position.x,
+            n.position.z - player.position.z,
+          ) < 3,
+      )
+        ? "E　交談"
+        : "",
+    );
   }
-  const labels =
-    mode === "playing"
-      ? [
-          ...(player
-            ? [
-                {
-                  position: {
-                    x: player.position.x,
-                    z: player.position.z,
-                    y: 2.25,
-                  },
-                  text: "你",
-                  player: true,
-                },
-              ]
-            : []),
-          ...clues
-            .filter((c) => !c.read)
-            .map((c) => ({
-              position: { x: c.position[0], z: c.position[1], y: 2.9 },
-              text: "◆ " + c.title,
-            })),
-          ...objectives
-            .filter((o) => o.type === "exit" || !secured)
-            .map((o) => ({
-              position: {
-                x: o.position[0],
-                z: o.position[1],
-                y: o.type === "cargo" ? 3.6 : 2.8,
-              },
-              text:
-                o.type === "exit"
-                  ? "◇ 南側撤離"
-                  : o.type === "parley"
-                    ? "◆ 議和"
-                    : "◆ 取物",
-            })),
-          ...enemies
-            .filter((e) => e.hp > 0)
-            .map((e) => ({
-              position: {
-                x: e.actor.position.x,
-                z: e.actor.position.z,
-                y: 2.35,
-              },
-              text: {
-                guard: "警戒",
-                flanker: "↔ 側翼",
-                shotgun: "近攻",
-                sniper: "◎ 狙擊",
-              }[e.type],
-              enemy: true,
-              hp: e.hp,
-            })),
-          ...(field?.labels() || []),
-          ...(missionSystem?.labels() || []),
-          ...(fieldEffects.healCharges > 0 && fieldEffects.healPosition
-            ? [
-                {
-                  position: {
-                    x: fieldEffects.healPosition[0],
-                    y: 2.7,
-                    z: fieldEffects.healPosition[1],
-                  },
-                  text: "＋ 保留淨水",
-                },
-              ]
-            : []),
-        ]
-      : sceneLabels;
-  renderWorldLabels(labels);
+  if (mode === "playing") {
+    hudLabelBuffer.length = 0;
+    if (player)
+      addHudLabel(
+        player.position.x,
+        2.25,
+        player.position.z,
+        "你",
+        false,
+        true,
+      );
+    for (let i = 0; i < clues.length; i++) {
+      const c = clues[i];
+      if (!c.read)
+        addHudLabel(
+          c.position[0],
+          2.9,
+          c.position[1],
+          (c.hudTitle ??= "◆ " + c.title),
+        );
+    }
+    for (let i = 0; i < objectives.length; i++) {
+      const o = objectives[i];
+      if (o.type === "exit" || !secured)
+        addHudLabel(
+          o.position[0],
+          o.type === "cargo" ? 3.6 : 2.8,
+          o.position[1],
+          o.type === "exit"
+            ? "◇ 南側撤離"
+            : o.type === "parley"
+              ? "◆ 議和"
+              : "◆ 取物",
+        );
+    }
+    for (let i = 0; i < enemies.length; i++) {
+      const e = enemies[i];
+      if (e.hp > 0)
+        addHudLabel(
+          e.actor.position.x,
+          2.35,
+          e.actor.position.z,
+          enemyLabelNames[e.type],
+          true,
+          false,
+          e.hp,
+        );
+    }
+    const fieldLabels = field?.labels(),
+      missionLabels = missionSystem?.labels();
+    if (fieldLabels)
+      for (let i = 0; i < fieldLabels.length; i++) {
+        const l = fieldLabels[i];
+        addHudLabel(
+          l.position.x,
+          l.position.y,
+          l.position.z,
+          l.text,
+          l.enemy,
+          l.player,
+          l.hp,
+        );
+      }
+    if (missionLabels)
+      for (let i = 0; i < missionLabels.length; i++) {
+        const l = missionLabels[i];
+        addHudLabel(
+          l.position.x,
+          l.position.y,
+          l.position.z,
+          l.text,
+          l.enemy,
+          l.player,
+          l.hp,
+        );
+      }
+    if (fieldEffects.healCharges > 0 && fieldEffects.healPosition)
+      addHudLabel(
+        fieldEffects.healPosition[0],
+        2.7,
+        fieldEffects.healPosition[1],
+        "＋ 保留淨水",
+      );
+    renderWorldLabels(hudLabelBuffer);
+  } else renderWorldLabels(sceneLabels);
 }
+const readingModes = new Set(["field", "clue", "parley", "extraction"]);
+const musicModes = new Set([
+  "title",
+  "hub",
+  "briefing",
+  "supplies",
+  "journal",
+  "result",
+  "ending",
+  "field",
+  "clue",
+  "parley",
+  "extraction",
+]);
+const movingModes = new Set(["playing", "town-walk", "transition"]);
 function frame(time) {
   if (shuttingDown) return;
   requestAnimationFrame(frame);
-  if (!world || contextLost || document.hidden) { lastTime = 0; return; }
+  if (!world || contextLost || document.hidden) {
+    lastTime = 0;
+    return;
+  }
   const raw = lastTime ? (time - lastTime) / 1000 : 1 / 60;
   lastTime = time;
   const updateStart = performance.now();
@@ -2696,10 +3241,39 @@ function frame(time) {
     if (frameTimes.length > 18000) frameTimes.shift();
   }
   if (mode === "playing") {
+    world.noteFrame(raw);
+    world.beginCollisionUpdate();
     stats.assisted ||= settings.assist;
     stats.slowAim ||= settings.slowAim;
     const slow = settings.slowAim && aiming ? 0.55 : 1;
-    if (foreground) elapsed += raw;
+    if (foreground) {
+      elapsed += raw;
+      missionClock.activeWallSeconds =
+        (missionClock.activeWallSeconds || 0) + raw;
+      stats.activeWallSeconds = missionClock.activeWallSeconds;
+    }
+    const warning = tickClock(
+      missionClock,
+      dt,
+      true,
+      foreground && !document.hidden,
+      !contextLost,
+    );
+    stats.activeSeconds = missionClock.activeSeconds;
+    if (warning === 3) {
+      failure(
+        "委託時限已到；現場工作未能及時交付。可從安全入口重試，或選故事模式放慢腳步。",
+      );
+      return;
+    }
+    if (warning) {
+      toast(
+        warning === 2
+          ? "委託剩餘一分鐘；確認回條並安排撤離。"
+          : "委託剩餘四分之一時間。",
+      );
+      audio.play("warning");
+    }
     cooldown = Math.max(0, cooldown - dt * slow);
     smoke = Math.max(0, smoke - dt * slow);
     fieldEffects.exposure = Math.max(0, fieldEffects.exposure - dt);
@@ -2719,6 +3293,7 @@ function frame(time) {
     fieldObjective = fieldUpdate?.objective || "";
     if (mode === "playing") {
       missionSystem?.update(dt * slow);
+      world.syncCollisionMatrices(true);
       if (firing) shoot();
       updateEnemies(dt * slow);
     }
@@ -2726,7 +3301,7 @@ function frame(time) {
     hurt = Math.max(0, hurt - dt);
     $("damage").style.opacity =
       hurt > 0 ? (settings.reduced ? ".2" : ".6") : "0";
-  } else if (["field", "clue", "parley", "extraction"].includes(mode)) {
+  } else if (readingModes.has(mode)) {
     if (foreground) elapsed += raw;
   } else if (mode === "town-walk") {
     movement(dt);
@@ -2742,22 +3317,26 @@ function frame(time) {
       action?.();
     }
   }
-  if (audioPolicyMode !== mode || (mode === "dead" && audio.active && time >= deathAnimationUntil)) syncAudioForMode();
-  if (["title", "hub", "briefing", "supplies", "journal", "result", "ending", "field", "clue", "parley", "extraction"].includes(mode))
-    audio.tick(time / 1000);
-  const active = [
-    "playing",
-    "town-walk",
-    "transition",
-  ].includes(mode) || (mode === "dead" && time < deathAnimationUntil);
+  if (
+    audioPolicyMode !== mode ||
+    (mode === "dead" && audio.active && time >= deathAnimationUntil)
+  )
+    syncAudioForMode();
+  if (musicModes.has(mode)) audio.tick(time / 1000);
+  const active =
+    movingModes.has(mode) || (mode === "dead" && time < deathAnimationUntil);
   missionSystem?.props.setInspection?.(mode === "field");
-  if (time - lastHudTime >= 100) { updateHud(); updateMap(); lastHudTime = time; }
+  if (time - lastHudTime >= 100) {
+    updateHud();
+    updateMap();
+    lastHudTime = time;
+  }
   const gameUpdateMs = performance.now() - updateStart;
   world.update(active ? dt : 0, player, settings.reduced);
   const updateCost = gameUpdateMs + world.updateMs;
   updateTimes[updateTimeIndex++ % updateTimes.length] = updateCost;
   updateTotalMs += updateCost;
-  updateHistogram[Math.min(255, Math.floor(updateCost * 10))]++;
+  updateHistogram[Math.min(10000, Math.floor(updateCost * 10))]++;
 }
 
 overlay.addEventListener("click", (event) => {
@@ -2774,6 +3353,7 @@ overlay.addEventListener("click", (event) => {
       action.startsWith("night-") ||
       action.startsWith("pact-")
     ) {
+      world.syncCollisionMatrices(true);
       missionSystem?.handle(action, b.dataset);
       return;
     }
@@ -2781,23 +3361,32 @@ overlay.addEventListener("click", (event) => {
       if (missionSystem?.beforeFieldAction?.(action, b.dataset) === false)
         return;
       field?.handle(action, b.dataset);
+      world.syncCollisionMatrices(true);
       missionSystem?.afterFieldAction?.(action, b.dataset);
       return;
     }
     if (action === "retry-save") {
-      if (["result", "ending", "journal", "hub", "supplies"].includes(mode)) save();
+      if (["result", "ending", "journal", "hub", "supplies"].includes(mode))
+        save();
     } else if (action === "supplies") suppliesPanel();
     else if (action === "buy-supply") {
       if (performance.now() < purchaseReadyAt) return;
       purchaseReadyAt = performance.now() + 500;
       const purchase = buySupply(profile, b.dataset.id, { mode: "hub" });
-      if (purchase.profile === profile) { toast(purchase.message); return; }
+      if (purchase.profile === profile) {
+        toast(purchase.message);
+        return;
+      }
       b.disabled = true;
       const saved = storage.save(purchase.profile);
       showSaveResult(saved);
       if (saved.ok) profile = purchase.profile;
       suppliesPanel();
-      toast(saved.ok ? purchase.message : "升級未完成，旅費未扣除。" + saved.message);
+      toast(
+        saved.ok
+          ? purchase.message
+          : "升級未完成，旅費未扣除。" + saved.message,
+      );
     } else if (action === "hub") showHub();
     else if (action === "brief") briefing(b.dataset.id);
     else if (action === "deploy") deploy();
@@ -2841,7 +3430,18 @@ overlay.addEventListener("click", (event) => {
     world?.invalidate();
   }
 });
+overlay.addEventListener("click", (event) => {
+  if (event.target.id === "new-encounter") {
+    $("loadout-seed").value = crypto.getRandomValues(new Uint32Array(1))[0];
+    briefing.preview?.();
+  }
+});
 overlay.addEventListener("input", (event) => {
+  if (
+    event.target.id === "loadout-seed" ||
+    event.target.id === "loadout-difficulty"
+  )
+    briefing.preview?.();
   const key = event.target.dataset.setting;
   if (!key) return;
   settings[key] =
@@ -2861,15 +3461,31 @@ window.addEventListener("keydown", (event) => {
     if (mode === "paused") resume();
     else if (mode === "help" || mode === "settings") closeSheet();
     else if (mode === "field") field.handle("field-close", {});
-    else if (mode === "clue" || mode === "parley") { mode = "playing"; hide(); clearInputs(); }
-    else if (mode === "town-dialogue") { mode = "town-walk"; hide(); clearInputs(); }
-    else pause();
+    else if (mode === "clue" || mode === "parley" || mode === "withdraw") {
+      mode = "playing";
+      hide();
+      clearInputs();
+    } else if (mode === "town-dialogue") {
+      mode = "town-walk";
+      hide();
+      clearInputs();
+    } else pause();
     syncAudioForMode();
     return;
   }
-  if (event.target?.closest?.('input, select, textarea, button, summary, [contenteditable="true"]')) return;
+  if (
+    event.target?.closest?.(
+      'input, select, textarea, button, summary, [contenteditable="true"]',
+    )
+  )
+    return;
   if (!["playing", "town-walk"].includes(mode)) return;
-  if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) event.preventDefault();
+  if (
+    ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(
+      event.code,
+    )
+  )
+    event.preventDefault();
   keys.add(event.code);
   if (event.repeat) return;
   audio.unlock();
@@ -2901,7 +3517,8 @@ canvas.addEventListener("pointermove", (event) => {
   $("reticle").style.display = mode === "playing" ? "block" : "none";
 });
 canvas.addEventListener("pointerdown", (event) => {
-  if (clearingInputs || mode !== "playing" || event.pointerType !== "mouse") return;
+  if (clearingInputs || mode !== "playing" || event.pointerType !== "mouse")
+    return;
   audio.unlock();
   audio.resume();
   canvas.setPointerCapture(event.pointerId);
@@ -2931,20 +3548,37 @@ function bindPad(element, callback) {
     if (pointer === null) return;
     callback(0, 0, true);
     try {
-      if (element.hasPointerCapture?.(pointer)) element.releasePointerCapture(pointer);
-    } catch { /* Ownership and visible input are already neutral. */ }
+      if (element.hasPointerCapture?.(pointer))
+        element.releasePointerCapture(pointer);
+    } catch {
+      /* Ownership and visible input are already neutral. */
+    }
   };
   padResets.push(reset);
   element.addEventListener("pointerdown", (e) => {
-    if (clearingInputs || id !== null || (mode !== "playing" && mode !== "town-walk")) return;
+    if (
+      clearingInputs ||
+      id !== null ||
+      (mode !== "playing" && mode !== "town-walk")
+    )
+      return;
     e.preventDefault();
-    try { element.setPointerCapture(e.pointerId); } catch { return; }
+    try {
+      element.setPointerCapture(e.pointerId);
+    } catch {
+      return;
+    }
     id = e.pointerId;
     audio.unlock();
     update(e);
   });
   function update(e) {
-    if (clearingInputs || (mode !== "playing" && mode !== "town-walk") || e.pointerId !== id) return;
+    if (
+      clearingInputs ||
+      (mode !== "playing" && mode !== "town-walk") ||
+      e.pointerId !== id
+    )
+      return;
     const r = element.getBoundingClientRect();
     let x = (e.clientX - r.left - r.width / 2) / (r.width * 0.38),
       y = (e.clientY - r.top - r.height / 2) / (r.height * 0.38);
@@ -2978,9 +3612,14 @@ bindPad($("aim-pad"), (x, y, end) => {
   syncCombatInput();
 });
 $("touch-fire").addEventListener("pointerdown", (e) => {
-  if (clearingInputs || mode !== "playing" || firePointers.has(e.pointerId)) return;
+  if (clearingInputs || mode !== "playing" || firePointers.has(e.pointerId))
+    return;
   e.preventDefault();
-  try { e.currentTarget.setPointerCapture(e.pointerId); } catch { return; }
+  try {
+    e.currentTarget.setPointerCapture(e.pointerId);
+  } catch {
+    return;
+  }
   audio.unlock();
   audio.resume();
   firePointers.add(e.pointerId);
@@ -2999,14 +3638,23 @@ $("touch-item").onclick = useItem;
 // All menus share one focus boundary, including fieldwork rebuilt in place.
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Tab" || overlay.classList.contains("hidden")) return;
-  const focusable = [...overlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, [tabindex="0"]')]
-    .filter(node => node.getClientRects().length);
+  const focusable = [
+    ...overlay.querySelectorAll(
+      'button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, [tabindex="0"]',
+    ),
+  ].filter((node) => node.getClientRects().length);
   if (!focusable.length) return;
-  const first = focusable[0], last = focusable.at(-1);
-  if (!overlay.contains(document.activeElement) || (event.shiftKey && document.activeElement === first)) {
-    event.preventDefault(); (event.shiftKey ? last : first).focus();
+  const first = focusable[0],
+    last = focusable.at(-1);
+  if (
+    !overlay.contains(document.activeElement) ||
+    (event.shiftKey && document.activeElement === first)
+  ) {
+    event.preventDefault();
+    (event.shiftKey ? last : first).focus();
   } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault(); first.focus();
+    event.preventDefault();
+    first.focus();
   }
 });
 canvas.addEventListener("webglcontextlost", (event) => {
@@ -3029,21 +3677,49 @@ function updateMap() {
   if (!map) return;
   map.hidden = mode !== "playing";
   if (map.hidden || !player) return;
-  const xy = p => [72 + p[0] * 2.1, 72 + p[1] * 2.1];
+  const xy = (p) => [72 + p[0] * 2.1, 72 + p[1] * 2.1];
   const point = (p, shape, color) => {
-    const [x,y] = xy(p);
-    return shape === "square" ? `<rect x="${x-3}" y="${y-3}" width="6" height="6" fill="${color}"/>`
-      : shape === "diamond" ? `<path d="M${x},${y-4}l4,4 -4,4 -4,-4Z" fill="${color}"/>`
-      : `<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`;
+    const [x, y] = xy(p);
+    return shape === "square"
+      ? `<rect x="${x - 3}" y="${y - 3}" width="6" height="6" fill="${color}"/>`
+      : shape === "diamond"
+        ? `<path d="M${x},${y - 4}l4,4 -4,4 -4,-4Z" fill="${color}"/>`
+        : `<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`;
   };
-  const markup = `<svg viewBox="0 0 144 156" aria-hidden="true"><path d="M72 12v120M12 72h120" stroke="#a7b69c" stroke-opacity=".15"/><rect x="16" y="16" width="112" height="112" fill="none" stroke="#a7b69c" stroke-opacity=".3"/><text x="72" y="10" text-anchor="middle">N</text>${clues.filter(c=>!c.read).map(c=>point(c.position,"diamond","#9edaca")).join("")}${field?.tasks.filter(t=>!field.state.completed.includes(t.id)).map(t=>{const p=field.taskPoint(t);return point([p.x,p.z],"circle","#d9bb79")}).join("") || ""}${point(mission.exit,"square",secured ? "#c6f8d6" : "#91a293")}${point([Math.round(player.position.x*20)/20,Math.round(player.position.z*20)/20],"circle","#ffffff")}<text x="72" y="148" text-anchor="middle">◆ 證據　● 作業　□ 撤離</text></svg>`;
-  if (updateMap.markup !== markup) { map.innerHTML = markup; updateMap.markup = markup; }
+  const markup = `<svg viewBox="0 0 144 156" aria-hidden="true"><path d="M72 12v120M12 72h120" stroke="#a7b69c" stroke-opacity=".15"/><rect x="16" y="16" width="112" height="112" fill="none" stroke="#a7b69c" stroke-opacity=".3"/><text x="72" y="10" text-anchor="middle">N</text>${clues
+    .filter((c) => !c.read)
+    .map((c) => point(c.position, "diamond", "#9edaca"))
+    .join("")}${
+    field?.tasks
+      .filter((t) => !field.state.completed.includes(t.id))
+      .map((t) => {
+        const p = field.taskPoint(t);
+        return point([p.x, p.z], "circle", "#d9bb79");
+      })
+      .join("") || ""
+  }${point(mission.exit, "square", secured ? "#c6f8d6" : "#91a293")}${point([Math.round(player.position.x * 20) / 20, Math.round(player.position.z * 20) / 20], "circle", "#ffffff")}<text x="72" y="148" text-anchor="middle">◆ 證據　● 作業　□ 撤離</text></svg>`;
+  if (updateMap.markup !== markup) {
+    map.innerHTML = markup;
+    updateMap.markup = markup;
+  }
 }
 window.addEventListener("blur", () => {
   foreground = false;
   lastTime = 0;
   clearInputs();
-  if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition", "briefing"].includes(mode)) pause();
+  if (
+    [
+      "playing",
+      "town-walk",
+      "field",
+      "clue",
+      "parley",
+      "extraction",
+      "transition",
+      "briefing",
+    ].includes(mode)
+  )
+    pause();
   else audio.pause();
 });
 window.addEventListener("focus", () => {
@@ -3055,7 +3731,19 @@ document.addEventListener("visibilitychange", () => {
   lastTime = 0;
   if (document.hidden) {
     clearInputs();
-    if (["playing", "town-walk", "field", "clue", "parley", "extraction", "transition", "briefing"].includes(mode)) pause();
+    if (
+      [
+        "playing",
+        "town-walk",
+        "field",
+        "clue",
+        "parley",
+        "extraction",
+        "transition",
+        "briefing",
+      ].includes(mode)
+    )
+      pause();
     else audio.pause();
   }
 });
@@ -3115,6 +3803,8 @@ window.dustDiagnostics = () => ({
   secured,
   strategy,
   elapsed,
+  challenge: missionClock ? { ...missionClock } : null,
+  encounter: encounter ? JSON.parse(JSON.stringify(encounter)) : null,
   field: field
     ? {
         state: JSON.parse(JSON.stringify(field.state)),
@@ -3125,7 +3815,9 @@ window.dustDiagnostics = () => ({
               type: field.traversal.type,
               taskId: field.traversal.task.id,
               index: field.traversal.index,
-              offset: field.traversal.offset ? { x: field.traversal.offset.x, z: field.traversal.offset.z } : null,
+              offset: field.traversal.offset
+                ? { x: field.traversal.offset.x, z: field.traversal.offset.z }
+                : null,
               route: field.traversal.route.map((p) => [...p]),
               paused: Boolean(field.traversal.paused),
             }
@@ -3225,13 +3917,24 @@ window.dustDiagnostics = () => ({
     tacticalTravel: e.tactics?.approachTravel || 0,
     windup: e.windup,
     rounds: e.rounds,
+    shots: e.shotCount,
+    recoverySeconds: e.recoverySeconds,
+    warningSeconds: e.warningSeconds,
     magazine: e.magazine,
   })),
   profile: JSON.parse(JSON.stringify(profile)),
   render: world?.stats(),
   performance: {
-    updateTotals: { count: updateTimeIndex, totalMs: updateTotalMs, histogram: Array.from(updateHistogram), binMs: 0.1 },
-    updateMs: Array.from(updateTimes.subarray(0, Math.min(updateTimeIndex, updateTimes.length))),
+    updateTotals: {
+      count: updateTimeIndex,
+      totalMs: updateTotalMs,
+      histogram: Array.from(updateHistogram),
+      overflowCount: updateHistogram[updateHistogram.length - 1],
+      binMs: 0.1,
+    },
+    updateMs: Array.from(
+      updateTimes.subarray(0, Math.min(updateTimeIndex, updateTimes.length)),
+    ),
     samples: frameTimes.length,
     p95:
       [...frameTimes].sort((a, b) => a - b)[

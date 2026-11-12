@@ -1,7 +1,9 @@
+import { createBoundsTracker } from "./collision-bounds.js";
 /** Original source-only supply scene. One borrowed Field cart/battery; no enemy spawns.
  * All lengths are metres, +Y up, +Z forward. Controller owns events and finite transfers.
  */
 export function createPactProps(THREE, world, flow, { field, player } = {}) {
+  const trackedBounds = createBoundsTracker(THREE);
   const feed = field?.tasks.find((t) => t.id === flow.feed.taskId),
     cart = field?.tasks.find((t) => t.id === flow.cart.taskId),
     lights = field?.tasks.find((t) => t.id === flow.lights.taskId);
@@ -141,22 +143,7 @@ export function createPactProps(THREE, world, flow, { field, player } = {}) {
     return true;
   }
   function bounds(n, id) {
-    n.updateWorldMatrix(true, true);
-    const b = new THREE.Box3().setFromObject(n),
-      s = b.getSize(new THREE.Vector3()),
-      c = b.getCenter(new THREE.Vector3());
-    return {
-      id,
-      x: c.x,
-      z: c.z,
-      w: s.x,
-      h: s.y,
-      d: s.z,
-      kind: "pact-prop",
-      vaultable: false,
-      min: { ...b.min },
-      max: { ...b.max },
-    };
+    return trackedBounds(n, id, "pact-prop");
   }
   function shot(n, box = bounds(n, n.name)) {
     if (!ownSolids.has(n)) {
@@ -611,8 +598,20 @@ export function createPactProps(THREE, world, flow, { field, player } = {}) {
       (b) => b !== cartCollider && b.max.y > 0 && intersects(c, b),
     );
   }
+  const cartSync = { x: NaN, y: NaN, z: NaN, yaw: NaN, version: -1, use: null };
   function syncCartCollider() {
     alive();
+    const p = cart.object.position,
+      yaw = cart.object.rotation.y;
+    if (
+      cartSync.x === p.x &&
+      cartSync.y === p.y &&
+      cartSync.z === p.z &&
+      cartSync.yaw === yaw &&
+      cartSync.version === stockMesh.instanceMatrix.version &&
+      cartSync.use === cartUse
+    )
+      return cartCollider;
     const classes = stockClasses();
     const c = corners(),
       xs = c.map((p) => p[0]),
@@ -657,6 +656,12 @@ export function createPactProps(THREE, world, flow, { field, player } = {}) {
         );
     });
     layoutStock(classes);
+    cartSync.x = p.x;
+    cartSync.y = p.y;
+    cartSync.z = p.z;
+    cartSync.yaw = yaw;
+    cartSync.version = stockMesh.instanceMatrix.version;
+    cartSync.use = cartUse;
     return cartCollider;
   }
   function resolveCartMotion(dx, dz, yaw, boxes = world.colliders) {
@@ -827,16 +832,20 @@ export function createPactProps(THREE, world, flow, { field, player } = {}) {
     shot(receipt);
     return receipt;
   }
+  const feedKeys = ["military-feed", "civilian-feed"],
+    feedTip = new THREE.Vector3(),
+    feedContact = new THREE.Vector3();
   function update() {
     alive();
     syncCartCollider();
     Object.assign(deedBox, bounds(deed, flow.handoff.deedId));
     Object.assign(batteryBox, bounds(battery, flow.lights.batteryId));
-    const connected = (key) =>
-      feed.parts[key]
-        .localToWorld(new THREE.Vector3(0, 0.3, 0))
-        .distanceTo(position(contactNodes[key])) < 0.015;
-    setFeed(connected("military-feed"), connected("civilian-feed"));
+    for (const key of feedKeys) {
+      feedTip.set(0, 0.3, 0);
+      feed.parts[key].localToWorld(feedTip);
+      contactNodes[key].getWorldPosition(feedContact);
+      powerLamps[key].visible = feedTip.distanceTo(feedContact) < 0.015;
+    }
   }
   function dispose() {
     if (disposed) return;

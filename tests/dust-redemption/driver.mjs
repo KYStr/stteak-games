@@ -8,7 +8,35 @@ assert.ok(
 export const url = `http://127.0.0.1:${port}/games/dust-redemption/`;
 export const snapshot = (p) => p.evaluate(() => dustDiagnostics());
 export async function click(p, selector) {
-  await p.locator(selector).filter({ visible: true }).first().click();
+  const target = p.locator(selector).filter({ visible: true }).first();
+  await target.waitFor({ state: "visible" });
+  assert.equal(await target.isEnabled(), true, `disabled control ${selector}`);
+  // Static inspection scenes deliberately skip WebGL submissions. Under shared
+  // SwiftShader Chrome's frame-based stability poll can stall even on an
+  // unchanged button. Scroll, validate the actual hit target, then send native
+  // pointer input; never force a click or invoke the DOM/event handler.
+  await target.evaluate((el) =>
+    el.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: "instant",
+    }),
+  );
+  const rect = await target.boundingBox();
+  assert.ok(
+    rect && rect.width > 0 && rect.height > 0,
+    `visible bounds ${selector}`,
+  );
+  const point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+  assert.equal(
+    await target.evaluate((el, point) => {
+      const hit = document.elementFromPoint(point.x, point.y);
+      return hit === el || el.contains(hit);
+    }, point),
+    true,
+    `unobstructed control ${selector}`,
+  );
+  await p.mouse.click(point.x, point.y);
 }
 export async function action(p, a, extra = "") {
   await click(p, `#overlay [data-action="${a}"]:not(:disabled)${extra}`);
@@ -25,6 +53,21 @@ export async function start(p) {
   await action(p, "brief");
   await action(p, "deploy");
   await mode(p, "playing");
+}
+function reachedSheet(d, target) {
+  if (d.mode !== "field" || d.field?.traversal) return false;
+  const gap = Math.hypot(d.player.x - target.x, d.player.z - target.z);
+  if (gap < 2) return true;
+  // Escort completion opens its real sheet within the authored 3m arrival
+  // threshold. All three identities must have arrived; this never accepts an
+  // arbitrary interruption or changes their/player positions.
+  return (
+    gap < 3.1 &&
+    d.field.active === "night-escort" &&
+    d.field.state.progress["night-escort"]?.includes("group-checkpoints") &&
+    d.nightFlow?.party.members.length === 3 &&
+    d.nightFlow.party.members.every((m) => m.state === "safe")
+  );
 }
 export async function walk(p, target, radius = 1.6) {
   let d = await snapshot(p);
@@ -84,12 +127,7 @@ export async function walk(p, target, radius = 1.6) {
       for (const waypoint of path.slice(1)) {
         for (let tries = 0; ; tries++) {
           d = await snapshot(p);
-          if (
-            d.mode === "field" &&
-            !d.field?.traversal &&
-            Math.hypot(d.player.x - target.x, d.player.z - target.z) < 2
-          )
-            return;
+          if (reachedSheet(d, target)) return;
           assert.equal(d.mode, "playing");
           if (d.player.hp < 45 && d.stats.itemsUsed === 0)
             await p.keyboard.press("KeyF");
@@ -147,13 +185,10 @@ export async function walk(p, target, radius = 1.6) {
     let tries = 0;
     while (true) {
       d = await snapshot(p);
-      if (
-        d.mode === "field" &&
-        !d.field?.traversal &&
-        Math.hypot(d.player.x - target.x, d.player.z - target.z) < 2
-      )
-        return;
+      if (reachedSheet(d, target)) return;
       assert.equal(d.mode, "playing", `Walking interrupted: ${d.mode}`);
+      if (d.player.hp < 45 && d.stats.itemsUsed === 0)
+        await p.keyboard.press("KeyF");
       const dx = waypoint.x - d.player.x,
         dz = waypoint.z - d.player.z,
         gap = Math.hypot(dx, dz);

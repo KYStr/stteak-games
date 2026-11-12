@@ -447,10 +447,18 @@ export class FieldSystem {
               ? ["偏左", "兩孔重合", "偏右"]
               : ["橫撐", "對角插座", "反對角"];
     const labels = {
-      "battery-socket": "⚡ 電池端子", "earth-socket": "≡ 接地端子", "service-socket": "□ 維修端子",
-      "company-square": "□ 公司線", "triangle-public": "△ 公開驛線", "circle-families": "○ 家屬線",
-      "left-offset": "偏左插座", "two-pins": "兩孔重合", "right-offset": "偏右插座",
-      horizontal: "水平橫撐", "upper-left-lower-right": "左上至右下斜撐", "reverse-diagonal": "反向斜撐",
+      "battery-socket": "⚡ 電池端子",
+      "earth-socket": "≡ 接地端子",
+      "service-socket": "□ 維修端子",
+      "company-square": "□ 公司線",
+      "triangle-public": "△ 公開驛線",
+      "circle-families": "○ 家屬線",
+      "left-offset": "偏左插座",
+      "two-pins": "兩孔重合",
+      "right-offset": "偏右插座",
+      horizontal: "水平橫撐",
+      "upper-left-lower-right": "左上至右下斜撐",
+      "reverse-diagonal": "反向斜撐",
     };
     const height = 1.08 + index * 0.42;
     this.box(task.object, "patch-board", [1.45, 0.34, 0.07], 0x397d7a, [
@@ -470,7 +478,11 @@ export class FieldSystem {
         0xc3a35d,
       );
       this.label(node, glyphs[i], [0, 0.12, 0.018], [0.32, 0.12]);
-      return { id, node, label: labels[id] || (/^A[0-9]+-[0-9]+$/.test(id) ? id : "未對位") };
+      return {
+        id,
+        node,
+        label: labels[id] || (/^A[0-9]+-[0-9]+$/.test(id) ? id : "未對位"),
+      };
     });
     const node = this.control(
       task,
@@ -512,7 +524,10 @@ export class FieldSystem {
     return node;
   }
   buildTask(task) {
-    const object = createFieldProp(baseKinds[task.id], this.world.graphics || THREE);
+    const object = createFieldProp(
+      baseKinds[task.id],
+      this.world.graphics || THREE,
+    );
     object.name = `task-${task.id}`;
     object.position.copy(position(task.position));
     task.object = object;
@@ -2056,7 +2071,10 @@ export class FieldSystem {
       this.renderPanel("請從尚未完成的搬運或護送步驟繼續。");
       return;
     }
-    if (task.cargo && !this.near(task.cargo.position, traversal.type === "push" ? 2.6 : 2.3)) {
+    if (
+      task.cargo &&
+      !this.near(task.cargo.position, traversal.type === "push" ? 2.6 : 2.3)
+    ) {
       this.renderPanel("走近留在原地的貨物再拿起。");
       return;
     }
@@ -2091,7 +2109,13 @@ export class FieldSystem {
     if (this.traversal) {
       const task = this.traversal.task;
       if (this.traversal.paused) {
-        if (!this.near(this.taskPoint(task), this.traversal.type === "push" ? 2.6 : 2.5)) return false;
+        if (
+          !this.near(
+            this.taskPoint(task),
+            this.traversal.type === "push" ? 2.6 : 2.5,
+          )
+        )
+          return false;
         this.resume(task);
       } else this.release();
       return true;
@@ -2124,6 +2148,8 @@ export class FieldSystem {
         dz / count,
         colliders,
         radius,
+        23,
+        (this.moveSafeOut ??= {}),
       );
       object.position.x = next.x;
       object.position.z = next.z;
@@ -2233,7 +2259,12 @@ export class FieldSystem {
     return path[0] || member.position;
   }
   constrainMovement(previous, proposed) {
-    const task = this.tasks.find((task) => task.carrying && task.cargo);
+    let task = null;
+    for (let i = 0; i < this.tasks.length; i++)
+      if (this.tasks[i].carrying && this.tasks[i].cargo) {
+        task = this.tasks[i];
+        break;
+      }
     if (!task) return proposed;
     const reach = this.traversal?.type === "push" ? 2.6 : 1.8;
     const target = tetherPosition(
@@ -2241,12 +2272,16 @@ export class FieldSystem {
       proposed,
       task.cargo.position,
       reach,
+      (this.tetherOut ??= {}),
     );
     const checked = moveCircle(
       previous,
       target.x - previous.x,
       target.z - previous.z,
       this.world.colliders,
+      0.34,
+      23,
+      (this.moveOut ??= {}),
     );
     const limit = Math.max(reach, distance(previous, task.cargo.position));
     return distance(checked, task.cargo.position) <= limit + 1e-8
@@ -2255,14 +2290,22 @@ export class FieldSystem {
   }
   update(dt, player, colliders = this.world.colliders) {
     const p = player.position || player;
-    this.playerPosition = new THREE.Vector3(p.x, p.y || 0, p.z);
+    (this.playerPosition ??= new THREE.Vector3()).set(p.x, p.y || 0, p.z);
     const traversal = this.traversal;
     if (!traversal || traversal.paused) {
-      const carried = this.tasks.find((task) => task.carrying && task.cargo);
+      let carried = null;
+      for (let i = 0; i < this.tasks.length; i++)
+        if (this.tasks[i].carrying && this.tasks[i].cargo) {
+          carried = this.tasks[i];
+          break;
+        }
       if (carried) {
-        const target = this.playerPosition
-            .clone()
-            .add(carried.carryOffset || new THREE.Vector3(0, 0, -0.7)),
+        const target = (this.carryTarget ??= new THREE.Vector3())
+            .copy(this.playerPosition)
+            .add(
+              carried.carryOffset ||
+                (this.defaultCarryOffset ??= new THREE.Vector3(0, 0, -0.7)),
+            ),
           delta = target.sub(carried.cargo.position);
         delta.y = 0;
         const length = delta.length();
@@ -2277,7 +2320,7 @@ export class FieldSystem {
           );
         }
         carried.cargo.position.y = 0.65;
-        this.lastPlayer = this.playerPosition.clone();
+        (this.lastPlayer ??= new THREE.Vector3()).copy(this.playerPosition);
         const next = this.currentSteps(carried).find(
           (step) => !this.recorded(carried, step),
         );
@@ -2290,19 +2333,25 @@ export class FieldSystem {
               : "貨物跟隨中 · 靠近 ⚙ 標記繼續作業 · E 暫放",
         };
       }
-      this.lastPlayer = this.playerPosition.clone();
-      return {
-        speedMultiplier: 1,
-        objective: traversal?.paused
-          ? traversal.type === "escort"
-            ? "護送已暫停 · 靠近家屬按 E 繼續"
-            : `作業已暫停 · 靠近${traversal.task.cargo ? "貨物" : "⚙ 標記"}按 E 繼續`
-          : "",
-      };
+      (this.lastPlayer ??= new THREE.Vector3()).copy(this.playerPosition);
+      const state = (this.updateState ??= {});
+      state.speedMultiplier = 1;
+      state.objective = traversal?.paused
+        ? traversal.type === "escort"
+          ? "護送已暫停 · 靠近家屬按 E 繼續"
+          : `作業已暫停 · 靠近${traversal.task.cargo ? "貨物" : "⚙ 標記"}按 E 繼續`
+        : "";
+      return state;
     }
     const task = traversal.task,
-      goal = position(traversal.route[traversal.index]),
-      delta = this.playerPosition.clone().sub(traversal.lastPlayer),
+      goal = (this.goalScratch ??= new THREE.Vector3()).set(
+        traversal.route[traversal.index][0],
+        0,
+        traversal.route[traversal.index][1],
+      ),
+      delta = (this.deltaScratch ??= new THREE.Vector3())
+        .copy(this.playerPosition)
+        .sub(traversal.lastPlayer),
       travel = delta.length();
     traversal.lastPlayer.copy(this.playerPosition);
     traversal.distanceTravelled += travel;
@@ -2315,7 +2364,9 @@ export class FieldSystem {
           this.world.animate(member, "idle");
           continue;
         }
-        const desired = goal.clone();
+        const desired = (this.desiredScratch ??= new THREE.Vector3()).copy(
+          goal,
+        );
         desired.x += (i - 1) * 0.38;
         desired.z += Math.abs(i - 1) * 0.25;
         const target = this.escortTarget(member, desired, colliders);
@@ -2341,7 +2392,9 @@ export class FieldSystem {
       task.anchor = task.members[1].object;
     } else if (traversal.carrying) {
       const cargo = task.cargo,
-        target = this.playerPosition.clone().add(traversal.offset),
+        target = (this.carryTarget ??= new THREE.Vector3())
+          .copy(this.playerPosition)
+          .add(traversal.offset),
         dx = target.x - cargo.position.x,
         dz = target.z - cargo.position.z,
         length = Math.hypot(dx, dz),
@@ -2350,7 +2403,9 @@ export class FieldSystem {
           Math.max(0, dt) * (traversal.type === "push" ? 2.6 : 3.4),
         );
       if (length > 0.005) {
-        const before = cargo.position.clone();
+        const before = (this.cargoBefore ??= new THREE.Vector3()).copy(
+          cargo.position,
+        );
         this.moveSafe(
           cargo,
           (dx / length) * amount,

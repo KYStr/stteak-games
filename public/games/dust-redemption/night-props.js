@@ -1,7 +1,9 @@
+import { createBoundsTracker } from "./collision-bounds.js";
 /** Original source-only night attachments. Metres, +Y up, +Z forward.
  * No WaterProps state, NPC creation, event submission or movement controller.
  */
 export function createNightProps(THREE, world, flow) {
+  const trackedBounds = createBoundsTracker(THREE);
   if (!THREE?.BufferGeometry || !world?.solid || !flow?.bridge?.hingePosition)
     throw TypeError(
       "Night props require World and authored bridge hingePosition",
@@ -88,22 +90,7 @@ export function createNightProps(THREE, world, flow) {
     return n;
   }
   function bbox(id, object, kind = "night-prop") {
-    object.updateWorldMatrix(true, true);
-    const box = new THREE.Box3().setFromObject(object),
-      size = box.getSize(new THREE.Vector3()),
-      center = box.getCenter(new THREE.Vector3());
-    return {
-      id,
-      kind,
-      vaultable: false,
-      x: center.x,
-      z: center.z,
-      w: size.x,
-      h: size.y,
-      d: size.z,
-      min: { ...box.min },
-      max: { ...box.max },
-    };
+    return trackedBounds(object, id, kind);
   }
   function proxy(id, x, z, w, h, d) {
     return {

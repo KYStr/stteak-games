@@ -14,8 +14,16 @@ import {
   tacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
+const vectorCache = new WeakMap();
 const point = (p) => [p.x, p.z],
-  vector = (p) => new THREE.Vector3(p[0], 0, p[1]),
+  vector = (p) => {
+    let v = vectorCache.get(p);
+    if (!v || v.x !== p[0] || v.z !== p[1]) {
+      v = new THREE.Vector3(p[0], 0, p[1]);
+      vectorCache.set(p, v);
+    }
+    return v;
+  },
   gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const esc = (v) =>
   String(v ?? "").replace(
@@ -105,7 +113,10 @@ export class PactSystem {
       "完整交涉保留車上全部剩餘彈藥；掩體用途會封存其中六發，不能再算作整車可交涉物資。",
       "E可放手，回同車把手旁續推；沒有第二輛車或補一趟物資。",
     ];
-    this.props = createPactProps(world.graphics || THREE, world, this.flow, { field, player });
+    this.props = createPactProps(world.graphics || THREE, world, this.flow, {
+      field,
+      player,
+    });
     this.originalMethods = new Map();
     const wrap = (key, handler) => {
       const old = field[key],
@@ -465,9 +476,14 @@ export class PactSystem {
           // A grip inside the cart's swept footprint traps the player against
           // its conservative movement proxy on the first steering change.
           // Reserve real turning clearance; keep the original collider solid.
-          const clearance = Math.max(...this.props.localCorners.map(([x, z]) => Math.hypot(x, z))) + 0.46;
+          const clearance =
+            Math.max(
+              ...this.props.localCorners.map(([x, z]) => Math.hypot(x, z)),
+            ) + 0.46;
           if (gap(this.player.position, this.cart.cargo.position) < clearance)
-            throw Error("先沿雙把手向後退半步，留出車身轉向空間，再握住推車。煞車與所選側線均已保留。");
+            throw Error(
+              "先沿雙把手向後退半步，留出車身轉向空間，再握住推車。煞車與所選側線均已保留。",
+            );
         }
         if (task === this.cart && step?.id === "park-cart") {
           const bay = this.flow.bays[this.status.localChoices.siding];

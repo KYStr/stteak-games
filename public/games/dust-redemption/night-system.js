@@ -13,8 +13,16 @@ import {
   tacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
+const vectorCache = new WeakMap();
 const point = (p) => [p.x, p.z],
-  vector = (p) => new THREE.Vector3(p[0], 0, p[1]),
+  vector = (p) => {
+    let v = vectorCache.get(p);
+    if (!v || v.x !== p[0] || v.z !== p[1]) {
+      v = new THREE.Vector3(p[0], 0, p[1]);
+      vectorCache.set(p, v);
+    }
+    return v;
+  },
   gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z),
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const esc = (v) =>
@@ -778,11 +786,20 @@ export class NightSystem {
     this.world.animate(enemy.actor, "walk");
   }
   occupants() {
-    const enemyObjects = new Set(this.enemies.map((e) => e.actor.object));
-    return [
-      ...this.world.actors.filter((a) => !enemyObjects.has(a.object)),
-      ...this.enemies.filter((e) => e.hp > 0).map((e) => e.actor),
-    ];
+    const result = (this.occupantBuffer ??= []);
+    result.length = 0;
+    const enemies = this.enemies;
+    for (let i = 0; i < this.world.actors.length; i++) {
+      const actor = this.world.actors[i];
+      let include = true;
+      for (let j = 0; j < enemies.length; j++)
+        if (enemies[j].actor === actor && enemies[j].hp <= 0) {
+          include = false;
+          break;
+        }
+      if (include) result.push(actor);
+    }
+    return result;
   }
   update(dt) {
     if (this.disposed || !Number.isFinite(dt) || dt <= 0) return;

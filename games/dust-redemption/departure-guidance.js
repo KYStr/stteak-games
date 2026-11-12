@@ -81,13 +81,18 @@ export function createDepartureGuidance({ moveCircle } = {}) {
     throw new TypeError("Pass the real moveCircle");
   let cache = null,
     revision = 0;
-  const hidden = (reason) => ({
+  const hiddenState = {
     visible: false,
-    reason,
+    reason: "disabled",
     chevrons: [],
     path: [],
-    revision,
-  });
+    revision: 0,
+  };
+  const hidden = (reason) => {
+    hiddenState.reason = reason;
+    hiddenState.revision = revision;
+    return hiddenState;
+  };
   const reset = () => {
     cache = null;
   };

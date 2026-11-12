@@ -14,8 +14,16 @@ import {
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 
+const vectorCache = new WeakMap();
 const point = (p) => [p.x, p.z],
-  vector = (p) => new THREE.Vector3(p[0], 0, p[1]),
+  vector = (p) => {
+    let v = vectorCache.get(p);
+    if (!v || v.x !== p[0] || v.z !== p[1]) {
+      v = new THREE.Vector3(p[0], 0, p[1]);
+      vectorCache.set(p, v);
+    }
+    return v;
+  },
   gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const esc = (v) =>
@@ -117,7 +125,10 @@ export class LedgerSystem {
         })),
       }));
     }
-    this.props = createLedgerProps(world.graphics || THREE, world, this.flow, { field, player });
+    this.props = createLedgerProps(world.graphics || THREE, world, this.flow, {
+      field,
+      player,
+    });
     this.borrowedTargets = [];
     for (const key of ["evidence-envelope", "notice-board"]) {
       const node = this.press.parts[key],
@@ -695,15 +706,26 @@ export class LedgerSystem {
   }
   interactTraversal() {
     if (!this.handsOccupied || !this.status.localChoices.custody) return false;
-    const dest = this.destination(), copy = this.props.readCopySnapshot();
-    if (!this.near(dest.position, dest.radius) ||
-        Math.hypot(copy.worldPosition[0] - dest.position[0], copy.worldPosition[2] - dest.position[1]) > dest.radius)
+    const dest = this.destination(),
+      copy = this.props.readCopySnapshot();
+    if (
+      !this.near(dest.position, dest.radius) ||
+      Math.hypot(
+        copy.worldPosition[0] - dest.position[0],
+        copy.worldPosition[2] - dest.position[1],
+      ) > dest.radius
+    )
       return false;
     // The authored receiver uses the flow's physical reach. Give its explicit
     // handoff panel first refusal before legacy Field E can release the page.
     // deliver() still verifies the same page, current evidence and the real ray.
-    return this.interact({ type: "mission", kind: "destination",
-      position: dest.position, radius: dest.radius, title: "同一副本／正式交付" });
+    return this.interact({
+      type: "mission",
+      kind: "destination",
+      position: dest.position,
+      radius: dest.radius,
+      title: "同一副本／正式交付",
+    });
   }
   nearest() {
     const entries = [],
