@@ -86,16 +86,32 @@ const INTRO_MAPS = [
 // These are authored spatial arrangements, in local metres. No random map generation
 // or repeated padding: each sector has a different traversal shape and security role.
 const SECTOR_LAYOUTS = {
-  roofline: { name: '雙簷屋脊', hint: '地面以箱體避巡邏；屋脊兩段長跳可跨過監視區。', roofs: [[37, 3.8, 44], [91, 3.8, 59]], gap: [73, 2.4], guards: [43], camera: 85 },
+  roofline: { name: '雙簷屋脊', hint: '地面以箱體避巡邏；屋脊兩段長跳可跨過監視區。', roofs: [[37, 3.8, 44], [91, 3.8, 59]], gap: [73, 2.4], guards: [52], camera: 85 },
   canal: { name: '雙階水道', hint: '觀察雷射熄滅再過水道；四段橋面有高低落差。', roofs: [[25, 3.5, 20], [49, 4.3, 23], [77, 4.3, 28], [109, 3.5, 31]], gap: [73, 2.5], guards: [102], lasers: [[65, 0], [84, 3.2]] },
   archive: { name: '檔案梯井', hint: '三層檔架逐步升高；脈衝可打開無人機的八秒窗口。', roofs: [[33, 3.6, 36], [70, 4.8, 33], [107, 6, 36]], gap: [75, 2.4], camera: 44, drone: [77, 7.1, 61, 83] },
   relay: { name: '錯層中繼', hint: '中繼橋遮住地面視線；離開陰影前先看守衛方向。', roofs: [[38, 4.5, 46], [94, 4.5, 61]], gap: [77, 2.6], guards: [42, 103], camera: 81 },
   maintenance: { name: '維修跳板', hint: '五塊窄跳板交替高低；地面通道有固定雷射節拍。', roofs: [[25, 3.8, 20], [47, 4.6, 20], [69, 3.8, 20], [91, 4.6, 20], [115, 3.8, 24]], gap: [75, 2.2], guards: [42], lasers: [[66, 2]] },
   skybridge: { name: '懸索監視橋', hint: '高橋受無人機巡查，橋面箱體可蹲伏遮擋；地面可繞行。', roofs: [[36, 5.2, 42], [80, 5.2, 42], [113, 4.2, 20]], gap: [74, 2.6], drone: [80, 7.5, 62, 97], lasers: [[46, 1.2]], camera: 112 },
   reactor: { name: '三拍反應室', hint: '三座雷射相位不同；高處依靠四次落點繞過供電線。', roofs: [[27, 4.5, 24], [55, 5.5, 27], [85, 4.5, 28], [114, 4.5, 25]], gap: [76, 2.4], lasers: [[34, 0], [65, 2.3], [103, 4.6]], camera: 85 },
-  foundry: { name: '起重機貨場', hint: '高貨箱需要完整跳躍；貨架上方可用誘餌拉開下方守衛。', roofs: [[34, 4, 38], [77, 4.8, 43], [113, 3.8, 24]], gap: [73, 2.4], guards: [42, 103], drone: [75, 7.1, 61, 94], tallCrates: true },
+  foundry: { name: '起重機貨場', hint: '高貨箱需要完整跳躍；貨架上方可用誘餌拉開下方守衛。', roofs: [[34, 4, 38], [77, 4.8, 43], [113, 3.8, 24]], gap: [73, 2.4], guards: [42, 113], drone: [75, 7.1, 61, 94], tallCrates: true },
   antenna: { name: '天線攀升段', hint: '四階天線逐步上升；頂層回落前可先觀察出口走廊。', roofs: [[27, 4.2, 24], [55, 5.2, 27], [85, 6.2, 28], [114, 7.2, 25]], gap: [75, 2.5], guards: [43], lasers: [[70, 1]], camera: 109 },
 };
+
+// Encounters first appear at arrival and halfway through each chapter. Later
+// sectors reinforce the introduced decision without requiring consumables.
+Object.assign(SECTOR_LAYOUTS,{
+ 'single-laser':{...SECTOR_LAYOUTS.maintenance,lasers:[[66,0]],guards:[],cargo:[10,31,56,94,126]},
+ 'opposed-laser-island':{...SECTOR_LAYOUTS.canal,lasers:[[57,0],[89,3.5]],cargo:[11,29,72,108,126],hint:'雙向閘門：兩道雷射反相。中央貨箱島可停留觀察；上橋可完全繞行。'},
+ 'shielded-detour':{...SECTOR_LAYOUTS.archive,drone:null,camera:78,cargo:[10,34,65,98,126],hint:'低路受掃描。三層檔架遮住鏡頭，從左梯上升後可安全繞過。'},
+ 'rewire-shortcut':{...SECTOR_LAYOUTS.relay,guards:[113],camera:null,lasers:[[54,0]],permanent:true,cargo:[11,30,62,96,126],hint:'常通電閘：改線可直穿；不耗工具時走上層遮蔽橋。雷射前有安全貨箱。'},
+ 'dual-patrol':{...SECTOR_LAYOUTS.foundry,drone:null,guards:[46,57],cargo:[10,32,71,96,126],hint:'交疊巡邏：等兩名守衛同時背向，或爬上起重架越過交會區。'},
+ 'drone-laser-crossing':{...SECTOR_LAYOUTS.skybridge,lasers:[[80,1.5]],camera:null,cargo:[11,32,58,104,126],hint:'上下交叉防線：雷射封鎖地面，無人機掃過高橋。兩座頂層掩體可等候；脈衝可製造窗口。'},
+ 'final-route-choice':{...SECTOR_LAYOUTS.antenna,drone:[83,8,65,99],lasers:[[64,0],[89,3.5]],cargo:[11,33,56,99,126],hint:'最後分流：短路需觀察兩道閘門或使用工具；四階遮蔽天線路較長，但不耗充能。'},
+});
+const EARLY=['guard-camera','elevated-drone','archive-ascent','staggered-lasers','dual-patrol','antenna-ascent'];
+const MID=['single-laser','opposed-laser-island','shielded-detour','rewire-shortcut','drone-laser-crossing','final-route-choice'];
+const INTRO_HINTS=['以貨箱遮住守衛視線；先觀察第一台攝影機。','新防線：高處無人機。橋面箱體可蹲下遮蔽；也可沿低處穿過。','新路線：三層檔架逐步升高。地面較快，高處能遮蔽鏡頭。','新防線：三道不同相位的雷射。逐段停看，或用高架橋跨越。','新防線：兩名巡邏同時轉身才有地面窗口。可改走高架貨場。','最後攀升：四層天線可觀察整片防區；下層通道較快但曝露較多。'];
+const ART=['canal','canal','archive','archive','core','core'];
 
 // Each row is an explicit chapter layout: sector position, spatial arrangement,
 // authored name and optional narrative objective. Starts are deliberately irregular.
@@ -111,16 +127,17 @@ const CHAPTER_SECTORS = [
 function extendedChapter(intro, index) {
   const chapter = CHAPTER_SECTORS[index];
   const end = chapter.at(-1)[0] + 139;
-  const result = { ...intro, revision: 2, length: end, timeTarget: 265 + index * 15,
+  const result = { ...intro, revision: 4, traceDeadline:420+index*15,detectionSeconds:.95-index*.05,patrolMultiplier:1+index*.04,length: end, timeTarget: 265 + index * 15,
     platforms: intro.platforms.filter(p => p.id !== 'ground').map(p => ({ ...p })), covers: intro.covers.map(c => ({ ...c })), ladders: intro.ladders.map(l => ({ ...l })), devices: intro.devices.map(d => ({ ...d })),
-    terminals: [{ ...intro.terminals[0] }], sectors: [{ id: 'arrival', name: '抵達 / ' + intro.name.slice(5), start: 0, end: chapter[0][0], hint: intro.brief }], gaps: [],
-    exit: { x: end - 5, y: 0 }, checkpoints: [], upperEntries: intro.ladders.filter((_, i) => i % 2 === 0).map(l => ({ ...l })), supplies: [3, 3, 3],
+    terminals: [{ ...intro.terminals[0] }], sectors: [{ id: 'arrival', name: '抵達 / ' + intro.name.slice(5), start: 0, end: chapter[0][0], mechanicId:EARLY[index], introduction:true,artSet:ART[index],hint:INTRO_HINTS[index] }], gaps: [],
+    exit: { x: end - 5, y: 0 }, checkpoints: [{id:'arrival-safe',x:intro.terminals[0].x+3,y:0}], upperEntries: intro.ladders.filter((_, i) => i % 2 === 0).map(l => ({ ...l })), supplies: [index===5?4:3, 3, 3],
   };
   for (let i = 0; i < chapter.length; i++) {
     const [start, type, name, objective] = chapter[i];
-    const layout = SECTOR_LAYOUTS[type];
+    let resolvedType=i===3?MID[index]:type;if(index===0&&i!==3)resolvedType='roofline';
+    let layout = SECTOR_LAYOUTS[resolvedType];if(index<3&&layout.lasers){const maximum=index===0||index===1&&i<3?1:2;layout={...layout,lasers:layout.lasers.slice(0,maximum)};}if(index<5&&resolvedType==='antenna')layout={...layout,roofs:layout.roofs.slice(0,3).map(([x,y,w],n)=>[x,index<2?3.8:3.6+n*1.2,w])};
     const prefix = `sector-${i + 1}`;
-    result.sectors.push({ id: prefix, name, start, end: chapter[i + 1]?.[0] || end, hint: layout.hint });
+    result.sectors.push({ id: prefix, name, start, end: chapter[i + 1]?.[0] || end, hint: layout.hint,mechanicId:i<3?EARLY[index]:MID[index],introduction:i===3,artSet:index===0?'canal':resolvedType.includes('archive')||resolvedType==='shielded-detour'?'archive':resolvedType==='reactor'||resolvedType==='antenna'||resolvedType==='final-route-choice'?'core':ART[index] });
     const roofs = layout.roofs.map(([x, y, w], r) => shelf(`${prefix}-roof-${r}`, start + x, y, w));
     result.platforms.push(...roofs);
     const first = roofs[0];
@@ -128,7 +145,7 @@ function extendedChapter(intro, index) {
     result.ladders.push(ladder);
     result.upperEntries.push(ladder);
     result.ladders.push({ x: roofs.at(-1).x + roofs.at(-1).w / 2 - 1, y0: 0, y1: roofs.at(-1).y + roofs.at(-1).h / 2 });
-    for (const [c, x] of [12, 28, 60, 89, 128].entries()) result.covers.push(cover(`${prefix}-cargo-${c}`, start + x, layout.tallCrates && c === 1 ? 1.8 : 1.2, c === 4 ? 2.2 : 1.8));
+    for (const [c, x] of (layout.cargo||[10+(i%3),30+(i%4),59-(i%3),94+(i%3),126]).entries()) result.covers.push(cover(`${prefix}-cargo-${c}`, start + x, layout.tallCrates && c === 1 ? 1.8 : 1.2, c === 4 ? 2.2 : 1.8));
     // Two physically solid rooftop shelters make drone timing observable and recoverable.
     if (layout.drone) {
       const middle = roofs[Math.floor(roofs.length / 2)];
@@ -136,16 +153,23 @@ function extendedChapter(intro, index) {
     }
     for (const [g, x] of (layout.guards || []).entries()) result.devices.push(guard(`${prefix}-guard-${g}`, start + x, start + x - 8, start + x + 8, (i + g) % 2 ? 1 : -1));
     if (layout.camera) result.devices.push(camera(`${prefix}-camera`, start + layout.camera, 2.8, i % 2 ? 1 : -1));
-    for (const [n, [x, phase]] of (layout.lasers || []).entries()) result.devices.push(laser(`${prefix}-laser-${n}`, start + x, phase));
+    for (const [n, [x, phase]] of (layout.lasers || []).entries()) result.devices.push({...laser(`${prefix}-laser-${n}`,start+x,phase),...(layout.permanent?{period:7,onTime:7}: {})});
     if (layout.drone) { const [x, y, min, max] = layout.drone; result.devices.push(drone(`${prefix}-drone`, start + x, y, start + min, start + max, i % 2 ? 1 : -1)); }
     result.gaps.push({ x: start + layout.gap[0], w: layout.gap[1] });
     if (objective) result.terminals.push({ id: `${prefix}-node`, x: start + 132, y: 0, kind: i === 3 ? 'data' : 'rewrite', label: objective });
-    if (i === 1 || i === 3) result.checkpoints.push({ id: `${prefix}-safe`, x: start + 134.5, y: 0 });
+    if (i === 1 || i === 3 || i === 5) result.checkpoints.push({ id: `${prefix}-safe`, x: start + 134.5, y: 0 });
     if (i === 4) {
       const roof = roofs[Math.floor(roofs.length / 2)];
       result.packet = { x: roof.x, y: roof.y + roof.h / 2 };
     }
   }
+  if(index===0)result.devices=result.devices.filter(d=>d.type!=='drone');
+  // Arrival constructions introduce the chapter's new spatial decision.
+  if(index===2||index===5){let tier=0;for(const roof of result.platforms){if(roof.id.startsWith(index===2?'archive-':'dawn-')){const old=roof.y+roof.h/2,newY=3.6+tier++*1.2;roof.y=newY-roof.h/2;for(const l of result.ladders)if(Math.abs(l.y1-old)<.01&&Math.abs(l.x-roof.x)<=roof.w/2)l.y1=newY;}}
+   if(index===5){result.platforms.push(shelf('arrival-tier-4',151,7.2,19));result.ladders.push({x:144,y0:0,y1:7.2});}}
+  if(index===3)result.devices.push(laser('arrival-third-phase',96,5));
+  if(index===4){const first=result.devices.find(d=>d.type==='guard');result.devices.push({...first,id:'arrival-overlap',x:37,min:27,max:45,dir:-1});}
+  for(const e of result.upperEntries){const ladder=result.ladders.find(l=>Math.abs(l.x-e.x)<.01);if(ladder)e.y1=ladder.y1;}
   result.checkpoint = result.checkpoints[0];
   const gaps = [...result.gaps].sort((a, b) => a.x - b.x);
   const ground = [];
@@ -158,7 +182,7 @@ function extendedChapter(intro, index) {
   ground.push({ id: `ground-${gaps.length}`, ground: true, x: (left + end + 4) / 2, y: -.6, z: 0, w: end + 4 - left, h: 1.2, d: 5 });
   result.platforms.unshift(...ground);
   result.brief = `依序完成「${result.terminals.map(t => t.label).join('」、「')}」，再由出口撤離。八個區段都有地面與高處通路；可選資料包位於第六區上層。`;
-  result.sectors[0].hint = `先取得「${result.terminals[0].label}」。A/D 移動，空白鍵跳過貨箱，W 攀梯或按住駭入；觀察視野再選地面或高處。`;
+  result.sectors[0].hint = INTRO_HINTS[index]+` 先取得「${result.terminals[0].label}」。A/D 移動，空白鍵跳過貨箱，W 攀梯或按住駭入；觀察視野再選地面或高處。`;
   return result;
 }
 

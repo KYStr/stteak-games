@@ -1,5 +1,5 @@
 import { LEVELS, ENDINGS } from './levels.js'; // 讀取手工關卡與可保存結局白名單。
-import { medalsFor } from './core.js'; // 沿用既有獎章判定，不改遊戲規則。
+import { medalsFor,validSeed } from './core.js'; // 沿用既有獎章判定，不改遊戲規則。
 
 export const SAVE_KEY = 'stteak.signal-zero.save.v1'; // 保持既有主存檔鍵，允許第一版資料向後相容。
 export const SAVE_BACKUP_KEY = `${SAVE_KEY}.backup`; // 沿用上一份有效存檔的備份鍵。
@@ -9,7 +9,7 @@ const clamp = (n, min, max) => Math.max(min, Math.min(max, n)); // 限制數值�
 const finite = (n, fallback, min = 0, max = 86400) => Number.isFinite(n) ? clamp(n, min, max) : fallback; // 只接受有限數字，否則使用安全預設。
 
 export function defaultSave() { // 每次建立獨立預設存檔。
-  return { schema: 1, unlocked: 1, bests: {}, medals: {}, packets: [], endings: [], pendingEnding: false, activeLevel: null, settings: { music: .45, sfx: .7, reducedMotion: false, quality: 'auto', touchControls: 'auto', bindings: { ...DEFAULT_BINDINGS } }, checkpoint: null }; // 新進度維持 schema 一，入口與安全點都可為空。
+  return { schema: 1, unlocked: 1, bests: {}, medals: {}, packets: [], endings: [], pendingEnding: false, activeLevel: null, activeSeed:1009,activeTrace:null,variantBests:{},relaxedBests:{}, settings: { difficulty:'standard',music: .45, sfx: .7, muted: false, reducedMotion: globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false, quality: 'auto', touchControls: 'auto', bindings: { ...DEFAULT_BINDINGS } }, checkpoint: null }; // 新進度維持 schema 一，入口與安全點都可為空。
 } // 結束此驗證或處理區塊。
 
 /** 回傳獨立且有界的存檔；無法信任外層格式時回傳空值。 */
@@ -31,17 +31,21 @@ export function validateSave(raw) { // 驗證並正規化不可信的外部存�
   // 章節入口延續獨立於選擇性的安全點。
   // 舊 schema 一仍有效，入口僅限已解鎖的手工章節。
   data.activeLevel = Number.isInteger(raw.activeLevel) && raw.activeLevel >= 0 && raw.activeLevel < data.unlocked ? raw.activeLevel : null; // 入口必須是有效且已解鎖的章節整數。
+  data.activeSeed=validSeed(raw.activeSeed,data.activeLevel??0);data.activeTrace=Number.isFinite(raw.activeTrace)?finite(raw.activeTrace,0,0,1000):null;
+  for(const key of ['variantBests','relaxedBests'])if(raw[key]&&typeof raw[key]==='object')for(const [id,best]of Object.entries(raw[key]).slice(-256))if(/^[a-z]+:(standard|relaxed):[0-9]+$/.test(id)&&Number.isFinite(best?.time)&&best.time>=0&&Number.isInteger(best.alerts)&&best.alerts>=0)data[key][id]={time:finite(best.time,0),alerts:finite(best.alerts,0,0,100000),completions:Math.floor(finite(best.completions,1,1,100000))};
   const settings = raw.settings; // 設定獨立於關卡遷移保存。
   if (settings && typeof settings === 'object') { // 只處理物件格式的設定。
+    data.settings.difficulty=settings.difficulty==='relaxed'?'relaxed':'standard';
     data.settings.music = finite(settings.music, .45, 0, 1); // 音樂音量限制在零至一。
     data.settings.sfx = finite(settings.sfx, .7, 0, 1); // 音效音量限制在零至一。
-    data.settings.reducedMotion = settings.reducedMotion === true; // 減少動態僅接受布林真值。
+    data.settings.muted = settings.muted === true;
+    data.settings.reducedMotion = typeof settings.reducedMotion==='boolean'?settings.reducedMotion:data.settings.reducedMotion; // 減少動態僅接受布林真值。
     data.settings.quality = ['auto', 'low', 'high'].includes(settings.quality) ? settings.quality : 'auto'; // 畫質只接受既有選項。
     data.settings.touchControls = ['auto', 'on', 'off'].includes(settings.touchControls) ? settings.touchControls : 'auto'; // 觸控顯示只接受既有選項。
     const taken = new Set(); // 追蹤已使用按鍵避免重複。
     for (const [action, fallback] of Object.entries(DEFAULT_BINDINGS)) { // 每個既有動作都取得有效按鍵或預設值。
       const key = settings.bindings?.[action]; // 讀取此動作的保存按鍵。
-      const valid = typeof key === 'string' && /^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Escape|ShiftLeft|ControlLeft)$/.test(key) && !taken.has(key); // 按鍵須在白名單且未被其他動作使用。
+      const valid = (action==='pause'?key==='Escape':key!=='Escape') && typeof key === 'string' && /^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Escape|ShiftLeft|ControlLeft)$/.test(key) && !taken.has(key); // 按鍵須在白名單且未被其他動作使用。
       data.settings.bindings[action] = valid ? key : fallback; // 不合法按鍵回到已知預設。
       taken.add(data.settings.bindings[action]); // 記錄本次選定按鍵。
     } // 結束此驗證或處理區塊。
@@ -53,7 +57,7 @@ export function validateSave(raw) { // 驗證並正規化不可信的外部存�
   const revision = checkpoint?.levelRevision === undefined ? 1 : checkpoint.levelRevision; // 僅缺省舊欄位視為第一版，拒絕字串、空值及其他異常版本。
   const validCheckpoint = checkpoint?.schema === 1 && level && level.id === checkpoint.levelId && Array.isArray(checkpoint.tools) && checkpoint.tools.length === 3 && checkpoint.tools.every((n, i) => Number.isInteger(n) && n >= 0 && n <= level.supplies[i]) && Number.isFinite(checkpoint.time) && checkpoint.time >= 0 && Array.isArray(checkpoint.objectives); // 與原安全點同一套信封檢查，不能只憑章節數字注入入口。
   if (validCheckpoint && revision === (level.revision || 1)) { // 同版快照維持原還原路徑及裝置白名單。
-    data.checkpoint = clone(checkpoint); // 同版合法安全點複製為獨立資料。
+    data.checkpoint = clone(checkpoint);data.checkpoint.seed=validSeed(checkpoint.seed,checkpoint.levelIndex);data.checkpoint.difficulty=checkpoint.difficulty==='relaxed'?'relaxed':'standard';data.checkpoint.traceRemaining=Number.isFinite(checkpoint.traceRemaining)?finite(checkpoint.traceRemaining,0,0,level.traceDeadline):Math.max(0,level.traceDeadline-checkpoint.time); // 同版合法安全點複製為獨立資料。
     // 裝置依已編寫 ID 篩選，不使用早期切片的固定數量。
     // 晚期區段的巡邏相位與永久改線必須完整保留。
     const savedDevices = Array.isArray(checkpoint.devices) ? checkpoint.devices : []; // 裝置列表若非陣列就安全視為空。
@@ -63,6 +67,7 @@ export function validateSave(raw) { // 驗證並正規化不可信的外部存�
   } else if (validCheckpoint && data.activeLevel === null && Number.isInteger(revision) && revision >= 1 && revision < (level.revision || 1)) { // 只遷移已知格式的舊版快照；合法現有入口優先，未來版或錯誤資料不推測。
     data.activeLevel = checkpoint.levelIndex; // 只保留經驗證的章節身份；舊座標、工具、目標及巡邏快照一律不搬移。
   } // 結束此驗證或處理區塊。
+  data.activeSeed=validSeed(raw.activeSeed,data.activeLevel??data.checkpoint?.levelIndex??0);
   return data; // 回傳安全且獨立的正規化存檔。
 } // 結束此驗證或處理區塊。
 
@@ -108,11 +113,14 @@ export function recordCompletion(raw, run) { // 只有正式完成才能累計�
   const data = validateSave(raw) || defaultSave(); // 完成紀錄以已驗證的保存資料為基礎。
   if (run.phase !== 'complete' || !LEVELS[run.levelIndex] || run.objectives.length !== LEVELS[run.levelIndex].terminals.length) return data; // 非完成或目標數量不符不發放成績。
   const id = LEVELS[run.levelIndex].id; // 採用已編寫關卡的穩定 ID。
+  const key=id+':'+(run.difficulty||'standard')+':'+validSeed(run.seed,run.levelIndex),records=run.difficulty==='relaxed'?data.relaxedBests:data.variantBests,variant=records[key];records[key]={time:Math.min(variant?.time??Infinity,run.time),alerts:Math.min(variant?.alerts??Infinity,run.alerts),completions:(variant?.completions||0)+1};
+  if(run.difficulty!=='relaxed'){
   const prior = data.bests[id]; // 讀取此前正式最佳紀錄。
   data.bests[id] = { time: Math.min(prior?.time ?? Infinity, run.time), alerts: Math.min(prior?.alerts ?? Infinity, run.alerts), alertTime: Math.min(prior?.alertTime ?? Infinity, run.alertTime), completions: (prior?.completions || 0) + 1 }; // 分別累計最佳時間、最少警報與完成次數。
   const earned = medalsFor(run); // 從既有規則計算本次獎章。
   const medals = data.medals[id] || {}; // 保留此前取得的獨立獎章。
   data.medals[id] = { speed: Boolean(medals.speed || earned.speed), ghost: Boolean(medals.ghost || earned.ghost), data: Boolean(medals.data || earned.data) }; // 各獎章只會累積，不由較差重玩覆蓋。
+  }
   if (run.packet && !data.packets.includes(id)) data.packets.push(id); // 正式完成時累計唯一資料包。
   data.unlocked = Math.min(LEVELS.length, Math.max(data.unlocked, run.levelIndex + 2)); // 解鎖數量限制於既有六關範圍。
   data.checkpoint = null; // 完成後不把舊安全點誤當仍在進行。

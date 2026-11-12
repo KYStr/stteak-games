@@ -1,3 +1,4 @@
+import {numericRecord,DEVICE as D,RUN as R} from './numeric.js';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -22,9 +23,9 @@ export const assetMaterials = Object.fromEntries(Object.entries(palette).map(([n
 // Hero-only values keep the player readable against the night architecture without
 // lifting the value of every platform, cabinet and guard in the shared palette.
 const runnerMaterials = new Map([
-  [assetMaterials.fabric, new THREE.MeshStandardMaterial({ name: 'sz-runner-fabric', color: 0x2c465d, metalness: .13, roughness: .83 })],
+  [assetMaterials.fabric, new THREE.MeshStandardMaterial({ name: 'sz-runner-fabric', color: 0x486e7d, metalness: .13, roughness: .83 })],
   [assetMaterials.armor, new THREE.MeshStandardMaterial({ name: 'sz-runner-armor', color: 0x64879b, metalness: .50, roughness: .42 })],
-  [assetMaterials.edge, new THREE.MeshStandardMaterial({ name: 'sz-runner-edge', color: 0xb4d4dc, metalness: .67, roughness: .30 })],
+  [assetMaterials.edge, new THREE.MeshStandardMaterial({ name: 'sz-runner-edge', color: 0xcaf9e6, emissive:0x69d9b5,emissiveIntensity:.5, metalness: .67, roughness: .30 })],
 ]);
 const archiveGlass = new THREE.MeshStandardMaterial({ name: 'sz-archive-glass', color: 0x599cae, metalness: .30, roughness: .18, emissive: 0x163846, emissiveIntensity: .3, transparent: true, opacity: .23, depthWrite: false });
 function geometry(kind, a, b, c, n = 8) {
@@ -168,7 +169,7 @@ function humanoid(guard = false) {
   const skeleton = skinRigidPieces(g, hips); const clips = createClips(guard); const mixer = new THREE.AnimationMixer(g);
   const actions = Object.fromEntries(clips.map(c => { const action = mixer.clipAction(c); if (!c.userData.loop) { action.setLoop(THREE.LoopOnce, 1); action.clampWhenFinished = true; } return [c.name, action]; }));
   const sockets = {}; skeleton.bones.filter(b => b.name.startsWith('socket-')).forEach(b => { sockets[b.name] = b; });
-  g.animations = clips; g.userData = { assetOwned: true, assetId: guard ? 'signal-zero.security.guard' : 'signal-zero.character.runner', mixer, animations: clips, actions, sockets, skeleton, activeAnimation: null, forward: '+X', unit: 'meter' };
+  g.animations = clips; g.userData = { assetOwned: true, assetId: guard ? 'signal-zero.security.guard' : 'signal-zero.character.runner', mixer, animations: clips, actions, sockets, skeleton, activeAnimation:null,tickArgs:[1],forward: '+X', unit: 'meter' };
   animateRunner(g, { animation: 'idle', facing: 1 }, 0); return g;
 }
 export function createRunner() { return humanoid(false); }
@@ -178,12 +179,16 @@ export function animateRunner(group, state, dt) {
     const previous = data.actions[data.activeAnimation]; const next = data.actions[name]; next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).play();
     if (previous) { previous.fadeOut(.12); next.fadeIn(.12); } data.activeAnimation = name;
   }
-  if (state.facing !== undefined && state.facing !== 0) group.rotation.y = state.facing < 0 ? Math.PI : 0;
-  data.mixer.update(Math.min(Math.max(dt || 0, 0), .1));
+  if (state.facing !== undefined && state.facing !== 0) {const rotation=state.facing<0?Math.PI:0;if(group.rotation.y!==rotation)group.rotation.y=rotation;}
+  // Accept a reusable frame buffer internally; the public numeric-delta API is
+  // retained for authored animation previews and tests.
+  // One unit tick, scaled by delta, preserves the native mixer semantics.
+  // The reusable call tuple avoids boxing float arguments at the engine API.
+  if(typeof dt==='object')data.mixer.timeScale=dt[0];else data.mixer.timeScale=!dt||dt<0?0:dt>.1?.1:dt;Reflect.apply(data.mixer.update,data.mixer,data.tickArgs);
 }
 
 export function createSecurity(type) {
-  if (type === 'guard') { const g = humanoid(true); g.userData.securityType = type; return g; }
+  if (type === 'guard') { const g = humanoid(true); g.userData.securityType = type;g.userData.animationState={animation:'idle',facing:1};return g; }
   const g = new THREE.Group(); g.name = `security-${type}`; const indicator = assetMaterials.mint.clone(); indicator.name = 'sz-security-indicator'; indicator.userData.assetInstanceOwned = true;
   const moving = new THREE.Group(); moving.name = `${type}-gimbal`; g.add(moving);
   const rotors = [];
@@ -225,20 +230,21 @@ export function createSecurity(type) {
     if (type === 'drone' && name !== 'disabled') for (const rotor of rotors) tracks.push(new THREE.QuaternionKeyframeTrack(`${rotor.name}.quaternion`, times, [0, Math.PI / 2, Math.PI, Math.PI * 1.5, Math.PI * 2].flatMap(a => [0, Math.sin(a / 2), 0, Math.cos(a / 2)])));
     const clip = new THREE.AnimationClip(name, duration, tracks); clip.userData = { loop: name !== 'disabled', rootMotion: false, events: [] }; return clip;
   });
-  g.userData = { assetOwned: true, assetId: `signal-zero.security.${type}`, securityType: type, moving, indicator, rotors, animationTime: 0 }; return g;
+  g.userData = { assetOwned: true, assetId: `signal-zero.security.${type}`, securityType: type, moving, indicator, rotors, animationTime:0,appearance:-1,direction:0 };numericRecord(g.userData,{animationTime:0,frameDelta:1,frameTime:2,scan:3,heading:4});return g;
 }
-export function animateSecurity(group, state, dt) {
-  const data = group.userData; const status = state.state ?? 'patrol'; const disabled = !!state.disabled;
+const CAMERA_PITCH=Math.atan(-.28),DRONE_PITCH=Math.atan(-.23);
+export function animateSecurity(group, state, dt, disabledOverride=state.disabled, timeOverride=state.time) {
+  const data = group.userData; const status = state.state ?? 'patrol'; const disabled = !!disabledOverride;
   if (data.securityType === 'guard') {
-    const animation = disabled ? 'caught' : ['chase', 'tracking', 'pursuit', 'alert'].includes(status) ? 'chase' : ['search', 'searching'].includes(status) ? 'search' : ['suspicious', 'notice'].includes(status) ? 'notice' : status === 'idle' ? 'idle' : 'patrol';
-    animateRunner(group, { animation, facing: state.dir ?? 1 }, dt); return;
+    const animation = disabled ? 'caught' : (status==='chase'||status==='tracking'||status==='pursuit'||status==='alert') ? 'chase' : (status==='search'||status==='searching') ? 'search' : (status==='suspicious'||status==='notice') ? 'notice' : status === 'idle' ? 'idle' : 'patrol';
+    data.animationState.animation=animation;if(state.numeric)data.animationState.facing=state.numeric[D.dir];else data.animationState.facing=state.dir??1;animateRunner(group,data.animationState,dt); return;
   }
-  data.animationTime += Math.min(Math.max(dt || 0, 0), .1); const t = state.time ?? data.animationTime;
-  const alert = ['alert', 'chase', 'tracking', 'pursuit'].includes(status); data.indicator.color.setHex(disabled ? 0x354451 : alert ? 0xff77ac : 0x71ffe2);
-  data.indicator.emissive.setHex(disabled ? 0x000000 : alert ? 0xc92c61 : 0x32eac8); data.indicator.emissiveIntensity = disabled ? 0 : alert ? 1.8 : 1.3;
-  if (state.dir !== undefined && state.dir !== 0) group.rotation.y = state.dir < 0 ? Math.PI : 0;
-  if (data.securityType === 'camera') { data.moving.rotation.y = 0; data.moving.rotation.z = disabled ? -.7 : Math.atan(-.28) + (state.scanOffset ?? 0) * (state.dir ?? 1); }
-  if (data.securityType === 'drone') { data.moving.position.y = disabled ? -.08 : Math.sin(t * 2.8) * .035; data.moving.rotation.z = disabled ? -.35 : Math.atan(-.23); for (const rotor of data.rotors) rotor.rotation.y += disabled ? 0 : dt * 36; }
+  if(typeof dt==='object')data.numeric[1]=dt[0];else data.numeric[1]=Math.min(Math.max(dt||0,0),.1);const elapsed=data.numeric[1];data.numeric[0]+=elapsed;if(typeof timeOverride==='object')data.numeric[2]=timeOverride[R.time];else data.numeric[2]=timeOverride??data.numeric[0];const t=data.numeric[2];if(state.numeric){data.numeric[3]=state.numeric[D.scanOffset];data.numeric[4]=state.numeric[D.dir];}else{data.numeric[3]=state.scanOffset??0;data.numeric[4]=state.dir??1;}
+  const alert = (status==='alert'||status==='chase'||status==='tracking'||status==='pursuit'); const appearance=disabled?0:alert?2:1;if(data.appearance!==appearance){data.appearance=appearance;data.indicator.color.setHex(disabled ? 0x354451 : alert ? 0xff77ac : 0x71ffe2);
+  data.indicator.emissive.setHex(disabled ? 0x000000 : alert ? 0xc92c61 : 0x32eac8); data.indicator.emissiveIntensity = disabled ? 0 : alert ? 1.8 : 1.3;}
+  const direction=data.numeric[4];if(direction!==undefined&&direction!==0&&data.direction!==direction){data.direction=direction;group.rotation.y=direction<0?Math.PI:0;}
+  if (data.securityType === 'camera') { const rotation=data.moving.rotation;rotation._z=disabled?-.7:CAMERA_PITCH+data.numeric[3]*data.numeric[4];data.moving.quaternion.setFromEuler(rotation,false); }
+  if (data.securityType === 'drone') { data.moving.position.y = disabled ? -.08 : Math.sin(t * 2.8) * .035; if(data.moving.userData.disabled!==disabled){data.moving.userData.disabled=disabled;data.moving.rotation.z=disabled?-.35:DRONE_PITCH;} for(let rotorIndex=0;rotorIndex<data.rotors.length;rotorIndex++){const rotor=data.rotors[rotorIndex];rotor.rotation._y+=disabled?0:elapsed*36;rotor.quaternion.setFromEuler(rotor.rotation,false);} }
 }
 
 export function createProp(type, options = {}) {

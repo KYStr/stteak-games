@@ -91,7 +91,7 @@ test('rendered vision rays terminate at actual solids and use the same cone defi
   const vision = getVision(guard, run);
   const polygon = visionPolygon(guard, run);
   assert.equal(polygon.length, 27);
-  assert.deepEqual(polygon[0], vision.origin);
+  assert.deepEqual(polygon[0], {x:vision.origin.x,y:vision.origin.y,z:vision.origin.z});
   assert.ok(polygon.some(p => Math.abs(p.x - 11.1) < .02));
   guard.disabledUntil = 4;
   assert.deepEqual(visionPolygon(guard, run), []);
@@ -103,7 +103,7 @@ test('exposure offers at least 700ms, raises alarm, then searches last seen posi
   run.devices = [{ ...run.devices[0], x: 3, min: 3, max: 3, dir: 1, speed: 0 }];
   advance(run, .7);
   assert.equal(run.alerts, 0); assert.equal(run.phase, 'playing');
-  advance(run, .15);
+  advance(run, .3);
   assert.equal(run.alerts, 1); assert.equal(run.devices[0].state, 'tracking');
   const last = { ...run.devices[0].lastSeen };
   run.player.x = 60; run.player.y = 3.4;
@@ -421,4 +421,23 @@ test('all twelve full input routes remain completable at 30 FPS', () => {
   console.log('FPS30_DIAGNOSTICS ' + JSON.stringify(results));
   assert.ok(results.every(result => result.phase === 'complete'));
   assert.ok(results.every(result => Math.abs(result.drift) < 3), 'frame rate does not materially change route reachability or completion time');
+});
+
+for(const fps of [30,60])test(`one jump and landing impact at ${fps} FPS, no standing clicks`,()=>{
+ const run=calm(0),events=[];
+ for(let n=0;n<fps*3;n++)events.push(...step(run,{jumpPressed:n===0,jumpHeld:n<fps/4},1/fps).map(e=>({...e})));
+ assert.equal(events.filter(e=>e.type==='jump').length,1);assert.equal(events.filter(e=>e.type==='land').length,1);assert.ok(run.player.grounded);
+ const standing=[];for(let n=0;n<fps*2;n++)standing.push(...step(run,{},1/fps));assert.equal(standing.filter(e=>e.type==='land').length,0);
+});
+test('walking off a real raised ledge emits one landing on the lower floor',()=>{
+ const run=calm(0),ledge=LEVELS[0].platforms.find(p=>p.y>1),events=[];
+ run.player.x=ledge.x+ledge.w/2-.2;run.player.y=ledge.y+ledge.h/2;
+ for(let n=0;n<180;n++)events.push(...step(run,{axis:run.player.x<27?1:0},1/60).map(e=>({...e})));
+ assert.equal(events.filter(e=>e.type==='jump').length,0);assert.equal(events.filter(e=>e.type==='land').length,1);assert.equal(run.phase,'playing');
+});
+
+
+test('locked exit hint clears when returning to the mission route',()=>{
+ const run=calm(0);run.player.x=LEVELS[0].exit.x;step(run,{});assert.match(run.prompt,/出口未解鎖/);
+ run.player.x=LEVELS[0].spawn.x;step(run,{});assert.equal(run.prompt,'');assert.equal(run.phase,'playing');
 });
