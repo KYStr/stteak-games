@@ -38,8 +38,10 @@ function settingsFrom(raw={}) {
   out.sensitivity=out.sensitivityByCar[out.carId];
   return out;
 }
-function unlocksFor(records,previous={}) {
-  const earned=Object.values(records).filter(r=>rank[r.medal]>0).length;
+function unlocksFor(records,tourRecords={},previous={}) {
+  const cards=new Set();
+  for(const track of TRACKS)for(const mode of ['time','drift']){const key=`${track.id}:${mode}`;if(rank[records[key]?.medal]>0||['original','mirrored'].some(variant=>rank[tourRecords[`tour:${key}:${track.id}:${variant}:v1`]?.medal]>0))cards.add(key);}
+  const earned=cards.size;
   // Cosmetics remain readable even if a damaged or migrated record loses its detailed timing data.
   const retained=Number.isInteger(previous.medals)?clamp(previous.medals,0,6):0;
   const medals=Math.max(earned,retained);
@@ -62,9 +64,9 @@ function sanitize(raw) {
     }
     out.records[key]=record;
   }
-  if(plain(raw.tourRecords))for(const [key,r] of Object.entries(raw.tourRecords).slice(-48)){if(/^tour:(harbor|skyway|oldtown):(time|drift):(harbor|skyway|oldtown):(original|mirrored):v1$/.test(key)&&plain(r)&&positive(r.bestTime)&&finite(r.bestScore)&&Object.hasOwn(rank,r.medal))out.tourRecords[key]={bestTime:r.bestTime,bestScore:r.bestScore,medal:r.medal};}
+  if(plain(raw.tourRecords))for(const [key,r] of Object.entries(raw.tourRecords).slice(-48)){if(/^tour:(harbor|skyway|oldtown):(time|drift):(harbor|skyway|oldtown):(original|mirrored):v1$/.test(key)&&key.split(':')[1]===key.split(':')[3]&&plain(r)&&positive(r.bestTime)&&finite(r.bestScore)&&Object.hasOwn(rank,r.medal))out.tourRecords[key]={bestTime:r.bestTime,bestScore:r.bestScore,medal:r.medal};}
   if(plain(raw.tourBests))for(const [key,r] of Object.entries(raw.tourBests).slice(-8)){if(plain(r)&&positive(r.activeSeconds)&&finite(r.score)&&finite(r.seed))out.tourBests[key]={...r};}
-  out.unlocks=unlocksFor(out.records,plain(raw.unlocks)?raw.unlocks:{});
+  out.unlocks=unlocksFor(out.records,out.tourRecords,plain(raw.unlocks)?raw.unlocks:{});
   if(!out.unlocks.colors.includes(out.settings.colorId))out.settings.colorId='cyan';
   if(!out.unlocks.decals.includes(out.settings.decalId))out.settings.decalId='none';
   if(droppedGhost)out.notice='物理／賽道版本更新或幽靈資料損壞：舊幽靈已停用，獎牌與最佳紀錄保留。';
@@ -121,7 +123,7 @@ export function saveRace(current,state,storage) {
     ghost:replaceGhost?state.completedGhost:old.ghost,
     sectors:bestLap?result.sectors.filter(s=>s.lap===fastestLap).map(s=>({sector:s.sector,time:s.time})):old.sectors,
     carId:newBest?state.carId:old.carId||state.carId,attempts:old.attempts+1,updatedAt:new Date().toISOString()};
-  save.unlocks=unlocksFor(save.records,save.unlocks);
+  save.unlocks=unlocksFor(save.records,save.tourRecords,save.unlocks);
   const persisted=persist(save,storage);
   if(rebuiltGhost&&persisted.ok&&!persisted.notice)persisted.notice='已建立目前物理版本的最佳圈幽靈；歷史最佳成績與獎牌保留。';
   return {...persisted,newBest};
@@ -140,6 +142,7 @@ export function saveTourStage(current,state,storage){
   const key=`tour:${r.trackId}:${r.mode}:${r.layoutId}`,old=save.tourRecords[key];
   const newBest=!old||(r.mode==='time'?r.time<old.bestTime:r.score>old.bestScore);
   save.tourRecords[key]={bestTime:Math.min(old?.bestTime??Infinity,r.time),bestScore:Math.max(old?.bestScore??0,r.score),medal:rank[old?.medal]>rank[r.medal]?old.medal:r.medal};
+  save.unlocks=unlocksFor(save.records,save.tourRecords,save.unlocks);
   return {...persist(save,storage),newBest};
 }
 export function saveTourBest(current,summary,storage){const save=sanitize(current),old=save.tourBests[summary.signature];if(!old||summary.activeSeconds<old.activeSeconds)save.tourBests[summary.signature]=summary;return persist(save,storage);}

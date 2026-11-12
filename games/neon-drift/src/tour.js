@@ -5,6 +5,8 @@ export function createTour(seed,carId='comet'){
 }
 export function recordStageResult(tour,result){
   if(tour.status!=='running'||tour.results.length!==tour.stageIndex)return false;
+  const stage=TOUR_STAGES[tour.stageIndex];
+  if(!stage||!result||result.trackId!==stage.trackId||result.mode!==stage.mode||result.carId!==tour.carId||result.seed!==tour.seed||result.layoutId!==resolveTourTrack(stage.trackId,tour.seed).layoutId)return false;
   if(!result.success){tour.status='failed';return true;}
   tour.results.push({...result});tour.activeSeconds+=result.activeSeconds??result.time-result.penalty;
   tour.status=tour.stageIndex===5?'complete':'between';return true;

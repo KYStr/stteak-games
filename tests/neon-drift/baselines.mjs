@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
 import {TOUR_STAGES,resolveTourTrack} from '../../games/neon-drift/src/content.js';
 import {createRace,stepRace} from '../../games/neon-drift/src/physics.js';
@@ -7,4 +8,5 @@ for(const seed of [0,7])for(const bot of ['idle','random'])for(let stage=0;stage
  for(let i=0;i<305*30&&!r.finished;i++){if(bot==='random'&&i%15===0)controls={throttle:random(),brake:random()*.5,steer:random()*2-1,handbrake:random()>.5};stepRace(r,controls,1/30);}
  rows.push({seed,bot,stage:stage+1,car:'comet',...r.result});
 }
+assert.ok(rows.every(r=>r.success===false),'Idle and random policies must lose all stages');
 const path=process.env.NEON_CALIBRATION_OUT||'/tmp/neon-calibration.json',report=JSON.parse(await readFile(path,'utf8'));report.baselines=rows;await writeFile(path,JSON.stringify(report,null,2));console.log(JSON.stringify(rows.map(r=>({stage:r.stage,seed:r.seed,bot:r.bot,score:r.score,time:r.time,success:r.success,collisions:r.collisions})),null,2));

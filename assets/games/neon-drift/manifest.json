@@ -575,8 +575,8 @@
     {
       "id": "neon-drift.road-kit",
       "source": "games/neon-drift/src/renderer.js",
-      "sha256": "4346d6dd220ba1142948d21543471c013e2d9e5b16d793a204c8cb2e7c2e77f9",
-      "bytes": 45621,
+      "sha256": "019c737abee9d108152e0c04c3069bd080f5d02e2394951f39c16c58d2d80567",
+      "bytes": 46370,
       "description": "Editable road ribbons, ramps, 3D curbs, armco, posts, road details (lane paint / kerbs / guide lamps / chevrons / puddles / start checkers / drain grates), contact shadows and district instancing. Bundled into runtime game.js.",
       "provenance": {
         "method": "original-procedural",
@@ -591,8 +591,8 @@
     {
       "id": "neon-drift.track-layouts",
       "source": "games/neon-drift/src/content.js",
-      "sha256": "51689e986b58c86dc24e721f2e1e37d3538494c85c0c9af6234780e7ab9692f4",
-      "bytes": 9018,
+      "sha256": "2f106e7523ee4bff9b8b334a73ea7dd96b9efcf3b44864c1cd00e7ae417e94f8",
+      "bytes": 11483,
       "description": "Three authored closed courses with elevation, width, checkpoint distances and optional legal offset corridors. Also supplies independent collision and recovery coordinates.",
       "provenance": {
         "method": "original-procedural",

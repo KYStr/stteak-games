@@ -94,6 +94,6 @@ test('新提示保留原按鈕、12px下限與自然換行，不新增焦點或�
   assert.doesNotMatch(node,/tabindex|autofocus|hidden/); // 不增加焦點或隱藏顯示。
   const rule=css.match(/#garage \.tutorial-progress\{([^}]+)\}/)[1];assert.match(rule,/font-size:max\(12px,\.75rem\)/);assert.match(rule,/overflow-wrap:anywhere/); // 窄螢幕不靠縮字塞入。
   assert.doesNotMatch(rule,/(?:^|;)(?:height:|overflow:hidden|position:)/);assert.match(css,/#garage\{[^}]*overflow-y:auto/); // 沿正常文流與既有車庫捲動，不把line-height誤當固定高度。
-  assert.match(source,/BUILD='neon-drift-rebuild-r3',VERSION='1\.3\.0'/); // 不冒用0014候選身份。
+  assert.match(source,/BUILD='neon-drift-rebuild-r4',VERSION='1\.4\.0'/); // 不冒用0014候選身份。
   assert.doesNotMatch(refreshSource,/localStorage|saveRace\(|saveSettings\(|scrollTo\(|scrollTop\s*=/); // 顯示不寫入、移焦或重設捲動。
 }); // 靜態契約案例結束。

@@ -8,7 +8,7 @@ Object.defineProperty(navigator,'getGamepads',{value:()=>[window.__pad]});
 function control(){
   if(window.__pilot&&window.neonDrift){const s=neonDrift.snapshot({renderer:false});if(s.phase==='running'){
     const state={...s,car:CARS.find(c=>c.id===s.carId),track:s.tour?resolveTourTrack(s.trackId,s.seed):TRACKS.find(t=>t.id===s.trackId)};
-    if(state.track){let controls=s.mode==='drift'?driftInput(state,28):driveInput(state,23);if(window.__bot==='random'){const interval=Math.floor(s.elapsed*2);if(interval!==lastRandom){lastRandom=interval;randomControls={throttle:random(),brake:random()*.5,steer:random()*2-1,handbrake:random()>.5};}controls=randomControls;}
+    if(state.track){let controls=s.mode==='drift'?driftInput(state,window.__target??28):driveInput(state,23);if(window.__bot==='random'){const interval=Math.floor(s.elapsed*2);if(interval!==lastRandom){lastRandom=interval;randomControls={throttle:random(),brake:random()*.5,steer:random()*2-1,handbrake:random()>.5};}controls=randomControls;}
       __pad.axes[0]=Math.abs(controls.steer)<.001?0:Math.sign(controls.steer)*(.14+Math.abs(controls.steer)*.86);
       for(const [id,v] of [[7,controls.throttle],[6,controls.brake],[0,Number(controls.handbrake)]]){buttons[id].value=v;buttons[id].pressed=v>.5;}
     }

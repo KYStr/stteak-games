@@ -27,6 +27,7 @@ export function loadSession(storage){
     if(r.finished!==false||r.result!==null||!finite(r.elapsed)||r.elapsed<0||(!tour&&r.elapsed===0)||r.elapsed>300||(!tour&&r.countdown!==0)||!finite(r.countdown)||r.countdown<0||r.countdown>3||!Number.isInteger(r.checkpointCount)||r.checkpointCount<0||r.checkpointCount>500||!Number.isInteger(r.nextCheckpoint)||r.nextCheckpoint<0||r.nextCheckpoint>7||!Number.isInteger(r.lap)||r.lap<1||r.lap>60)return null;
     for(const [key,value] of Object.entries(state)){
       if(['track','car','ghost','bestLap'].includes(key))continue;
+      if(key==='seed'){if(!Number.isInteger(r.seed)||r.seed<0||r.seed>4294967295)return null;continue;}
       if(typeof value==='number'&&(!finite(r[key])||Math.abs(r[key])>1e8))return null;
       if(typeof value==='boolean'&&typeof r[key]!=='boolean')return null;
       if(key==='layoutId'&&data.version===1){r[key]=state.layoutId;continue;}
