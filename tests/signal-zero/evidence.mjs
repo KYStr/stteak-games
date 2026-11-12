@@ -4,6 +4,29 @@ export const actionTimeout=Number(process.env.SIGNAL_ZERO_ACTION_TIMEOUT_MS||120
 assert.ok(Number.isInteger(actionTimeout)&&actionTimeout>=1000&&actionTimeout<=600000,'SIGNAL_ZERO_ACTION_TIMEOUT_MS must be 1000..600000');
 export async function stopServer(server){if(server&&server.exitCode===null){const exited=new Promise(resolve=>server.once('exit',resolve));server.kill('SIGTERM');await exited}}
 export function deadline(promise,ms){let timer;return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('CDP capture deadline '+ms+' ms')),ms)})]).finally(()=>clearTimeout(timer))}
+// Navigation commit and observable application readiness have separate evidence.
+// Node's clock keeps this deadline real under Playwright's virtual browser clock.
+export async function navigateAndReady(page,navigate,expected='home',timeout=actionTimeout,options={}){
+ const started=performance.now(),record={url:options.url||page.url(),expectedScreen:expected,commitMs:null,readyMs:null};
+ if(options.report)(options.report.navigations??=[]).push(record);
+ const oldOrigin=await deadline(page.evaluate(()=>(window.__pwClock?.builtins.performance??performance).timeOrigin),timeout).catch(()=>null);record.previousOrigin=oldOrigin;
+ const left=()=>Math.max(1,timeout-(performance.now()-started));
+ try{
+  await deadline(navigate({waitUntil:'commit',timeout:left()}),left());record.commitMs=performance.now()-started;record.url=page.url();
+  while(performance.now()-started<timeout){
+   const snapshot=await deadline(page.evaluate(()=>{
+    const state=window.signalZeroControlState;
+    return{origin:(window.__pwClock?.builtins.performance??performance).timeOrigin,ready:document.readyState,screen:state?.screen,error:state?.error,calls:window.signalZeroDiagnostics?.render?.drawCalls||0};
+   }),left());Object.assign(record,snapshot);
+   if(snapshot.screen==='error')throw Error('Application boot failed: '+snapshot.error);
+   const expectedScreens=Array.isArray(expected)?expected:[expected];
+   if((options.history||snapshot.origin!==oldOrigin)&&snapshot.ready!=='loading'&&expectedScreens.includes(snapshot.screen)&&snapshot.calls>0){record.readyMs=performance.now()-started;return snapshot}
+   await new Promise(resolve=>setTimeout(resolve,Math.min(50,left())));
+  }
+  throw Error('Navigation committed but application readiness deadline expired');
+ }catch(error){record.failure=error.message;if(options.report)(options.report.requiredFailures??=[]).push('Navigation: '+error.message);throw error}
+ finally{record.elapsedMs=performance.now()-started;record.errors=[...(options.errors||[])];record.failedRequests=[...(options.failedRequests||[])]}
+}
 export async function capture(page,path,report){
  const record={path,attempts:[]};(report.captures??=[]).push(record);
  // Direct CDP capture avoids Playwright's layout/animation/font synchronization

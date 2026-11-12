@@ -25,3 +25,11 @@ test('a late native suspend completion cannot override a new mission',async()=>{
  s.setRunning(true);suspends.shift()();await Promise.resolve();assert.equal(s.context.pending.length,1);
  s.context.resolve();await Promise.resolve();assert.equal(s.context.state,'running');assert.equal(s.running,true);
 });
+
+
+test('buffered music timing schedules the same notes and alert cues as numeric updates',()=>{
+ const settings={music:.45,sfx:.7},actual=new Sound(settings),reference=new Sound(settings),a=[],b=[],timing=new Float64Array(8);
+ actual.running=reference.running=true;actual.tone=(...args)=>a.push(args);reference.tone=(...args)=>b.push(args);
+ for(let i=0;i<240;i++){const dt=[.016,.033,.1][i%3],alert=i%7===0?.4:0;timing[0]=dt;timing[7]=alert;actual.update(timing);reference.update(dt,alert);}
+ assert.equal(actual.beat,reference.beat);assert.equal(actual.clock,reference.clock);assert.deepEqual(a,b);assert.ok(a.length>20);
+});

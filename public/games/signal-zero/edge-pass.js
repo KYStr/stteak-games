@@ -7,7 +7,7 @@ import {FXAAShader} from './vendor/FXAAShader.js';
 // This also preserves toneMapped=false on the runner silhouette.
 export class EdgePass {
  constructor(software){
-  this.target=new T.WebGLRenderTarget(1,1,{depthBuffer:true,stencilBuffer:true});this.prepared=new WeakSet();this.background=new T.Color();
+  this.target=new T.WebGLRenderTarget(1,1,{depthBuffer:true,stencilBuffer:true});this.prepared=new WeakSet();this.background=new T.Color();this.backgroundSource=new Float64Array([NaN,NaN,NaN]);
   let fragmentShader=FXAAShader.fragmentShader;
   this.uniforms=T.UniformsUtils.clone(FXAAShader.uniforms);this.uniforms.tDiffuse.value=this.target.texture;
   this.material=new T.ShaderMaterial({name:'signal-zero-edge-output',uniforms:this.uniforms,vertexShader:FXAAShader.vertexShader,fragmentShader,depthWrite:false,depthTest:false,toneMapped:false});
@@ -30,6 +30,6 @@ export class EdgePass {
   }});
  }
  resize(width,height){this.target.setSize(width,height);this.uniforms.resolution.value.set(1/width,1/height);}
- render(renderer,scene,camera){const background=scene.background;if(background?.isColor)scene.background=this.background.copy(background).convertLinearToSRGB();renderer.setRenderTarget(this.target);renderer.render(scene,camera);scene.background=background;renderer.setRenderTarget(null);this.quad.render(renderer);}
+ render(renderer,scene,camera){const background=scene.background;if(background?.isColor){const saved=this.backgroundSource;if(saved[0]!==background.r||saved[1]!==background.g||saved[2]!==background.b){saved[0]=background.r;saved[1]=background.g;saved[2]=background.b;this.background.copy(background).convertLinearToSRGB();}scene.background=this.background;}renderer.setRenderTarget(this.target);renderer.render(scene,camera);scene.background=background;renderer.setRenderTarget(null);this.quad.render(renderer);}
  dispose(){this.target.dispose();this.material.dispose();this.quad.dispose();}
 }

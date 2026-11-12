@@ -25,6 +25,6 @@ export async function runBrowserChapter(page,index,{artifacts,clock=false,route=
  }
  trace.push({kind:action.kind,x:action.x,actualX:last.player.x,y:last.player.y,time:last.time,objectives:last.objectives.length,phase:last.phase});if(last.phase!=='playing')break;}
  await setKeys([]);last=await page.evaluate(()=>window.signalZeroControlState);assert.equal(last.phase,'complete','Input-only traversal failed: '+JSON.stringify({last,trace}));assert.equal(last.objectives.length,4);if(artifacts)await page.screenshot({path:`${artifacts}/chapter-${index+1}-${seedLabel}.png`});
- return {chapter:index+1,phase:last.phase,seed:last.seed,time:last.time,alerts:last.alerts,traceRemaining:last.traceRemaining,tools:last.tools,trace,introductions,competent25,clock:clock?'virtual 100ms RAF ticks; real keyboard, live renderer':'wall clock'};
+ return {chapter:index+1,phase:last.phase,seed:last.seed,time:last.time,objectives:last.objectives.length,alerts:last.alerts,traceRemaining:last.traceRemaining,tools:last.tools,trace,introductions,competent25,clock:clock?'virtual 100ms RAF ticks; real keyboard, live renderer':'wall clock'};
  }finally{await setKeys([]);}
 }

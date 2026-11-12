@@ -6,8 +6,8 @@ import {chromium} from '/workspace/stteak8/tools/node_modules/playwright-core/in
 import {defaultSave,SAVE_KEY,SAVE_BACKUP_KEY} from '../../games/signal-zero/src/save.js';
 import {createRun,step,checkpointSnapshot} from '../../games/signal-zero/src/core.js';
 import {runBrowserChapter} from './campaign-driver.mjs';
-import {instrumentation} from './browser-harness.mjs';
-import {actionTimeout,capture,stopServer,installFeedbackProbe,deadline} from './evidence.mjs';
+import {instrumentation,captureErrors} from './browser-harness.mjs';
+import {actionTimeout,capture,stopServer,installFeedbackProbe,deadline,navigateAndReady} from './evidence.mjs';
 import {LEVELS} from '../../games/signal-zero/src/levels.js';
 
 const root=fileURLToPath(new URL('../../',import.meta.url));
@@ -28,7 +28,7 @@ try{
  async function openBrowser(){
  browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  page=await browser.newPage({viewport:{width:1280,height:720}});page.setDefaultTimeout(actionTimeout);
- page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('requestfailed',r=>failed.push(r.url()));page.on('response',r=>{if(r.status()>=400)failed.push(r.status()+' '+r.url())});
+ captureErrors(page,errors,failed);
  await page.addInitScript(instrumentation);
  await page.addInitScript(()=>{
   // Consume fixtures on the new document, after pagehide persisted the old run.
@@ -43,6 +43,7 @@ try{
  });
  }
  await openBrowser();
+ const nav=(navigate,expected='home',options={})=>navigateAndReady(page,navigate,expected,actionTimeout,{report,errors,failedRequests:failed,...options});
  // Poll from Node: browser timers intentionally stop under page.clock, and
  // can be delayed by a busy software compositor. The predicate itself still
  // reads the real application state and retains the same bounded deadline.
@@ -69,7 +70,7 @@ try{
  }
  async function loadSaveFixture(save,{start=true}={}){
   await page.evaluate(save=>sessionStorage.setItem('signal-zero-acceptance-pending-save',JSON.stringify(save)),save);
-  await page.reload();await screen('home');await installFeedbackProbe(page);if(virtualClock)await refreshVirtualRafProbe();if(!start)return;
+  await nav(opts=>page.reload(opts));await installFeedbackProbe(page);if(virtualClock)await refreshVirtualRafProbe();if(!start)return;
   const initialFrame=await page.evaluate(()=>signalZeroDiagnostics.performance.totalFrames);
   try{await page.click('#begin')}catch(error){if((await state()).screen!=='playing')throw error}
   await screen('playing');
@@ -134,24 +135,13 @@ try{
  async function group(name,fn){
   const record={name};report.groups.push(record);console.log('GROUP '+name);
   try{await fn();record.passed=true}catch(error){record.error=error.stack;record.state=await Promise.race([state(),wait(10000).then(()=>null)]).catch(()=>null);report.requiredFailures.push(name+': '+error.message);console.error('FAIL '+name+': '+error.message);if(record.state)await setKeys([]).catch(()=>{});
-   else{console.error('Closing unresponsive browser before recreating it');await browser.close();await openBrowser();virtualClock=false;keys.clear();await page.goto(base);await screen('home')}
+   else{console.error('Closing unresponsive browser before recreating it');await browser.close();await openBrowser();virtualClock=false;keys.clear();await nav(opts=>page.goto(base,opts),'home',{url:base})}
   }
   await writeFile(artifacts+'/report.json',JSON.stringify(report,null,2));
  }
  await group('opening-controls-save-audio',async()=>{
  const loadStarted=performance.now();
- for(let attempt=0;attempt<2;attempt++){
-  const errorStart=errors.length;
-  await page.goto(base);await page.waitForFunction(()=>window.signalZeroControlState,{timeout:actionTimeout});
-  const failure=await page.evaluate(()=>signalZeroControlState.screen==='error'?document.getElementById('overlay').textContent:null);
-  (report.initialization??=[]).push({attempt:attempt+1,failure,errors:errors.slice(errorStart)});
-  if(!failure)break;
-  if(attempt||!failure.includes('Error creating WebGL context'))throw Error(failure);
-  // A failed GPU process cannot recover by repeatedly creating canvases in
-  // that same process. Close it before the single bounded fresh-browser retry.
-  const initializationErrors=errors.splice(errorStart);for(const message of initializationErrors)if(!/WebGL|GL_|GPU|context/.test(message))errors.push(message);
-  await browser.close();await openBrowser();
- }
+ await nav(opts=>page.goto(base,opts),'home',{url:base});
  await screen('home');await installFeedbackProbe(page);report.load=await page.evaluate(()=>({bytes:performance.getEntriesByType('resource').reduce((n,r)=>n+r.transferSize,0),resources:performance.getEntriesByType('resource').length}));report.load.interactiveWallMs=performance.now()-loadStarted;assert.ok(report.load.bytes<=30*1024*1024);assert.equal((await page.evaluate(()=>signalZeroDiagnostics.audio.context)),'not-created');check('relative modules load; audio waits for user gesture');
  await page.click('#begin');await screen('brief');await page.keyboard.press('Escape');await screen('missions');await page.click('[data-level="0"]');await page.fill('#seed-code','9999');await page.click('#guide');await screen('help');await page.keyboard.press('Escape');await screen('brief');assert.equal(await page.locator('#seed-code').inputValue(),'9999');check('brief frequency code survives help and Back');await page.click('#deploy');await screen('playing');
  await waitForState(()=>{if(window.__acceptanceAudio?.state!=='running')return false;const data=new Float32Array(window.__audioAnalyser.fftSize);window.__audioAnalyser.getFloatTimeDomainData(data);return data.some(v=>Math.abs(v)>.00001)});check('default gesture policy unlocks running audio with nonzero samples');
@@ -179,18 +169,42 @@ try{
  check('Q/mouse selection, failed tool, climb and hack milestones have live envelopes and immediate visual feedback');await driveTo(35);await waitForState(()=>signalZeroControlState.checkpoint,null,{timeout:12000});
  const saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),SAVE_KEY);assert.equal(saved.checkpoint.levelRevision,LEVELS[0].revision);assert.equal(saved.checkpoint.seed,saved.activeSeed);check('real keyboard movement, jumping, tool, terminal hacking and checkpoint save');
  await capture(page,artifacts+'/play-1280.png',report);
- await page.reload();await screen('home');await page.click('#begin');await screen('playing');assert.ok(Math.abs((await state()).player.x-35)<.05);assert.equal((await state()).seed,saved.activeSeed);assert.ok((await state()).traceRemaining<=saved.checkpoint.traceRemaining);check('reload restores earned checkpoint and objective');
- await page.goto('about:blank');await page.goBack();await waitForState(()=>['home','pause'].includes(signalZeroControlState?.screen));if((await state()).screen==='home')await page.click('#begin');else await page.click('#resume');await screen('playing');assert.ok((await state()).checkpoint);check('browser navigation back returns paused or restores the saved checkpoint');
+ await nav(opts=>page.reload(opts));await page.click('#begin');await screen('playing');assert.ok(Math.abs((await state()).player.x-35)<.05);assert.equal((await state()).seed,saved.activeSeed);assert.ok((await state()).traceRemaining<=saved.checkpoint.traceRemaining);check('reload restores earned checkpoint and objective');
+ await page.goto('about:blank',{waitUntil:'commit'});await nav(opts=>page.goBack(opts),['home','pause'],{history:true,url:base});if((await state()).screen==='home')await page.click('#begin');else await page.click('#resume');await screen('playing');assert.ok((await state()).checkpoint);check('browser navigation back returns paused or restores the saved checkpoint');
  await page.keyboard.down('KeyD');await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.keyboard.up('KeyD');await screen('pause');const frozen=(await state()).time,frozenTrace=(await state()).traceRemaining;await page.waitForTimeout(300);assert.equal((await state()).time,frozen);assert.equal((await state()).traceRemaining,frozenTrace);
  await waitForState(()=>signalZeroDiagnostics.audio.context==='suspended');await page.click('#resume');await waitForState(()=>signalZeroDiagnostics.audio.context==='running');check('blur freezes simulation and suspends audio; explicit resume recovers');
  await page.keyboard.press('Escape');await screen('pause');await page.click('#settings');const original=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).settings.bindings,SAVE_KEY);
  await page.click('[data-bind="right"]');await page.click('#back');await page.keyboard.press('KeyX');assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).settings.bindings,SAVE_KEY),original);
  await page.click('#settings');await page.click('[data-bind="right"]');await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await page.keyboard.press('KeyZ');assert.deepEqual(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).settings.bindings,SAVE_KEY),original);check('binding capture cancels on Back and blur');
  await page.locator('#reset-keys').focus();await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'back');await page.keyboard.press('Shift+Tab');assert.equal(await page.evaluate(()=>document.activeElement.id),'reset-keys');check('modal keyboard focus stays in menu');
- await page.click('#mute');assert.equal(await page.locator('#mute').getAttribute('aria-pressed'),'true');await page.reload();await screen('home');assert.equal(await page.locator('#mute').getAttribute('aria-pressed'),'true');await page.click('#mute');await page.click('#begin');await page.keyboard.press('Escape');await page.click('#settings');
+ await page.click('#mute');assert.equal(await page.locator('#mute').getAttribute('aria-pressed'),'true');await nav(opts=>page.reload(opts));assert.equal(await page.locator('#mute').getAttribute('aria-pressed'),'true');await page.click('#mute');await page.click('#begin');await page.keyboard.press('Escape');await page.click('#settings');
  await page.locator('#music').focus();await page.keyboard.press('Home');await page.locator('#sfx').focus();await page.keyboard.press('Home');assert.equal(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).settings.music,SAVE_KEY),0);await page.locator('#music').evaluate(el=>{el.value='0.45';el.dispatchEvent(new Event('input',{bubbles:true}))});await page.locator('#sfx').evaluate(el=>{el.value='0.7';el.dispatchEvent(new Event('input',{bubbles:true}))});await page.click('#back');await page.click('#resume');
  await page.evaluate(()=>window.__acceptanceAudio.suspend());await page.keyboard.press('KeyA');await waitForState(()=>signalZeroDiagnostics.audio.context==='running');check('mute/volume persist; a gesture resumes externally suspended audio');
  assert.ok(await page.evaluate(()=>__raf.requests)>0);assert.equal(await page.evaluate(()=>__raf.max),1);check('pause/resume retains one outstanding game RAF');
+ });
+ await group('navigation-readiness-regressions',async()=>{
+  report.muteReloadTrials=[];
+  for(let trial=0;trial<5;trial++){
+   const before=await page.locator('#mute').getAttribute('aria-pressed');await page.click('#mute');
+   const expected=before!=='true';await nav(opts=>page.reload(opts));
+   assert.equal(await page.locator('#mute').getAttribute('aria-pressed'),String(expected));
+   assert.equal(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).settings.muted,SAVE_KEY),expected);
+   report.muteReloadTrials.push({trial:trial+1,muted:expected,navigation:report.navigations.at(-1)});
+  }
+  check('five consecutive mute/reload trials preserve saved values on a new rendered document');
+  const broken=await browser.newPage();
+  try{
+   await broken.route('**/synthetic-boot-error',route=>route.fulfill({contentType:'text/html',body:'<script>window.signalZeroControlState={screen:"error",error:"synthetic missing module"}</script>'}));
+   await assert.rejects(navigateAndReady(broken,opts=>broken.goto(base+'synthetic-boot-error',opts),'home',5000),/synthetic missing module/);
+   report.syntheticBootFailureRejected=true;check('readiness rejects a synthetic boot failure');
+   await broken.route('**/synthetic-rendered-boot',route=>route.fulfill({contentType:'text/html',body:'<link rel="icon" href="data:,"><script>window.signalZeroControlState={screen:"home"};window.signalZeroDiagnostics={render:{drawCalls:1}}</script>'}));
+   await broken.clock.install();
+   const first=await navigateAndReady(broken,opts=>broken.goto(base+'synthetic-rendered-boot',opts),'home',5000);
+   const virtualOrigin=await broken.evaluate(()=>performance.timeOrigin);
+   const second=await navigateAndReady(broken,opts=>broken.reload(opts),'home',5000);
+   assert.notEqual(second.origin,first.origin);assert.equal(await broken.evaluate(()=>performance.timeOrigin),virtualOrigin);
+   report.nativeOriginUnderVirtualClock=true;check('native document identity changes on reload while virtual time origin stays fixed');
+  }finally{await broken.close()}
  });
  await group('hud-dirty-updates-and-remapping',async()=>{
   const entry=defaultSave();entry.activeLevel=0;await page.setViewportSize({width:480,height:270});await loadSaveFixture(entry);await page.waitForTimeout(500);
@@ -262,8 +276,8 @@ try{
  await group('context-corrupt-save',async()=>{
  const entry=defaultSave();entry.activeLevel=0;await loadSaveFixture(entry);
  // Graceful context failure is intentionally tested last, then rebuilt by reload.
- await page.evaluate(()=>{const gl=document.getElementById('world').getContext('webgl2');gl.getExtension('WEBGL_lose_context').loseContext()});await screen('error');if(virtualClock)await page.clock.fastForward(100);await page.waitForTimeout(500);assert.equal(await page.evaluate(()=>__raf.pending.size),0);assert.equal(await page.evaluate(()=>__raf.max),1);await page.click('#retry');await screen('home');check('WebGL context loss stops RAF and has a working recovery action');
- await page.evaluate(({key,backup})=>{localStorage.setItem(key,'{broken');localStorage.removeItem(backup)},{key:SAVE_KEY,backup:SAVE_BACKUP_KEY});await page.emulateMedia({reducedMotion:'reduce'});await page.reload();await screen('home');assert.equal(await page.locator('#storage-warning').isVisible(),true);await page.click('#settings');assert.equal(await page.locator('#motion').isChecked(),true);check('corrupt save falls back visibly and new settings honor system reduced motion');
+ await page.evaluate(()=>{const gl=document.getElementById('world').getContext('webgl2');gl.getExtension('WEBGL_lose_context').loseContext()});await screen('error');if(virtualClock)await page.clock.fastForward(100);await page.waitForTimeout(500);assert.equal(await page.evaluate(()=>__raf.pending.size),0);assert.equal(await page.evaluate(()=>__raf.max),1);await nav(opts=>Promise.all([page.waitForNavigation(opts),page.click('#retry',{noWaitAfter:true})]));check('WebGL context loss stops RAF and has a working recovery action');
+ await page.evaluate(({key,backup})=>{localStorage.setItem(key,'{broken');localStorage.removeItem(backup)},{key:SAVE_KEY,backup:SAVE_BACKUP_KEY});await page.emulateMedia({reducedMotion:'reduce'});await nav(opts=>page.reload(opts));assert.equal(await page.locator('#storage-warning').isVisible(),true);await page.click('#settings');assert.equal(await page.locator('#motion').isChecked(),true);check('corrupt save falls back visibly and new settings honor system reduced motion');
  });
  await group('result-audio-output-matrix',async()=>{
   await page.setViewportSize({width:480,height:270});

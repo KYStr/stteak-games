@@ -65,7 +65,7 @@ a warning. Older checkpoint layouts resume at the saved chapter entrance while
 preserving scores/settings. Blur, hidden tabs and back/forward cache suspend play;
 resuming always requires an explicit action. Context loss offers a reload action.
 
-Auto graphics mode uses GPU timing to adapt resolution. Software renderers omit
+Auto graphics mode adapts resolution using a reusable frame-interval window. Software renderers omit
 shadows; high mode enables them. City windows are spatially grouped so distant
 blocks are culled. Paused scenes render only when changed. Audio has one procedural
 transport, at most 12 voices, and explicit suspend/resume. Diagnostics in settings
@@ -76,7 +76,7 @@ download frame times, GPU timings, render counts and game state to the local dev
 From the repository root:
 
 ```sh
-SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-release npm test --prefix games/signal-zero
+SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-release npm run test:release --prefix games/signal-zero
 SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-campaign npm run test:campaign --prefix games/signal-zero
 SIGNAL_ZERO_PORT=8107 SIGNAL_ZERO_ARTIFACTS=/tmp/signal-zero-performance npm run test:performance --prefix games/signal-zero
 ```
@@ -86,7 +86,9 @@ closing both in `finally`. Run commands sequentially. They require Python 3,
 `/usr/bin/google-chrome` and Playwright from `/workspace/stteak8/tools/node_modules/`.
 `SIGNAL_ZERO_PORT` defaults to 8107; `SIGNAL_ZERO_ARTIFACTS` sets report/PNG output.
 
-`npm test` rebuilds, runs physics/save/input/build-parity tests and the browser
+`test:release` runs unit/browser acceptance, the strict performance suite and the
+complete campaign sequentially. Any failed allocation/resource/scenario gate exits
+nonzero. `npm test` rebuilds, runs physics/save/input/build-parity tests and the browser
 acceptance suite. Unit evidence includes 90 input-only strategy/arrival-phase
 trials (three approaches × six chapters × five offsets), 72 finite-tool seeded
 routes (twelve seeds × six chapters), idle deadline defeats, and checkpoint layout
@@ -117,7 +119,10 @@ RAF timestamps in 100 ms ticks; bounded 120 Hz physics substeps still run normal
 This accelerates campaign coverage and is not wall-clock performance evidence.
 No player/objective/tool/victory state is assigned by the controller. It records
 terminal/exit traces, active duration, seed, finite inventory, introduction times
-and screenshots, plus real idle defeat and random/competent comparisons.
+and screenshots, plus real idle defeat and random/competent comparisons. The seeded random controller can choose all seven gameplay actions. Two trials
+at frequency 1009 record physical keydown counts and 25-second progress, and run to an actual
+outcome/deadline. They must substantially underperform a completed competent
+chapter; zero objectives is not assumed for arbitrary seeds.
 `SIGNAL_ZERO_SEEDS` accepts comma-separated uint32 seeds for extended campaign runs.
 
 `test:performance` uses real wall time: a three-minute active soak with restart,
@@ -140,7 +145,7 @@ FXAAShader/Pass and the MIT notice ship locally.
 Original procedural art and score are in `src/models.js` and `src/audio.js`.
 Existing exported assets, notices and Three.js MIT license remain intact.
 
-Round 4 verification controls: `SIGNAL_ZERO_ACTION_TIMEOUT_MS` defaults to 120000
+Verification controls: `SIGNAL_ZERO_ACTION_TIMEOUT_MS` defaults to 120000
 and accepts an integer from 1000 to 600000. This controls action and capture
 budgets; it does not relax simulation coverage, resource gates or JS feedback
 latency. World captures use direct CDP pixels to avoid font/layout synchronization
@@ -168,19 +173,37 @@ inside either 20-second sample. Requested forced collections and traced natural
 GC events are reported separately. The real soak still spans >=180 seconds and
 includes restart; no shortened run qualifies as release evidence.
 
-The allocation report preserves residual V8 numeric boxing rather than labeling
-all sampled bytes as object creation. A separate ten-second allocation timeline
-records exact per-function allocation counts/bytes and retained node types after
-the timed soak. Steady input/physics/view helpers must allocate only scalar-sized
-values and retain no object/array/closure/string containers. Unchanged HUD and
-shader-key helpers additionally require zero sampled bytes. Browser RAF wrappers,
-JIT code, original audio envelopes, engine internals and changed display text are
-reported separately. This is not a claim of literally zero V8 number allocations.
-A failed initial software-WebGL context creation is recorded and retried once in
-a fresh browser, after closing the previous browser. Other errors remain failures.
+The strict allocation gate is separate from resource/leak success and from the
+older scalar-size/container regression check. Scalar boxing fails the strict gate.
+All steady source locations are covered, including `step`/`stepBuffered`, `frame`,
+`renderScene`, physics, input, view and animation. Source keys include file,
+function, line and column; same-named helpers do not inherit exemptions.
+After normal JIT warmup, each stationary/moving 20-second profile has a second
+matched 20-second confirmation. The confirmation must contain zero sampled
+steady application bytes. Earlier allocations remain visible as warmup evidence;
+there are no per-function byte allowances. Two exact ten-second timelines follow
+outside the real soak; the final one must have zero steady allocation counts,
+including scalars. Counts/bytes and retained types are summed across all stacks
+at each source location. Retained types describe GC survivors, never all allocated
+types. A scalar-only recurring input read or physics step fails the release gate.
+
+Simulation, persistent frame/HUD timings, input timestamps and quality counters
+use preallocated double buffers. Named JSON adapters and explicit serialization
+preserve schema-1 saves and control/diagnostic fields. GPU timing uses a fixed ring
+and one reused query object. Original models, live animations, lighting, audio and
+120 Hz physics remain active. The mixer uses a reusable engine call tuple with an
+equivalent scaled unit tick; pose equivalence has regression coverage. Browser
+clock/GPU measurement APIs and changed-text writes retain explicit source
+boundaries, and their allocations remain reported separately alongside engine
+and discrete input/audio costs. No simulation or frame function is exempted.
+
 Recovery screens include their diagnostic message in the read-only control state.
-State waits use external polling, so virtual-clock fixtures cannot freeze their
-own readiness timers. Failed scenario groups retain their exact recovery message.
+Navigation waits for `commit`, then polls with Node's real clock for a new
+native `performance.timeOrigin` (preserved before a virtual clock), ready document, expected screen and a rendered scene.
+History restoration can retain the origin but must still pass paused/checkpoint
+assertions. Reports retain commit/readiness times, URL, screen, rendering and error
+arrays. Five mute/reload trials and synthetic boot-failure rejection protect this
+contract; a missing module or graphics recovery screen fails readiness. Failed scenario groups retain their exact recovery message.
 The late-checkpoint victory fixture uses deterministic virtual-clock input stepping
 after all real-time scene/soak measurements finish. Its RAF probe is reattached to
 the installed scheduler, including after fixture reloads; context loss must still

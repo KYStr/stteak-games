@@ -13,3 +13,20 @@ export const contextText=(source,progress,tenth,active)=>{let text=source==='las
 export const positionText=position=>position+'%';
 export const routeText=(next,direction,distance)=>next?`${direction?'→':'←'} ${next.label} · ${distance} m`:'→ 全節點連線 · 前往出口';
 export const toolCountText=count=>'×'+count;
+
+export function positionTextFromCoordinates(player,length){return positionText(Math.min(100,player[0]/length*100));}
+
+function writeText(node,text){node.textContent=text}
+export class TextSlot{
+ constructor(node){this.args=[node,''];this.formatArgs=[null,null,null,null]}
+ format(formatter,a,b,c,d){const args=this.formatArgs;args[0]=a;args[1]=b;args[2]=c;args[3]=d;this.set(Reflect.apply(formatter,null,args))}
+ set(text){this.args[1]=text;Reflect.apply(writeText,null,this.args)}
+}
+
+export function setRoutePosition(player,length,pin,fill){const left=positionTextFromCoordinates(player,length);pin.style.left=left;fill.style.width=left}
+
+function writeMeter(node,buffer,index){node.value=buffer[index]}
+export class MeterSlot{
+ constructor(node){this.args=[node,null,0]}
+ setFrom(buffer,index){this.args[1]=buffer;this.args[2]=index;Reflect.apply(writeMeter,null,this.args)}
+}
