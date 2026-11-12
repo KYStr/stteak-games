@@ -178,7 +178,7 @@ export function animateRunner(group, state, dt) {
     const previous = data.actions[data.activeAnimation]; const next = data.actions[name]; next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).play();
     if (previous) { previous.fadeOut(.12); next.fadeIn(.12); } data.activeAnimation = name;
   }
-  if (state.facing !== undefined && state.facing !== 0) group.rotation.y = state.facing < 0 ? Math.PI : 0;
+  if (state.facing !== undefined && state.facing !== 0) {const rotation=state.facing<0?Math.PI:0;if(group.rotation.y!==rotation)group.rotation.y=rotation;}
   data.mixer.update(Math.min(Math.max(dt || 0, 0), .1));
 }
 

@@ -47,18 +47,29 @@ function synchronizeCycle(device, time) {
   }
 }
 
+class Player {
+ constructor(spawn){
+  // Fixed double fields keep entering motion/jumping from invalidating every
+  // optimized physics path warmed while the runner stood at the entrance.
+  this.x=.1;this.y=.1;this.z=.1;this.vx=.1;this.vy=.1;this.coyote=.1;this.jumpBuffer=.1;
+  this.x=spawn.x;this.y=spawn.y;this.z=0;this.vx=0;this.vy=0;this.coyote=PHYSICS.coyote;this.jumpBuffer=0;
+  this.facing=1;this.grounded=true;this.crouched=false;this.animation='idle';this.climbing=false;
+ }
+}
+
 export function createRun(levelIndex = 0, checkpoint = null, seed, difficulty = 'standard') {
   const safeIndex = clamp(Math.floor(Number(levelIndex) || 0), 0, LEVELS.length - 1);
   const level = LEVELS[safeIndex];
   const run = {
     levelIndex: safeIndex, levelId: level.id, seed: validSeed(seed,safeIndex), difficulty:difficulty==='relaxed'?'relaxed':'standard',traceRemaining:level.traceDeadline,tracePenalty:0, detectionSeconds:level.detectionSeconds, patrolMultiplier:level.patrolMultiplier,
-    player: { x: level.spawn.x, y: level.spawn.y, z: 0, vx: 0, vy: 0, facing: 1, grounded: true, crouched: false, animation: 'idle', coyote: PHYSICS.coyote, jumpBuffer: 0, climbing: false },
-    devices: resolveEncounter(level,validSeed(seed,safeIndex)).map(freshDevice), time: 0, alerts: 0, alertTime: 0, suspicion: 0, alertState: 'normal',
+    player: new Player(level.spawn),
+    devices: resolveEncounter(level,validSeed(seed,safeIndex)).map(freshDevice), time: .1, alerts: 0, alertTime: .1, suspicion: .1, alertState: 'normal',
     phase: 'playing', objectives: [], packet: false, tools: [...level.supplies], selectedTool: 0,
-    checkpoint: null, checkpointReached: false, checkpointIndex: -1, hackProgress: 0, hackTarget: null, prompt: '', events: [],
-    _eventPool:Array.from({length:64},()=>({})),_subInput:{},_ray:new Ray(),_rayOrigin:new Vector3(),_rayDelta:new Vector3(),_rayHit:new Vector3(),_vision:{origin:new Vector3(),direction:new Vector3()},_target:new Vector3(),_delta:new Vector3(),_toolOrigin:new Vector3(),_toolTarget:new Vector3(),_collision:new Box3(),hackMilestone:0,encounters:[],sectorId:null, catches: 0, lastFailure: null, route: 'ground', traveled: 0,
+    checkpoint: null, checkpointReached: false, checkpointIndex: -1, hackProgress: .1, _promptTerminal: null, _exitRemaining: -1, _exitPrompt: '', hackTarget: null, prompt: '', events: [],
+    _eventPool:Array.from({length:64},()=>({})),_subInput:{axis:.1,jumpHeld:false,jumpPressed:false,crouch:false,up:false,interactPressed:false},_ray:new Ray(),_rayOrigin:new Vector3(),_rayDelta:new Vector3(),_rayHit:new Vector3(),_vision:{origin:new Vector3(),direction:new Vector3()},_target:new Vector3(),_delta:new Vector3(),_toolOrigin:new Vector3(),_toolTarget:new Vector3(),_collision:new Box3(),hackMilestone:0,encounters:[],sectorId:null, catches: 0, lastFailure: null, route: 'ground', traveled: .1,
     _solids: [...level.platforms, ...level.covers].map(item => ({ ...item, box: solidBox(item) })),
   };
+  run.time=0;run.alertTime=0;run.suspicion=0;run.hackProgress=0;run.traveled=0;
   if (checkpoint) return restoreRun(checkpoint, safeIndex);
   return run;
 }
@@ -317,6 +328,7 @@ function updateObjectives(run, input, dt) {
   const p = run.player;
   let terminal=null;for(let terminalIndex=0;terminalIndex<level.terminals.length;terminalIndex++){const item=level.terminals[terminalIndex];if(!run.objectives.includes(item.id)&&Math.abs(item.x-p.x)<1.4&&Math.abs(item.y-p.y)<.65){terminal=item;break;}}
   if(run._promptTerminal!==terminal){run._promptTerminal=terminal;run.prompt=terminal?`按住 W／互動 · ${terminal.label}`:'';}
+  if(!terminal)run.prompt='';
   if (terminal && (input.up || input.interactPressed) && p.grounded && Math.abs(p.vx) < .3) {
     if(run.hackTarget!==terminal.id){run.hackProgress=0;run.hackMilestone=0;emit(run,'hack-start','',{id:terminal.id});}
     run.hackTarget = terminal.id; run.hackProgress = Math.min(1, run.hackProgress + dt / 1.05); p.animation = 'hack';
@@ -337,7 +349,7 @@ function updateObjectives(run, input, dt) {
     if (run.objectives.length === level.terminals.length) {
       run.phase = 'complete'; p.vx = 0; p.animation = 'idle';
       emit(run, 'complete', '訊號送達 · 任務完成', { medals: medalsFor(run) });
-    } else run.prompt = `出口未解鎖 · 尚有 ${level.terminals.length - run.objectives.length} 個任務節點`;
+    } else {const remaining=level.terminals.length-run.objectives.length;if(run._exitRemaining!==remaining){run._exitRemaining=remaining;run._exitPrompt=`出口未解鎖 · 尚有 ${remaining} 個任務節點`;}run.prompt=run._exitPrompt;}
   }
 }
 

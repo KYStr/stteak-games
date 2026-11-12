@@ -25,7 +25,8 @@ export class EdgePass {
     }
     shader.fragmentShader=shader.fragmentShader.replace('#include <colorspace_fragment>','gl_FragColor = sRGBTransferOETF( gl_FragColor );');
    };
-   material.customProgramCacheKey=()=>cacheKey+'-sz-display-color-'+Number(material.toneMapped);material.needsUpdate=true;
+   const unmappedKey=cacheKey+'-sz-display-color-0',mappedKey=cacheKey+'-sz-display-color-1';
+   material.customProgramCacheKey=()=>material.toneMapped?mappedKey:unmappedKey;material.needsUpdate=true;
   }});
  }
  resize(width,height){this.target.setSize(width,height);this.uniforms.resolution.value.set(1/width,1/height);}

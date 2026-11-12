@@ -2,13 +2,14 @@ import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {mkdir} from 'node:fs/promises';
 import {chromium} from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
+import {actionTimeout,stopServer} from './evidence.mjs';
 export async function harness(name){
  const root=fileURLToPath(new URL('../../',import.meta.url)),port=Number(process.env.SIGNAL_ZERO_PORT||8107),artifacts=process.env.SIGNAL_ZERO_ARTIFACTS||'/tmp/signal-zero-'+name;
  await mkdir(artifacts,{recursive:true});const base=`http://127.0.0.1:${port}/games/signal-zero/`;let server,browser;
  try{try{if(!(await fetch(base,{signal:AbortSignal.timeout(1500)})).ok)throw Error('offline')}catch{server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',root+'public'],{stdio:'ignore'});for(let i=0;i<100;i++){try{if((await fetch(base,{signal:AbortSignal.timeout(1500)})).ok)break}catch{}if(server.exitCode!==null)throw Error('HTTP port '+port+' is occupied or unavailable');await new Promise(r=>setTimeout(r,100));}}
- browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:480,height:270}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('requestfailed',r=>errors.push(r.url()));page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url())});
- return {page,base,artifacts,errors,browser,close:async()=>{await browser.close();if(server){server.kill('SIGTERM');await new Promise(r=>server.once('exit',r));}}};
- }catch(error){await browser?.close();server?.kill('SIGTERM');throw error;}
+ browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const page=await browser.newPage({viewport:{width:480,height:270}}),errors=[];page.setDefaultTimeout(actionTimeout);page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});page.on('requestfailed',r=>errors.push(r.url()));page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url())});
+ return {page,base,artifacts,errors,browser,close:async()=>{await browser.close();await stopServer(server);}};
+ }catch(error){await browser?.close();await stopServer(server);throw error;}
 }
 export function instrumentation(){
  const add=EventTarget.prototype.addEventListener,removeListener=EventTarget.prototype.removeEventListener,records=[];

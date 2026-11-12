@@ -435,3 +435,9 @@ test('walking off a real raised ledge emits one landing on the lower floor',()=>
  for(let n=0;n<180;n++)events.push(...step(run,{axis:run.player.x<27?1:0},1/60).map(e=>({...e})));
  assert.equal(events.filter(e=>e.type==='jump').length,0);assert.equal(events.filter(e=>e.type==='land').length,1);assert.equal(run.phase,'playing');
 });
+
+
+test('locked exit hint clears when returning to the mission route',()=>{
+ const run=calm(0);run.player.x=LEVELS[0].exit.x;step(run,{});assert.match(run.prompt,/出口未解鎖/);
+ run.player.x=LEVELS[0].spawn.x;step(run,{});assert.equal(run.prompt,'');assert.equal(run.phase,'playing');
+});

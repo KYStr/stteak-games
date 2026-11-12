@@ -139,3 +139,51 @@ FXAAShader/Pass and the MIT notice ship locally.
 
 Original procedural art and score are in `src/models.js` and `src/audio.js`.
 Existing exported assets, notices and Three.js MIT license remain intact.
+
+Round 4 verification controls: `SIGNAL_ZERO_ACTION_TIMEOUT_MS` defaults to 120000
+and accepts an integer from 1000 to 600000. This controls action and capture
+budgets; it does not relax simulation coverage, resource gates or JS feedback
+latency. World captures use direct CDP pixels to avoid font/layout synchronization
+on paused WebGL scenes; one longer retry is allowed. Both attempts and the
+current screen/RAF/resources are recorded. A failed required capture still makes
+the release command fail. Independent scene, lifecycle, soak, output-audio and
+input-only scenario groups continue collecting evidence after another group fails.
+Only servers spawned by the command are terminated and awaited.
+
+The result-audio matrix disables music and checks both outcomes with positive
+SFX, master mute and SFX zero. It asserts oscillator creation and real nonzero
+analyser output, <=100 ms cue scheduling, stopped music transport, idle context
+suspension, and retry recovery. Fake-context units delay resume promises to check
+restart/blur/disposal cancellation and stale cue-tail suspension. The matrix uses
+labeled saves and keyboard traversal; the six-chapter campaign remains entirely
+input driven. Input-read-to-cue/effect JS timings are asserted separately from raw
+DOM-event-to-RAF queue delay (which includes shared software-render scheduling).
+
+HUD regression observes objective/key-hint mutations: unchanged values cause zero
+writes; movement, remapping, terminal/tool events, restart and restored checkpoints
+update persistent nodes. Performance profiles aggregate each application source
+location across all stacks and separate application, engine, discrete event/audio
+and explicit telemetry allocations. No full diagnostic/control export occurs
+inside either 20-second sample. Requested forced collections and traced natural
+GC events are reported separately. The real soak still spans >=180 seconds and
+includes restart; no shortened run qualifies as release evidence.
+
+The allocation report preserves residual V8 numeric boxing rather than labeling
+all sampled bytes as object creation. A separate ten-second allocation timeline
+records exact per-function allocation counts/bytes and retained node types after
+the timed soak. Steady input/physics/view helpers must allocate only scalar-sized
+values and retain no object/array/closure/string containers. Unchanged HUD and
+shader-key helpers additionally require zero sampled bytes. Browser RAF wrappers,
+JIT code, original audio envelopes, engine internals and changed display text are
+reported separately. This is not a claim of literally zero V8 number allocations.
+A failed initial software-WebGL context creation is recorded and retried once in
+a fresh browser, after closing the previous browser. Other errors remain failures.
+Recovery screens include their diagnostic message in the read-only control state.
+State waits use external polling, so virtual-clock fixtures cannot freeze their
+own readiness timers. Failed scenario groups retain their exact recovery message.
+The late-checkpoint victory fixture uses deterministic virtual-clock input stepping
+after all real-time scene/soak measurements finish. Its RAF probe is reattached to
+the installed scheduler, including after fixture reloads; context loss must still
+leave zero pending callbacks. Feedback probes use Playwright's preserved native
+performance clock when simulation time is virtual, so scheduling latency is not
+artificially reported as zero. The fresh six-chapter campaign remains input-only.

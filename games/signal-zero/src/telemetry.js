@@ -1,3 +1,5 @@
+// Native timestamp number boxing belongs to instrumentation, outside game state.
+export const clock=()=>performance.now();
 // Numeric history only; object serialization is reserved for explicit diagnostics.
 export class Samples {
  constructor(keys,capacity=3600){this.keys=keys;this.capacity=capacity;this.count=0;this.data=new Float64Array(capacity*keys.length);}
