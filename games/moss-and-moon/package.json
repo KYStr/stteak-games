@@ -9,7 +9,9 @@
     "test:unit": "node --test ../../tests/games/moss-and-moon/*.test.js",
     "test:profile": "node ../../tests/moss-and-moon/profile.mjs",
     "test:journey": "node ../../tests/moss-and-moon/campaign-bots.mjs",
-    "test:soak": "node ../../tests/moss-and-moon/stability.mjs"
+    "test:soak": "node ../../tests/moss-and-moon/stability.mjs",
+    "test:attribution": "node ../../tests/moss-and-moon/allocation-attribution.mjs",
+    "test:allocation-types": "node ../../tests/moss-and-moon/allocation-types.mjs"
   },
   "dependencies": {
     "three": "0.180.0"

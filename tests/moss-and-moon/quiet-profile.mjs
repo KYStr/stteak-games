@@ -1,77 +1,62 @@
-import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {writeFile,readFile} from 'node:fs/promises';
-import {performance} from 'node:perf_hooks';
-// No diagnostics/polling inside either 30-second measurement. CDP collects outside
-// the page heap; UI input is dispatched before sampling starts.
-export async function quietProfiles(page,cdp,artifacts) {
- const results=[];
+import {sampleQuietInterval} from './allocation-sampling.mjs';
+import {collectAllocationTypes} from './allocation-types-collector.mjs';
+import {allocationComparison,gate,intervalGates,referenceAllocationGate} from './allocation-gates.mjs';
+// No page diagnostics/polling within either 30-second sampling interval.
+// This function returns named gates; it never aborts independent budget checks.
+export async function quietProfiles(page,cdp,artifacts,source) {
+ const reference=JSON.parse(await readFile(new URL('./fixtures/numeric-path-reference.json',import.meta.url),'utf8'));
+ const results=[],gates=[];
  for(let interval=0;interval<2;interval++) {
-  await page.locator('#world').focus();await page.keyboard.down('d');
-  await page.waitForTimeout(3000);
-  await cdp.send('HeapProfiler.collectGarbage');
-  const before=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world);
-  const heapBefore=await cdp.send('Runtime.getHeapUsage');
-  const trace=[];const collect=event=>trace.push(...event.value);
-  cdp.on('Tracing.dataCollected',collect);
-  await cdp.send('Tracing.start',{categories:'v8,devtools.timeline,disabled-by-default-v8.gc',transferMode:'ReportEvents'});
-  await cdp.send('HeapProfiler.startSampling',{samplingInterval:512,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});
-  const start=performance.now();
-  let profile;
-  try {
-   await page.waitForTimeout(30000);
-   ({profile}=await cdp.send('HeapProfiler.stopSampling'));
-  } finally {await page.keyboard.up('d');}
-  const elapsedMs=performance.now()-start;
-  const complete=new Promise(resolve=>cdp.once('Tracing.tracingComplete',resolve));await cdp.send('Tracing.end');await complete;
-  cdp.off('Tracing.dataCollected',collect);
-  const heapEnd=await cdp.send('Runtime.getHeapUsage');
-  const after=await page.evaluate(()=>window.mossDiagnostics({summary:true}).world);
-  await cdp.send('HeapProfiler.collectGarbage');const retained=await cdp.send('Runtime.getHeapUsage');
-  await writeFile(`${artifacts}/quiet-${interval}-allocation.json`,JSON.stringify(profile));
-  await writeFile(`${artifacts}/quiet-${interval}-trace.json`,JSON.stringify({traceEvents:trace}));
-  const allocations=[];
-  function walk(n) {if(n.selfSize)allocations.push({bytes:n.selfSize,frame:n.callFrame});for(const c of n.children)walk(c);}
-  walk(profile.head);
-  const frames=after.activeRenderedFrames-before.activeRenderedFrames;
-  const app=allocations.filter(r=>r.frame.url.includes('/moss-and-moon/')&&!r.frame.url.includes('/vendor/'));
-  const diagnostics=app.filter(r=>/metrics|value|stats/.test(r.frame.functionName));
-  const recurring=app.filter(r=>!diagnostics.includes(r));
-  // The source audit below checks explicit storage/closure creation in these
-  // functions. Sampling does not identify types: native RAF bookkeeping and
-  // double boxing remain possible. Preserve all direct frame bytes for review.
-  const auditedFrame=recurring.filter(r=>['frame','blocked'].includes(r.frame.functionName));
-  const unknown=recurring.filter(r=>!auditedFrame.includes(r));
-  const minor=trace.filter(e=>e.name==='MinorGC'&&['X','B'].includes(e.ph)).length;
-  const major=trace.filter(e=>e.name==='MajorGC'&&['X','B'].includes(e.ph)).length;
-  const gcEventNames={};for(const e of trace)if(/GC/.test(e.name))gcEventNames[e.name]=(gcEventNames[e.name]||0)+1;
-  const total=rows=>rows.reduce((n,r)=>n+r.bytes,0);
-  const result={interval,elapsedMs,frames,before,after,heapBefore,heapEnd,retained,app,diagnostics,auditedFrame,unknown,
-   sampledAppBytes:total(app),frameBytesPerFrame:total(auditedFrame)/frames,
-   gcEventNames,minorGC:minor,majorGC:major,gcPerFrame:(minor+major)/frames,
-   threeBytes:total(allocations.filter(r=>r.frame.url.includes('/vendor/'))),instrumentationBytes:total(allocations.filter(r=>!r.frame.url.includes('/moss-and-moon/')))};
-  results.push(result);
+  const result=await sampleQuietInterval(page,cdp,artifacts,interval);results.push(result);
+  gates.push(...intervalGates(result));
+  // No function-name exemption for frame: its bytes, sample weights and live
+  // types are all examined below. Other recurring app stacks must be explained.
+  const unknown=result.app.filter(r=>r.frame.functionName!=='frame'||!r.frame.url.endsWith('/world.js'));
+  gates.push(gate(`interval-${interval}-unclassified-application-stacks`,unknown.length===0,{unknown}));
   await writeFile(artifacts+'/quiet-intervals.json',JSON.stringify(results,null,2));
-  assert.ok(frames>30,'quiet profile has active rendered frames');
-  assert.deepEqual(unknown,[],'no recurring application object/array allocation outside audited numeric updates');
-  assert.equal(after.staticStageRebuilds,before.staticStageRebuilds);
-  assert.equal(after.geometries,before.geometries);assert.equal(after.textures,before.textures);
-  assert.ok((retained.usedSize-heapBefore.usedSize)/heapBefore.usedSize<.10,'quiet interval retained heap <10%');
  }
- // Audit the actual shipped hot path alongside sampling. Reject new explicit
- // object/array/vector creation. Native numeric boxing is recorded, not hidden.
- const source=await readFile(new URL('../../public/games/moss-and-moon/world.js',import.meta.url),'utf8');
+ const [a,b]=results;
+ const legacyMargin=3*512*Math.sqrt((a.sampledAppBytes+b.sampledAppBytes)/512+1)/Math.min(a.frames,b.frames);
+ const legacyComparison={beforeBytesPerFrame:a.frameBytesPerFrame,afterBytesPerFrame:b.frameBytesPerFrame,
+  deltaBytesPerFrame:b.frameBytesPerFrame-a.frameBytesPerFrame,samplingMargin:legacyMargin,
+  pass:b.frameBytesPerFrame<=a.frameBytesPerFrame+legacyMargin,
+  beforeFrames:a.frames,afterFrames:b.frames,beforeElapsedMs:a.elapsedMs,afterElapsedMs:b.elapsedMs,
+  referenceOnly:true,reason:'Original fixed-512-byte uncertainty approximation; observed sample weights are variable.'};
+ await writeFile(artifacts+'/legacy-allocation-comparison.json',JSON.stringify(legacyComparison,null,2));
+ const comparison=allocationComparison(a,b);
+ await writeFile(artifacts+'/allocation-comparison.json',JSON.stringify(comparison,null,2));
+ // Preserve the temporal comparison as evidence. A/B/A controls reproduce
+ // their aggregate rate while individual intervals change with engine tiers.
+ // The release gate compares every interval to that recorded full-path control.
+ for(const interval of results)gates.push(referenceAllocationGate(interval,reference));
+ gates.push(gate('gc-rate-stability',b.gcPerFrame<=a.gcPerFrame+1/Math.min(a.frames,b.frames),{before:a.gcPerFrame,after:b.gcPerFrame}));
+ gates.push(gate('equal-interval-retained-heap',(b.retained.usedSize-a.retained.usedSize)/a.retained.usedSize<.10));
+ source??=await readFile(new URL('../../public/games/moss-and-moon/world.js',import.meta.url),'utf8');
+ gates.push(gate('classified-source-identity',createHash('sha256').update(source).digest('hex')===reference.source.sha256,
+  {expected:reference.source.sha256,actual:createHash('sha256').update(source).digest('hex')}));
  const frame=source.slice(source.indexOf('  function frame(now)'),source.indexOf('  frameRequest = requestAnimationFrame(frame); //'));
  const blocked=source.slice(source.indexOf('  function blocked('),source.indexOf('  function animate('));
- assert.ok(!/\bnew\s|\.map\(|\.filter\(|\.clone\(|\.toArray\(|Math\.hypot\(/.test(frame+blocked),'hot loop uses reusable storage and scalar collision arithmetic');
- assert.ok(!/path = \[\]/.test(frame),'hot path reuses route storage');
- assert.ok(!/(?:^|[=(:,?])\s*[\[{]/m.test(frame+blocked),'no object or array literals in hot updates');
- assert.ok(!/\bfunction\b|=>/.test(frame.slice(frame.indexOf('{')+1)),'no closures constructed inside frame');
- const [a,b]=results;
- // Sampling is stochastic: compare normalized rates with a Poisson margin based
- // on 512-byte samples. A newly recurring allocation still fails above by name.
- const samplingMargin=3*512*Math.sqrt((a.sampledAppBytes+b.sampledAppBytes)/512+1)/Math.min(a.frames,b.frames);
- assert.ok(b.frameBytesPerFrame<=a.frameBytesPerFrame+samplingMargin,'direct frame allocation/frame does not increase beyond sampling uncertainty');
- assert.ok(b.gcPerFrame<=a.gcPerFrame+1/Math.min(a.frames,b.frames),'no increasing GC/frame rate (one-event quantization)');
- assert.ok((b.retained.usedSize-a.retained.usedSize)/a.retained.usedSize<.10,'equal quiet intervals retained heap <10%');
- return {intervals:results,classification:'Direct frame samples do not identify object types. Native callback registration/numeric boxing is inferred from the storage/closure source audit, not proved by sampling alone.',assessment:'No explicit recurring application storage construction; residual frame attribution retained; equal-interval GC, heap and residency gates passed.',samplingMargin};
+ // Supplemental source checks, NOT proof of the allocation types. All direct
+ // allocation bytes stay in the rate gate and independent type collection.
+ const storage=/\bnew\s|\.map\(|\.filter\(|\.clone\(|\.toArray\(|Math\.hypot\(/.test(frame+blocked)||
+  /path = \[\]/.test(frame)||/(?:^|[=(:,?])\s*[\[{]/m.test(frame+blocked)||/\bfunction\b|=>/.test(frame.slice(frame.indexOf('{')+1));
+ gates.push(gate('application-storage-construction',!storage));
+ let types;
+ try {
+  types=await collectAllocationTypes(page,cdp,source,artifacts);
+  // V8's number/hidden/code nodes are engine storage. A JS object, array,
+  // closure, or string at the direct update site is application churn, even if
+  // retained heap plateaus. The negative ring control exercises this gate.
+  const applicationTypes=types.directFrameNodes.filter(n=>!['number','hidden','code','native'].includes(n.type));
+  gates.push(gate('direct-frame-live-application-allocation',applicationTypes.length===0,{applicationTypes,
+   observedTypes:[...new Set(types.directFrameNodes.map(n=>n.type))]}));
+  gates.push(gate('allocation-type-collection-valid',types.snapshotNodeCount>0,
+   {snapshotNodes:types.snapshotNodeCount,trackedFrameTraces:types.trackedFrameTraceCount,liveDirectNodes:types.directFrameNodes.length}));
+ }catch(error){gates.push(gate('allocation-types-collection',false,{message:String(error)}));}
+ const result={intervals:results,gates,comparison,legacyComparison,reference,types,
+  classification:'Sampling totals include V8/Three.js work and do not identify collected object types. A separate allocation-tracked snapshot without a debugger breakpoint types surviving direct allocations; source checks and unknown-stack gates supplement that limited coverage. Minimal renderer controls and subsystem A/B/A evidence are documented in docs/moss-and-moon-round5.md. No zero-total-allocation claim.',
+  assessment:gates.every(g=>g.pass)?'All named allocation, type, GC, heap and residency gates passed.':'See named failed gates; independent resource measurements continue.'};
+ await writeFile(artifacts+'/allocation-gates.json',JSON.stringify(result,null,2));return result;
 }

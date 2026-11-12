@@ -1,0 +1,53 @@
+{
+  "provenance": "Round 5 controlled unchanged baseline and restored-baseline, all original raw profiles and source retained in round workspace. No failed/repeated interval excluded. Same full game source before and after renderer ablation. Numeric-path source/type evidence and minimal Three control are documented in docs/moss-and-moon-round5.md.",
+  "source": {
+    "name": "baseline",
+    "sha256": "3e4dae70724c2f2aa284fa6aae8cc2fedfa85b545bf3c7438682d097a63be8fc",
+    "bytes": 53010,
+    "sourceFile": "/workspace/stteak8/work/moss-and-moon/rounds/r5/attribution-initial/attribution/baseline/world.mjs"
+  },
+  "records": [
+    {
+      "variant": "baseline",
+      "interval": 0,
+      "frames": 639,
+      "elapsedMs": 30067.867975,
+      "frameBytesPerFrame": 388.67605633802816,
+      "directStandardError": 41.92577555549826,
+      "directSampleCount": 324,
+      "directSampleSquaredBytes": 717734672
+    },
+    {
+      "variant": "baseline",
+      "interval": 1,
+      "frames": 520,
+      "elapsedMs": 30050.515995,
+      "frameBytesPerFrame": 418.7076923076923,
+      "directStandardError": 22.779759779710183,
+      "directSampleCount": 395,
+      "directSampleSquaredBytes": 140315280
+    },
+    {
+      "variant": "baseline-restored",
+      "interval": 0,
+      "frames": 525,
+      "elapsedMs": 30057.13666800002,
+      "frameBytesPerFrame": 253.12,
+      "directStandardError": 20.76897040103997,
+      "directSampleCount": 228,
+      "directSampleSquaredBytes": 118890880
+    },
+    {
+      "variant": "baseline-restored",
+      "interval": 1,
+      "frames": 475,
+      "elapsedMs": 30043.288992999995,
+      "frameBytesPerFrame": 566.0042105263158,
+      "directStandardError": 55.47004897706514,
+      "directSampleCount": 381,
+      "directSampleSquaredBytes": 694231504
+    }
+  ],
+  "browser": "Google Chrome 156.0.8078.47",
+  "three": "180"
+}

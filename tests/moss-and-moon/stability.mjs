@@ -2,7 +2,8 @@ import {installGeometryTracker,residencyDelta} from './geometry-tracker.mjs';
 import {activate,settledTravel} from './interactions.mjs';
 import { chromium } from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
 import assert from 'node:assert/strict';
-import { mkdir, writeFile, access } from 'node:fs/promises';
+import { mkdir, writeFile, access, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import os from 'node:os';
 import { base, ensureServer } from './server.mjs';
@@ -16,6 +17,9 @@ await access(backup); // Earned by the UI campaign, never a synthetic winning st
 await mkdir(artifacts, { recursive:true });
 let browser, server;
 const errors = [], failed = [], report = { timestamp:new Date().toISOString(), durationTargetMs:duration };
+const harnessSource=await readFile(new URL(import.meta.url),'utf8');
+report.harnessSha256=createHash('sha256').update(harnessSource).digest('hex');
+await writeFile(artifacts+'/stability-source.mjs',harnessSource);
 try {
   server = await ensureServer();
   browser = await chromium.launch({executablePath:'/usr/bin/google-chrome',args:[
@@ -158,11 +162,17 @@ try {
     fullCursor=d.world.activeRenderedFrames;
   };
   let n=0;
-  while(performance.now()-start<duration) {
+  const viewportSamples=width=>segments.reduce((count,s)=>count+(s.viewport.width===width?s.samples.length:0),0);
+  // A host interruption can consume the full time budget in the first segment.
+  // Still render both required viewports; never fabricate or omit their samples.
+  while(performance.now()-start<duration ||
+    viewportSamples(1280)<=30 || viewportSamples(1920)<=30) {
     const viewport=n%2 ? {width:1920,height:1080} : {width:1280,height:720};
     await page.setViewportSize(viewport);
     await page.waitForTimeout(1500);
-    segments.push(await measureMovement(page,Math.min(15000,Math.max(2000,duration-(performance.now()-start)))));
+    const segmentMs=viewportSamples(viewport.width)<=30 ? 15000 :
+      Math.min(15000,Math.max(2000,duration-(performance.now()-start)));
+    segments.push(await measureMovement(page,segmentMs));
     // Exercise repeated suspend/gesture recovery during the monotonic run.
     await page.evaluate(()=>window.__audioContexts[0].suspend());
     await page.keyboard.press('1');
@@ -201,6 +211,8 @@ try {
   assert.ok(canonicalAfter.activeRenderedFrames>canonicalBefore.activeRenderedFrames);
   assert.equal(after.runtime.pendingFrames,1); assert.equal(before.runtime.pendingFrames,1);
   assert.equal(after.dom.jsEventListeners,before.dom.jsEventListeners);
+  assert.deepEqual(report.residencyDelta.addedIds,[],'same warmed geometry identities after restart/import');
+  assert.deepEqual(report.residencyDelta.removedIds,[],'warmed geometry identities remain resident');
   // DOM wrapper totals are retained for reference; live listener/RAF/GPU residency is gated.
   assert.ok(after.runtime.diagnostics.world.geometries<=before.runtime.diagnostics.world.geometries,"no geometry residency growth");
   assert.ok(after.runtime.diagnostics.world.textures<=before.runtime.diagnostics.world.textures,"no texture residency growth");
