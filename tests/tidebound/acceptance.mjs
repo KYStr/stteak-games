@@ -1,6 +1,8 @@
 import {writeFileSync} from 'node:fs';
 import {driveDive} from './dive-pilot.mjs';
 import {assertBudgets} from './performance-budget.mjs';
+import {auditHotContainers,summarizeAllocations,assertAllocationWindows} from './allocation-audit.mjs';
+import {build} from '../../games/tidebound/node_modules/esbuild/lib/main.js';
 // Real browser inputs drive the short commission. Save fixtures separately cover dive/endgame recovery.
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
@@ -10,11 +12,12 @@ import {availableParallelism} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {runRegressions} from './regressions.mjs';
 import {runStory} from './story.mjs';
+import {runBots} from './bots.mjs';
 import {createState,depart,dock,interact,startDive,serialize} from '../../games/tidebound/src/rules.js';
 import {ISLANDS,DIVE_SITES} from '../../games/tidebound/src/world.js';
 const {chromium}=await import('/workspace/stteak8/tools/node_modules/playwright-core/index.mjs');
 const scenario=process.env.TIDEBOUND_SCENARIO||'all';if(!['all','smoke','regressions','story','performance'].includes(scenario))throw Error('Invalid TIDEBOUND_SCENARIO');
-const port=Number(process.env.TIDEBOUND_PORT??8128);if(!Number.isInteger(port)||port<1024||port>65535)throw Error('TIDEBOUND_PORT must be an integer from 1024 to 65535');
+const port=Number(process.env.TIDEBOUND_PORT??8108);if(!Number.isInteger(port)||port<1024||port>65535)throw Error('TIDEBOUND_PORT must be an integer from 1024 to 65535');
 const root=fileURLToPath(new URL('../../',import.meta.url)),base=`http://127.0.0.1:${port}/games/tidebound/`;
 const output=process.env.TIDEBOUND_ARTIFACTS||fileURLToPath(new URL('../../games/tidebound/test-results/',import.meta.url));await mkdir(output,{recursive:true});
 async function bounded(promise,label,ms=120000){let timer;try{return await Promise.race([promise,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error(label+' exceeded '+ms+'ms')),ms))]);}finally{clearTimeout(timer);}}
@@ -24,18 +27,19 @@ try{
   let existing=false;try{const response=await fetch(base);if(!response.ok||!(await response.text()).includes('逐潮'))throw Error('Port is serving a different application');existing=true}catch(e){if(e.message.includes('different application'))throw e;}
   if(!existing){server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',root+'public'],{stdio:'ignore'});for(let i=0;i<50;i++){try{if((await fetch(base)).ok)break}catch{}await new Promise(r=>setTimeout(r,100));}}
   report.serverPid=server?.pid||null;console.log('Owned server PID',report.serverPid);
-  browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
-  report.networkFailures=[];async function newPageForPhase(label){report.phase=label;console.log('PHASE',label);if(page)await bounded(page.context().close(),'close previous context',30000);
+  browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+  report.networkFailures=[];async function newPageForPhase(label,{native=false}={}){report.phase=label;console.log('PHASE',label);if(page)await bounded(page.context().close(),'close previous context',30000);
 const context=await browser.newContext({viewport:{width:1280,height:720}});page=await bounded(context.newPage(),'new page');const evaluate=page.evaluate.bind(page);page.evaluate=(...args)=>bounded(evaluate(...args),'page.evaluate '+String(args[0]).slice(0,80),600000);page.setDefaultTimeout(120000);page.setDefaultNavigationTimeout(120000);
   page.on('console',m=>{if(m.type()==='error')report.errors.push({text:m.text(),location:m.location(),url:page.url(),timestamp:Date.now()})});page.on('pageerror',e=>report.errors.push(e.message));page.on('requestfailed',r=>report.requests.push(r.url()+': '+r.failure()?.errorText));page.on('response',r=>{if(r.status()>=400)report.requests.push(r.status()+': '+r.url())});
+  if(native)await page.addInitScript(()=>{const original=WebGL2RenderingContext.prototype.getParameter;WebGL2RenderingContext.prototype.getParameter=function(parameter){return parameter===37446?'QA native renderer':original.call(this,parameter);};});
   await page.addInitScript(()=>{
     if(sessionStorage.getItem('tidebound.test.fresh')){localStorage.clear();sessionStorage.removeItem('tidebound.test.fresh');}
     const fixture=sessionStorage.getItem('tidebound.test.fixture');if(fixture!==null){localStorage.setItem('stteak.tidebound.save.v1',fixture);sessionStorage.removeItem('tidebound.test.fixture');}
-    window.__testAudio=[];window.__qa={sources:[],raf:new Set(),pointer:null,pageShows:[]};
+    window.__testAudio=[];window.__qa={sources:[],raf:new Set(),pointer:null,pageShows:[],inputs:[]};
     const raf=window.requestAnimationFrame.bind(window),cancel=window.cancelAnimationFrame.bind(window);window.__nativeRAF=raf;
     window.requestAnimationFrame=cb=>{const id=raf(t=>{__qa.raf.delete(id);cb(t)});__qa.raf.add(id);return id};window.cancelAnimationFrame=id=>{__qa.raf.delete(id);cancel(id)};
     const C=window.AudioContext;window.AudioContext=class extends C{constructor(...args){super(...args);window.__testAudio.push(this)}createBufferSource(){const s=super.createBufferSource(),start=s.start;s.start=function(...a){__qa.sources.push({loop:s.loop,sound:s.sound,time:performance.now()});return start.apply(s,a)};return s}};
-    document.addEventListener('keydown',()=>__qa.lastInputAt=performance.now(),true);document.addEventListener('click',()=>__qa.lastInputAt=performance.now(),true);
+    document.addEventListener('keydown',e=>{__qa.lastInputAt=performance.now();__qa.inputs.push({kind:'key',key:e.key,time:__qa.lastInputAt});},true);document.addEventListener('click',e=>{__qa.lastInputAt=performance.now();__qa.inputs.push({kind:'click',id:e.target.id,time:__qa.lastInputAt});},true);
     window.addEventListener('pointerdown',e=>__qa.pointer=e.pointerId,true);window.addEventListener('pageshow',e=>__qa.pageShows.push(e.persisted));
   });
   const network=await page.context().newCDPSession(page);await network.send('Network.enable');network.on('Network.loadingFailed',e=>report.networkFailures.push(e));network.on('Network.responseReceived',e=>{if(e.response.status>=400)report.networkFailures.push({url:e.response.url,status:e.response.status,type:e.type})});
@@ -44,6 +48,17 @@ await page.bringToFront();}
   const load=async()=>{report.initialization={navigationStart:Date.now()};await page.goto(base,{waitUntil:'domcontentloaded'});report.initialization.domReady=Date.now();await page.waitForFunction(()=>window.tidebound);report.initialization.gameReady=Date.now();};const snapshot=()=>page.evaluate(()=>tidebound.snapshot());const metrics=()=>page.evaluate(()=>tidebound.metrics());
   await load();assert.equal((await metrics()).audio.context,'locked');assert.equal(report.errors.length,0);await page.screenshot({path:output+'/harbor-1280.png'});check('clean load; sound locked before gesture; visible launch');
   async function fixture(state){await page.evaluate(raw=>sessionStorage.setItem('tidebound.test.fixture',raw),serialize(state));await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.tidebound);}
+  if(['all','smoke','regressions'].includes(scenario)){
+   report.coldGestures=[];
+   for(let trial=0;trial<3;trial++){
+    await newPageForPhase('cold-normal-autoplay-'+trial);const cdp=await page.context().newCDPSession(page);await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});await load();
+    assert.equal((await metrics()).audio.context,'locked');assert.equal((await metrics()).audio.loaded,9);assert.equal(await page.evaluate(()=>__qa.sources.length),0);
+    await page.click('#depart');await page.keyboard.down('w');await page.waitForFunction(()=>tidebound.snapshot().boat.sail>0);await page.keyboard.up('w');
+    const data=await page.evaluate(()=>{const click=__qa.inputs.find(e=>e.id==='depart'),key=__qa.inputs.find(e=>e.key==='w'),sails=__qa.sources.filter(e=>e.sound==='sail'&&!e.loop);return{click,key,sails,departureDelay:sails.find(e=>e.time>=click.time)?.time-click.time,keyDelay:sails.find(e=>e.time>=key.time)?.time-key.time,visualDelay:Number(document.querySelector('#sail-label').dataset.cueAt)-key.time,audio:tidebound.metrics().audio,wavRequests:performance.getEntriesByType('resource').filter(r=>r.name.endsWith('.wav')).map(r=>r.name)}});
+    report.coldGestures.push(data);assert.ok(data.departureDelay>=0&&data.departureDelay<=100,JSON.stringify(data));assert.ok(data.keyDelay>=0&&data.keyDelay<=100,JSON.stringify(data));assert.ok(data.visualDelay>=0&&data.visualDelay<=100);assert.equal(data.wavRequests.length,9);assert.equal(new Set(data.wavRequests).size,9);
+   }
+   check('three uncached normal-autoplay launches: silent preparation, cold departure and W feedback within 100ms');await newPageForPhase('initial-after-cold');await load();
+  }
   if(['all','smoke'].includes(scenario)){
   await page.selectOption('#contract','gull-watch');await page.click('#depart');await page.waitForFunction(()=>tidebound.metrics().audio.loaded===9);assert.equal((await metrics()).audio.loops,2);report.coldAudio=await page.evaluate(()=>({gestureToReadyMs:performance.now()-__qa.lastInputAt,firstActionSource:__qa.sources.find(s=>!s.loop),loaded:tidebound.metrics().audio.loaded}));check('start unlocks nine local sounds and two ambient loops');
   // Keyboard movement and barrier semantics.
@@ -69,15 +84,24 @@ await page.bringToFront();}
   }
   if(['all','story'].includes(scenario)){await newPageForPhase('story');await load();await runStory({page,base,output,report,check,fresh:true});}
   if(['all','regressions'].includes(scenario)){await newPageForPhase('regressions');await load();await runRegressions({page,base,output,report,check});}
+  if(scenario==='all'){await newPageForPhase('bots');await load();await runBots({page,fixture,snapshot,metrics,report,check});}
+  if(['all','regressions','performance'].includes(scenario)){
+   await newPageForPhase('standard-renderer-branch',{native:true});await load();assert.equal((await metrics()).renderer.software,false);await page.waitForFunction(()=>tidebound.metrics().renderer.frames>0);
+   report.standardRenderer=[];for(const label of ['harbor','celebration']){if(label==='celebration'){const s=createState();s.parts=DIVE_SITES.map(s=>s.partId);s.lighthouseFixed=true;depart(s);await fixture(s);await page.click('#continue-voyage');await page.keyboard.press('e');await page.waitForFunction(()=>tidebound.metrics().renderer.celebration.visible&&tidebound.metrics().renderer.celebration.confetti);}
+    const m=await metrics();assert.equal(m.renderer.software,false);const updateP95=assertBudgets({renderer:m.renderer,cpu:m.cpu,textureBytes:m.renderer.textureBytesUpperBound,transferBytes:await page.evaluate(()=>performance.getEntriesByType('resource').reduce((sum,r)=>sum+r.transferSize,0))});report.standardRenderer.push({label,...m,updateP95});await page.screenshot({path:output+'/standard-'+label+'.png'});
+   }check('standard shadow/batching branch remains within hardware-independent budgets (actual SwiftShader)');
+  }
   if(['all','performance'].includes(scenario)){
   await newPageForPhase('performance');await load();
+  const sources=Object.fromEntries(await Promise.all(['main.js','rules.js','scene.js'].map(async file=>[file,await readFile(root+'games/tidebound/src/'+file,'utf8')])));report.hotContainerAudit=auditHotContainers(sources);
+  const mapped=await build({entryPoints:[root+'games/tidebound/src/main.js'],bundle:true,minify:true,format:'esm',target:'es2022',legalComments:'eof',sourcemap:'external',outfile:root+'public/games/tidebound/game.js',write:false});assert.equal(mapped.outputFiles.find(f=>f.path.endsWith('game.js')).text,await readFile(root+'public/games/tidebound/game.js','utf8'));const allocationMap=JSON.parse(mapped.outputFiles.find(f=>f.path.endsWith('.map')).text);await writeFile(output+'/allocation-source-map.json',JSON.stringify(allocationMap));
   const cdp=await page.context().newCDPSession(page);await cdp.send('Performance.enable');async function memory(){await cdp.send('HeapProfiler.collectGarbage');const m=Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map(v=>[v.name,v.value]));return{heap:m.JSHeapUsedSize,nodes:m.Nodes,listeners:m.JSEventListeners,renderer:(await metrics()).renderer};}
   async function soakCase(label,duration){
     await page.waitForTimeout(3000);const before=await memory();const trace=[];const collect=e=>trace.push(...e.value);cdp.on('Tracing.dataCollected',collect);await cdp.send('Tracing.start',{categories:'v8',options:'record-as-much-as-possible'});await cdp.send('HeapProfiler.startSampling',{samplingInterval:65536,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});console.log(`Performance ${label} ${duration/1000}s…`);
     await page.evaluate(()=>{window.__frameTimes=[];let last=performance.now();window.__perfStop=false;function sample(now){if(window.__perfStop)return;window.__frameTimes.push(now-last);last=now;window.__nativeRAF(sample)}window.__nativeRAF(sample)});
     for(let elapsed=0;elapsed<duration;elapsed+=15000){await page.waitForTimeout(Math.min(15000,duration-elapsed));console.log(label,Math.min(duration,elapsed+15000)/1000,'seconds');if(label==='fresh stationary sailing'&&elapsed>=duration/2&&!report.soakRestart){await page.keyboard.press('Escape');await page.click('#restart-button');await page.click('#confirm-restart');await page.click('#depart');report.soakRestart=true;}}
     const perf=await page.evaluate(()=>{window.__perfStop=true;const a=window.__frameTimes.sort((a,b)=>a-b);return{frames:a.length,average:a.reduce((s,n)=>s+n,0)/a.length,p95:a[Math.floor(a.length*.95)],cpu:tidebound.metrics().cpu}});const after=await memory();
-    const profile=await cdp.send('HeapProfiler.stopSampling');const tracingDone=new Promise(resolve=>cdp.once('Tracing.tracingComplete',resolve));await cdp.send('Tracing.end');await tracingDone;cdp.off('Tracing.dataCollected',collect);const filename=label.replaceAll(' ','-');await writeFile(output+'/'+filename+'-allocations.json',JSON.stringify(profile));const gc=trace.filter(e=>/MinorGC|MajorGC/.test(e.name));await writeFile(output+'/'+filename+'-gc.json',JSON.stringify(gc));const result={label,...perf,before,after,gcEvents:gc.length,allocationProfile:filename+'-allocations.json'};report.performance??=[];report.performance.push(result);await writeFile(output+'/acceptance.json',JSON.stringify(report,null,2));
+    const profile=await cdp.send('HeapProfiler.stopSampling');const tracingDone=new Promise(resolve=>cdp.once('Tracing.tracingComplete',resolve));await cdp.send('Tracing.end');await tracingDone;cdp.off('Tracing.dataCollected',collect);const filename=label.replaceAll(' ','-');await writeFile(output+'/'+filename+'-allocations.json',JSON.stringify(profile));const gc=trace.filter(e=>/MinorGC|MajorGC/.test(e.name));await writeFile(output+'/'+filename+'-gc.json',JSON.stringify(gc));const result={label,...perf,before,after,gcEvents:gc.filter(e=>e.ph==='X'||e.ph==='B').length,allocationProfile:filename+'-allocations.json',allocations:summarizeAllocations(profile,allocationMap,perf.frames)};report.performance??=[];report.performance.push(result);await writeFile(output+'/acceptance.json',JSON.stringify(report,null,2));
     assert.ok((after.heap-before.heap)/before.heap<.10,`heap growth ${((after.heap-before.heap)/before.heap*100).toFixed(2)}% exceeds 10%`);assert.equal(after.listeners,before.listeners);assert.ok(after.nodes-before.nodes<80);assert.ok(after.renderer.geometries<=before.renderer.geometries+2,'unbounded GPU geometry growth');assert.equal(after.renderer.sceneMeshes,before.renderer.sceneMeshes);assert.equal(after.renderer.textures,before.renderer.textures);assert.equal(await page.evaluate(()=>__qa.raf.size),1);
     check(label+': measured frame times, bounded memory/resources, one game RAF');return result;
   }
@@ -88,6 +112,8 @@ await page.bringToFront();}
   await page.keyboard.press('Escape');await page.click('#restart-button');await page.click('#confirm-restart');await page.waitForTimeout(3000);await page.click('#depart');report.restartWarmup=true;
   const soak=Number(process.env.TIDEBOUND_SOAK_MS||180000);await soakCase('fresh stationary sailing',soak);
   await page.evaluate(()=>{window.__testLoss=document.querySelector('#sea').getContext('webgl2').getExtension('WEBGL_lose_context');__testLoss.loseContext()});await page.waitForFunction(()=>tidebound.metrics().contextLost);await page.waitForTimeout(500);await page.evaluate(()=>__testLoss.restoreContext());await page.waitForFunction(()=>!tidebound.metrics().contextLost);await page.keyboard.press('Escape');await soakCase('restored stationary sailing',soak);
+  for(const window of report.performance.slice(0,2)){assert.ok(window.gcEvents>0,'GC tracing must contain actual collections');assert.ok(window.allocations.applicationBytes>0&&window.allocations.engineBytes>0,'allocation map must attribute both application and engine samples');}
+  report.allocationGate=assertAllocationWindows(report.performance[0],report.performance[1],report.hotContainerAudit);check('no recurring application hot-path containers; equal-window normalized GC rate stable');
   await page.setViewportSize({width:1920,height:1080});await soakCase('1920 stationary sailing',15000);await page.screenshot({path:output+'/performance-1920.png'});await page.setViewportSize({width:1280,height:720});
   const dive=createState();depart(dive);Object.assign(dive.boat,ISLANDS.find(i=>i.id==='coral').dock);dock(dive);startDive(dive,'coral-dive');await fixture(dive);await page.click('#continue-voyage');await soakCase('representative stationary dive',15000);
   const late=createState();late.parts=DIVE_SITES.map(s=>s.partId);late.lighthouseFixed=true;depart(late);await fixture(late);await page.click('#continue-voyage');await page.keyboard.press('Escape');await page.selectOption('#quality','high');await page.keyboard.press('Escape');await page.keyboard.press('e');await soakCase('high quality homecoming shadow and celebration',15000);await page.screenshot({path:output+'/high-celebration-1920.png'});

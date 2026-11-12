@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createState,depart,dock,startDive,interact,step,surface,restore,serialize,collectObservation,sampleTideInto,tideAt,currentAt,currentAtInto} from '../../games/tidebound/src/rules.js';
-import {DIVE_SITES,STORY_STAGES,ISLANDS,voyageVariant,diveStage,diveTarget} from '../../games/tidebound/src/world.js';
+import {DIVE_SITES,STORY_STAGES,ISLANDS,voyageVariant,diveStage,diveTarget,guardianInto} from '../../games/tidebound/src/world.js';
 import {completeDive} from './pilot-rules.mjs';
 function enter(seed,index=0){let s=createState(seed);depart(s);s.parts=STORY_STAGES.slice(0,index).map(s=>s.partId);const site=DIVE_SITES.find(s=>s.id===STORY_STAGES[index].siteId);Object.assign(s.boat,ISLANDS.find(i=>i.id===site.islandId).dock);dock(s);startDive(s,site.id);return s;}
 test('later challenges explain prerequisite; original schema-one parts unlock their saved tasks',()=>{let s=createState();depart(s);Object.assign(s.boat,ISLANDS.find(i=>i.id==='ruin').dock);dock(s);assert.equal(startDive(s,'ruin-dive')[0].type,'info');assert.equal(s.mode,'island');s.parts=['gear'];let r=restore(serialize(s)).state;assert.equal(r.diveTasks['ruin-dive'].opened,true);assert.equal(r.diveTasks['ruin-dive'].completedStationIds.length,4);});
@@ -10,3 +10,14 @@ test('stations cannot be skipped and E repeat is idempotent; every intermediate 
 test('supply warns at 120/60/15, idling rescues exactly once, relaxed sailing has no pressure',()=>{let s=createState();depart(s);s.supplyRemaining=121;const warnings=[];for(let i=0;i<1220;i++)warnings.push(...step(s,.1));assert.equal(s.records.rescues,1);assert.ok(warnings.filter(e=>e.type==='warning'&&e.text.includes('遠航補給')).length===3);let r=createState();r.difficulty='relaxed';depart(r);for(let i=0;i<1000;i++)step(r,1);assert.equal(r.records.rescues,0);assert.equal(r.supplyRemaining,900);});
 test('restore validates optional state and defaults old saves without discarding discoveries',()=>{let s=createState();s.discoveries=['tern'];s.diveTasks={'coral-dive':{completedStationIds:['bad','coral-dive-0','coral-dive-0'],opened:true}};s.supplyRemaining=-1;s.difficulty='bogus';let r=restore(serialize(s)).state;assert.deepEqual(r.diveTasks['coral-dive'].completedStationIds,['coral-dive-0']);assert.equal(r.diveTasks['coral-dive'].opened,false);assert.equal(r.supplyRemaining,0);assert.equal(r.difficulty,'standard');delete s.diveTasks;delete s.supplyRemaining;r=restore(serialize(s)).state;assert.equal(r.supplyRemaining,900);assert.deepEqual(r.discoveries,['tern']);});
 test('physics output arrays and scalar sampling reuse storage and match public helpers',()=>{let s=createState();depart(s);const events=[],out={},current={};assert.equal(step(s,.1,{},events),events);for(let i=0;i<100;i++){const t=i*2.3;assert.equal(sampleTideInto(t,out),out);assert.equal(out.height,tideAt(t).height);assert.deepEqual(currentAtInto(-50,-10,t,1,current),currentAt(-50,-10,t,1));}});
+test('guardian grants saved two-second entry grace at every compulsory overlap phase',()=>{
+ for(const seed of [1,3])for(const phase of [0,3.9,4,4.1]){
+  let s=enter(seed,2);s.time=phase-(seed===3?2:0)+8;assert.equal(s.guardianCooldown,2);
+  let events=step(s,.5);assert.ok(!events.some(e=>e.text?.includes('氧氣 -4')));s=restore(serialize(s)).state;assert.ok(Math.abs(s.guardianCooldown-1.5)<1e-6);
+  events=step(s,1.49);assert.ok(!events.some(e=>e.text?.includes('氧氣 -4')));assert.ok(Math.abs(s.oxygen-43.01)<1e-6);assert.ok(s.guardianCooldown>0&&s.guardianCooldown<.011);
+  // Hazard is still active after grace: canonical entry overlaps time zero.
+  s.time=0;s.guardianCooldown=0;const site=DIVE_SITES.find(d=>d.id==='ruin-dive');const angle=(seed===3?2:0)/8*Math.PI*2;s.diver={x:site.entry.x+Math.sin(angle)*10,z:site.entry.z+Math.cos(angle)*7};
+  // Explicit hazardous centre from the production scalar sampler.
+  const point={};guardianInto(0,site,point,s.voyage.variantId);s.diver={x:point.x,z:point.z};const before=s.oxygen;events=step(s,.01);assert.ok(events.some(e=>e.text?.includes('氧氣 -4')));assert.ok(Math.abs(s.oxygen-(before-4.01))<1e-6);assert.equal(s.guardianCooldown,2);assert.ok(!step(s,.1).some(e=>e.text?.includes('氧氣 -4')));
+ }
+});

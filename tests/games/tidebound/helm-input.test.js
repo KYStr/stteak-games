@@ -16,7 +16,7 @@ function harness(){
  let throwRelease=false,throwCapture=false;
  const helm={style,attributes,setAttribute(k,v){attributes[k]=v},setPointerCapture(id){if(throwCapture)throw Error('inactive pointer');capture.add(id)},hasPointerCapture:id=>capture.has(id),releasePointerCapture(id){released.push(id);capture.delete(id);if(throwRelease)throw Error('capture already ended');this.onlostpointercapture?.({pointerId:id})},getBoundingClientRect:()=>({left:10,top:20,width:100,height:100})};
  const knob={style:{setProperty(k,v){this[k]=v}}};
- const context={pendingInputAt:-1,paused:false,overlay:null,phase:'running',window:new EventTarget(),document:{createElement:()=>helm,querySelectorAll:()=>[]},__tideClock:{reset(){}},__tideInput(){},steer:{prepend(){}},$:selector=>selector==='#helm'?helm:knob,input(){},unlock(){},__tideEligible:()=>true,audio:{play(){}},flashControl(){},pause(){context.paused=true},console};
+ const context={pendingInputAt:-1,paused:false,overlay:null,phase:'running',window:new EventTarget(),document:{createElement:()=>helm,querySelectorAll:()=>[]},__tideClock:{reset(){}},physicsScheduler:{invalidate(){}},__tideInput(){},steer:{prepend(){}},$:selector=>selector==='#helm'?helm:knob,input(){},unlock(){},__tideEligible:()=>true,audio:{play(){}},flashControl(){},pause(){context.paused=true},console};
  vm.createContext(context);vm.runInContext(state+clear+binding+blur+'\nglobalThis.snapshot=()=>({owner:helmPointer,x:helmInput.x,y:helmInput.y});globalThis.clear=clearInput;',context);
  const send=(type,id,x=92,y=70)=>{let prevented=false;helm['on'+type]({pointerId:id,clientX:x,clientY:y,preventDefault(){prevented=true}});return prevented};
  return{helm,context,knob,attributes,capture,released,send,state:()=>context.snapshot(),clear:()=>context.clear(),failRelease(){throwRelease=true},failCapture(value=true){throwCapture=value}};
@@ -66,7 +66,7 @@ test('held action never survives failed pointer capture',()=>{const h=heldHarnes
 test('lifecycle clear releases held captures 31 and 257 on their actual buttons',()=>{
  const h=heldHarness(),source=readFileSync(new URL('../../../games/tidebound/src/main.js',import.meta.url),'utf8');
  const a=source.indexOf('function clearInput(){'),b=source.indexOf('function notify(',a);
- Object.assign(h.c,{keys:new Set(),orbitPointer:null,helmInput:{x:0,y:0},helmPointer:null,__tideClock:{reset(){}},$:()=>({style:{setProperty(){}},setAttribute(){}})});
+ Object.assign(h.c,{keys:new Set(),orbitPointer:null,helmInput:{x:0,y:0},helmPointer:null,__tideClock:{reset(){}},physicsScheduler:{invalidate(){}},$:()=>({style:{setProperty(){}},setAttribute(){}})});
  vm.runInContext(source.slice(a,b)+';globalThis.clear=clearInput',h.c);
  h.send(0,'pointerdown',31);h.send(1,'pointerdown',257);h.c.clear();assert.equal(h.c.holds.size,0);assert.equal(h.c.holdOwners.size,0);assert.equal(h.buttons[0].capture.size,0);assert.equal(h.buttons[1].capture.size,0);
 });

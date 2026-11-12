@@ -2,7 +2,7 @@ import {completeDive} from '../../tidebound/pilot-rules.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, REEFS, WHIRLS, CURRENTS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, TIDE_PERIOD, STORY_STAGES } from '../../../games/tidebound/src/world.js';
-import { CREDITS_DESCRIPTION, createState, tideAt, currentAt, whirlActive, step, depart, dock, interact, startDive, surface, rescue, advanceTide, serialize, restore, contractProgress, nextObjective, nearestObservation, collectObservation, skipObservation, nearestRouteChoice, chooseRoute, activeNavigation, cancelRoute } from '../../../games/tidebound/src/rules.js';
+import { CREDITS_DESCRIPTION, createState, tideAt, currentAt, whirlActive, step, depart, dock, interact, startDive, surface, rescue, advanceTide, serialize, restore, contractProgress, nextObjective, nearestObservation, collectObservation, skipObservation, nearestRouteChoice, compileRouteChoices, chooseRoute, activeNavigation, cancelRoute } from '../../../games/tidebound/src/rules.js';
 import { measureFirst } from './maker-pacing.mjs';
 import { simulateReturn, simulateBranch, simulateCompleteLeg, crossingLegs, startLeg } from './maker-0011-navigation.mjs';
 
@@ -695,20 +695,20 @@ test('direction metadata uses finite geometry, safe fallbacks and a distance bou
   try {
     for (const malformed of [null, [], 'bad', { x: '64', z: 35, radius: 17 }, { x: 64, z: 35, radius: -1 }, { x: Infinity, z: 35, radius: 17 }]) {
       gate.directions.east.entry = malformed;
-      assert.equal(nearestRouteChoice(state)?.id, gate.id, 'invalid custom entry falls back to the authored gate circle');
+      assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices())?.id, gate.id, 'invalid custom entry falls back to the authored gate circle');
     }
     gate.directions.east.entry = { x: 64, z: 35, radius: 20, lateralRadius: -1, maxDestinationDistance: 5 };
-    assert.equal(nearestRouteChoice(state), null, 'known destination distance limit is enforced');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices()), null, 'known destination distance limit is enforced');
     gate.directions.east.destinationIslandId = 'not-an-island';
-    assert.equal(nearestRouteChoice(state)?.id, gate.id, 'unknown destination ignores the optional bound safely');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices())?.id, gate.id, 'unknown destination ignores the optional bound safely');
     gate.directions.east.destinationIslandId = 'gull';
     gate.directions.east.entry.maxDestinationDistance = NaN;
-    assert.equal(nearestRouteChoice(state)?.id, gate.id, 'nonfinite bound is ignored; another contract does not hide this free-exploration gate');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices())?.id, gate.id, 'nonfinite bound is ignored; another contract does not hide this free-exploration gate');
     gate.directions.east.entries = [null, { x: 0, z: 0, radius: 0 }, { x: 50, z: 35, radius: 12, options: 'invalid' }];
-    const fallback = nearestRouteChoice(state);
+    const fallback = nearestRouteChoice(state, undefined, compileRouteChoices());
     assert.equal(fallback.options.length, 2);
     gate.directions.east.options = [{ id: 'outer', waypoints: [{ x: NaN, z: 0 }] }];
-    assert.equal(nearestRouteChoice(state), null, 'invalid option metadata never reaches geometry or UI code');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices()), null, 'invalid option metadata never reaches geometry or UI code');
   } finally { gate.directions.east = original; }
 });
 

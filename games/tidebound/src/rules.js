@@ -122,10 +122,11 @@ function localRouteOptions(state, gate, direction) {
   });
 }
 
+const pathObstacles=[...ISLANDS.map(item=>({x:item.x,z:item.z,clearance:item.radius+7})),...REEFS.map(item=>({x:item.x,z:item.z,clearance:item.radius+1})),...WHIRLS.map(item=>({x:item.x,z:item.z,clearance:item.radius+1}))];
 function clearLocalPath(origin, waypoints) {
   for (const target of waypoints) {
     const dx = target.x - origin.x, dz = target.z - origin.z, length = dx * dx + dz * dz;
-    for (const obstacle of [...ISLANDS.map((item) => ({ ...item, clearance: item.radius + 7 })), ...REEFS.map((item) => ({ ...item, clearance: item.radius + 1 })), ...WHIRLS.map((item) => ({ ...item, clearance: item.radius + 1 }))]) {
+    for (const obstacle of pathObstacles) {
       const projection = length ? clamp(((obstacle.x - origin.x) * dx + (obstacle.z - origin.z) * dz) / length, 0, 1) : 0;
       if (Math.hypot(obstacle.x - origin.x - projection * dx, obstacle.z - origin.z - projection * dz) < obstacle.clearance - 1e-6) return false;
     }
@@ -137,33 +138,40 @@ function clearLocalPath(origin, waypoints) {
 const validEntry = (entry) => entry && Number.isFinite(entry.x) && Number.isFinite(entry.z) && Number.isFinite(entry.radius) && entry.radius > 0;
 const validOptions = (options) => Array.isArray(options) && options.length >= 2 && options.every((option) => option && typeof option.id === 'string' && Array.isArray(option.waypoints) && option.waypoints.length && option.waypoints.every((point) => point && Number.isFinite(point.x) && Number.isFinite(point.z)));
 
-export function nearestRouteChoice(state, radiusOverride) {
-  const lastChoice = state.voyage.routeChoices?.at(-1);
-  if (state.mode !== 'sailing' || (activeNavigation(state) && lastChoice && state.time - lastChoice.time < 18)) return null;
-  const forward = { x: Math.sin(state.boat.heading), z: -Math.cos(state.boat.heading) };
-  return ROUTE_CHOICES.flatMap((gate) => Object.entries(gate.directions).flatMap(([direction, data]) => {
-    const axis = Object.hasOwn(ROUTE_DIRECTIONS, direction) && ROUTE_DIRECTIONS[direction];
-    const minForwardDot = Number.isFinite(data?.minForwardDot) && data.minForwardDot >= 0 && data.minForwardDot <= 1 ? data.minForwardDot : 0.2;
-    if (!axis || !data || !validOptions(data.options) || forward.x * axis.x + forward.z * axis.z < minForwardDot) return [];
-    const entries = [validEntry(data.entry) ? data.entry : gate, ...(Array.isArray(data.entries) ? data.entries.filter(validEntry) : [])];
-    return entries.flatMap((entry, entryIndex) => {
-    const destinationIslandId = typeof entry.destinationIslandId === 'string' ? entry.destinationIslandId : data.destinationIslandId;
-    const destination = ISLANDS.find((island) => island.id === destinationIslandId);
-    if (destination && Number.isFinite(entry.maxDestinationDistance) && entry.maxDestinationDistance > 0 && distance(state.boat, destination.dock) > entry.maxDestinationDistance) return [];
-    const dx = state.boat.x - entry.x, dz = state.boat.z - entry.z;
-    const along = dx * axis.x + dz * axis.z, across = dx * axis.z - dz * axis.x;
-    const lateralRadius = Number.isFinite(entry.lateralRadius) && entry.lateralRadius > 0 ? entry.lateralRadius : entry.radius;
-    const withinEntry = Math.hypot(along / entry.radius, across / lateralRadius) <= 1;
-    const options = validOptions(entry.options) ? entry.options : data.options;
-    return [{ ...gate, directions: { ...gate.directions, [direction]: { ...data, destinationIslandId, options } }, x: entry.x, z: entry.z, radius: entry.radius, direction, entryIndex, axis, withinEntry, distance: distance(state.boat, entry) }];
-    });
-  }))
-    .filter((gate) => (!(Number.isFinite(radiusOverride) && radiusOverride > 0) ? gate.withinEntry : gate.distance <= radiusOverride)
-      && (state.boat.x - gate.x) * gate.axis.x + (state.boat.z - gate.z) * gate.axis.z <= 2
-      && gate.directions[gate.direction].options.every((option) => clearLocalPath(state.boat, option.waypoints))
-      && !(state.voyage.routeChoices || []).some((choice) => choice.id === gate.id && choice.legIndex === state.voyage.legIndex))
-    .sort((a, b) => a.distance - b.distance)
-    .map((gate) => ({ ...gate, options: localRouteOptions(state, gate, gate.direction) }))[0] || null;
+// Flatten once; entryIndex is the original canonical identity used by saves.
+export function compileRouteChoices(gates=ROUTE_CHOICES){const candidates=[];
+for(const gate of gates)for(const [direction,data]of Object.entries(gate.directions)){
+ const axis=Object.hasOwn(ROUTE_DIRECTIONS,direction)&&ROUTE_DIRECTIONS[direction];
+ if(!axis||!data||!validOptions(data.options))continue;
+ const entries=[validEntry(data.entry)?data.entry:gate,...(Array.isArray(data.entries)?data.entries.filter(validEntry):[])];
+ for(let entryIndex=0;entryIndex<entries.length;entryIndex++){
+  const entry=entries[entryIndex],destinationIslandId=typeof entry.destinationIslandId==='string'?entry.destinationIslandId:data.destinationIslandId,options=validOptions(entry.options)?entry.options:data.options;
+  candidates.push({gate,entry,axis,direction,entryIndex,destination:ISLANDS.find(i=>i.id===destinationIslandId),minForwardDot:Number.isFinite(data.minForwardDot)&&data.minForwardDot>=0&&data.minForwardDot<=1?data.minForwardDot:.2,
+   resolved:{...gate,x:entry.x,z:entry.z,radius:entry.radius,axis,direction,entryIndex,directions:{...gate.directions,[direction]:{...data,destinationIslandId,options}}}});
+ }
+}
+return candidates;
+}
+const routeCandidates=compileRouteChoices(),emptyRouteHistory=Object.freeze([]);
+export function nearestRouteChoice(state, radiusOverride, candidates=routeCandidates) {
+ const history=state.voyage.routeChoices||emptyRouteHistory,lastChoice=history?.at(-1),nav=state.voyage.navigation;
+ if(state.mode!=='sailing'||(nav&&nav.legIndex===state.voyage.legIndex&&nav.waypoints[nav.index]&&lastChoice&&state.time-lastChoice.time<18))return null;
+ const fx=Math.sin(state.boat.heading),fz=-Math.cos(state.boat.heading);let winner=null,best=Infinity,within=false;
+ for(let i=0;i<candidates.length;i++){
+  const c=candidates[i],entry=c.entry,axis=c.axis;
+  if(fx*axis.x+fz*axis.z<c.minForwardDot)continue;
+  let excluded=false;for(let j=0;j<history.length;j++)if(history[j].id===c.gate.id&&history[j].legIndex===state.voyage.legIndex){excluded=true;break;}if(excluded)continue;
+  const dx=state.boat.x-entry.x,dz=state.boat.z-entry.z,along=dx*axis.x+dz*axis.z,across=dx*axis.z-dz*axis.x;
+  if(along>2)continue;
+  const lateral=Number.isFinite(entry.lateralRadius)&&entry.lateralRadius>0?entry.lateralRadius:entry.radius;
+  const inside=Math.hypot(along/entry.radius,across/lateral)<=1,d=Math.hypot(dx,dz);
+  if((Number.isFinite(radiusOverride)&&radiusOverride>0?d>radiusOverride:!inside)||d>=best)continue;
+  if(c.destination&&Number.isFinite(entry.maxDestinationDistance)&&entry.maxDestinationDistance>0&&distance(state.boat,c.destination.dock)>entry.maxDestinationDistance)continue;
+  const options=c.resolved.directions[c.direction].options;let clear=true;
+  for(let j=0;j<options.length;j++)if(!clearLocalPath(state.boat,options[j].waypoints)){clear=false;break;}if(!clear)continue;
+  winner=c;best=d;within=inside;
+ }
+ return winner?{...winner.resolved,distance:best,withinEntry:within,options:localRouteOptions(state,winner.resolved,winner.direction)}:null;
 }
 
 function routeEntries(gate, direction) {
@@ -220,10 +228,10 @@ export function cancelRoute(state) {
 }
 
 export function nearestObservation(state, radius = 45, { includeSkipped = false } = {}) {
-  if (state.mode !== 'sailing') return null;
-  return encounterVariant(state).observations.map((item) => ({ ...item, distance: distance(state.boat, item) }))
-    .filter((item) => item.distance <= radius && !state.voyage.harvested.includes(`observation:${item.id}`) && (includeSkipped || !state.voyage.skippedObservations?.includes(item.id)))
-    .sort((a, b) => a.distance - b.distance)[0] || null;
+ if(state.mode!=='sailing')return null;
+ const points=encounterVariant(state).observations;let best=null,best2=radius*radius;
+ for(let i=0;i<points.length;i++){const p=points[i];if(state.voyage.harvested.includes(`observation:${p.id}`)||(!includeSkipped&&state.voyage.skippedObservations?.includes(p.id)))continue;const dx=p.x-state.boat.x,dz=p.z-state.boat.z,d2=dx*dx+dz*dz;if(d2<=best2&&(!best||d2<best2)){best=p;best2=d2;}}
+ return best?{...best,distance:Math.sqrt(best2)}:null;
 }
 
 export function skipObservation(state, id) {
@@ -399,8 +407,6 @@ export function interact(state) {
   for (const id of island.discoveries) {
     if (!DISCOVERIES.find((item) => item.id === id)?.diveSiteId) discover(state, id, events);
   }
-  if(island.id==='mangrove')events.push(event('info','青根航誌：下一站琉璃礁有潮汐閥門，每 6 秒開關，青綠色可操作，琥珀色預告開啟。每個閥門都能補滿氧氣。'));
-  if(island.id==='gull')events.push(event('info','燕鷗避開橫掃的洋流。星盤水庭的守鐘洋流每 8 秒循環，琥珀色預警 2 秒後橫掃；繞開有色圓圈即可安全通過。'));
   if (island.id === 'lighthouse') {
     if (state.parts.length === DIVE_SITES.length && !state.lighthouseFixed) {
       state.lighthouseFixed = true;
@@ -417,13 +423,13 @@ export function startDive(state, siteId) {
   const site = getSite(siteId);
   if (state.mode !== 'island' || !site || site.islandId !== state.currentIsland) return [event('info', '請先靠岸到該淺水點所在島嶼。')];
   const stageIndex=STORY_STAGES.findIndex(s=>s.siteId===site.id);if(stageIndex>0&&!state.parts.includes(STORY_STAGES[stageIndex-1].partId)&&!state.parts.includes(site.partId))return [event('info',`先完成${getSite(STORY_STAGES[stageIndex-1].siteId).name}取得零件，再挑戰${site.name}。`)];
-  state.guardianCooldown=0;state.guardianWarnedCycle=-1;state.valveWarnedCycle=-1;
+  state.guardianCooldown=diveStage(state,site.id).mechanic==='guardian'?2:0;state.guardianWarnedCycle=-1;state.valveWarnedCycle=-1;
   state.activeDive = site.id;
   state.mode = 'diving';
   state.oxygen = site.oxygen;
   state.diver = { ...site.entry };
   state.diveCollected = state.parts.includes(site.partId);
-  return [event('dive', `${site.name}：${diveStage(state).name}。依序到發光站按 E，每站補滿 ${site.oxygen} 秒氧氣。最後取得零件；隨時可浮出回船。`)];
+  return [event('dive', `${site.name}：${diveStage(state).name}。依序到發光站按 E，每站補滿 ${site.oxygen} 秒氧氣。最後取得零件；隨時可浮出回船。${diveStage(state).mechanic==='guardian'?'入水有 2 秒緩衝，可先離開洋流圈。':''}`)];
 }
 
 export function surface(state) {
@@ -470,7 +476,7 @@ function damage(state, amount, text, events) {
 }
 
 // 私有零欠帳時計；事件屏障犧牲舊區間，不把新控制回溯。
-function createTideClock(){
+export function createTideClock(){
  let previous=null,anchor=null,mode=null,disposed=false,collecting=false,sum=0,steps=0;
  function reset(){anchor=null;mode=null;}
  function input(now,eligible,currentMode){

@@ -1,12 +1,23 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createState,depart,dock,interact,startDive,serialize} from '../../games/tidebound/src/rules.js';
-import {ISLANDS,DIVE_SITES,OBSERVATIONS,STORY_STAGES,diveTarget,voyageVariant} from '../../games/tidebound/src/world.js';
+import {ISLANDS,DIVE_SITES,OBSERVATIONS,STORY_STAGES,diveTarget,voyageVariant,DISCOVERIES} from '../../games/tidebound/src/world.js';
 export async function runRegressions({page,base,output:out,report,check}){
  const snap=()=>page.evaluate(()=>tidebound.snapshot()),metrics=()=>page.evaluate(()=>tidebound.metrics());
  const fixture=async state=>{await page.evaluate(raw=>sessionStorage.setItem('tidebound.test.fixture',raw),typeof state==='string'?state:serialize(state));await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.tidebound)};
  const test=async(name,fn)=>{const data=await fn();(report.regressions??=[]).push({name,data});check(name)};
  await page.evaluate(()=>localStorage.setItem('stteak.tidebound.preferences.v1',JSON.stringify({music:.35,sfx:.65,reducedMotion:false,quality:'auto',camera:'overhead'})));
+ await test('real first island discoveries aggregate visible names and one immediate sound, lessons remain readable',async()=>{
+  const results=[];
+  for(const [w,h]of [[1280,720],[1920,1080]]){await page.setViewportSize({width:w,height:h});for(const id of ['gull','mangrove']){
+   const s=createState();depart(s);Object.assign(s.boat,ISLANDS.find(i=>i.id===id).dock);dock(s);if(id==='mangrove')s.cargo=DISCOVERIES.filter(d=>d.islandId!==id).slice(0,8).map(d=>d.id);await fixture(s);if(id==='mangrove')assert.equal((await snap()).cargo.length,8,'saved fixture must retain a genuinely full hold');await page.keyboard.press('c');await page.waitForFunction(()=>tidebound.metrics().audio.loaded===9&&tidebound.metrics().audio.context==='running');const count=await page.evaluate(()=>__qa.sources.length);await page.click('#investigate');
+   const data=await page.evaluate(n=>({toast:document.querySelector('#toast').textContent,lesson:document.querySelector('#island-lesson').textContent,sources:__qa.sources.slice(n).filter(s=>s.sound==='discovery'&&!s.loop),at:__qa.lastInputAt}),count);const names=ISLANDS.find(i=>i.id===id).discoveries.map(id=>DISCOVERIES.find(d=>d.id===id)).filter(d=>!d.diveSiteId).map(d=>d.name);
+   for(const name of names)assert.ok(data.toast.includes(name),JSON.stringify(data));assert.equal(data.sources.length,1);assert.ok(data.sources[0].time-data.at<=100);assert.equal(await page.locator('#island-lesson').isVisible(),true);await page.waitForTimeout(250);for(const name of names)assert.ok((await page.locator('#toast').innerText()).includes(name));await page.screenshot({path:out+`/new-discovery-${id}-${w}.png`});const after=await page.evaluate(()=>__qa.sources.length);await page.click('#investigate');assert.equal(await page.evaluate(n=>__qa.sources.slice(n).some(s=>s.sound==='discovery'),after),false);assert.doesNotMatch(await page.locator('#toast').innerText(),/圖鑑新增/);results.push({id,w,...data});
+  }}await page.setViewportSize({width:1280,height:720});return results;
+ });
+ await test('real Ruin entry grants two seconds to react at both overlapping phases',async()=>{
+  const results=[];for(const time of [0,4]){const s=createState();depart(s);s.parts=STORY_STAGES.slice(0,2).map(s=>s.partId);Object.assign(s.boat,ISLANDS.find(i=>i.id==='ruin').dock);dock(s);s.time=time;await fixture(s);assert.match(await page.locator('#panel').innerText(),/2 秒緩衝/);await page.click('#dive');await page.waitForFunction(t=>tidebound.snapshot().time>t+.1,time);const entered=await snap();assert.ok(entered.time-time<1,'entry observation must precede reaction grace expiry');assert.ok(entered.oxygen>44);assert.doesNotMatch(await page.locator('#toast').innerText(),/氧氣 -4/);await page.keyboard.down('d');await page.waitForTimeout(500);await page.keyboard.up('d');results.push({time,entered,afterMove:await snap()});}return results;
+ });
  const initial=createState();depart(initial);await fixture(initial);await page.click('#continue-voyage');
  await test('held Escape and M stay open and freeze simulation, audio and position',async()=>{
  for(const key of ['Escape','m']){await page.keyboard.down(key);const before=await snap();await page.keyboard.down(key);await page.keyboard.down(key);await page.waitForTimeout(500);await page.keyboard.up(key);const after=await snap(),m=await metrics();assert.equal(m.overlay,key==='m'?'map':'pause');assert.equal(after.time,before.time);assert.deepEqual(after.boat,before.boat);assert.equal(m.audio.loops,0);await page.keyboard.press(key);}return {heldRepeats:2};
@@ -14,6 +25,12 @@ export async function runRegressions({page,base,output:out,report,check}){
  await test('warm sail, lower, brake and steering cues occur within 100ms at keydown',async()=>{
  await page.waitForFunction(()=>tidebound.metrics().audio.loaded===9);const observations=[];
  for(const key of ['w','s','Space','a']){await page.evaluate(()=>{window.__cueCount=__qa.sources.length;window.__cueStart=performance.now();});await page.keyboard.down(key);const result=await page.evaluate(()=>({delay:__qa.sources.slice(__cueCount).find(s=>!s.loop)?.time-__qa.lastInputAt,visual:Math.max(...[...document.querySelectorAll('[data-cue-at]')].map(e=>Number(e.dataset.cueAt)))-__qa.lastInputAt}));await page.keyboard.up(key);assert.ok(result.delay>=0&&result.delay<=100,JSON.stringify({key,...result}));assert.ok(result.visual>=0&&result.visual<=100);observations.push({key,...result});await page.waitForTimeout(180);}return observations;
+ });
+ await test('actual W S A D and brake physics responses meet render-subtracted 50ms p95',async()=>{
+  const responses=[];report.physicsResponses=responses;for(let round=0;round<4;round++)for(const key of ['w','s','a','d','Space']){
+   const before=await snap(),count=(await metrics()).physicsInputQueue.count;await page.keyboard.down(key);await page.waitForFunction(n=>tidebound.metrics().physicsInputQueue.count>n,count);await page.waitForTimeout(80);const after=await snap();await page.keyboard.up(key);
+   assert.ok(key==='a'||key==='d'?after.boat.heading!==before.boat.heading:key==='Space'?after.boat.sail<=before.boat.sail:after.boat.sail!==before.boat.sail,JSON.stringify({key,before:before.boat,after:after.boat}));responses.push({key,before:before.boat,after:after.boat,metrics:(await metrics()).physicsInputQueue});
+  }const m=(await metrics()).physicsInputQueue;report.physicsResponse=m;assert.ok(m.count>=20);assert.ok(m.p95<=50,JSON.stringify(m));return {metrics:m,responses};
  });
  await test('keyboard and mouse sail SFX share bounded feedback under normal autoplay',async()=>{
   await page.waitForFunction(()=>tidebound.metrics().audio.loaded===9);const count=()=>page.evaluate(()=>__qa.sources.filter(s=>!s.loop).length),before=await count();

@@ -14,6 +14,8 @@
     "three": "0.180.0"
   },
   "devDependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31",
+    "acorn": "^8.19.0",
     "esbuild": "0.25.10",
     "playwright": "1.56.1"
   }

@@ -1,23 +1,32 @@
 // Original Tidebound sound design. All sources are local, gesture gated, and bounded.
 export class SeaAudio {
   constructor(){this.ctx=null;this.buffers={};this.voices=new Set();this.loops=[];this.last=new Map();this.prefs={music:.35,sfx:.65};this.active=false;this.ambient=false;this.disposed=false;this.resumePending=null;this.pendingCue=null;this.appliedMusic=null;this.appliedSfx=null;}
+  prepare(){
+    if(this.preparing)return this.preparing;
+    if(this.disposed)return Promise.resolve();
+    // Offline decoding cannot start playback or unlock the output context.
+    const Offline=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+    this.preparing=(async()=>{
+      if(!Offline)throw new Error('Offline audio unavailable');
+      let decoder=new Offline(1,1,44100);
+      try{await Promise.all(['waves','music','sail','dock','discovery','danger','gull','helm','bubble'].map(async name=>{
+        if(this.buffers[name])return;
+        const response=await fetch(new URL(`./assets/audio/${name}.wav`,location.href));if(!response.ok)throw new Error('音訊載入失敗');
+        const buffer=await decoder.decodeAudioData(await response.arrayBuffer());if(!this.disposed)this.buffers[name]=buffer;
+      }));}finally{decoder=null;}
+    })().catch(error=>{this.preparing=null;throw error;});
+    return this.preparing;
+  }
   async unlock(){
     if(this.disposed)return;
     if(!this.ctx){
       const Context=window.AudioContext||window.webkitAudioContext;if(!Context)throw new Error('Web Audio unavailable');
       this.ctx=new Context();
       this.master=this.ctx.createGain();this.master.gain.value=.75;this.master.connect(this.ctx.destination);
-      this.music=this.ctx.createGain();this.effects=this.ctx.createGain();this.music.connect(this.master);this.effects.connect(this.master);
+      this.music=this.ctx.createGain();this.effects=this.ctx.createGain();this.music.gain.value=this.prefs.music*.32;this.effects.gain.value=this.prefs.sfx*.42;this.appliedMusic=this.prefs.music;this.appliedSfx=this.prefs.sfx;this.music.connect(this.master);this.effects.connect(this.master);
       this.ctx.onstatechange=()=>{if(this.active&&this.ctx.state==='suspended')this.resume();};
     }
-    if(!this.pending){
-      this.pending=Promise.all(['waves','music','sail','dock','discovery','danger','gull','helm','bubble'].map(async name=>{
-        if(this.buffers[name])return;
-        const response=await fetch(new URL(`./assets/audio/${name}.wav`,location.href));if(!response.ok)throw new Error('音訊載入失敗');
-        const buffer=await this.ctx.decodeAudioData(await response.arrayBuffer());if(!this.disposed)this.buffers[name]=buffer;
-      })).catch(error=>{this.pending=null;throw error;});
-    }
-    await this.ctx.resume();await this.pending;if(this.disposed)return;this.setPrefs(this.prefs);this.setActive(this.active,this.ambient);const cue=this.pendingCue;this.pendingCue=null;if(cue&&this.active&&performance.now()-cue.time<=500)this.play(cue.name,true);
+    await this.ctx.resume();await this.prepare();if(this.disposed)return;this.setPrefs(this.prefs);this.setActive(this.active,this.ambient);const cue=this.pendingCue;this.pendingCue=null;if(cue&&this.active&&performance.now()-cue.time<=500)this.play(cue.name,true);
   }
   resume(){
     if(!this.ctx||this.ctx.state==='closed'||this.ctx.state==='running'||this.resumePending)return;
@@ -36,6 +45,6 @@ export class SeaAudio {
     if(!active){this.pendingCue=null;for(const s of this.voices){try{s.stop();}catch{}s.disconnect();}this.voices.clear();}
   }
   play(name,intent=false){if(this.disposed||!this.active)return;if(!this.buffers[name]){this.pendingCue={name,time:performance.now()};return;}if(!this.ctx||this.voices.size>=8)return;this.resume();const now=this.ctx.currentTime;if(!intent&&now-(this.last.get(name)??-10)<.15)return;this.last.set(name,now);const s=this.ctx.createBufferSource();s.sound=name;s.buffer=this.buffers[name];s.connect(this.effects);this.voices.add(s);s.onended=()=>{this.voices.delete(s);s.disconnect();};s.start();}
-  dispose(){this.setActive(false);this.disposed=true;if(this.ctx)this.ctx.onstatechange=null;this.music?.disconnect();this.effects?.disconnect();this.master?.disconnect();this.ctx?.close().catch(()=>{});}
+  dispose(){this.setActive(false);this.disposed=true;this.buffers={};if(this.ctx)this.ctx.onstatechange=null;this.music?.disconnect();this.effects?.disconnect();this.master?.disconnect();this.ctx?.close().catch(()=>{});}
   stats(){return{context:this.ctx?.state??'locked',loops:this.loops.length,voices:this.voices.size,loaded:Object.keys(this.buffers).length,music:this.prefs.music,sfx:this.prefs.sfx};}
 }
