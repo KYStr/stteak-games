@@ -5,11 +5,23 @@ import {installPilot} from './browser-pilot.js';
 import {url,artifact,harness} from './test-config.mjs';
 const KEY='stteak.hollow-crown.v1';
 let runner,browser,page,cdp;const errors=[],requests=[],checks=[],report={};
+const gates=[];
+async function collect(name,fn){try{await fn();gates.push({name,passed:true});}catch(error){gates.push({name,passed:false,error:error.stack});console.error('FAIL '+name+': '+error.message);}}
 const check=(label)=>{checks.push(label);console.log('PASS '+label);};
-const snapshot=()=>page.evaluate(()=>hollowCrownDiagnostics.snapshot());
+const snapshot=()=>page.evaluate(()=>({...hollowCrownDiagnostics.snapshot(),hidden:document.hidden}));
 const wait=(fn,timeout=20000)=>page.waitForFunction(fn,null,{timeout});
 const shot=async name=>page.screenshot({path:artifact(name+'.png')});
 const sleep=ms=>page.waitForTimeout(ms);
+async function activeWait(label,predicate,{activeLimit=180,wallLimit=900000}={}){
+ const start=performance.now(),initial=(await snapshot()).run?.time||0;let lastActive=initial,lastProgress=start,state;
+ while(performance.now()-start<wallLimit){state=await snapshot();if(predicate(state)){const result={label,wallMs:performance.now()-start,activeSeconds:(state.run?.time||0)-initial,hp:state.run?.player.hp};(report.progressWaits||=[]).push(result);return state;}
+  const active=state.run?.time||0,now=performance.now();if(active>lastActive){lastProgress=now;lastActive=active;}
+  if(active-initial>=activeLimit)break;
+  if(!state.paused&&!state.hidden&&now-lastProgress>60000)throw Error(label+' stalled/incomplete '+JSON.stringify({active:active-initial,wallMs:now-start,hp:state.run?.player.hp,overlay:state.overlay}));
+  await sleep(1000);
+ }
+ const result={label,incomplete:true,wallMs:performance.now()-start,activeSeconds:(state?.run?.time||0)-initial,hp:state?.run?.player.hp};(report.progressWaits||=[]).push(result);throw Error(label+' incomplete '+JSON.stringify(result));
+}
 async function setupInventory(){await page.evaluate(async()=>{const {SceneView}=await import('./scene.js');let view;const original=SceneView.prototype.render;SceneView.prototype.render=function(state,dt,cue){view=this;return original.call(this,state,dt,cue);};window.sceneInventoryReady=()=>!!view;window.sceneInventory=()=>{const geometries=new Map(),add=(g,owner)=>{if(!g)return;let record=geometries.get(g.uuid);if(!record){record={uuid:g.uuid,name:g.name,type:g.type,owners:[],uploaded:!!g._listeners?.dispose?.some(fn=>fn.name==='onGeometryDispose')};geometries.set(g.uuid,record);}record.owners.push(owner);};view.scene.traverse(n=>add(n.geometry,n.name||n.type));for(let i=0;i<view.extraGeometries.length;i++)add(view.extraGeometries[i],'owned['+i+']');for(const [key,parts]of view.actorGeometryCache)for(const part of parts)add(part.geometry,'actor-template:'+key);for(const [key,parts]of view.propGeometryCache)for(const part of parts)add(part.geometry,'prop-template:'+key);return{pools:Object.fromEntries([...view.actorPool].map(([key,pool])=>[key,pool.length])),actorTemplates:view.actorGeometryCache.size,propTemplates:view.propGeometryCache.size,geometries:[...geometries.values()],warnings:view.warningGroups.size,projectiles:view.projectileGroups.size,effects:view.effectGroups.size,liveActors:view.actorList.length};};});await wait(()=>window.sceneInventoryReady());}
 async function boot(){await page.goto(url);await wait(()=>!!window.hollowCrownDiagnostics);await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().render.frameSamples>2);await setupInventory();}
 async function heapSnapshot(name){const chunks=[];const onChunk=({chunk})=>chunks.push(chunk);cdp.on('HeapProfiler.addHeapSnapshotChunk',onChunk);try{await cdp.send('HeapProfiler.takeHeapSnapshot',{reportProgress:false});await writeFile(artifact(name+'.heapsnapshot'),chunks.join(''));}finally{cdp.off('HeapProfiler.addHeapSnapshotChunk',onChunk);}}
@@ -38,7 +50,7 @@ try{
   await page.click('[data-action="help"]');const buttons=page.locator('#overlay button');await buttons.last().focus();await page.keyboard.press('Tab');assert.equal(await buttons.first().evaluate(el=>el===document.activeElement),true);await page.keyboard.press('Escape');
   check('settings persist, reversible mute, dialog focus containment and Escape navigation');
   await page.click('[data-action="tutorial"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.buffers===17);
-  await installPilot(page);await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().run?.phase==='result',120000);
+  await installPilot(page);await activeWait('tutorial completion',s=>s.run?.phase==='result',{activeLimit:300});
   let s=await snapshot();assert.equal(s.run.tutorial.done,true);assert.equal(s.profile.tutorialDone,true);assert.match(await page.locator('.results').innerText(),/5 \/ 5/);assert.match(await page.locator('.results').innerText(),/試煉完成/);assert.doesNotMatch(await page.locator('.results').innerText(),/普通房完成/);await shot('tutorial-complete');await page.evaluate(()=>acceptancePilot.stop());
   check('tutorial completes using movement, light attack, dodge, timed guard and defeat');
   await page.click('[data-action="begin"]');await page.keyboard.down('KeyD');await sleep(600);await page.keyboard.up('KeyD');s=await snapshot();assert.ok(s.run.player.x>1);
@@ -47,13 +59,14 @@ try{
   await page.click('[data-action="settings"]');await page.keyboard.press('Escape');assert.equal((await snapshot()).overlay,'pause');await page.click('[data-action="resume"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.context==='running');
   await boot();await page.click('[data-action="continue"]');s=await snapshot();assert.equal(s.runId,runId);assert.equal(s.run.seed,seedNumber);assert.ok(Math.abs(s.run.player.x)<.01);assert.equal(s.profile.settings.music,.2);
   await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.metrics().audio.context==='running');check('real movement and attacks, blur pause, suspended audio resume, reload and room-entry restore');
-  await page.evaluate(()=>{window.activeRaf={raw:[],windows:[],last:performance.now(),active:true};function sample(t){const p=activeRaf;if(!p.active)return;if(document.body.dataset.menu==='false')p.raw.push(t-p.last);p.last=t;requestAnimationFrame(sample);}requestAnimationFrame(sample);});
+  await page.evaluate(()=>{window.activeRaf={raw:[],windows:[],last:performance.now(),active:false,raf:0};function sample(t){const p=activeRaf;if(!p.active)return;if(document.body.dataset.menu==='false')p.raw.push(t-p.last);p.last=t;p.raf=requestAnimationFrame(sample);}window.startRafSampling=()=>{activeRaf.active=true;activeRaf.last=performance.now();activeRaf.raf=requestAnimationFrame(sample);};window.stopRafSampling=()=>{activeRaf.active=false;cancelAnimationFrame(activeRaf.raf);};});
   await page.keyboard.press('Escape');await page.click('[data-action="leave-confirm"]');await page.click('[data-action="confirm"]');await sleep(1000);
-  const before=await memory(),beforeSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());report.beforeInventory=await inventory();await writeFile(artifact('retention-before-inventory.json'),JSON.stringify(report.beforeInventory,null,2));await heapSnapshot('retention-before');await page.click('[data-action="continue"]');
+  await installPilot(page);await page.evaluate(()=>acceptancePilot.stop()); // Same controller factory installed and stopped at both retention endpoints.
+  const before=await memory(),beforeSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());report.beforeInventory=await inventory();await writeFile(artifact('retention-before-inventory.json'),JSON.stringify(report.beforeInventory,null,2));await heapSnapshot('retention-before');await page.click('[data-action="continue"]');await page.evaluate(()=>startRafSampling());
   const soakStart=performance.now(),performanceWindows=[];await installPilot(page);
-  let lastLog=performance.now();const bossCaptures=new Set();report.bossCaptures=[];
+  let lastLog=performance.now(),lastActive=0,lastProgress=performance.now();const bossCaptures=new Set();report.bossCaptures=[];
   while(performance.now()-soakStart<3600000){
-    await sleep(1000);performanceWindows.push(await page.evaluate(()=>hollowCrownDiagnostics.metrics()));s=await snapshot();for(const boss of s.run.enemies.filter(e=>e.hp>0&&['regent','arbiter'].includes(e.type))){const key=boss.type+'-phase-'+boss.phase;if(!bossCaptures.has(key)){bossCaptures.add(key);report.bossCaptures.push({key,at:s.run.time});for(const width of [1280,1920]){await page.setViewportSize({width,height:width*9/16});await shot(key+'-'+width);}await page.setViewportSize({width:1280,height:720});}}
+    await sleep(1000);performanceWindows.push(await page.evaluate(()=>hollowCrownDiagnostics.metrics()));s=await snapshot();if(s.run.time>lastActive){lastActive=s.run.time;lastProgress=performance.now();}if(!s.paused&&!s.hidden&&performance.now()-lastProgress>60000)throw Error('Full expedition stalled/incomplete '+JSON.stringify({active:lastActive,wallMs:performance.now()-soakStart,hp:s.run.player.hp}));for(const boss of s.run.enemies.filter(e=>e.hp>0&&['regent','arbiter'].includes(e.type))){const key=boss.type+'-phase-'+boss.phase;if(!bossCaptures.has(key)){bossCaptures.add(key);report.bossCaptures.push({key,at:s.run.time});for(const width of [1280,1920]){await page.setViewportSize({width,height:width*9/16});await shot(key+'-'+width);}await page.setViewportSize({width:1280,height:720});}}
     if(performance.now()-lastLog>15000){console.log(`PLAY room=${s.run.roomIndex+1} phase=${s.run.phase} hp=${s.run.player.hp.toFixed(0)} time=${s.run.time.toFixed(0)}`);lastLog=performance.now();}
     if(s.run.phase==='result')break;
   }
@@ -65,7 +78,7 @@ try{
   while(performance.now()-soakStart<soakMs){await sleep(Math.min(5000,soakMs-(performance.now()-soakStart)));s=await snapshot();if(s.run.phase==='result'){await page.evaluate(()=>acceptancePilot.stop());await page.click('[data-action="replay"]');await installPilot(page);}}
   const after=await memory();report.soak={wallMs:performance.now()-soakStart,before,after,metrics:await page.evaluate(()=>hollowCrownDiagnostics.metrics())};
   const measured=report.soak.metrics;report.performanceBudget={averageTargetMs:33.3,p95TargetMs:66.7,met:measured.avgFrameMs<=33.3&&measured.p95FrameMs<=66.7};
-  report.independentRaf=await page.evaluate(()=>{activeRaf.active=false;const raw=activeRaf.raw;activeRaf.raw=[];const sorted=[...raw].sort((a,b)=>a-b);return{raw,avg:raw.reduce((a,b)=>a+b,0)/raw.length,p95:sorted[Math.floor(sorted.length*.95)]};});
+  report.independentRaf=await page.evaluate(()=>{stopRafSampling();const raw=activeRaf.raw;activeRaf.raw=[];const sorted=[...raw].sort((a,b)=>a-b);return{raw,avg:raw.reduce((a,b)=>a+b,0)/raw.length,p95:sorted[Math.floor(sorted.length*.95)]};});
   report.performanceWindows=performanceWindows;
   // QA-RUBRIC explicitly excludes absolute SwiftShader speed from release gates.
   // Keep the historical frame targets as audited reference data, never as a pass claim.
@@ -79,13 +92,20 @@ try{
   await page.evaluate(()=>acceptancePilot.stop());await sleep(200);assert.equal(await page.evaluate(()=>pendingGameRaf()),1,'one game RAF after sampler and controller stop');check('restart and >=3 minute bounded-memory/listener run');
   for(let i=0;i<10;i++){await page.keyboard.press('Escape');await page.click('[data-action="restart-confirm"]');await page.click('[data-action="confirm"]');await sleep(200);assert.equal(await page.evaluate(()=>pendingGameRaf()),1);}
   await page.keyboard.press('Escape');await page.click('[data-action="leave-confirm"]');await page.click('[data-action="confirm"]');await sleep(1000);
-  const retained=await memory(),afterSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());report.afterInventory=await inventory();await writeFile(artifact('retention-after-inventory.json'),JSON.stringify(report.afterInventory,null,2));await heapSnapshot('retention-after');report.heapOwners=await heapOwners(artifact('retention-before.heapsnapshot'),artifact('retention-after.heapsnapshot'));await writeFile(artifact('retention-owners.json'),JSON.stringify(report.heapOwners,null,2));
+  const retained=await memory(),afterSameScene=await page.evaluate(()=>hollowCrownDiagnostics.metrics());report.afterInventory=await inventory();await writeFile(artifact('retention-after-inventory.json'),JSON.stringify(report.afterInventory,null,2));await heapSnapshot('retention-after');const ownership=await heapOwners(artifact('retention-before.heapsnapshot'),artifact('retention-after.heapsnapshot'));await writeFile(artifact('retention-code-owners.json'),JSON.stringify(ownership.codeOwners,null,2));const {codeOwners,...strongOwners}=ownership;report.heapOwners={...strongOwners,codeOwners:{method:codeOwners.method,aggregates:codeOwners.aggregates,nodeCount:codeOwners.nodes.length,path:artifact('retention-code-owners.json')}};await writeFile(artifact('retention-owners.json'),JSON.stringify(report.heapOwners,null,2));
   report.restartAudit={restarts:10,pendingRaf:await page.evaluate(()=>pendingGameRaf()),memory:retained};
   report.retention={method:'Finite prop/actor templates prewarmed before interactive; identical camp before expedition and after ten restarts. Inventory and heap snapshots identify actual persistent owners; peak metrics are recorded separately.',before,after:retained,growth:(retained.heap-before.heap)/before.heap,beforeRender:beforeSameScene.render,afterRender:afterSameScene.render};
   // Keep every retention assertion and its original measurements. Report failures
   // after independent lifecycle checks so one performance miss cannot hide them.
-  const validateRetention=()=>{assert.ok(report.retention.growth<.10,'Retained heap growth must be <10%');assert.equal(retained.jsEventListeners,before.jsEventListeners);assert.equal(afterSameScene.render.geometries,beforeSameScene.render.geometries);assert.equal(afterSameScene.render.textures,beforeSameScene.render.textures);assert.equal(report.restartAudit.pendingRaf,1);check('full expedition and ten restarts retain <10% heap and identical resources/listeners/RAF');};
+  const validateRetention=()=>{
+    const assertions=[['heap',()=>assert.ok(report.retention.growth<.10,'Retained heap growth must be <10%')],['listeners',()=>assert.equal(retained.jsEventListeners,before.jsEventListeners)],['geometries',()=>assert.equal(afterSameScene.render.geometries,beforeSameScene.render.geometries)],['textures',()=>assert.equal(afterSameScene.render.textures,beforeSameScene.render.textures)],['RAF',()=>assert.equal(report.restartAudit.pendingRaf,1)],['warning templates',()=>assert.equal(afterSameScene.render.warningTemplates,0)],['pooled warnings',()=>assert.equal(afterSameScene.render.pooledWarnings,0)]];
+    report.retention.checks=assertions.map(([name,fn])=>{try{fn();return{name,passed:true};}catch(error){return{name,passed:false,error:error.message};}});
+    assert.ok(report.retention.checks.every(c=>c.passed),'Retained heap/resource assertions failed; see retention.checks');check('full expedition and ten restarts retain <10% heap and identical resources/listeners/RAF');
+  };
+
+  await collect('retention',validateRetention);
   console.log('RETENTION '+JSON.stringify({growth:report.retention.growth,beforeGeometries:beforeSameScene.render.geometries,afterGeometries:afterSameScene.render.geometries,listeners:retained.jsEventListeners,pendingRaf:report.restartAudit.pendingRaf}));
+  await collect('responsive dialogs and graphics recovery',async()=>{
   await page.click('[data-action="continue"]');
   await page.keyboard.press('Escape');await shot('pause-1280');
   await page.setViewportSize({width:1920,height:1080});await sleep(400);await shot('pause-1920');
@@ -94,12 +114,21 @@ try{
   // Context loss is a terminal graphics pause, with an explicit reload recovery.
   await page.evaluate(()=>document.querySelector('#world').getContext('webgl2').getExtension('WEBGL_lose_context').loseContext());await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().overlay==='graphics-error');assert.equal((await snapshot()).paused,true);await shot('context-recovery');
   await page.click('[data-action="reload"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().overlay==='camp');await page.click('[data-action="continue"]');assert.equal((await snapshot()).run.phase,'combat');check('responsive dialogs and WebGL context loss reload recovery');
-  // A real death path, independent of the winning controller.
-  await seed({schemaVersion:1,tutorialDone:true,settings:{quality:'auto'}});await page.locator('[data-config="challenge"]').selectOption('normal');await page.click('[data-action="begin"]');await wait(()=>window.hollowCrownDiagnostics&&hollowCrownDiagnostics.snapshot().run?.phase==='result',90000);s=await snapshot();assert.equal(s.run.result.won,false);assert.equal(s.profile.runs,1);await page.click('[data-action="replay"]');assert.equal((await snapshot()).run.phase,'combat');check('natural combat death, settlement and restart');
+  });
+  // Natural idle death is measured in both active and wall time, never inferred from timeout.
+  await collect('natural death and restart',async()=>{
+   await seed({schemaVersion:1,tutorialDone:true,settings:{quality:'auto'}});await page.locator('[data-config="challenge"]').selectOption('normal');await page.click('[data-action="begin"]');
+   s=await activeWait('idle death',s=>s.run?.phase==='result',{activeLimit:180,wallLimit:900000});assert.equal(s.run.result.won,false);assert.equal(s.profile.runs,1);await page.click('[data-action="replay"]');assert.equal((await snapshot()).run.phase,'combat');check('natural combat death, settlement and restart');
+  });
+  await collect('corruption and backup recovery',async()=>{
+  if(page.isClosed()){page=await browser.newPage({viewport:{width:1280,height:720}});await boot();}
   await page.evaluate(KEY=>{const raw=localStorage.getItem(KEY);localStorage.setItem(KEY+'.backup',raw);localStorage.setItem(KEY,'broken');},KEY);await boot();assert.match(await page.locator('#save-notice').innerText(),/備份/);
   await page.evaluate(KEY=>{localStorage.setItem(KEY,'[]');localStorage.setItem(KEY+'.backup','[]');},KEY);await boot();assert.equal((await snapshot()).profile.runs,0);assert.match(await page.locator('#save-notice').innerText(),/重建/);check('corrupt primary backup recovery and malformed-array safe rebuild');
+  });
+  await collect('reduced motion',async()=>{
   await page.emulateMedia({reducedMotion:'reduce'});await seed(null);assert.equal((await snapshot()).profile.settings.reducedMotion,true);check('system reduced-motion preference');
+  });
   assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);check('zero uncaught errors, console errors or failed HTTP requests');
-  validateRetention();report.passed=true;
+  report.passed=gates.every(g=>g.passed);assert.ok(report.passed,'Collected release gates failed; see gates');
 }catch(e){report.passed=false;report.failure=e.stack;report.snapshot=page?await snapshot().catch(()=>null):null;report.metrics=page?await page.evaluate(()=>hollowCrownDiagnostics.metrics()).catch(()=>null):null;console.error(e);if(page)await shot('failure').catch(()=>{});process.exitCode=1;
-}finally{report.checks=checks;report.errors=errors;report.failedRequests=requests;await writeFile(artifact(report.passed?'acceptance.json':`failure-${Date.now()}.json`),JSON.stringify(report,null,2)+'\n');await runner?.cleanup();}
+}finally{report.gates=gates;report.checks=checks;report.errors=errors;report.failedRequests=requests;await writeFile(artifact(report.passed?'acceptance.json':`failure-${Date.now()}.json`),JSON.stringify(report,null,2)+'\n');await runner?.cleanup();}

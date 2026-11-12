@@ -32,5 +32,27 @@ try{
  await page.evaluate(()=>{feedback.cues=[];feedback.effects=[];feedback.seenEffects.clear();});await installPilot(page);await page.waitForFunction(()=>hollowCrownDiagnostics.snapshot().run.tutorial.step>=3,null,{timeout:120000});await page.evaluate(()=>acceptancePilot.stop());
  const hits=await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.stats.hits);await page.waitForFunction(h=>hollowCrownDiagnostics.snapshot().run.stats.hits>h,hits,{timeout:20000});await installPilot(page);await page.waitForFunction(()=>hollowCrownDiagnostics.snapshot().run.phase==='result',null,{timeout:120000});await page.evaluate(()=>acceptancePilot.stop());
  const events=await page.evaluate(()=>({cues:feedback.cues,effects:feedback.effects}));report.combatFeedback=[];for(const type of ['hit','parry','hurt','death']){const cue=events.cues.find(c=>c.type===type),effect=events.effects.find(e=>e.type===type&&e.t>=cue?.t);assert.ok(cue&&effect,type+' has an audio cue and authoritative scene effect');const jsMs=cue.t-cue.updateRead,sceneMs=effect.t-cue.t;assert.ok(jsMs<=50,type+' update-to-audio <=50ms');assert.ok(sceneMs<=100,type+' cue-to-scene <=100ms');report.combatFeedback.push({type,jsMs,sceneMs});}
- await page.screenshot({path:artifact('feedback-reduced-motion.png')});report.passed=!report.errors.length;
+ await page.screenshot({path:artifact('feedback-reduced-motion.png')});await page.close();
+ // Real touch contexts expose controls that a desktop viewport resize cannot test.
+ report.touchLayouts=[];
+ for(const viewport of [{width:390,height:844},{width:800,height:450}]){
+  const context=await runner.browser.newContext({viewport,isMobile:true,hasTouch:true});
+  try{
+   page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('console',e=>{if(e.type()==='error')report.errors.push(e.text());});await page.goto(url);await page.waitForFunction(()=>window.hollowCrownDiagnostics);await page.locator('[data-action="tutorial"]').first().tap();await page.waitForTimeout(500);
+   assert.equal(await page.locator('#touch-controls').isVisible(),true);
+   const geometry=await page.evaluate(()=>{const rect=el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom};};return{tutorial:rect(document.querySelector('#tutorial')),aim:rect(document.querySelector('#aim-stick')),controls:[...document.querySelectorAll('#move-stick,#aim-stick,#attack,#guard,#evade')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(rect)};});
+   const layout={viewport,geometry};report.touchLayouts.push(layout);await page.screenshot({path:artifact('tutorial-real-touch-'+viewport.width+'.png')});
+   const disjoint=(a,b)=>a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom;
+   assert.ok(geometry.controls.every(r=>disjoint(r,geometry.tutorial)),'all real touch controls clear tutorial at '+viewport.width);
+   if(viewport.width===390)assert.ok(geometry.aim.top-geometry.tutorial.bottom>=12,'portrait touch aim clearance >=12px');
+   await page.screenshot({path:artifact('tutorial-real-touch-'+viewport.width+'.png')});
+   const box=await page.locator('#move-stick').boundingBox(),cx=box.x+box.width/2,cy=box.y+box.height/2,session=await context.newCDPSession(page),initial=await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.player.x);
+   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:cx,y:cy}]});await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:cx+28,y:cy}]});await page.waitForTimeout(700);
+   const moved=await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.player.x);assert.ok(moved>initial+.3,'real touch drag moves player');
+   await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.waitForTimeout(200);const released=await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.player.x);await page.waitForTimeout(300);assert.ok(Math.abs((await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.player.x))-released)<.01,'touch end releases movement');
+   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:cx,y:cy}]});await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:cx+28,y:cy}]});await page.waitForTimeout(100);await session.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});await page.waitForTimeout(200);const cancelled=await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.player.x);await page.waitForTimeout(300);assert.ok(Math.abs((await page.evaluate(()=>hollowCrownDiagnostics.snapshot().run.player.x))-cancelled)<.01,'touch cancel releases movement');
+   Object.assign(layout,{initial,moved,released,cancelled});
+  }finally{await context.close();}
+ }
+ report.passed=!report.errors.length;
 }catch(e){report.failure=e.stack;report.snapshot=await page?.evaluate(()=>hollowCrownDiagnostics.snapshot()).catch(()=>null);await page?.screenshot({path:artifact('feedback-failure.png')}).catch(()=>{});process.exitCode=1;console.error(e);}finally{await writeFile(artifact('feedback.json'),JSON.stringify(report,null,2));await runner.cleanup();}

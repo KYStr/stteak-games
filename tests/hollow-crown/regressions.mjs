@@ -12,6 +12,12 @@ try {
  const snap=()=>page.evaluate(()=>hollowCrownDiagnostics.snapshot());
  const seed=async p=>{await page.evaluate(({p,KEY})=>{localStorage.clear();if(p)localStorage.setItem(KEY,JSON.stringify(p));},{p,KEY});await boot();};
  const check=name=>{report.checks.push(name);console.log('PASS '+name);};await boot();
+ // Wrap to the first enabled control; a disabled route select must never trap Tab.
+ assert.equal(await page.locator('[data-config="route"]').isDisabled(),true);
+ await page.locator('[data-action="progress"]').focus();await page.keyboard.press('Tab');assert.equal(await page.locator('[data-config="difficulty"]').evaluate(el=>el===document.activeElement),true);
+ await page.keyboard.press('Shift+Tab');assert.equal(await page.locator('[data-action="progress"]').evaluate(el=>el===document.activeElement),true);
+ await page.locator('[data-config="challenge"]').selectOption('normal');await page.locator('[data-action="progress"]').focus();await page.keyboard.press('Tab');assert.equal(await page.locator('[data-config="route"]').evaluate(el=>el===document.activeElement),true);
+ await page.locator('[data-config="challenge"]').selectOption('crown-pilgrimage');check('camp keyboard wraps across enabled controls for both route modes');
  for(const phase of ['reward','route']) {
   const state=createRun({seed:72});state.enemies.forEach(e=>e.hp=0);state.pendingWaves=[];step(state,{},.02);if(phase==='route')chooseReward(state,'restore');
   const cp=checkpoint(state);cp.run[phase==='reward'?'rewardOptions':'routeOptions']=[];
@@ -33,6 +39,8 @@ try {
   await mute.focus();for(const value of [true,false]){await page.keyboard.press('m');assert.equal((await snap()).profile.settings.muted,value);assert.equal(await mute.getAttribute('aria-pressed'),String(value));assert.match(await mute.innerText(),value?/恢復聲音/:/全部靜音/);}
   for(const value of [true,false]){await mute.click();assert.equal(await mute.evaluate(el=>el===document.activeElement),true);assert.equal((await snap()).profile.settings.muted,value);}
   assert.equal(await page.locator('[data-setting="music"]').inputValue(),music);assert.equal(await page.locator('[data-setting="effects"]').inputValue(),effects);await page.keyboard.press('Escape');check('mute hotkey, button, ARIA and focus from '+source);
+  if(source==='pause')for(const width of [1280,1920]){await page.setViewportSize({width,height:width*9/16});await page.click('[data-action="restart-confirm"]');assert.equal(await page.evaluate(()=>document.activeElement?.dataset.action),'cancel-confirm');const enabled=page.locator('#overlay button:not(:disabled)');await enabled.last().focus();await page.keyboard.press('Tab');assert.equal(await enabled.first().evaluate(el=>el===document.activeElement),true);await page.keyboard.press('Shift+Tab');assert.equal(await enabled.last().evaluate(el=>el===document.activeElement),true);await page.keyboard.press('Escape');assert.equal((await snap()).overlay,'pause');}await page.setViewportSize({width:1280,height:720});
+
  }
  // Real shipped DOM, real keyboard progress: stop immediately before parry.
  await seed(null);await page.click('[data-action="tutorial"]');await installPilot(page);

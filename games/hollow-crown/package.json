@@ -1,6 +1,6 @@
 {
   "name": "@stteak/hollow-crown",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
     "check:release": "node release.mjs",
     "test:matrix": "node ../../tests/hollow-crown/matrix.mjs",
     "test:feedback": "node ../../tests/hollow-crown/feedback.mjs",
-    "test:allocation": "node ../../tests/hollow-crown/allocation.mjs",
+    "test:allocation": "node ../../tests/hollow-crown/allocation-gate.mjs",
     "test:pacing:standard": "HOLLOW_PACING_SCENARIO=standard-burn node ../../tests/hollow-crown/pacing.mjs"
   },
   "dependencies": {

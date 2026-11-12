@@ -16,7 +16,7 @@ const TEXT_INPUT_TAGS=Object.freeze(['INPUT','SELECT','TEXTAREA']);
 const ACTIVE_PHASES=Object.freeze(['combat','tutorial']);
 
 
-const BUILD='stteak8-hollow-crown-r4', VERSION='1.4.0'; // 只消除品質與尺寸重複提交的新候選，不回填run75原因。
+const BUILD='stteak8-hollow-crown-r5', VERSION='1.5.0';
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let renderUnavailable=false; // Context loss is reload-only; never resume unverified graphics.
 let store;try{store=new SaveStore();}catch{store=new SaveStore({getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}});}
@@ -60,7 +60,7 @@ function unlockProgress(){
 function panelHeader(kicker,title,close='camp'){return `<div class="panel-header"><div><span class="eyebrow">${kicker}</span><h2>${title}</h2></div><button data-action="${close}" class="quiet compact">返回</button></div>`;}
 function option(items,value){return items.map(t=>`<option value="${esc(t.id)}" ${t.id===value?'selected':''}>${esc(t.name)}</option>`).join('');}
 function setOverlay(name,{focus=true}={}){if(renderUnavailable)name='graphics-error';clearWarningCue(); // overlay改動之前先清舊警示。
-  lastRender=0;overlay=name;document.body.dataset.menu=String(!!name);flushInput();$('overlay').className=name==='camp'?'camp':'';
+  frameClock[2]=0;overlay=name;document.body.dataset.menu=String(!!name);flushInput();$('overlay').className=name==='camp'?'camp':'';
   $('overlay').innerHTML=renderPanel(name);
   $('overlay').setAttribute('role',name&&name!=='camp'?'dialog':'main');$('overlay').setAttribute('aria-label',name==='camp'?'餘燼之冠營地':'旅途選單');if(name&&name!=='camp')$('overlay').setAttribute('aria-modal','true');else $('overlay').removeAttribute('aria-modal');$('hud').inert=!!name;$('world').inert=!!name;
   if(name&&focus){const root=$('overlay'),el=(name==='confirm'?root.querySelector('[data-action=cancel-confirm]'):null)||root.querySelector('[autofocus]')||root.querySelector('button.primary')||root.querySelector('button,input,select');el?.focus({preventScroll:true});}
@@ -112,21 +112,21 @@ function flushInput(){controls?.clear();if(run){clearInputEdges(run);run.player.
 function showConfirm(action){confirmAction=action;confirmReturn=overlay||'pause';pause(false);setOverlay('confirm');}
 function begin(tutorial=false){
   if(renderUnavailable)return;
-  controls?.clear();run=tutorial?startTutorial({practiceWindow:profile.settings.practiceWindow}):createRun({...config});runId=crypto.randomUUID();credited={rooms:0,parries:0,flawless:0};
+  controls?.clear();releaseRun(run);run=tutorial?startTutorial({practiceWindow:profile.settings.practiceWindow}):createRun({...config});runId=crypto.randomUUID();credited={rooms:0,parries:0,flawless:0};
   run.settings=profile.settings;run.player.skin=profile.selectedSkin;paused=false;lastPhase='';lastRoom='';replaceReward=null;
   if(!tutorial)safeCheckpoint();setOverlay('');sound.unlock();sound.setTheme('combat');bridge.state('running');$('world').focus();syncPhase();
 }
 function resumeSave(){
   if(renderUnavailable)return;
   try{ // 當局資料與已計入計數須一起驗證，避免壞metadata洗掉原有累積進度。
-    const cp=profile.checkpoint;if(!cp?.run)throw Error();run=restoreRun(cp.run);if(!run?.player)throw Error(); // 先沿用正式run schema損壞降級。
-    const savedCredit=cp.credited===undefined?{}:cp.credited, creditCaps={rooms:run.stats.rooms,parries:run.stats.parries,flawless:run.stats.flawlessRooms}; // 歷史未提供欄位仍用零預設，計數上限來自合法當局。
+    const cp=profile.checkpoint;if(!cp?.run)throw Error();const restored=restoreRun(cp.run);if(!restored?.player)throw Error(); // 先沿用正式run schema損壞降級。
+    const savedCredit=cp.credited===undefined?{}:cp.credited, creditCaps={rooms:restored.stats.rooms,parries:restored.stats.parries,flawless:restored.stats.flawlessRooms}; // 歷史未提供欄位仍用零預設，計數上限來自合法當局。
     if(!savedCredit||typeof savedCredit!=='object'||Array.isArray(savedCredit)||Object.keys(creditCaps).some(key=>savedCredit[key]!==undefined&&(!Number.isSafeInteger(savedCredit[key])||savedCredit[key]<0||savedCredit[key]>creditCaps[key])))throw Error(); // 錯型、負數、非整數或超出當局的credited都不可進入算術。
     if(typeof cp.runId!=='string'||!/^[\w-]{1,100}$/.test(cp.runId))throw Error();
-    runId=cp.runId;config={seed:run.seed,route:run.route,startTalent:run.startTalent,challenge:run.challenge,difficulty:run.difficulty};credited={rooms:savedCredit.rooms??0,parries:savedCredit.parries??0,flawless:savedCredit.flawless??0}; // 再玩配置只由已驗證當局還原；wrapper的null種子或錯路線不可偷偷改變相同種子再試，credited仍只取已驗證三欄。
+    releaseRun(run);run=restored;runId=cp.runId;config={seed:run.seed,route:run.route,startTalent:run.startTalent,challenge:run.challenge,difficulty:run.difficulty};credited={rooms:savedCredit.rooms??0,parries:savedCredit.parries??0,flawless:savedCredit.flawless??0}; // 再玩配置只由已驗證當局還原；wrapper的null種子或錯路線不可偷偷改變相同種子再試，credited仍只取已驗證三欄。
     run.settings=profile.settings;run.player.skin=profile.selectedSkin;lastPhase='';lastRoom='';paused=false;setOverlay('');sound.unlock();bridge.state('running');syncPhase();$('world').focus();toast('已恢復同一房間入口。'); // 通過完整驗證後才更新進度與UI。
   } // 壞wrapper與壞run同走下方既有保留解鎖及設定的安全恢復。
-  catch{profile.checkpoint=null;persist();run=null;setOverlay('camp');toast('房間存檔版本不相容或損壞；解鎖與設定已保留，請開始新旅途。');}
+  catch{profile.checkpoint=null;persist();releaseRun(run);run=null;setOverlay('camp');toast('房間存檔版本不相容或損壞；解鎖與設定已保留，請開始新旅途。');}
 }
 function pause(show=true){clearWarningCue(); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
   if(!run||run.phase==='result')return;paused=true;flushInput();sound.pause();bridge.state('paused');if(show)setOverlay('pause');
@@ -156,7 +156,8 @@ const hudNodes=Object.create(null),hudValues=Object.create(null),hudStrings=Obje
 function hudNode(id){return hudNodes[id]||(hudNodes[id]=$(id));}
 function hudText(id,text){if(hudStrings[id]!==text){hudStrings[id]=text;hudNode(id).textContent=text;}}
 function hudHidden(id,hidden){const node=hudNode(id);if(node.hidden!==hidden)node.hidden=hidden;}
-function hudWidth(id,value){if(hudValues[id]!==value){hudValues[id]=value;hudNode(id).style.width=value+'%';}}
+const meterWidths=Array.from({length:101},(_,i)=>i+'%');
+function hudWidth(id,percent){const value=Math.max(0,Math.min(100,Math.round(percent)));if(hudValues[id]!==value){hudValues[id]=value;hudNode(id).style.width=meterWidths[value];}}
 function updateHud(){
   if(!run)return;
   const p=run.player,obj=run.objective,plan=journeyPlan(run);
@@ -227,13 +228,13 @@ $('overlay').addEventListener('input',e=>{const key=e.target.dataset.setting;if(
 $('pause-button').onclick=()=>pause();
 document.addEventListener('visibilitychange',()=>{clearWarningCue();if(document.hidden){if(run&&run.phase!=='result')pause();else sound.pause();}}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 window.addEventListener('blur',()=>{clearWarningCue();if(run&&run.phase!=='result'&&!paused)pause();else sound.pause();}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
-window.addEventListener('keydown',e=>{if(e.key!=='Tab'||!overlay)return;const focusables=[...$('overlay').querySelectorAll('button:not(:disabled),input,select')];if(!focusables.length)return;const first=focusables[0],last=focusables.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+window.addEventListener('keydown',e=>{if(e.key!=='Tab'||!overlay)return;const focusables=Array.from($('overlay').querySelectorAll('button,input,select,textarea,a[href],[tabindex]')).filter(el=>!el.matches(':disabled')&&el.tabIndex>=0&&!el.closest('[hidden],[inert]')&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden');if(!focusables.length)return;const first=focusables[0],last=focusables.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
 window.addEventListener('resize',()=>{view?.resize();updateVisibility();});
 window.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&!touchActive){touchActive=true;updateVisibility();}});
 window.addEventListener('pagehide',()=>{motionPreference.removeEventListener('change',onMotionChange);cancelAnimationFrame(frame);clearWarningCue();warningCueUI.dispose();if(disposed)return;disposed=true;controls?.dispose();sound.dispose();view?.dispose();bridge.dispose();}); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
 $('world').addEventListener('webglcontextlost',e=>{e.preventDefault();renderUnavailable=true;paused=true;flushInput();sound.pause();bridge.state('paused');setOverlay('graphics-error');});
-let frame=0,last=performance.now(),hudTime=0,lastRender=0;
+let frame=0;const frameClock=new Float64Array([performance.now(),0,0,0]); // last tick, HUD, throttle, actual scene submission
 function back(){
   if(renderUnavailable)return;
   if(overlay==='confirm'){setOverlay(confirmReturn);return;}
@@ -247,15 +248,15 @@ function back(){
 function syncMuteControl(){const button=$('overlay').querySelector('[data-action="mute"]');if(button){button.setAttribute('aria-pressed',String(profile.settings.muted));button.textContent=`${profile.settings.muted?'恢復聲音':'全部靜音'} · M`;}}
 function toggleMute(){profile.settings.muted=!profile.settings.muted;sound.update(profile.settings);persist();syncMuteControl();toast(profile.settings.muted?'已靜音 · M 恢復聲音':'聲音已恢復');}
 window.addEventListener('keydown',e=>{if(e.code==='KeyM'&&!e.repeat&&!TEXT_INPUT_TAGS.includes(e.target.tagName)){e.preventDefault();toggleMute();}});
-function tick(now){if(disposed||renderUnavailable)return;frame=requestAnimationFrame(tick);const raw=(now-last)/1000;last=now;const dt=Math.min(.15,raw);if(!document.hidden&&!overlay&&!paused){timing.frames.push(raw*1000);view.recordFrame(raw*1000);}
+function tick(now){if(disposed||renderUnavailable)return;frame=requestAnimationFrame(tick);const raw=(now-frameClock[0])/1000;frameClock[0]=now;const dt=Math.min(.15,raw);if(!document.hidden&&!overlay&&!paused){timing.frames.push(raw*1000);view.recordFrame(raw*1000);}
   if(run&&!paused&&!overlay&&(run.phase==='combat'||run.phase==='tutorial')){
     const updateStart=performance.now();step(run,controls.read(run.player,profile.settings.autoAim),dt);timing.updates.push(performance.now()-updateStart);
     for(let eventIndex=0;eventIndex<run.events.length;eventIndex++){const event=run.events[eventIndex];dispatchEventCue(event);}run.events.length=0;
     syncPhase();
   }
-  camp.time+=dt;if(now-hudTime>90){updateHud();hudTime=now;}if(now>toastUntil&&!$('toast').hidden)$('toast').hidden=true;
-  if(document.hidden||overlay&&now-lastRender<100)return;lastRender=now;
-  const cueEnabled=!!run?.tutorial&&!paused&&!overlay&&!document.hidden&&!disposed;const cue=view.render(run||camp,paused?0:Math.min(.15,overlay?(now-(view.lastRenderTime||now))/1000:dt),cueEnabled);view.lastRenderTime=now;warningCueUI.present(cue,cueEnabled);
+  if(now-frameClock[1]>90){updateHud();frameClock[1]=now;}if(now>toastUntil&&!$('toast').hidden)$('toast').hidden=true;
+  if(document.hidden||overlay&&now-frameClock[2]<100)return;frameClock[2]=now;
+  const cueEnabled=!!run?.tutorial&&!paused&&!overlay&&!document.hidden&&!disposed;const cue=view.render(run||camp,paused?0:Math.min(.15,overlay?(now-(frameClock[3]||now))/1000:dt),cueEnabled);frameClock[3]=now;warningCueUI.present(cue,cueEnabled);
 }
 function dispatchEventCue(event){sound.cue(event.type,event.cue==='phase'||event.cue==='wave'?event.cue:event.material==='armor'||event.material==='shield'?'metal':event.material);if(event.type==='parry')toast('精準反擊');if(event.type==='hurt')toast(`受到 ${sourceName(event.source)} 的攻擊`);if((event.type==='objective'||event.type==='hazard'||event.type==='ui'&&!event.source&&event.cue!=='tutorial')&&event.text)toast(event.text);}
 
@@ -269,5 +270,6 @@ try{
 // Read-only telemetry for reproducible performance and lifecycle review. Returned values are copies.
 Object.defineProperty(window,'hollowCrownDiagnostics',{value:Object.freeze({
   snapshot:()=>structuredClone({buildId:BUILD,version:VERSION,run,paused,overlay,runId,profile:{...profile,checkpoint:profile.checkpoint?{present:true}:null}}),
-  metrics:()=>{const sorted=timing.frames.toArray().sort((a,b)=>a-b),updates=timing.updates.toArray().sort((a,b)=>a-b);return{updateAvgMs:updates.length?updates.reduce((a,b)=>a+b,0)/updates.length:0,updateP95Ms:updates[Math.floor(updates.length*.95)]||0,buildId:BUILD,readyMs:timing.loaded,samples:sorted.length,avgFrameMs:sorted.length?sorted.reduce((a,b)=>a+b,0)/sorted.length:null,recentAvgFrameMs:timing.frames.length?timing.frames.toArray().slice(-180).reduce((a,b)=>a+b,0)/Math.min(180,timing.frames.length):null,p95FrameMs:sorted[Math.floor(sorted.length*.95)]??null,render:view?.metrics(),audio:sound.metrics(),canvas:{width:$('world').width,height:$('world').height},storageAvailable:store.available};}
+  metrics:()=>{const frames=timing.frames.summary(),updates=timing.updates.summary();return{updateAvgMs:updates.sortedMean,updateP95Ms:updates.p95||0,buildId:BUILD,readyMs:timing.loaded,samples:frames.length,avgFrameMs:frames.length?frames.sortedMean:null,recentAvgFrameMs:frames.length?frames.recentMean:null,p95FrameMs:frames.p95,render:view?.metrics(),audio:sound.metrics(),canvas:{width:$('world').width,height:$('world').height},storageAvailable:store.available};}
+
 }),writable:false});

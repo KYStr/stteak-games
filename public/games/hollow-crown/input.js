@@ -86,7 +86,7 @@ export class Controls {
     const k=this.keys;let x=(k.has('KeyD')||k.has('ArrowRight')?1:0)-(k.has('KeyA')||k.has('ArrowLeft')?1:0)+this.touchMove.x,z=(k.has('KeyS')||k.has('ArrowDown')?1:0)-(k.has('KeyW')||k.has('ArrowUp')?1:0)+this.touchMove.z;const n=Math.sqrt(x*x+z*z);if(n>1){x/=n;z/=n;}
     const ax=this.touchAim?player.x+this.touchAim.x*10:this.aim.x,az=this.touchAim?player.z+this.touchAim.z*10:this.aim.z;
     const assisted=autoAim&&!this.touchAim;
-    const r=this.record;r.moveX=x;r.moveZ=z;r.aimX=assisted?undefined:ax;r.aimZ=assisted?undefined:az;r.attackPressed=this.pressed;r.attackHeld=this.held;r.attackReleased=this.released;r.block=this.block||k.has('KeyK');r.dodge=this.dodge;r.autoAim=assisted;this.pressed=false;this.released=false;this.dodge=false;this.dodgeSources.clear();return r;
+    const r=this.record;r.moveX=x;r.moveZ=z;r.aimX=assisted?undefined:ax;r.aimZ=assisted?undefined:az;r.attackPressed=this.pressed;r.attackHeld=this.held;r.attackReleased=this.released;r.block=this.block||k.has('KeyK');r.dodge=this.dodge;r.autoAim=assisted;this.pressed=false;this.released=false;this.dodge=false;if(this.dodgeSources.size)this.dodgeSources.clear();return r;
   }
   clear(){this.attackSources.clear();this.blockSources.clear();this.dodgeSources.clear();for(const reset of this.pointerResets)reset();this.keys.clear();this.held=false;this.pressed=false;this.released=false;this.dodge=false;this.block=false;this.touchMove={x:0,z:0};this.touchAim=null;document.querySelectorAll('.held').forEach(x=>x.classList.remove('held'));document.querySelectorAll('.stick i').forEach(x=>x.style.transform='');}
   dispose(){this.clear();this.abort.abort();}

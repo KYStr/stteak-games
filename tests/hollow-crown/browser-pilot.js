@@ -1,14 +1,17 @@
 // Acceptance controller: reads copied diagnostics and sends ordinary keyboard/menu input.
 // Exact threat geometry is used here; this is automation evidence, not a human playtest.
-export async function installPilot(page) {
-  await page.evaluate(async () => {
+export async function preparePilot(page) {
+  if(await page.evaluate(()=>typeof window.createAcceptancePilot==='function'))return;
+  await page.evaluate(async function installAcceptancePilotFactory() {
     const {findPath, lineClear, shapeHits}=await import('./rules.js');
-    const held=new Set();let stopped=false,lastTime=0,path=[],pathAge=0,lastRoom='',lastStep=-1;
+    window.createAcceptancePilot=()=>{
+    window.acceptancePilot?.stop();
+    const held=new Set();let raf=0,stopped=false,lastTime=0,path=[],pathAge=0,lastRoom='',lastStep=-1;
     const key=(code,down)=>{if(held.has(code)===down)return;if(down)held.add(code);else held.delete(code);window.dispatchEvent(new KeyboardEvent(down?'keydown':'keyup',{code,key:code==='Space'?' ':code.replace('Key','').toLowerCase(),bubbles:true}));};
     const release=()=>{for(const code of [...held])key(code,false);};
-    window.acceptancePilot={stop(){stopped=true;release();},completed:[],failures:[],rooms:[],ticks:0};
+    window.acceptancePilot={stop(){stopped=true;cancelAnimationFrame(raf);release();path.length=0;if(path._pool)path._pool.length=0;const report=window.acceptancePilot;delete window.acceptancePilot;return report&&{completed:report.completed,failures:report.failures,rooms:report.rooms,ticks:report.ticks};},completed:[],failures:[],rooms:[],ticks:0};
     function tick(){
-      if(stopped)return;requestAnimationFrame(tick);
+      if(stopped)return;raf=requestAnimationFrame(tick);
       const snap=hollowCrownDiagnostics.snapshot(),s=snap.run, pilot=window.acceptancePilot;pilot.ticks++;
       if(!s||snap.paused){release();return;}
       if(s.phase==='result'){release();if(!pilot.completed.some(r=>r.runId===snap.runId))pilot.completed.push({runId:snap.runId,won:s.result?.won,tutorial:!!s.tutorial,rooms:s.roomHistory.length,hits:s.stats.hits,time:s.time});return;}
@@ -57,6 +60,9 @@ export async function installPilot(page) {
       key('KeyK',block);key('Space',dodge);
       if(charge)key('KeyJ',true);else{key('KeyJ',false);if(attack){key('KeyJ',true);}}
     }
-    requestAnimationFrame(tick);
+    raf=requestAnimationFrame(tick);
+    };
   });
 }
+
+export async function installPilot(page){await preparePilot(page);await page.evaluate(()=>window.createAcceptancePilot());}

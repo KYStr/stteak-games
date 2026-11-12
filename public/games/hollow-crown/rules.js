@@ -1,3 +1,4 @@
+import {clamp,minimumRadius} from './numeric.js';
 import { OBJECTIVES, objectiveInstruction, roomPool, journeyPlan, crownType, ARENA, RULE_VERSION, ROOMS, TUTORIAL_ROOM, BOSS_ROOM, ROUTES, TALENTS, STARTING_TALENTS, CHALLENGES, DIFFICULTIES, STORIES, ENDINGS, ENEMIES } from './content.js';
 const ROOM_ENTRY_PHASES=Object.freeze(['camp', 'route']);
 const COMMITTED_STATES=Object.freeze(['telegraph', 'attack']);
@@ -18,14 +19,15 @@ const HAZARD_PHASES=Object.freeze(['recover','telegraph','attack']);
 const TAU = Math.PI * 2;
 const EMPTY_INPUT = Object.freeze({});
 const runScratch = new WeakMap(), navigation = new WeakMap(), topologies = new WeakMap();
+const knownRooms=new WeakSet(),lineCaches=new WeakMap();
 const topologyPool=new Map(),NAV_RADII=Object.freeze([ARENA.playerRadius,.4,.42,.48,.6,.86,.9]);
 const EDGES = ['attackPressed','attackReleased','dodge'];
 const SEEK_OFFSETS = [0,.65,-.65,1.2,-1.2,Math.PI*.5];
-function scratch(state){let s=runScratch.get(state);if(!s){s={pending:{},controls:{moveX:0,moveZ:0,aimX:undefined,aimZ:undefined,autoAim:false,attackHeld:false,block:false,attackPressed:false,attackReleased:false,dodge:false},segment:{shape:'line',width:.18},origin:{x:0,z:0},living:[]};runScratch.set(state,s);}return s;}
+function scratch(state){let s=runScratch.get(state);if(!s){s={pending:{attackPressed:false,attackReleased:false,dodge:false},controls:{moveX:0,moveZ:0,aimX:undefined,aimZ:undefined,autoAim:false,attackHeld:false,block:false,attackPressed:false,attackReleased:false,dodge:false},segment:{shape:'line',width:.18,x:0,z:0,heading:0,range:0},origin:{x:0,z:0},living:[]};runScratch.set(state,s);}return s;}
 // The cross-room topology LRU belongs to an expedition. Returning to camp releases
 // its graph buffers; a new expedition still warms its actual entrance normally.
 export function releaseRun(state){
-  topologyPool.clear();if(!state)return;runScratch.delete(state);if(state.room)topologies.delete(state.room);
+  topologyPool.clear();if(!state)return;runScratch.delete(state);if(state.room){topologies.delete(state.room);lineCaches.delete(state.room);knownRooms.delete(state.room);}
   for(let i=0;i<(state.enemies?.length||0);i++)navigation.delete(state.enemies[i]);
 }
 export function clearInputEdges(state){const work=runScratch.get(state);if(work)for(let i=0;i<EDGES.length;i++)work.pending[EDGES[i]]=false;state.pendingInput=null;}
@@ -33,7 +35,6 @@ function committedCount(state){let n=0;for(let i=0;i<state.enemies.length;i++){c
 function allDefeated(enemies){for(let i=0;i<enemies.length;i++)if(enemies[i].hp>0)return false;return true;}
 function compact(items){let n=0;for(let i=0;i<items.length;i++)if(items[i].life>0)items[n++]=items[i];items.length=n;}
 
-const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const length = (x, z) => Math.sqrt(x*x+z*z);
 const distance = (a, b) => length(a.x - b.x, a.z - b.z);
 const heading = (x, z) => Math.atan2(x, z);
@@ -190,12 +191,12 @@ export function startTutorial({ practiceWindow = .5 } = {}) {
 
 // Collider geometry is shared by attack tests, projectile obstruction, and actor movement.
 function circleOverlaps(x, z, radius, obstacle) {
-  if (Number.isFinite(obstacle.r)) return length(x - obstacle.x, z - obstacle.z) < radius + obstacle.r;
-  return length(x - clamp(x, obstacle.x - obstacle.w / 2, obstacle.x + obstacle.w / 2), z - clamp(z, obstacle.z - obstacle.d / 2, obstacle.z + obstacle.d / 2)) < radius;
+  if(Number.isFinite(obstacle.r)){const dx=x-obstacle.x,dz=z-obstacle.z,r=radius+obstacle.r;return dx*dx+dz*dz<r*r;}
+  const dx=x-clamp(x,obstacle.x-obstacle.w/2,obstacle.x+obstacle.w/2),dz=z-clamp(z,obstacle.z-obstacle.d/2,obstacle.z+obstacle.d/2);return dx*dx+dz*dz<radius*radius;
 }
 
 export function blocked(room, x, z, radius = 0) {
-  if(!room)return false;for(let i=0;i<room.obstacles.length;i++)if(circleOverlaps(x,z,Math.max(.001,radius),room.obstacles[i]))return true;return false;
+  if(!room)return false;if(typeof radius==='number'){const r=minimumRadius(radius);for(let i=0;i<room.obstacles.length;i++)if(circleOverlaps(x,z,r,room.obstacles[i]))return true;}else for(let i=0;i<room.obstacles.length;i++)if(circleOverlaps(x,z,Math.max(.001,radius),room.obstacles[i]))return true;return false;
 }
 
 function pushOut(room, actor, radius) {
@@ -219,15 +220,60 @@ function pushOut(room, actor, radius) {
 
 function move(state, actor, dx, dz, radius) {
   const x = actor.x, z = actor.z;
+  if(dx===0&&dz===0&&x>=ARENA.min+radius&&x<=ARENA.max-radius&&z>=ARENA.min+radius&&z<=ARENA.max-radius&&!blocked(state.room,x,z,radius))return 0;
   actor.x += dx; pushOut(state.room, actor, radius);
   actor.z += dz; pushOut(state.room, actor, radius);
   return length(actor.x - x, actor.z - z);
 }
 
+// Squared point/closed-segment distance; scalar arguments avoid temporary vectors.
+function pointSegmentSq(px,pz,ax,az,dx,dz,lenSq){
+  const t=lenSq?clamp(((px-ax)*dx+(pz-az)*dz)/lenSq,0,1):0;
+  const x=px-ax-t*dx,z=pz-az-t*dz;return x*x+z*z;
+}
+function pointBoxSq(x,z,left,right,top,bottom){
+  const dx=x-clamp(x,left,right),dz=z-clamp(z,top,bottom);return dx*dx+dz*dz;
+}
+function segmentBox(ax,az,dx,dz,left,right,top,bottom){
+  let near=0,far=1;
+  if(dx===0){if(ax<left||ax>right)return false;}
+  else{const a=(left-ax)/dx,b=(right-ax)/dx;near=Math.max(near,Math.min(a,b));far=Math.min(far,Math.max(a,b));if(near>far)return false;}
+  if(dz===0)return az>=top&&az<=bottom;
+  const a=(top-az)/dz,b=(bottom-az)/dz;return Math.max(near,Math.min(a,b))<=Math.min(far,Math.max(a,b));
+}
+function rayResult(cache,slot,visible){
+ if(cache){cache.values[slot+5]=visible?1:0;cache.last=cache.next;cache.next=(cache.next+1)%8;cache.used=Math.min(8,cache.used+1);}return visible;
+}
 export function lineClear(room, ax, az, bx, bz, radius = .04) {
-  const d = length(bx - ax, bz - az), samples = Math.max(1, Math.ceil(d / .12));
-  for (let i = 0; i <= samples; i++) if (blocked(room, ax + (bx - ax) * i / samples, az + (bz - az) * i / samples, radius)) return false;
-  return true;
+  if(!room||room.obstacles.length===0)return true;
+  const r=minimumRadius(radius);let cache=null,slot=0;
+  // Only rule-owned rooms have a managed revision. Caller-owned geometry stays
+  // uncached, so arbitrary external edits cannot reuse an unprovable result.
+  if(knownRooms.has(room)&&Number.isSafeInteger(room.revision)){
+    cache=lineCaches.get(room);
+    if(!cache){cache={revision:room.revision,obstacles:room.obstacles,count:room.obstacles.length,next:0,last:0,used:0,values:new Float64Array(48)};lineCaches.set(room,cache);}
+    if(cache.revision!==room.revision||cache.obstacles!==room.obstacles||cache.count!==room.obstacles.length){cache.revision=room.revision;cache.obstacles=room.obstacles;cache.count=room.obstacles.length;cache.next=0;cache.last=0;cache.used=0;}
+    const values=cache.values;
+    for(let i=0;i<cache.used;i++){const at=((cache.last-i+cache.used)%cache.used)*6;if(values[at]===ax&&values[at+1]===az&&values[at+2]===bx&&values[at+3]===bz&&values[at+4]===r){cache.last=at/6;return values[at+5]===1;}}
+    slot=cache.next*6;values[slot]=ax;values[slot+1]=az;values[slot+2]=bx;values[slot+3]=bz;values[slot+4]=r;
+  }
+  const dx=bx-ax,dz=bz-az,lenSq=dx*dx+dz*dz,rSq=r*r;
+  for(let i=0;i<room.obstacles.length;i++){
+    const o=room.obstacles[i];
+    if(Number.isFinite(o.r)){
+      const reach=o.r+r;if(pointSegmentSq(o.x,o.z,ax,az,dx,dz,lenSq)<reach*reach)return rayResult(cache,slot,false);
+    }else{
+      const left=o.x-o.w/2,right=o.x+o.w/2,top=o.z-o.d/2,bottom=o.z+o.d/2;
+      if(segmentBox(ax,az,dx,dz,left,right,top,bottom))return rayResult(cache,slot,false);
+      // Disjoint closed segments attain their minimum at an endpoint of either
+      // segment. Test endpoint-to-box and each corner-to-segment distance; unlike
+      // an expanded AABB this preserves the rounded corners and strict tangency.
+      if(pointBoxSq(ax,az,left,right,top,bottom)<rSq||pointBoxSq(bx,bz,left,right,top,bottom)<rSq||
+         pointSegmentSq(left,top,ax,az,dx,dz,lenSq)<rSq||pointSegmentSq(right,top,ax,az,dx,dz,lenSq)<rSq||
+         pointSegmentSq(left,bottom,ax,az,dx,dz,lenSq)<rSq||pointSegmentSq(right,bottom,ax,az,dx,dz,lenSq)<rSq)return rayResult(cache,slot,false);
+    }
+  }
+  return rayResult(cache,slot,true);
 }
 
 export function shapeHits(attack, target, targetRadius = target.radius || .43) {
@@ -327,6 +373,14 @@ function attackPlayer(state, charged) {
 }
 
 function sealVisible(room,p,t){const d=distance(p,t)||1;return lineClear(room,p.x,p.z,t.x+(p.x-t.x)/d*.98,t.z+(p.z-t.z)/d*.98);}
+function hitSeals(state,attack){
+      for(let ti=0;ti<(state.objective?.targets.length||0);ti++){const t=state.objective.targets[ti];if(state.objective.kind==='seals'&&!t.done&&!attack.hitIds.includes(t.id)&&shapeHits(attack,t,.65)&&sealVisible(state.room,attack,t)){
+        attack.hitIds.push(t.id);t.hp=Math.max(0,t.hp-attack.damage);effect(state,'hit',t.x,t.z);event(state,'hit',{material:'stone'});
+        if(t.hp===0){t.done=true;state.objective.completed++;const obstacle=state.room.obstacles.find(o=>o.sealId===t.id);if(obstacle){state.room.obstacles.splice(state.room.obstacles.indexOf(obstacle),1);state.room.revision++;topologies.delete(state.room);}state.pendingWaves.push(['soldier','spear']);event(state,'objective',{text:'封印已破 · 兩名守衛即將增援'});}
+      }
+      }
+}
+
 function updatePlayer(state, input, dt) {
   const p = state.player;
   p.invuln = Math.max(0, p.invuln - dt); p.cooldown = Math.max(0, p.cooldown - dt); p.afterDodge = Math.max(0, p.afterDodge - dt); p.healCooldown = Math.max(0, p.healCooldown - dt);
@@ -376,11 +430,7 @@ function updatePlayer(state, input, dt) {
   if (p.attack) {
     const attack = p.attack; const oldAge = attack.age; attack.age += dt;
     if (attack.age >= attack.activeStart && oldAge <= attack.activeEnd) {
-      for(let ti=0;ti<(state.objective?.targets.length||0);ti++){const t=state.objective.targets[ti];if(state.objective.kind==='seals'&&!t.done&&!attack.hitIds.includes(t.id)&&shapeHits(attack,t,.65)&&sealVisible(state.room,attack,t)){
-        attack.hitIds.push(t.id);t.hp=Math.max(0,t.hp-attack.damage);effect(state,'hit',t.x,t.z);event(state,'hit',{material:'stone'});
-        if(t.hp===0){t.done=true;state.objective.completed++;const obstacle=state.room.obstacles.find(o=>o.sealId===t.id);if(obstacle){state.room.obstacles.splice(state.room.obstacles.indexOf(obstacle),1);state.room.revision++;topologies.delete(state.room);}state.pendingWaves.push(['soldier','spear']);event(state,'objective',{text:'封印已破 · 兩名守衛即將增援'});}
-      }
-      }
+      if(state.objective?.kind==='seals')hitSeals(state,attack);
       for (let ei=0;ei<state.enemies.length;ei++) {const enemy=state.enemies[ei];
         if (enemy.hp <= 0 || attack.hitIds.includes(enemy.id)) continue;
         if (shapeHits(attack, enemy) && lineClear(state.room, attack.x, attack.z, enemy.x, enemy.z)) {
@@ -420,7 +470,7 @@ function topology(room,radius){
     g={valid,links,parents:new Int16Array(361),queue:new Int16Array(361),reverse:new Int16Array(361)};cache.set(radius,g);topologyPool.set(key,g);if(topologyPool.size>32)topologyPool.delete(topologyPool.keys().next().value);}
   return g;
 }
-function warmNavigation(room){for(const radius of NAV_RADII)topology(room,radius);}
+function warmNavigation(room){knownRooms.add(room);for(const radius of NAV_RADII)topology(room,radius);}
 export function findPath(room,from,to,radius=.5,output=[]){
   const g=topology(room,radius);
   let start=-1,goal=-1,sd=Infinity,gd=Infinity;for(let i=0;i<361;i++)if(g.valid[i]){const x=(i/19|0)-9,z=i%19-9,ds=length(x-from.x,z-from.z),dg=length(x-to.x,z-to.z);if(ds<sd&&lineClear(room,from.x,from.z,x,z,radius)){start=i;sd=ds;}if(dg<gd&&lineClear(room,to.x,to.z,x,z,radius)){goal=i;gd=dg;}}

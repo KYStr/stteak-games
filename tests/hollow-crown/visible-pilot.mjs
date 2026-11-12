@@ -3,7 +3,7 @@ export async function installVisiblePilot(page,strategy='mobility',mode='compete
  const source=`return {VisibleController:(${VisibleController.toString()}),publicView:(${publicView.toString()})}`;
  await page.evaluate(async({source,strategy,mode})=>{
   const rules=await import('./rules.js'),{VisibleController,publicView}=new Function('findPath','lineClear','shapeHits','blocked',source)(rules.findPath,rules.lineClear,rules.shapeHits,rules.blocked),bot=new VisibleController(strategy);
-  const held=new Set(),metrics={decisions:0,stages:[],builds:[],introductions:[],menuMs:0,progressSamples:[],strategy,mode};let lastTime=performance.now(),rng=731;
+  const held=new Set(),metrics={history:[],decisions:0,stages:[],builds:[],introductions:[],menuMs:0,progressSamples:[],strategy,mode};const started=performance.now();let lastTime=started,rng=731;
   const key=(code,down)=>{if(held.has(code)===down)return;if(down)held.add(code);else held.delete(code);window.dispatchEvent(new KeyboardEvent(down?'keydown':'keyup',{code,key:code==='Space'?' ':code.replace('Key','').toLowerCase(),bubbles:true}));};
   const release=()=>{for(const code of held)key(code,false);};
   const random=()=>{rng=(Math.imul(rng,1664525)+1013904223)>>>0;return rng/4294967296;};
@@ -20,9 +20,10 @@ export async function installVisiblePilot(page,strategy='mobility',mode='compete
    const ids=run.talents.join(',');if(metrics.builds.at(-1)?.ids!==ids)metrics.builds.push({ids,at:run.time});
    if(metrics.decisions%25===0)metrics.progressSamples.push({at:run.time,room:run.roomIndex,kills:run.stats.kills,objective:run.objective?.completed,damage:run.stats.damageDealt});
    let c=mode==='idle'?{}:mode==='random'?{moveX:random()*2-1,moveZ:random()*2-1,attackPressed:random()<.65,attackHeld:random()<.3,attackReleased:random()<.3,block:random()<.2,dodge:random()<.2}:bot.decide(view);
+   metrics.history.push({active:run.time,wall:now-started,stage:run.roomIndex+1,hp:run.player.hp,energy:run.player.energy,action:run.player.action,bosses:run.enemies.filter(e=>rules.ENEMIES[e.type].boss).map(e=>({hp:e.hp,phase:e.phase,state:e.state,attack:view.enemies.find(v=>v.id===e.id)?.attack})),input:{...c}});while(metrics.history.length>1&&(metrics.history[0].active<run.time-20||metrics.history.length>200))metrics.history.shift();
    key('KeyD',c.moveX>.3);key('KeyA',c.moveX<-.3);key('KeyS',c.moveZ>.3);key('KeyW',c.moveZ<-.3);key('KeyK',!!c.block);key('Space',!!c.dodge);
    if(c.attackHeld&&!c.attackPressed)key('KeyJ',true);else{key('KeyJ',false);if(c.attackPressed)key('KeyJ',true);}
   },200);
-  window.visiblePilot={metrics,stop(){clearInterval(timer);release();}};
+  window.visiblePilot={metrics,stop(){clearInterval(timer);release();bot.path.length=0;if(bot.path._pool)bot.path._pool.length=0;bot.guardAge.clear();delete window.visiblePilot;return metrics;}};
  },{source,strategy,mode});
 }

@@ -35,3 +35,11 @@ test('visible overlays and a legitimate mask covering the warning remain conserv
  const overlay=fixture();overlay.nodes.get('overlay').computed.display='block';assert.equal(overlay.present(),'觀察場上動作');
  const covering=fixture(),mask=covering.nodes.get('action-feedback');mask.hidden=false;mask.box={left:400,right:900,top:150,bottom:400,width:500,height:250};assert.equal(covering.present(),'觀察場上動作');
 });
+test('owned root bounds refresh after mutation and resize invalidation, clearing stale semantics immediately',()=>{
+ const f=fixture(),mask=f.nodes.get('action-feedback');mask.hidden=false;mask.box={left:28,right:258,top:100,bottom:170,width:230,height:70};assert.equal(f.present(),'扇形提示：蓄勢');
+ mask.box={left:400,right:900,top:150,bottom:400,width:500,height:250};f.ui.consume([{type:'attributes',target:mask,attributeName:'hidden'}]);assert.equal(f.nodes.get('warning-cue').style.visibility,'hidden');assert.equal(f.present(),'觀察場上動作');
+ mask.box={left:28,right:258,top:100,bottom:170,width:230,height:70};f.ui.invalidateBounds();assert.equal(f.present(),'扇形提示：蓄勢');
+});
+test('animated owned roots cannot reuse static cached mask bounds',()=>{
+ const f=fixture(),mask=f.nodes.get('action-feedback');mask.hidden=false;mask.box={left:28,right:258,top:100,bottom:170,width:230,height:70};mask.getAnimations=()=>[];assert.equal(f.present(),'扇形提示：蓄勢');mask.getAnimations=()=>[{}];assert.equal(f.present(),'觀察場上動作');
+});

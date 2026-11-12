@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js'; // 只沿用正式渲染數學，不建立額外renderer或狀態通道。
 const finite = value => Number.isFinite(value); // 非有限數值一律不能證明可見。
-const matrixOkay = matrix => {const e=matrix?.elements;if(e?.length!==16)return false;for(let i=0;i<16;i++)if(!finite(e[i]))return false;return true;}; // 固定十六項矩陣上限。
+const matrixOkay = matrix => {const e=matrix?.elements;if(e?.length!==16)return false;for(let i=0;i<16;i++)if(!Number.isFinite(e[i]))return false;return true;}; // 固定十六項矩陣上限。
 const sameMatrix = (matrix,values) => {if(!matrixOkay(matrix))return false;for(let i=0;i<16;i++)if(matrix.elements[i]!==values[i])return false;return true;}; // 快取失效不可沿用舊界。
 const intersects = (a, b) => a.left <= b.right && a.right >= b.left && a.top <= b.bottom && a.bottom >= b.top; // 邊界接觸亦保守視為可能覆蓋。
 export const CUE_VIEW_LIMITS = Object.freeze({ nodes: 512, health: 2, vertices: 2048 }); // 這是有限工作量，不是實測耗時承諾。
@@ -19,17 +19,26 @@ function stampCurrent(stamp, object) { // 每幀只核固定欄位，避免重�
   return !!stamp && geometry === stamp.geometry && position === stamp.position && index === stamp.index && position.version === stamp.version && position.count === stamp.count && index?.version === stamp.indexVersion && index?.count === stamp.indexCount && geometry.drawRange.start === stamp.start && geometry.drawRange.count === stamp.drawCount; // 任一改變都須重新建立。
 } // 結束快取有效性。
 function warningMaterial(material) { // 與原扇形可見材質的窄契約一致。
-  return !!material && !Array.isArray(material) && material.visible && material.transparent && material.depthTest === false && material.colorWrite && material.blending === THREE.NormalBlending && finite(material.opacity) && material.opacity >= .1 && material.opacity <= 1 && !material.map && !material.alphaMap && !material.alphaTest && !material.clippingPlanes?.length && !material.transmission && !material.wireframe; // 不把未知貼圖或裁剪當有可見填色。
+  return !!material && !Array.isArray(material) && material.visible && material.transparent && material.depthTest === false && material.colorWrite && material.blending === THREE.NormalBlending && Number.isFinite(material.opacity) && material.opacity >= .1 && material.opacity <= 1 && !material.map && !material.alphaMap && !material.alphaTest && !material.clippingPlanes?.length && !material.transmission && !material.wireframe; // 不把未知貼圖或裁剪當有可見填色。
 } // 結束警示材質守門。
 export function projectCueBox(box,matrix,camera,result={left:0,right:0,top:0,bottom:0},point=new THREE.Vector3()) {
   if(!box||box.isEmpty()||!matrixOkay(matrix)||!camera?.isOrthographicCamera||!matrixOkay(camera.matrixWorldInverse)||!matrixOkay(camera.projectionMatrix))return null;
   result.left=Infinity;result.right=-Infinity;result.top=Infinity;result.bottom=-Infinity;
+  const minX=box.min.x,minY=box.min.y,minZ=box.min.z,maxX=box.max.x,maxY=box.max.y,maxZ=box.max.z;
+  let left=Infinity,right=-Infinity,top=Infinity,bottom=-Infinity;
   for(let i=0;i<8;i++){
-    point.set(i&1?box.max.x:box.min.x,i&2?box.max.y:box.min.y,i&4?box.max.z:box.min.z).applyMatrix4(matrix).project(camera);
-    if(!finite(point.x)||!finite(point.y)||!finite(point.z)||point.z<=-1||point.z>=1)return null;
-    result.left=Math.min(result.left,point.x);result.right=Math.max(result.right,point.x);result.top=Math.min(result.top,-point.y);result.bottom=Math.max(result.bottom,-point.y);
+    point.set(i&1?maxX:minX,i&2?maxY:minY,i&4?maxZ:minZ).applyMatrix4(matrix).project(camera);
+    const x=point.x,y=-point.y,z=point.z;
+    if(!Number.isFinite(x)||!Number.isFinite(y)||!Number.isFinite(z)||z<=-1||z>=1){result.left=left;result.right=right;result.top=top;result.bottom=bottom;return null;}
+    // Comparisons select existing numeric values without repeated Math result
+    // boxes. The tie branches retain Math.min/max's signed-zero convention.
+    if(x<left||x===0&&left===0&&Object.is(x,-0))left=x;
+    if(x>right||x===0&&right===0&&!Object.is(x,-0))right=x;
+    if(y<top||y===0&&top===0&&Object.is(y,-0))top=y;
+    if(y>bottom||y===0&&bottom===0&&!Object.is(y,-0))bottom=y;
   }
-  return result.right>result.left&&result.bottom>result.top?result:null;
+  result.left=left;result.right=right;result.top=top;result.bottom=bottom;
+  return right>left&&bottom>top?result:null;
 }
 export class WarningCueView { // 一般產品呈現helper，不接觸simulation timer或測試接口。
   constructor(renderer, scene, camera) { this.renderer = renderer; this.scene = scene; this.camera = camera; this.token = null; this.sequence=0;this.receipt={record:null,valid:false,active:false,seen:0};this.stack=[];this.projectPoint=new THREE.Vector3();this.projected={left:0,right:0,top:0,bottom:0};this.blocker={left:0,right:0,top:0,bottom:0};this.result={kind:'none',rect:this.projected};this.healthCache = new WeakMap(); } // 唯一渲染實例的私有receipt。
@@ -75,7 +84,7 @@ export class WarningCueView { // 一般產品呈現helper，不接觸simulation 
         if (object.children.length + stackCount + visited > CUE_VIEW_LIMITS.nodes) return null; for(let i=0;i<object.children.length;i++)stack[stackCount++]=object.children[i]; // 入stack前也守固定量上限。
         if (!object.material) continue; const material = object.material; if (Array.isArray(material) || material.transmission > 0) return null; // 未知排序/傳輸變體不推論。
         if (!material.visible || material.opacity === 0 || !material.transparent || object.renderOrder < 10 || cue.parts.includes(object)) continue; // 原opaque及早透明不會蓋過depthTest:false警示。
-        if (!healthBacks.includes(object) || object.renderOrder !== 30 || object.isInstancedMesh || !finite(material.opacity)) return null; // 唯一已核晚透明為healthBack30。
+        if (!healthBacks.includes(object) || object.renderOrder !== 30 || object.isInstancedMesh || !Number.isFinite(material.opacity)) return null; // 唯一已核晚透明為healthBack30。
         let stamp = this.healthCache.get(object.geometry); if (!stamp) { stamp = geometryStamp(object.geometry); if (stamp) this.healthCache.set(object.geometry, stamp); } // 平面界只建立一次。
         if (!stampCurrent(stamp, object)) return null; const blocker = projectCueBox(stamp.box, object.matrixWorld, this.camera,this.blocker,this.projectPoint); // 只比較保守矩形，不推深度或血量。
         if (!blocker || intersects(rect, blocker)) return null; // 遮蔽不確定即抑制，不宣稱身體可見。

@@ -1,3 +1,4 @@
+import {clamp} from './numeric.js';
 import { NumericRing } from './ring-buffer.js';
 import { ROOMS, BOSS_ROOM } from './content.js';
 import * as THREE from './vendor/three.module.js';
@@ -7,6 +8,7 @@ import { RenderBudget } from './render-budget.js';
 import { WarningCueView } from './warning-cue-view.js'; // 公開扇形的只讀呈現守門，不接simulation。
 import { createKit, KIT_VERSION } from './assets/models/kit.js';
 const ONE_SHOT_ACTIONS=Object.freeze(['light','attack','hurt','dodge','death','recover']);
+const EMPTY_SETTINGS=Object.freeze({});
 const EMPTY_ARRAY=Object.freeze([]);
 const ACTIVE_PHASES=Object.freeze(['combat','tutorial']);
 
@@ -20,7 +22,6 @@ const THEME = {
   blue:{floor:0x465c66,light:0xbdd9e9,fog:0x10212b,mark:0x80a9b1,fill:0x99c4e0},
   crown:{floor:0x595352,light:0xf9cf8b,fog:0x19151e,mark:0xccb178,fill:0xb0a5c5},
 };
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
 const actionAliases={idle:'idle',moving:'run',move:'run',approach:'run',chase:'run',light:'light',attack:'attack',thrust:'light',charged:'light',heavy:'light',counter:'light',charge:'charge',charging:'charge',block:'block',blocking:'block',parry:'block',dodge:'dodge',dodging:'dodge',hurt:'hurt',stagger:'hurt',stunned:'hurt',dead:'death',death:'death',telegraph:'telegraph',recover:'recover'};
 
@@ -39,8 +40,8 @@ export class SceneView {
     this.focus=new THREE.Vector3();this.camera.lookAt(0,0,0);this.raycaster=new THREE.Raycaster();this.ground=new THREE.Plane(new THREE.Vector3(0,1,0),0);
     this.warningCue=new WarningCueView(this.renderer,this.scene,this.camera); // 同一主renderer的私有提交receipt，不增加畫面或pass。
     this.cameraShake={age:.18,duration:.18,strength:0,offset:new THREE.Vector3()};
-    this.assetErrors=new Set();this.kit=createKit(THREE,{simpleLighting:this.softwareRenderer,simpleGeometry:this.softwareRenderer,textureBaseUrl:new URL('./assets/textures/',import.meta.url),onTextureError:file=>this.handleTextureError(file)});this.actors=new Map();this.actorList=[];this.actorBatches=new Map();this.batchList=[];this.warningGroups=new Map();this.projectileGroups=new Map();this.effectGroups=new Map();this.extraGeometries=[];this.extraMaterials=[];
-    this.actorGeometryCache=new Map();this.propGeometryCache=new Map();this.roomRoot=new THREE.Group();this.roomRoot.name='room-visuals';this.scene.add(this.roomRoot);this.decorationRoot=new THREE.Group();this.decorationRoot.name='room-theme-decoration';this.scene.add(this.decorationRoot);this.obstacles=[];this.roomSignature='';this.frames=new NumericRing(720);this.renderTimes=new NumericRing(720);this.projectPoint=new THREE.Vector3();this.playerPoint=new THREE.Vector3();this.healthBacks=[];this.actorPool=new Map();this.elapsed=0;this.frameCount=0;this.lastPlayerPosition=new THREE.Vector2();
+    this.assetErrors=new Set();this.kit=createKit(THREE,{simpleLighting:this.softwareRenderer,simpleGeometry:this.softwareRenderer,textureBaseUrl:new URL('./assets/textures/',import.meta.url),onTextureError:file=>this.handleTextureError(file)});this.actors=new Map();this.actorList=[];this.actorBatches=new Map();this.batchList=[];this.warningGroups=new Map();this.warningGeometryCache=new Map();this.projectileGroups=new Map();this.effectGroups=new Map();this.extraGeometries=[];this.extraMaterials=[];
+    this.actorGeometryCache=new Map();this.propGeometryCache=new Map();this.roomRoot=new THREE.Group();this.roomRoot.name='room-visuals';this.scene.add(this.roomRoot);this.decorationRoot=new THREE.Group();this.decorationRoot.name='room-theme-decoration';this.scene.add(this.decorationRoot);this.obstacles=[];this.roomSignature='';this.frames=new NumericRing(720);this.renderTimes=new NumericRing(720);this.projectPoint=new THREE.Vector3();this.playerPoint=new THREE.Vector3();this.healthBacks=[];this.actorPool=new Map();this.motionClock=new Float64Array(1);this.frameCount=0;this.lastPlayerPosition=new THREE.Vector2();
     this.ambient=new THREE.HemisphereLight(0xb6d3e4,0x24222a,2.5);this.scene.add(this.ambient);
     this.sun=new THREE.DirectionalLight(0xffd4a1,3.1);this.sun.position.set(-7,16,-6);this.sun.castShadow=true;
     Object.assign(this.sun.shadow.camera,{left:-15,right:15,top:15,bottom:-15,near:.5,far:45});this.sun.shadow.bias=-.0004;this.sun.shadow.normalBias=.035;this.sun.shadow.mapSize.set(1024,1024);this.scene.add(this.sun);
@@ -203,22 +204,34 @@ export class SceneView {
       }
       bakedParts=templates.map(t=>({...t,bone:model.group.getObjectByName(t.boneName)}));
     }
-    const a={...model,bakedParts,contact,id,type:resolved,skin,mixer,actions,current:null,health,healthFront:front,meshes,previousX:0,previousZ:0,first:true};this.actors.set(id,a);this.actorList.push(a);return a;
+    let boneCount=0;model.group.traverse(node=>{if(node.isBone)boneCount++;});const a={...model,bakedParts,contact,boneCount,id,type:resolved,skin,mixer,actions,current:null,health,healthFront:front,meshes,positionHistory:new Float64Array(2),first:true,lastAttack:null,healthHp:NaN,healthMax:NaN,facingAngle:NaN};this.actors.set(id,a);this.actorList.push(a);return a;
   }
-  animateActor(a,data,dt,isPlayer=false) {
-    const moved=!a.first&&((finite(data.x)-a.previousX)**2+(finite(data.z)-a.previousZ)**2)>.000001;
-    a.previousX=finite(data.x);a.previousZ=finite(data.z);a.first=false;
-    a.group.position.set(a.previousX,.015,a.previousZ);a.group.rotation.y=finite(data.angle);
-    const raw=isPlayer?data.action:data.state;let action=actionAliases[raw]||'idle';if(isPlayer&&raw==='charge'&&data.attack)action='light';if((!raw||raw==='idle')&&moved)action='run';if(data.hp<=0)action='death';
-    const freshAttack=isPlayer&&data.attack&&data.attack!==a.lastAttack;
-    if(action!==a.current||freshAttack){const prev=a.actions[a.current];const next=a.actions[action]||a.actions.idle;next.reset();next.enabled=true;next.setEffectiveWeight(1);const speed=isPlayer&&action==='light'?.17/Math.max(.05,finite(data.attack?.activeStart,.095)):!isPlayer&&action==='attack'?1.8:1;next.setEffectiveTimeScale(speed);const oneShot=ONE_SHOT_ACTIONS.includes(action);next.setLoop(oneShot?THREE.LoopOnce:THREE.LoopRepeat,oneShot?1:Infinity);next.clampWhenFinished=oneShot;if(!isPlayer&&action==='attack')next.time=.17;next.play();if(prev&&prev!==next)prev.crossFadeTo(next,action==='attack'?.025:.07,false);a.current=action;}
-    a.lastAttack=data.attack;
-    a.mixer.update(dt);
-    a.contact.position.set(a.previousX,.01,a.previousZ);a.contact.visible=this.quality==='low'&&data.hp>0;a.contact.scale.setScalar(a.type==='crown'||a.type==='bellwarden'?1.6:1);
+  setActorAction(a,data,action,isPlayer){
+    const prev=a.actions[a.current],next=a.actions[action]||a.actions.idle;next.reset();next.enabled=true;next.setEffectiveWeight(1);const speed=isPlayer&&action==='light'?.17/Math.max(.05,finite(data.attack?.activeStart,.095)):!isPlayer&&action==='attack'?1.8:1;next.setEffectiveTimeScale(speed);const oneShot=ONE_SHOT_ACTIONS.includes(action);next.setLoop(oneShot?THREE.LoopOnce:THREE.LoopRepeat,oneShot?1:Infinity);next.clampWhenFinished=oneShot;if(!isPlayer&&action==='attack')next.time=.17;next.play();if(prev&&prev!==next)prev.crossFadeTo(next,action==='attack'?.025:.07,false);a.current=action;
+  }
+  animateActor(a,data,dt,isPlayer=false){
+    const x=finite(data.x),z=finite(data.z),angle=finite(data.angle),oldX=a.positionHistory[0],oldZ=a.positionHistory[1],first=a.first,translated=first||x!==oldX||z!==oldZ;
+    const raw=isPlayer?data.action:data.state;let action=actionAliases[raw]||'idle';if(isPlayer&&raw==='charge'&&data.attack)action='light';if((!raw||raw==='idle')&&!first&&((x-oldX)**2+(z-oldZ)**2)>.000001)action='run';if(data.hp<=0)action='death';
+    a.positionHistory[0]=x;a.positionHistory[1]=z;a.first=false;
+    if(a.group.position.x!==x||a.group.position.y!==.015||a.group.position.z!==z)a.group.position.set(x,.015,z);
+    // Camp presentation may override this rotation; compare the actual pose.
+    if(a.group.rotation.y!==angle)a.group.rotation.y=angle;
+    if(action!==a.current||isPlayer&&data.attack&&data.attack!==a.lastAttack)this.setActorAction(a,data,action,isPlayer);
+    a.lastAttack=data.attack;a.mixer.update(dt);
+    const contactWasVisible=a.contact.visible;a.contact.visible=this.quality==='low'&&data.hp>0;
+    if(a.contact.visible&&(translated||!contactWasVisible)){a.contact.position.set(x,.01,z);a.contact.scale.setScalar(a.type==='crown'||a.type==='bellwarden'?1.6:1);}
     const dead=data.hp<=0;a.group.visible=!dead||a.actions.death.time<.8;
-    const hp=clamp(finite(data.hp,1)/Math.max(1,finite(data.maxHp,1)),0,1);a.health.visible=!isPlayer&&!dead&&hp<1;
-    a.health.position.set(a.previousX,a.type==='crown'?3.2:a.type==='bellwarden'?3: a.type==='cinderbug'?1.1:2,a.previousZ);a.health.quaternion.copy(this.camera.quaternion);a.healthFront.scale.x=.71*hp;a.healthFront.position.x=-.355*(1-hp);
-    if(isPlayer){this.playerMarker.position.set(a.previousX,.035,a.previousZ);this.facingMarker.position.set(a.previousX+Math.sin(finite(data.angle))*.93,.07,a.previousZ+Math.cos(finite(data.angle))*.93);this.facingMarker.rotation.z=-finite(data.angle);this.playerMarker.material.opacity=data.invuln>0?.45:.85;}
+    const healthWasVisible=a.health.visible;
+    if(isPlayer||dead)a.health.visible=false;
+    else{
+      const hp=finite(data.hp,1),maxHp=Math.max(1,finite(data.maxHp,1));a.health.visible=hp<maxHp;
+      if(a.health.visible){
+        if(translated||!healthWasVisible)a.health.position.set(x,a.type==='crown'?3.2:a.type==='bellwarden'?3:a.type==='cinderbug'?1.1:2,z);
+        if(!a.health.quaternion.equals(this.camera.quaternion))a.health.quaternion.copy(this.camera.quaternion);
+        if(a.healthHp!==hp||a.healthMax!==maxHp){const ratio=clamp(hp/maxHp,0,1);a.healthHp=hp;a.healthMax=maxHp;a.healthFront.scale.x=.71*ratio;a.healthFront.position.x=-.355*(1-ratio);}
+      }
+    }
+    if(isPlayer){if(translated)this.playerMarker.position.set(x,.035,z);if(translated||a.facingAngle!==angle){a.facingAngle=angle;this.facingMarker.position.set(x+Math.sin(angle)*.93,.07,z+Math.cos(angle)*.93);this.facingMarker.rotation.z=-angle;}this.playerMarker.material.opacity=data.invuln>0?.45:.85;}
   }
   recycleActors(enemies){
     for(let i=this.actorList.length-1;i>=0;i--){const actor=this.actorList[i];if(actor.id==='player')continue;let present=false;for(let j=0;j<enemies.length;j++)if(String(enemies[j].id)===actor.id){present=true;break;}if(!present)this.removeActor(actor.id);}
@@ -242,59 +255,82 @@ export class SceneView {
       if(batch.count>0){uploadRange(batch.mesh.instanceMatrix,batch.count*16);}
     }
   }
-  pruneWarning(w,id){if(id!=='objective-hazard'&&!this.actors.has(id)){this.scene.remove(w.group);this.disposeWarning(w);this.warningGroups.delete(id);}}
+  pruneWarning(w,id){if(id!=='objective-hazard'&&!this.actors.has(id)){this.scene.remove(w.group);this.releaseWarning(w);this.warningGroups.delete(id);}}
   pruneProjectile(obj,id){if(obj.userData.stamp!==this.liveStamp){this.scene.remove(obj);this.projectileGroups.delete(id);}}
   pruneEffect(record,id){if(record.stamp!==this.liveStamp)this.effectGroups.delete(id);}
-  disposeWarning(w){w.group.traverse(n=>{if(n.isInstancedMesh)n.dispose();});w.geometries.forEach(g=>g.dispose());w.material.dispose();w.tickMaterial?.dispose();w.outlineMaterial.dispose();}
-  warning(enemy,cueEligible=false) { // 非單教學場景不建立新提示幾何快取。
-    const attack=enemy.attack;const visible=enemy.state==='telegraph'||enemy.state==='attack';const id=String(enemy.id);let record=this.warningGroups.get(id);
-    if(!attack||!visible){if(record){record.group.visible=false;record.cueKind='none';}return;} // 無實際公開警示就清語義，不讀倒數。
-    const shape=attack.shape||'circle',range=finite(attack.range,finite(attack.radius,3)),width=finite(attack.width,1),radius=finite(attack.radius,range),angle=finite(attack.angle,Math.PI/3),inner=finite(attack.innerRadius,radius*.6);
-    const signature=record?.attackRef===attack?record.signature:shape+':'+range+':'+width+':'+radius+':'+angle+':'+inner;
-    if(!record||record.signature!==signature){
-      if(record){this.scene.remove(record.group);this.disposeWarning(record);}
-      const group=new THREE.Group();group.name='attack-warning-'+id;const geometries=[];let geometry;
-      if(shape==='line'){geometry=new THREE.PlaneGeometry(width,range);geometry.rotateX(-Math.PI/2);geometry.translate(0,0,range*.5);}
-      else if(shape==='cone'){const s=new THREE.Shape();s.moveTo(0,0);for(let i=0;i<=32;i++){const a=-angle/2+i/32*angle;s.lineTo(Math.sin(a)*range,-Math.cos(a)*range);}s.closePath();geometry=new THREE.ShapeGeometry(s);geometry.rotateX(-Math.PI/2);}
-      else{geometry=new THREE.RingGeometry(shape==='ring'?Math.max(0,inner):.02,radius,64);geometry.rotateX(-Math.PI/2);}
-      geometries.push(geometry);const material=new THREE.MeshBasicMaterial({color:0xec8858,transparent:true,opacity:.27,depthWrite:false,depthTest:false,side:THREE.DoubleSide,forceSinglePass:true});const fill=new THREE.Mesh(geometry,material);fill.renderOrder=10;group.add(fill);
-      const outlineGeometry=new THREE.EdgesGeometry(geometry,45);geometries.push(outlineGeometry);const outline=new THREE.LineSegments(outlineGeometry,new THREE.LineBasicMaterial({color:0xffc99c,transparent:true,opacity:.75,depthTest:false,depthWrite:false}));outline.renderOrder=11;group.add(outline);
-      // Attack zones have both edges and a repeating warning tick pattern, never color alone.
-      const tickGeo=new THREE.BoxGeometry(.08,.015,.22);geometries.push(tickGeo);const tickMaterial=material.clone(),tick=new THREE.InstancedMesh(tickGeo,tickMaterial,shape==='line'?6:16),dummy=new THREE.Object3D();
-      for(let i=0;i<tick.count;i++){if(shape==='line'){dummy.position.set((i%2?1:-1)*width*.44,.02,range*(.2+Math.floor(i/2)*.27));dummy.rotation.y=0;}else{const a=shape==='cone'?(-angle/2+i/15*angle):i/16*Math.PI*2;dummy.position.set(Math.sin(a)*(shape==='cone'?range:radius)*.92,.02,Math.cos(a)*(shape==='cone'?range:radius)*.92);dummy.rotation.y=a;}dummy.updateMatrix();tick.setMatrixAt(i,dummy.matrix);}tick.renderOrder=12;group.add(tick);this.scene.add(group);record={group,geometries,material,tickMaterial,outlineMaterial:outline.material,signature,shape};this.warningGroups.set(id,record);if(cueEligible)this.warningCue.attach(record,fill,outline,tick); // 只讀三個實際警示物件，快取含全部tick。
-    }
-    if(cueEligible&&record.cue===undefined)this.warningCue.attach(record,...record.group.children); // 曾在其他場景建立的同形幾何只在首次合格教學快取。
-    record.attackRef=attack;record.cueKind=enemy.state==='attack'?'strike':'windup'; // 與下一行原可見材質階段同源，不推最佳反擊時機。
-    record.group.visible=true;record.group.position.set(finite(attack.x,finite(enemy.x)),.045,finite(attack.z,finite(enemy.z)));record.group.rotation.y=finite(attack.heading,finite(enemy.angle));record.material.opacity=enemy.state==='attack'?.46:.22+.08*Math.sin(this.elapsed*12);record.material.color.set(enemy.state==='attack'?0xffb377:0xe77c50);record.tickMaterial.opacity=record.material.opacity;record.tickMaterial.color.copy(record.material.color);
+  releaseWarning(w){
+    if(w.disposed)return;w.group.visible=false;w.attackRef=null;w.cueKind='none';const entry=this.warningGeometryCache?.get(w.signature);
+    if(w.sharedGeometries&&entry?.geometries===w.geometries&&entry.pool.length<4)entry.pool.push(w);else this.disposeWarning(w);
   }
-  render(state={},dt=1/60,cueEnabled=false) { // 第三參數只控制普通提示，不改step或輸入。
-    this.warningCue.invalidate(); // 每幀立即丟棄前次receipt，不能跨幀追認。
-    if(this.disposed||this.contextLost)return null;const start=performance.now();const rawDt=finite(dt,1/60);dt=clamp(rawDt,0,.1);this.elapsed+=dt;const settings=state.settings||{};const shakeEnabled=settings.shake===true&&!settings.reducedMotion&&!state.paused&&rawDt>0&&ACTIVE_PHASES.includes(state.phase);if(settings.quality&&settings.quality!==this.preferredQuality)this.setQuality(settings.quality); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
-    this.buildRoom(state.room,state.phase);
-    const p=state.player||{x:0,z:3,angle:Math.PI,hp:100,maxHp:100};let player=this.actors.get('player');if(player&&player.skin!==p.skin){this.removeActor('player');player=null;}if(!player)player=this.createActor('player','guardian',p.skin);this.animateActor(player,p,dt,true);if(state.phase==='camp')player.group.rotation.y=-.42;
-    // Return the outgoing wave before borrowing its replacements. Dead authoritative
-    // actors stay until the rules remove them, preserving their death animation.
-    const enemies=state.enemies||EMPTY_ARRAY;
-    this.recycleActors(enemies);
-    const stamp=++this.liveStamp|| (this.liveStamp=1);player.stamp=stamp;for(let enemyIndex=0;enemyIndex<enemies.length;enemyIndex++){const e=enemies[enemyIndex];const id=String(e.id);let a=this.actors.get(id);const type=ALIASES[e.type]||e.type||'infantry';if(a&&a.type!==type){this.removeActor(id);a=null;}if(!a)a=this.createActor(id,type);a.stamp=stamp;this.animateActor(a,e,dt);this.warning(e,state.phase==='tutorial'&&state.enemies.length===1);} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+  clearWarningGeometryCache(){
+    if(!this.warningGeometryCache?.size||this.warningGroups.size)return;
+    for(const entry of this.warningGeometryCache.values()){for(const record of entry.pool)this.disposeWarning(record);entry.pool.length=0;for(const geometry of entry.geometries)geometry.dispose();}this.warningGeometryCache.clear();
+  }
+  disposeWarning(w){if(w.disposed)return;w.disposed=true;w.group.traverse(n=>{if(n.isInstancedMesh)n.dispose();});if(!w.sharedGeometries)w.geometries.forEach(g=>g.dispose());w.material.dispose();w.tickMaterial?.dispose();w.outlineMaterial.dispose();w.attackRef=null;}
+  getWarningGeometry(shape,range,width,radius,angle,inner,signature){
+    const cache=this.warningGeometryCache||(this.warningGeometryCache=new Map());let entry=cache.get(signature);if(entry)return entry;
+    // Templates are created only for actual attacks, bounded, and released at camp.
+    if(cache.size>=64)for(const [key,value]of cache){let used=false;for(const warning of this.warningGroups.values())if(warning.signature===key){used=true;break;}if(!used){for(const record of value.pool)this.disposeWarning(record);value.pool.length=0;for(const g of value.geometries)g.dispose();cache.delete(key);break;}}
+    let geometry;
+    if(shape==='line'){geometry=new THREE.PlaneGeometry(width,range);geometry.rotateX(-Math.PI/2);geometry.translate(0,0,range*.5);}
+    else if(shape==='cone'){const outline=new THREE.Shape();outline.moveTo(0,0);for(let i=0;i<=32;i++){const a=-angle/2+i/32*angle;outline.lineTo(Math.sin(a)*range,-Math.cos(a)*range);}outline.closePath();geometry=new THREE.ShapeGeometry(outline);geometry.rotateX(-Math.PI/2);}
+    else{geometry=new THREE.RingGeometry(shape==='ring'?Math.max(0,inner):.02,radius,64);geometry.rotateX(-Math.PI/2);}
+    entry={geometries:[geometry,new THREE.EdgesGeometry(geometry,45),new THREE.BoxGeometry(.08,.015,.22)],shared:cache.size<64,pool:[]};if(entry.shared)cache.set(signature,entry);return entry;
+  }
+  createWarningRecord(id,shape,range,width,radius,angle,inner,signature,cueEligible){
+    const template=this.getWarningGeometry(shape,range,width,radius,angle,inner,signature);if(template.pool.length){const record=template.pool.pop();record.group.name='attack-warning-'+id;record.group.visible=true;this.scene.add(record.group);this.warningGroups.set(id,record);if(cueEligible&&record.cue===undefined)this.warningCue.attach(record,...record.group.children);return record;}const [geometry,outlineGeometry,tickGeometry]=template.geometries,group=new THREE.Group();group.name='attack-warning-'+id;
+    const material=new THREE.MeshBasicMaterial({color:0xec8858,transparent:true,opacity:.27,depthWrite:false,depthTest:false,side:THREE.DoubleSide,forceSinglePass:true}),fill=new THREE.Mesh(geometry,material);fill.renderOrder=10;group.add(fill);
+    const outline=new THREE.LineSegments(outlineGeometry,new THREE.LineBasicMaterial({color:0xffc99c,transparent:true,opacity:.75,depthTest:false,depthWrite:false}));outline.renderOrder=11;group.add(outline);
+    const tickMaterial=material.clone(),tick=new THREE.InstancedMesh(tickGeometry,tickMaterial,shape==='line'?6:16),dummy=new THREE.Object3D();
+    for(let i=0;i<tick.count;i++){if(shape==='line'){dummy.position.set((i%2?1:-1)*width*.44,.02,range*(.2+Math.floor(i/2)*.27));dummy.rotation.y=0;}else{const a=shape==='cone'?(-angle/2+i/15*angle):i/16*Math.PI*2;dummy.position.set(Math.sin(a)*(shape==='cone'?range:radius)*.92,.02,Math.cos(a)*(shape==='cone'?range:radius)*.92);dummy.rotation.y=a;}dummy.updateMatrix();tick.setMatrixAt(i,dummy.matrix);}tick.renderOrder=12;group.add(tick);this.scene.add(group);
+    const record={group,geometries:template.geometries,sharedGeometries:template.shared,material,tickMaterial,outlineMaterial:outline.material,signature,shape,attackRef:null,cueKind:'none',cue:undefined,disposed:false};this.warningGroups.set(id,record);if(cueEligible)this.warningCue.attach(record,fill,outline,tick);return record;
+  }
+  warning(enemy,cueEligible=false){
+    const attack=enemy.attack,visible=enemy.state==='telegraph'||enemy.state==='attack',id=String(enemy.id);let record=this.warningGroups.get(id);
+    if(!attack||!visible){if(record){record.group.visible=false;record.cueKind='none';record.attackRef=null;}return;}
+    if(!record||record.attackRef!==attack){
+      const shape=attack.shape||'circle',range=finite(attack.range,finite(attack.radius,3)),width=finite(attack.width,1),radius=finite(attack.radius,range),angle=finite(attack.angle,Math.PI/3),inner=finite(attack.innerRadius,radius*.6),signature=shape+':'+range+':'+width+':'+radius+':'+angle+':'+inner;
+      if(!record||record.signature!==signature){if(record){this.scene.remove(record.group);this.releaseWarning(record);}record=this.createWarningRecord(id,shape,range,width,radius,angle,inner,signature,cueEligible);}
+    }
+    if(cueEligible&&record.cue===undefined)this.warningCue.attach(record,...record.group.children);
+    record.attackRef=attack;record.cueKind=enemy.state==='attack'?'strike':'windup';record.group.visible=true;record.group.position.set(finite(attack.x,finite(enemy.x)),.045,finite(attack.z,finite(enemy.z)));record.group.rotation.y=finite(attack.heading,finite(enemy.angle));record.material.opacity=enemy.state==='attack'?.46:.22+.08*Math.sin((this.motionClock?.[0]??this.elapsed)*12);record.material.color.set(enemy.state==='attack'?0xffb377:0xe77c50);record.tickMaterial.opacity=record.material.opacity;record.tickMaterial.color.copy(record.material.color);
+  }
+  createEffectRecord(effect,shakeEnabled){if(shakeEnabled)this.queueCameraShake(effect.type);const record={start:Math.max(.05,finite(effect.life,.4)),stamp:0};this.effectGroups.set(effect.id,record);return record;}
+  updatePresentation(state,stamp,shakeEnabled){
+    const settings=state.settings||EMPTY_SETTINGS;
     const objective=state.objective;
     for(let i=0;i<2;i++){const m=this.objectiveMarkers[i],t=objective?.targets[i];m.group.visible=!!t&&state.phase==='combat';if(t){m.group.position.set(t.x,.06,t.z);m.core.rotation.y=objective.kind==='seals'?Math.PI/4:0;m.core.scale.setScalar(t.done?.35:1);m.core.position.y=t.done?.2:.8;m.ring.material.color.set(t.done?0x94d9d3:0xffd39b);m.ring.scale.setScalar(objective.kind==='beacons'?.4+.6*t.progress/objective.chargeRequired:.75);}}
-    this.hazardActor.state=state.phase==='combat'?(objective?.phase||'idle'):'idle';this.hazardActor.attack=objective?.attack;if(this.hazardActor.attack)this.warning(this.hazardActor);else {const w=this.warningGroups.get('objective-hazard');if(w){this.scene.remove(w.group);this.disposeWarning(w);this.warningGroups.delete('objective-hazard');}}
-    this.warningGroups.forEach(this.pruneWarning,this);
-    for(let bi=0;bi<(state.projectiles?.length||0);bi++){const b=state.projectiles[bi];const id=String(b.id);let obj=this.projectileGroups.get(id);if(!obj){obj=new THREE.Mesh(this.boltGeometry,this.boltMaterial);obj.name='physical-crossbow-bolt';this.scene.add(obj);this.projectileGroups.set(id,obj);}obj.userData.stamp=stamp;obj.position.set(finite(b.x),.68,finite(b.z));obj.rotation.set(Math.PI/2,0,-finite(b.angle));}
+    this.hazardActor.state=state.phase==='combat'?(objective?.phase||'idle'):'idle';this.hazardActor.attack=objective?.attack;if(this.hazardActor.attack)this.warning(this.hazardActor);else {const w=this.warningGroups.get('objective-hazard');if(w){this.scene.remove(w.group);this.releaseWarning(w);this.warningGroups.delete('objective-hazard');}}
+    this.warningGroups.forEach(this.pruneWarning,this);if(state.phase==='camp')this.clearWarningGeometryCache();
+    for(let bi=0;bi<(state.projectiles?.length||0);bi++){const b=state.projectiles[bi];const id=b.id;let obj=this.projectileGroups.get(id);if(!obj){obj=new THREE.Mesh(this.boltGeometry,this.boltMaterial);obj.name='physical-crossbow-bolt';this.scene.add(obj);this.projectileGroups.set(id,obj);}obj.userData.stamp=stamp;obj.position.set(finite(b.x),.68,finite(b.z));obj.rotation.set(Math.PI/2,0,-finite(b.angle));}
     this.projectileGroups.forEach(this.pruneProjectile,this);
     let sparkCount=0;const effects=state.effects;
-    for(let ei=Math.max(0,(effects?.length||0)-28);ei<(effects?.length||0);ei++){const e=effects[ei];const id=String(e.id);let record=this.effectGroups.get(id);if(!record){if(shakeEnabled)this.queueCameraShake(e.type);record={start:Math.max(.05,finite(e.life,.4))};this.effectGroups.set(id,record);}record.stamp=stamp;const t=clamp(1-finite(e.life,0)/record.start,0,1);
+    for(let ei=Math.max(0,(effects?.length||0)-28);ei<(effects?.length||0);ei++){const e=effects[ei];const id=e.id;let record=this.effectGroups.get(id);if(!record)record=this.createEffectRecord(e,shakeEnabled);record.stamp=stamp;const t=clamp(1-finite(e.life,0)/record.start,0,1);
       if(settings.flash!==false)for(let i=0;i<7;i++){const a=i/7*Math.PI*2,d=this.sparkDummy;d.position.set(finite(e.x)+Math.sin(a)*t*.8,.38+t*.7,finite(e.z)+Math.cos(a)*t*.8);d.scale.setScalar((1-t)*.85);d.rotation.set(i+t*3,t*2,i);d.updateMatrix();this.sparkBatch.setMatrixAt(sparkCount++,d.matrix);}
     }
     this.effectGroups.forEach(this.pruneEffect,this);
     this.sparkBatch.count=sparkCount;this.sparkBatch.visible=sparkCount>0;if(sparkCount){uploadRange(this.sparkBatch.instanceMatrix,sparkCount*16);}
+  }
+  updateSceneMotion(state,p,settings,dt,shakeEnabled){
     const camp=state.phase==='camp',tracking=this.aspect<1?.35:.12,targetX=camp&&this.aspect>=1?finite(p.x)-3.9:clamp(finite(p.x)*tracking,-3.4,3.4),targetZ=camp&&this.aspect>=1?finite(p.z)-.6:clamp(finite(p.z)*tracking,-3.2,3.2);const smooth=settings.reducedMotion?1:1-Math.exp(-dt*5);this.focus.x+=(targetX-this.focus.x)*smooth;this.focus.z+=(targetZ-this.focus.z)*smooth;const zoom=camp&&this.aspect>=1?2.7:this.aspect>=1?1.18:1;this.camera.zoom+=(zoom-this.camera.zoom)*smooth;this.camera.updateProjectionMatrix();
     this.updateCameraShake(dt,shakeEnabled);const shake=this.cameraShake.offset;
     const cameraY=this.camera.position.y+((camp&&this.aspect>=1?14:23)-this.camera.position.y)*smooth;this.camera.position.set(this.focus.x+shake.x,cameraY,this.focus.z+22+shake.z);this.camera.lookAt(this.focus.x+shake.x,0,this.focus.z+shake.z);this.camera.updateMatrixWorld();
     const playerPoint=this.playerPoint.set(finite(p.x),.9,finite(p.z)).project(this.camera);
     for(let oi=0;oi<this.obstacles.length;oi++){const o=this.obstacles[oi];const point=this.projectPoint.copy(o.group.position);point.y=o.height*.55;point.project(this.camera);const occluded=o.group.position.z>finite(p.z)-.3&&Math.abs(point.x-playerPoint.x)<.07+o.w/28&&Math.abs(point.y-playerPoint.y)<.09+o.height/20;const alpha=occluded?.24:1;for(let mi=0;mi<o.materials.length;mi++){const m=o.materials[mi];m.opacity+=(alpha-m.opacity)*Math.min(1,dt*12);m.depthWrite=m.opacity>.97;}}
-    const dustCount=this.quality==='low'?10:38;this.dust.count=dustCount;for(let i=0;i<dustCount;i++){const t=settings.reducedMotion?0:this.elapsed;this.dustDummy.position.set(Math.sin(i*5.31)*10+Math.sin(t*.25+i)*.3,((t*.18+i*.39)%4)+.3,Math.cos(i*8.77)*10);this.dustDummy.rotation.set(i+t*.2,i,i);this.dustDummy.scale.setScalar(.5+(i%4)*.3);this.dustDummy.updateMatrix();this.dust.setMatrixAt(i,this.dustDummy.matrix);}this.dust.instanceMatrix.needsUpdate=true;
+    const dustCount=this.quality==='low'?10:38;this.dust.count=dustCount;for(let i=0;i<dustCount;i++){const t=settings.reducedMotion?0:this.motionClock[0];this.dustDummy.position.set(Math.sin(i*5.31)*10+Math.sin(t*.25+i)*.3,((t*.18+i*.39)%4)+.3,Math.cos(i*8.77)*10);this.dustDummy.rotation.set(i+t*.2,i,i);this.dustDummy.scale.setScalar(.5+(i%4)*.3);this.dustDummy.updateMatrix();this.dust.setMatrixAt(i,this.dustDummy.matrix);}this.dust.instanceMatrix.needsUpdate=true;
+  }
+  render(state={},dt=1/60,cueEnabled=false) { // 第三參數只控制普通提示，不改step或輸入。
+    this.warningCue.invalidate(); // 每幀立即丟棄前次receipt，不能跨幀追認。
+    if(this.disposed||this.contextLost)return null;const start=performance.now();const rawDt=finite(dt,1/60);dt=clamp(rawDt,0,.1);this.motionClock[0]+=dt;const settings=state.settings||{};const shakeEnabled=settings.shake===true&&!settings.reducedMotion&&!state.paused&&rawDt>0&&ACTIVE_PHASES.includes(state.phase);if(settings.quality&&settings.quality!==this.preferredQuality)this.setQuality(settings.quality); // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+    this.buildRoom(state.room,state.phase);
+    const p=state.player||{x:0,z:3,angle:Math.PI,hp:100,maxHp:100};let player=this.actors.get('player');if(player&&player.skin!==p.skin){this.removeActor('player');player=null;}if(!player)player=this.createActor('player','guardian',p.skin);this.animateActor(player,p,dt,true);if(state.phase==='camp')player.group.rotation.y=-.42;
+    // Return the outgoing wave before borrowing its replacements. Dead authoritative
+    // actors stay until the rules remove them, preserving their death animation.
+    const enemies=state.enemies||EMPTY_ARRAY;
+    this.recycleActors(enemies);this.warningGroups.forEach(this.pruneWarning,this);
+    const stamp=++this.liveStamp|| (this.liveStamp=1);player.stamp=stamp;for(let enemyIndex=0;enemyIndex<enemies.length;enemyIndex++){const e=enemies[enemyIndex];const id=String(e.id);let a=this.actors.get(id);const type=ALIASES[e.type]||e.type||'infantry';if(a&&a.type!==type){this.removeActor(id);a=null;}if(!a)a=this.createActor(id,type);a.stamp=stamp;this.animateActor(a,e,dt);this.warning(e,state.phase==='tutorial'&&state.enemies.length===1);} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+    this.updatePresentation(state,stamp,shakeEnabled);
+    this.updateSceneMotion(state,p,settings,dt,shakeEnabled);
     this.updateActorBatches();const cueRecord=state.phase==='tutorial'&&state.enemies?.length===1?this.warningGroups.get(String(state.enemies[0].id)):null; // 僅單教學警示，ID不離開view。
     const cueToken=this.warningCue.begin(cueRecord,cueEnabled);let cue=null; // token只涵蓋下一個主render呼叫。
     try{this.renderer.render(this.scene,this.camera);if(cueToken){for(let i=0;i<this.actorList.length;i++)this.healthBacks[i]=this.actorList[i].health.children[0];this.healthBacks.length=this.actorList.length;cue=this.warningCue.finish(cueToken,this.healthBacks);}}finally{this.warningCue.invalidate();} // renderer錯誤照原路拋出，只有helper計算降級。
@@ -319,9 +355,9 @@ export class SceneView {
     this.resize();this.appliedQuality=next; // resize與投影全成功才記；throw後只允下次合法setQuality重試，不聲稱render會自動重入。
   } // 不重建房間、不改畫面動畫或simulation。
   metrics(){
-    const percentile=key=>{const values=(key==='dt'?this.frames:this.renderTimes).toArray().sort((a,b)=>a-b);return values.length?Number(values[Math.min(values.length-1,Math.floor(values.length*.95))].toFixed(2)):null;};let instances=0;this.scene.traverse(node=>{if(node.isInstancedMesh&&node.visible)instances++;});
+    const frameStats=this.frames.summary(),submitStats=this.renderTimes.summary();let instances=0,activeBones=0;this.scene.traverse(node=>{if(node.isInstancedMesh&&node.visible)instances++;});for(let i=0;i<this.actorList.length;i++)activeBones+=this.actorList[i].boneCount;
     const textureBytes=this.kit.shared.textures.reduce((n,t)=>n+(t.image?.width||0)*(t.image?.height||0)*4*(t.generateMipmaps?4/3:1),0),shadow=this.sun.shadow.map;
-    return{engine:'three@0.180.0',kitVersion:KIT_VERSION,quality:this.quality,frameSamples:this.frames.length,frameP95Ms:percentile('dt'),frameAvgMs:this.frames.length?Number((this.frames.toArray().reduce((n,f)=>n+f,0)/this.frames.length).toFixed(2)):null,renderScale:this.budget.scale,softwareRenderer:this.softwareRenderer,renderSubmitP95Ms:percentile('renderMs'),drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,textureMemoryBytes:Math.round(textureBytes),renderTargetColorMemoryBytes:shadow?shadow.width*shadow.height*4:0,memoryIsEstimate:true,activeRigs:this.actors.size,activeBones:[...this.actorList].reduce((n,a)=>{a.group.traverse(o=>{if(o.isBone)n++;});return n;},0),pointLights:1,directionalLights:2,shadowMaps:this.quality==='high'?1:0,shadowResolution:this.quality==='high'?1024:0,transparentEffects:this.effectGroups.size,instancedMeshes:instances,contextLost:!!this.contextLost,drawingBuffer:[this.canvas.width,this.canvas.height],rendererInfo:this.renderer.getContext().getParameter(this.renderer.getContext().RENDERER)};
+    return{engine:'three@0.180.0',kitVersion:KIT_VERSION,quality:this.quality,frameSamples:this.frames.length,frameP95Ms:frameStats.p95===null?null:Number(frameStats.p95.toFixed(2)),frameAvgMs:frameStats.length?Number(frameStats.mean.toFixed(2)):null,renderScale:this.budget.scale,softwareRenderer:this.softwareRenderer,renderSubmitP95Ms:submitStats.p95===null?null:Number(submitStats.p95.toFixed(2)),drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,textureMemoryBytes:Math.round(textureBytes),renderTargetColorMemoryBytes:shadow?shadow.width*shadow.height*4:0,memoryIsEstimate:true,activeRigs:this.actors.size,activeBones,pointLights:1,directionalLights:2,shadowMaps:this.quality==='high'?1:0,shadowResolution:this.quality==='high'?1024:0,transparentEffects:this.effectGroups.size,warningTemplates:this.warningGeometryCache.size,pooledWarnings:[...this.warningGeometryCache.values()].reduce((n,e)=>n+e.pool.length,0),instancedMeshes:instances,contextLost:!!this.contextLost,drawingBuffer:[this.canvas.width,this.canvas.height],rendererInfo:this.renderer.getContext().getParameter(this.renderer.getContext().RENDERER)};
   }
-  dispose(){this.warningCue.invalidate();this.options.onCueClear?.();if(this.disposed)return;this.disposed=true;this.resizeObserver?.disconnect();this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('webglcontextrestored',this.onContextRestored);for(const id of [...this.actors.keys()])this.removeActor(id);for(const w of this.warningGroups.values())this.disposeWarning(w);for(const o of this.obstacles)for(const m of o.materials)m.dispose();this.scene.traverse(n=>{if(n.isInstancedMesh)n.dispose();});this.extraGeometries.forEach(g=>g.dispose());this.extraMaterials.forEach(m=>m.dispose());this.staticRoot.userData.bakedGeometry?.dispose();this.decorationRoot.userData.bakedGeometry?.dispose();for(const parts of this.actorGeometryCache.values())parts.forEach(p=>p.geometry.dispose());this.rigidStream?.dispose();this.kit.dispose();this.scene.clear();this.renderer.dispose();this.actorPool.clear();this.healthBacks.length=0;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
+  dispose(){this.warningCue.invalidate();this.options.onCueClear?.();if(this.disposed)return;this.disposed=true;this.resizeObserver?.disconnect();this.canvas.removeEventListener('webglcontextlost',this.onContextLost);this.canvas.removeEventListener('webglcontextrestored',this.onContextRestored);for(const id of [...this.actors.keys()])this.removeActor(id);for(const w of this.warningGroups.values())this.disposeWarning(w);this.warningGroups.clear();this.clearWarningGeometryCache();for(const o of this.obstacles)for(const m of o.materials)m.dispose();this.scene.traverse(n=>{if(n.isInstancedMesh)n.dispose();});this.extraGeometries.forEach(g=>g.dispose());this.extraMaterials.forEach(m=>m.dispose());this.staticRoot.userData.bakedGeometry?.dispose();this.decorationRoot.userData.bakedGeometry?.dispose();for(const parts of this.actorGeometryCache.values())parts.forEach(p=>p.geometry.dispose());this.rigidStream?.dispose();this.kit.dispose();this.scene.clear();this.renderer.dispose();this.actorPool.clear();this.healthBacks.length=0;} // 僅新增公開提示的清除、版位或單教學呈現接線；原玩法流程不變。
 }

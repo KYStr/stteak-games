@@ -2,6 +2,7 @@ const MASK_IDS = ['hud', 'boss-hud', 'tutorial', 'loadout', 'combat-tip', 'touch
 const ROOT_IDS = ['world', 'vignette', ...MASK_IDS, 'overlay']; // 僅此原頁面固定根，不掃未知大DOM樹。
 const WORDS = Object.freeze({ none: '觀察場上動作', windup: '扇形提示：蓄勢', strike: '扇形提示：出招' }); // 三態全是玩家可見文字，不洩露倒數或最佳按鍵。
 const plain = style => style && style.opacity === '1' && style.filter === 'none' && (!style.backdropFilter || style.backdropFilter === 'none') && style.mixBlendMode === 'normal' && style.transform === 'none' && style.clipPath === 'none'; // 未知全頁效果不能推定可見。
+const still = element => typeof element.getAnimations !== 'function' || element.getAnimations().length === 0;
 const effectsOkay = style => style && style.filter === 'none' && (!style.backdropFilter || style.backdropFilter === 'none') && style.clipPath === 'none' && style.mixBlendMode === 'normal' && style.boxShadow === 'none' && style.textShadow === 'none' && style.outlineStyle === 'none' && (!style.perspective || style.perspective === 'none'); // 未知外伸filter/陰影/outline不得只看layout框。
 const transformCache=new WeakMap();
 const CENTERED=Object.freeze(['tutorial','boss-hud','toast','save-notice','action-feedback','room-label']);
@@ -45,6 +46,8 @@ function auxiliaryKind(element, document, window) { // 只判本次body直接附
 export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA專用方法或window接口。
   constructor(document, window) { // DOM依賴可用純mock測，正式由main傳真頁面。
     this.document = document; this.window = window; this.disposed = false; this.dirty = true; this.headChanged = false; this.rootsOkay = false; this.lastKind = null; this.structureUncertain = false; // 不保存遊戲資料或上一招倒數。
+    this.bounds=new WeakMap();this.boundsVersion=1;this.boundsDirty=true;this.invalidateBounds=()=>{this.boundsDirty=true;this.clear();};
+    this.bodyChildren=document.body.children;
     this.rootSnapshot={valid:false,auxiliaries:new Set()};this.styleCache=new WeakMap();this.style=element=>{let value=this.styleCache.get(element);if(!value){value=this.window.getComputedStyle(element);this.styleCache.set(element,value);}return value;};this.target={left:0,right:0,top:0,bottom:0};this.maskBox={left:0,right:0,top:0,bottom:0};
     this.canvas = document.getElementById('world'); this.element = document.getElementById('warning-cue'); this.text = document.getElementById('warning-cue-text'); this.shape = document.getElementById('warning-cue-shape'); // 全為一般玩家看得到的節點。
     this.primaryElements=[document.documentElement,document.body,this.canvas];this.overlay = document.getElementById('overlay'); this.vignette = document.getElementById('vignette'); this.masks = MASK_IDS.map(id => document.getElementById(id)); // 固定引用避免每幀query整棵樹。
@@ -56,6 +59,7 @@ export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA�
     this.nubs = new Set(['move-stick', 'aim-stick'].map(id => document.getElementById(id)?.querySelector?.('i')).filter(Boolean)); // 原搖桿只容許正常27px位移，不增加rect讀取。
     const Observer = window.MutationObserver; this.observer = Observer ? new Observer(records => this.consume(records)) : null; // 事件回調立即清未知舊提示。
     const attributes = { attributes: true, attributeFilter: ['style', 'class', 'hidden', 'id'] }; // 只關注可能改可見性的四種屬性。
+    this.resizeObserver=window.ResizeObserver?new window.ResizeObserver(this.invalidateBounds):null;for(const element of [this.canvas,...this.masks,...this.extensions])if(element)this.resizeObserver?.observe(element);window.addEventListener?.('resize',this.invalidateBounds);window.addEventListener?.('scroll',this.invalidateBounds,true);
     this.observer?.observe(document.body, { childList: true, subtree: true, ...attributes }); this.observer?.observe(document.head, { childList: true }); this.observer?.observe(document.documentElement, attributes); this.clear(); // body子樹有限records，非全DOM layout引擎。
   } // 結束有限DOM初始化。
   attributeSafe(record) { // 只豁免正常程式自己會寫的固定可見屬性。
@@ -69,6 +73,7 @@ export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA�
     return false; // 所有其他內層style/class/hidden都未知抑制。
   } // 結束固定屬性白名單。
   consume(records, validating=false, snapshot=null) { // callback與present共用一次當前有限快照，最多32筆，不借延時追認。
+    if(records.length)this.boundsDirty=true;
     let changed = records.length > 32; if (changed) this.structureUncertain = true; const current = snapshot || this.inspectRoots(); // 超量仍永久拒；每批最多一次body快照，不按record倍增。
     for(let i=0;i<Math.min(records.length,32);i++){const record=records[i]; // 固定資料工作上限。
       if (record.target === this.document.head) { this.headChanged = true; changed = true; continue; } // head政策原文保留，連非繪製script也無例外。
@@ -83,11 +88,14 @@ export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA�
     this.lastKind = kind; if (this.text) this.text.textContent = WORDS[kind]; if (this.shape) this.shape.className = `warning-cue-shape cue-${kind}`; // class只控制公開形狀，無額外隱藏資料。
   } // 結束三態UI更新。
   clear() { this.setKind('none'); if (this.element && this.element.style.visibility !== 'hidden') this.element.style.visibility = 'hidden'; } // 清舊語義且保留固定行高，避免反覆顯示改變遮罩尺寸。
-  dispose() { this.disposed = true; this.observer?.disconnect(); this.clear(); } // pagehide後永不恢復。
+  dispose() { this.disposed = true; this.observer?.disconnect();this.resizeObserver?.disconnect();this.window.removeEventListener?.('resize',this.invalidateBounds);this.window.removeEventListener?.('scroll',this.invalidateBounds,true); this.clear(); } // pagehide後永不恢復。
+  boundsFor(element){
+    let rect=this.bounds.get(element);if(!rect){rect={version:0,left:0.1,right:0.1,top:0.1,bottom:0.1,width:0.1,height:0.1};this.bounds.set(element,rect);}if(rect.version!==this.boundsVersion){const r=element.getBoundingClientRect();rect.left=r.left;rect.right=r.right;rect.top=r.top;rect.bottom=r.bottom;rect.width=r.width;rect.height=r.height;rect.version=this.boundsVersion;}return rect;
+  }
   inspectRoots() { // 每次present或observer批次重新核原根與最多四附屬根，不跨幀用cache。
-    const snapshot=this.rootSnapshot;snapshot.valid=false;snapshot.auxiliaries.clear();
+    const snapshot=this.rootSnapshot;snapshot.valid=false;if(snapshot.auxiliaries.size)snapshot.auxiliaries.clear();
     try {
-      const roots=this.document.body.children,count=roots.length;if(this.headChanged||this.structureUncertain||!Number.isInteger(count)||count>CUE_UI_LIMITS.rootElements)return snapshot;
+      const roots=this.bodyChildren,count=roots.length;if(this.headChanged||this.structureUncertain||!Number.isInteger(count)||count>CUE_UI_LIMITS.rootElements)return snapshot;
       let seen=0,scripts=0;
       for(let i=0;i<count;i++){const element=roots[i];if(!element)return snapshot;if(element.tagName==='SCRIPT'&&element.getAttribute('type')==='module'&&element.getAttribute('src')==='./boot.js'){scripts++;continue;}const index=ROOT_IDS.indexOf(element.id);if(index>=0){const bit=1<<index;if(seen&bit||this.rootById.get(element.id)!==element)return snapshot;seen|=bit;continue;}if(snapshot.auxiliaries.size>=CUE_UI_LIMITS.auxiliaryRoots||!auxiliaryKind(element,this.document,this.window))return snapshot;snapshot.auxiliaries.add(element);}
       snapshot.valid=seen===(1<<ROOT_IDS.length)-1&&scripts===1&&this.masks.every(Boolean)&&this.extensions.every(Boolean)&&!!this.element&&!!this.text&&!!this.shape;return snapshot;
@@ -101,22 +109,24 @@ export class WarningCueUI { // 正常教學可見文字與形狀，不提供QA�
     try { // 提示計算錯誤可降級，不吞renderer錯誤。
       const snapshot = this.inspectRoots(); if (this.observer) this.consume(this.observer.takeRecords(), true, snapshot); // 同步吸收本幀HUD並只共用本次快照；下一present必重新核CSS/幾何/動畫。
       if (this.disposed || !enabled || this.document.hidden || !this.rootsValid(snapshot) || !this.observer || this.overlay.children.length || this.overlay.textContent.trim()) { this.clear(); return; } // overlay/hidden/未知根不播動態字。
+      if(this.boundsDirty){this.boundsVersion++;this.boundsDirty=false;}
       const style = this.style; // 固定次數樣式讀取，非全DOM搜尋。
       if (style(this.overlay).display !== 'none') { this.clear(); return; } // 空文字overlay也可能有背景，必須真正display:none才放行。
-      for(let i=0;i<this.primaryElements.length;i++){const element=this.primaryElements[i];if(!shown(style(element))||!plain(style(element))||!effectsOkay(style(element))||!noInline(element)||element.className){this.clear();return;}} // 全頁裁剪、透明、filter未知拒絕。
+      for(let i=0;i<this.primaryElements.length;i++){const element=this.primaryElements[i];if(!still(element)||!shown(style(element))||!plain(style(element))||!effectsOkay(style(element))||!noInline(element)||element.className){this.clear();return;}} // 全頁裁剪、透明、filter未知拒絕。
       const vignette = style(this.vignette), gradient = vignette.backgroundImage; // 僅允許原exact裝飾，不能把任意覆蓋層列白名單。
-      if (!shown(vignette) || !plain(vignette) || !effectsOkay(vignette) || !noInline(this.vignette) || this.vignette.className || !GRADIENTS.includes(gradient)) { this.clear(); return; } // 原最大alpha.6只保不完全遮去，不宣稱對比達標。
+      if (!still(this.vignette)||!shown(vignette) || !plain(vignette) || !effectsOkay(vignette) || !noInline(this.vignette) || this.vignette.className || !GRADIENTS.includes(gradient)) { this.clear(); return; } // 原最大alpha.6只保不完全遮去，不宣稱對比達標。
       if (this.element.style.visibility !== 'visible') this.element.style.visibility = 'visible'; visible = true; // 中性列占相同行高；本幀不合格也不保留上一招。
       if (!candidate || !['windup', 'strike'].includes(candidate.kind)) return; // 無當幀main receipt只有中性提示。
-      const canvas = this.canvas.getBoundingClientRect(), width = this.window.innerWidth, height = this.window.innerHeight; // 第一次有限rect讀。
+      const canvas = this.boundsFor(this.canvas), width = this.window.innerWidth, height = this.window.innerHeight; // 第一次有限rect讀。
       if (!validRect(canvas) || !Number.isFinite(width) || !Number.isFinite(height) || canvas.left !== 0 || canvas.top !== 0 || Math.abs(canvas.right - width) > .5 || Math.abs(canvas.bottom - height) > .5 || this.window.scrollX || this.window.scrollY) return; // 未知canvas裁剪或捲動不猜測。
       const r = candidate.rect; if (!r || !Number.isFinite(r.left)||!Number.isFinite(r.right)||!Number.isFinite(r.top)||!Number.isFinite(r.bottom)) return; // 只消費有限呈現矩形。
       const target=this.target;target.left=canvas.left+(r.left+1)*canvas.width/2;target.right=canvas.left+(r.right+1)*canvas.width/2;target.top=canvas.top+(r.top+1)*canvas.height/2;target.bottom=canvas.top+(r.bottom+1)*canvas.height/2; // 正交NDC轉CSS像素。
       if (target.left < 2 || target.top < 2 || target.right > width - 2 || target.bottom > height - 2 || target.right - target.left < 24 || target.bottom - target.top < 12) return; // 全入viewport加最小可辨投影門檻。
       for (let i = 0; i < this.masks.length; i++) { // 最多九根及兩已知外伸框。
         const mask = this.masks[i], maskStyle = style(mask); if (mask.hidden || !shown(maskStyle)) continue; // hidden不畫，pointer-events:none仍照常檢查。
-        let box = mask.getBoundingClientRect(); if (!validRect(box) || !maskStyleOkay(mask, maskStyle, box)) return; // 不把未知遮罩當空。
-        if (mask.id === 'hud' || mask.id === 'touch-controls') { const extension = this.extensions[mask.id === 'hud' ? 0 : 1]; const extensionStyle=style(extension); if (!extension.hidden && shown(extensionStyle)) { const child = extension.getBoundingClientRect(); if (!validRect(child) || !maskStyleOkay(extension, extensionStyle, child, mask.id === 'hud' ? 'room-label' : 'aim-stick')) return; box = unite(box, child,this.maskBox); } } // 手機外伸room-label及aim-stick不能漏掉。
+        if(!still(mask))return;
+        let box = this.boundsFor(mask); if (!validRect(box) || !maskStyleOkay(mask, maskStyle, box)) return; // 不把未知遮罩當空。
+        if (mask.id === 'hud' || mask.id === 'touch-controls') { const extension = this.extensions[mask.id === 'hud' ? 0 : 1]; const extensionStyle=style(extension); if (!extension.hidden && shown(extensionStyle)) { if(!still(extension))return;const child = this.boundsFor(extension); if (!validRect(child) || !maskStyleOkay(extension, extensionStyle, child, mask.id === 'hud' ? 'room-label' : 'aim-stick')) return; box = unite(box, child,this.maskBox); } } // 手機外伸room-label及aim-stick不能漏掉。
         else if (mask.scrollWidth > mask.clientWidth + 1 || mask.scrollHeight > mask.clientHeight + 1) return; // 其他未知overflow先拒，絕不擴DOM掃描。
         if (mask.id === 'touch-controls') {const out=this.maskBox;out.left=box.left-49;out.right=box.right+49;out.top=box.top-49;out.bottom=box.bottom+49;box=out;} // 原nub半徑22加位移27，保守擴49px而不讀更多DOM。
         if (overlap(target, box)) return; // DOM遮罩包含新提示所在tutorial卡，重疊則中性。
