@@ -1,3 +1,4 @@
+import {completeDive,swim} from '../../tidebound/pilot-rules.mjs';
 // 公開版僅保留單元測試使用的純模型函式；已移除歷史 QA 報告輸出入口。
 // Rules-model navigation evidence, not browser or human-play evidence.
 import { createState, step, depart, dock, interact, startDive, surface, nearestObservation, skipObservation } from '../../../games/tidebound/src/rules.js';
@@ -12,7 +13,8 @@ function tick(state, input) {
   step(state, 0.1, input);
   if (!decisions) return;
   let observation;
-  while ((observation = nearestObservation(state, 45))) {
+  for(let guard=0;(observation=nearestObservation(state,45));guard++){
+    if(guard>20)throw Error("sample loop "+JSON.stringify({observation,skipped:state.voyage.skippedObservations,variant:state.voyage.variantId}));
     decisions.push({ time: +state.time.toFixed(2), kind: 'optional-sample-or-skip', id: observation.id });
     skipObservation(state, observation.id);
   }
@@ -33,7 +35,7 @@ export function sailLeg(state, points, toIslandId) {
     }
   }
   decisions?.push({ time: +state.time.toFixed(2), kind: 'brake-and-dock', id: toIslandId });
-  while (state.boat.speed > 0.5 || state.boat.sail > 0) tick(state, { brake: true });
+  for(let guard=0;state.boat.speed>.5||state.boat.sail>0;guard++){if(guard>1000)throw Error("braking stalled "+JSON.stringify(state));tick(state,{brake:true});}
   const hull = state.boat.hull;
   const events = dock(state);
   if (state.currentIsland !== toIslandId) throw new Error(`Dock failed: ${toIslandId}: ${JSON.stringify(events)}`);
@@ -42,18 +44,12 @@ export function sailLeg(state, points, toIslandId) {
 export function dive(state, id, returnSwimming = false) {
   const started = state.time, site = DIVE_SITES.find((item) => item.id === id);
   startDive(state, id);
-  for (const target of returnSwimming ? [site.target, site.entry] : [site.target]) {
-    while (distance(state.diver, target) > (target === site.target ? 4.4 : 0.5)) {
-      const dx = target.x - state.diver.x, dz = target.z - state.diver.z, d = Math.hypot(dx, dz);
-      step(state, 0.1, { diveX: dx / d, diveZ: dz / d });
-    }
-    if (target === site.target) interact(state);
-  }
+  completeDive(state);if(returnSwimming)swim(state,site.entry);
   surface(state);
   return { siteId: id, seconds: +(state.time - started).toFixed(2) };
 }
-export function measureFirst(seed = 1, time = 0, routeId = 'safe', continueStory = false) {
-  const state = createState(seed); state.time = time; depart(state);
+export function measureFirst(seed = 1, time = 0, routeId = 'safe', continueStory = false,rigId='steady') {
+  const state = createState(seed); state.time = time;state.rigId=rigId;depart(state);
   const legs = [], dives = []; decisions = [];
   for (const leg of CONTRACTS[0].routes.find((route) => route.id === routeId).legs) {
     legs.push(sailLeg(state, leg.waypoints.slice(1), leg.toIslandId));

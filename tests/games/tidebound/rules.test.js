@@ -1,7 +1,8 @@
+import {completeDive} from '../../tidebound/pilot-rules.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, REEFS, WHIRLS, CURRENTS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, TIDE_PERIOD } from '../../../games/tidebound/src/world.js';
-import { CREDITS_DESCRIPTION, createState, tideAt, currentAt, whirlActive, step, depart, dock, interact, startDive, surface, rescue, advanceTide, serialize, restore, contractProgress, nextObjective, nearestObservation, collectObservation, skipObservation, nearestRouteChoice, chooseRoute, activeNavigation, cancelRoute } from '../../../games/tidebound/src/rules.js';
+import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, REEFS, WHIRLS, CURRENTS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, TIDE_PERIOD, STORY_STAGES } from '../../../games/tidebound/src/world.js';
+import { CREDITS_DESCRIPTION, createState, tideAt, currentAt, whirlActive, step, depart, dock, interact, startDive, surface, rescue, advanceTide, serialize, restore, contractProgress, nextObjective, nearestObservation, collectObservation, skipObservation, nearestRouteChoice, compileRouteChoices, chooseRoute, activeNavigation, cancelRoute } from '../../../games/tidebound/src/rules.js';
 import { measureFirst } from './maker-pacing.mjs';
 import { simulateReturn, simulateBranch, simulateCompleteLeg, crossingLegs, startLeg } from './maker-0011-navigation.mjs';
 
@@ -14,6 +15,7 @@ const pointSegmentDistance = (p, a, b) => {
 };
 function moor(state, islandId) {
   const island = islandById(islandId);
+  const index=STORY_STAGES.findIndex(s=>DIVE_SITES.find(d=>d.id===s.siteId).islandId===islandId);for(const stage of STORY_STAGES.slice(0,Math.max(0,index)))if(!state.parts.includes(stage.partId))state.parts.push(stage.partId);
   Object.assign(state.boat, island.dock, { speed: 0, sail: 0 });
   state.mode = 'sailing';
   return dock(state);
@@ -35,7 +37,9 @@ function navigate(state, waypoints) {
   for (let i = 0; i < 15; i += 1) step(state, 0.1, { brake: true });
 }
 function swimTo(state, target) {
-  for (let i = 0; i < 300; i += 1) {
+  if(target===DIVE_SITES.find(s=>s.id===state.activeDive)?.target&&!state.diveTasks[state.activeDive].opened)completeDive(state);
+
+  for (let i = 0; i < 1200; i += 1) {
     const dx = target.x - state.diver.x, dz = target.z - state.diver.z, d = Math.hypot(dx, dz);
     if (d < 1) return;
     step(state, 0.1, { diveX: dx / d, diveZ: dz / d });
@@ -107,7 +111,7 @@ test('phase descriptions match the continuous water level and forecasts announce
   }
   for (let transition = 60; transition <= TIDE_PERIOD * 10; transition += 60) {
     const state = createState();
-    state.time = transition - 30.01;
+    depart(state);state.time = transition - 30.01;
     const events = step(state, 0.02);
     const forecast = events.find((entry) => entry.type === 'tide-forecast');
     assert.ok(forecast);
@@ -274,7 +278,7 @@ test('each finite dive supports three collect-and-return trips with >15% oxygen 
       surface(state);
       assert.equal(state.mode, 'island');
     }
-    assert.equal(state.parts.length, 1);
+    assert.equal(state.parts.length,STORY_STAGES.findIndex(s=>s.siteId===site.id)+1);
   }
 });
 
@@ -312,7 +316,7 @@ test('dive region is bounded, bubbles refill oxygen and surface never soft-locks
 test('all three main parts, lighthouse repair, return celebration and free replay form a complete story', () => {
   const state = createState();
   depart(state);
-  for (const site of DIVE_SITES) {
+  for (const site of [...DIVE_SITES].sort((a,b)=>STORY_STAGES.findIndex(s=>s.siteId===a.id)-STORY_STAGES.findIndex(s=>s.siteId===b.id))) {
     moor(state, site.islandId); interact(state); startDive(state, site.id);
     swimTo(state, site.target); interact(state); surface(state); depart(state);
   }
@@ -331,48 +335,29 @@ test('all three main parts, lighthouse repair, return celebration and free repla
   assert.equal(state.storyComplete, true);
 });
 
-test('save recovery is safe, versioned, idempotent and never advances offline resources', () => {
-  for (const mode of ['harbor', 'island', 'sailing', 'diving']) {
-    let state = createState(9);
-    depart(state); moor(state, 'coral'); interact(state);
-    state.mode = mode;
-    state.time = 172.25; state.parts = ['prism']; state.completed = ['gull-watch']; state.credits = 37;
-    state.boat.hull = 1;
-    state.boat.x = 86; state.boat.z = 115;
-    for (let i = 0; i < 5; i += 1) {
-      const result = restore(serialize(state));
-      state = result.state;
-      assert.equal(state.time, 172.25);
-      assert.equal(state.boat.hull, 100);
-      assert.equal(state.credits, 37);
-      assert.deepEqual(state.parts, ['prism']);
-      assert.deepEqual(state.completed, ['gull-watch']);
-      assert.equal(state.currentIsland, 'coral');
-      assert.ok(distance(state.boat, islandById('coral').dock) < 0.01);
-      assert.ok(!['sailing', 'diving'].includes(state.mode));
+test('save recovery is versioned, idempotent and preserves valid live voyage resources', () => {
+  for(const mode of ['sailing','diving']){
+    let state=createState(9);depart(state);moor(state,'coral');interact(state);
+    if(mode==='diving'){startDive(state,'coral-dive');step(state,2,{diveX:1});}
+    else{depart(state);Object.assign(state.boat,{x:86,z:115,hull:41,sail:.5,speed:1});}
+    state.time=172.25;state.parts=['prism'];state.completed=['gull-watch'];state.credits=37;
+    const boat={...state.boat},oxygen=state.oxygen,diver={...state.diver};
+    for(let i=0;i<5;i++){
+      state=restore(serialize(state)).state;
+      assert.equal(state.time,172.25);assert.equal(state.mode,mode);assert.deepEqual(state.boat,boat);
+      assert.equal(state.oxygen,oxygen);if(mode==='diving')assert.deepEqual(state.diver,diver);
+      assert.equal(state.credits,37);assert.deepEqual(state.parts,['prism']);assert.deepEqual(state.completed,['gull-watch']);
     }
   }
 });
 
-test('interrupted cargo is halved once: rereading the same snapshot and five safe re-saves never compound loss', () => {
-  for (const mode of ['sailing', 'diving']) {
-    const original = createState();
-    depart(original); moor(original, 'coral');
-    original.mode = mode;
-    original.cargo = ['tern', 'turtle', 'fan-coral', 'mangrove-root', 'glass-coral'];
-    original.parts = ['prism']; original.credits = 123;
-    const snapshot = serialize(original);
-    const expectedCargo = ['mangrove-root', 'glass-coral'];
-    for (let i = 0; i < 5; i += 1) assert.deepEqual(restore(snapshot).state.cargo, expectedCargo);
-    let restored = restore(snapshot).state;
-    for (let i = 0; i < 5; i += 1) {
-      assert.equal(restored.mode, 'island');
-      assert.deepEqual(restored.cargo, expectedCargo);
-      assert.deepEqual(restored.parts, ['prism']);
-      assert.equal(restored.credits, 123);
-      restored = restore(serialize(restored)).state;
-    }
-    assert.deepEqual(original.cargo, ['tern', 'turtle', 'fan-coral', 'mangrove-root', 'glass-coral']);
+test('reload retains cargo without compounding loss; invalid positions recover to a safe dock', () => {
+  let state=createState();depart(state);state.cargo=['tern','turtle','fan-coral','mangrove-root','glass-coral'];
+  for(let i=0;i<5;i++)state=restore(serialize(state)).state;
+  assert.equal(state.cargo.length,5);assert.equal(state.mode,'sailing');
+  for(const bad of [NaN,Infinity,99999]){
+    const invalid={...state,boat:{...state.boat,x:bad}};const recovered=restore(serialize(invalid)).state;
+    assert.equal(recovered.mode,'harbor');assert.equal(recovered.boat.hull,100);assert.equal(recovered.cargo.length,5);
   }
 });
 
@@ -508,7 +493,7 @@ test('optional observation samples have safe locations, distinct knowledge, rang
   assert.equal(skipObservation(state, distant.id)[0].type, 'info');
 });
 
-test('skipping is saved but permits later collection; rescue loss, delivery and new-voyage reset are idempotent', () => {
+test('skipping is saved but permits later collection; retained cargo, delivery and new-voyage reset are idempotent', () => {
   let state = createState(); depart(state);
   for (const item of OBSERVATIONS.slice(0, 4)) {
     Object.assign(state.boat, item, { speed: 0 });
@@ -519,15 +504,15 @@ test('skipping is saved but permits later collection; rescue loss, delivery and 
   }
   assert.equal(state.cargo.length, 4);
   state = restore(serialize(state)).state;
-  assert.equal(state.cargo.length, 2);
+  assert.equal(state.cargo.length, 4);
   assert.equal(state.voyage.harvested.length, 4);
   assert.equal(state.voyage.skippedObservations.length, 4);
   for (let i = 0; i < 5; i += 1) state = restore(serialize(state)).state;
-  assert.equal(state.cargo.length, 2);
+  assert.equal(state.cargo.length, 4);
   const before = state.credits;
   moor(state, 'harbor');
-  assert.equal(state.credits, before + 6);
-  dock(state); assert.equal(state.credits, before + 6);
+  assert.equal(state.credits, before + 12);
+  dock(state); assert.equal(state.credits, before + 12);
   depart(state);
   assert.deepEqual(state.voyage.harvested, []);
   assert.deepEqual(state.voyage.skippedObservations, []);
@@ -546,12 +531,12 @@ test('sailing interaction prioritizes a nearby port over samples', () => {
   assert.equal(state.cargo.length, 0);
 });
 
-test('recommended stable-rig rule navigation completes first voyage in 4–6 minutes and continuous story in 8–12 without waiting', () => {
+test('recommended stable-rig rule navigation completes first voyage in 6–9 minutes and continuous story in 10–15 without waiting', () => {
   // Deterministic pure-rules autopilot, not a browser or human-play timing claim.
   for (const seed of [1, 2, 3, 8, 16]) for (const time of [0, 60, 120, 180]) {
     const result = measureFirst(seed, time, 'safe', true);
-    assert.ok(result.seconds >= 240 && result.seconds <= 360, `${seed}/${time}: first ${result.seconds}s`);
-    assert.ok(result.story.totalSeconds >= 480 && result.story.totalSeconds <= 720, `${seed}/${time}: story ${result.story.totalSeconds}s`);
+    assert.ok(result.seconds >= 360 && result.seconds <= 540, `${seed}/${time}: first ${result.seconds}s`);
+    assert.ok(result.story.totalSeconds >= 600 && result.story.totalSeconds <= 900, `${seed}/${time}: story ${result.story.totalSeconds}s`);
     assert.equal(result.damage, 0); assert.equal(result.story.damage, 0);
     assert.equal(result.delivered, true); assert.equal(result.story.completed, true);
     assert.equal(new Set(result.decisions.filter((item) => item.kind === 'optional-sample-or-skip').map((item) => item.id)).size, result.decisions.filter((item) => item.kind === 'optional-sample-or-skip').length, 'repeated buoy sightings must not count as fresh choices');
@@ -627,7 +612,8 @@ test('new geographical gates can replace an older guide after eighteen seconds; 
   chooseRoute(state, next.id, 'outer'); assert.equal(state.voyage.routeChoices.length, 2);
   assert.equal(activeNavigation(state).choiceId, next.id);
   const restored = restore(serialize(state)).state;
-  assert.equal(activeNavigation(restored), null); assert.equal(restored.voyage.routeChoices.length, 2);
+  assert.deepEqual(activeNavigation(restored), activeNavigation(state)); assert.equal(restored.voyage.routeChoices.length, 2);
+  const invalid=structuredClone(state);invalid.boat.x=999;assert.equal(activeNavigation(restore(invalid).state),null);
   rescue(state); assert.equal(activeNavigation(state), null);
 });
 
@@ -693,7 +679,7 @@ test('four-direction entrances expose the real east/west crossing, retain north/
     assert.equal(recovered.voyage.routeChoices.length, 1);
     assert.equal(recovered.voyage.routeChoices[0].direction, fixture.direction);
     assert.equal(recovered.credits, 93); assert.deepEqual(recovered.parts, ['prism']);
-    assert.equal(activeNavigation(recovered), null);
+    assert.deepEqual(activeNavigation(recovered), activeNavigation(state));
     state.boat.heading += Math.PI;
     state.voyage.routeChoices = []; state.voyage.navigation = null;
     assert.notEqual(nearestRouteChoice(state)?.direction, fixture.direction);
@@ -709,20 +695,20 @@ test('direction metadata uses finite geometry, safe fallbacks and a distance bou
   try {
     for (const malformed of [null, [], 'bad', { x: '64', z: 35, radius: 17 }, { x: 64, z: 35, radius: -1 }, { x: Infinity, z: 35, radius: 17 }]) {
       gate.directions.east.entry = malformed;
-      assert.equal(nearestRouteChoice(state)?.id, gate.id, 'invalid custom entry falls back to the authored gate circle');
+      assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices())?.id, gate.id, 'invalid custom entry falls back to the authored gate circle');
     }
     gate.directions.east.entry = { x: 64, z: 35, radius: 20, lateralRadius: -1, maxDestinationDistance: 5 };
-    assert.equal(nearestRouteChoice(state), null, 'known destination distance limit is enforced');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices()), null, 'known destination distance limit is enforced');
     gate.directions.east.destinationIslandId = 'not-an-island';
-    assert.equal(nearestRouteChoice(state)?.id, gate.id, 'unknown destination ignores the optional bound safely');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices())?.id, gate.id, 'unknown destination ignores the optional bound safely');
     gate.directions.east.destinationIslandId = 'gull';
     gate.directions.east.entry.maxDestinationDistance = NaN;
-    assert.equal(nearestRouteChoice(state)?.id, gate.id, 'nonfinite bound is ignored; another contract does not hide this free-exploration gate');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices())?.id, gate.id, 'nonfinite bound is ignored; another contract does not hide this free-exploration gate');
     gate.directions.east.entries = [null, { x: 0, z: 0, radius: 0 }, { x: 50, z: 35, radius: 12, options: 'invalid' }];
-    const fallback = nearestRouteChoice(state);
+    const fallback = nearestRouteChoice(state, undefined, compileRouteChoices());
     assert.equal(fallback.options.length, 2);
     gate.directions.east.options = [{ id: 'outer', waypoints: [{ x: NaN, z: 0 }] }];
-    assert.equal(nearestRouteChoice(state), null, 'invalid option metadata never reaches geometry or UI code');
+    assert.equal(nearestRouteChoice(state, undefined, compileRouteChoices()), null, 'invalid option metadata never reaches geometry or UI code');
   } finally { gate.directions.east = original; }
 });
 

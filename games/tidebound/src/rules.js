@@ -1,10 +1,13 @@
-import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, CURRENTS, REEFS, WHIRLS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, WORLD_BOUND, TIDE_PERIOD } from './world.js';
+import { ISLANDS, DISCOVERIES, CONTRACTS, RIGS, CURRENTS, REEFS, WHIRLS, DIVE_SITES, OBSERVATIONS, ROUTE_CHOICES, ROUTE_DIRECTIONS, WORLD_BOUND, TIDE_PERIOD, STORY_STAGES, voyageVariant, encounterVariant, diveStage, diveTarget, valvePhase, guardianInto } from './world.js';
 
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
-const getIsland = (id) => ISLANDS.find((item) => item.id === id) || ISLANDS[0];
-const getRig = (id) => RIGS.find((item) => item.id === id) || RIGS[0];
-const getSite = (id) => DIVE_SITES.find((item) => item.id === id);
+const islandLookup=Object.fromEntries(ISLANDS.map(s=>[s.id,s])),rigLookup=Object.fromEntries(RIGS.map(s=>[s.id,s])),siteLookup=Object.fromEntries(DIVE_SITES.map(s=>[s.id,s]));
+const getIsland=id=>Object.hasOwn(islandLookup,id)?islandLookup[id]:ISLANDS[0];
+const getRig=id=>Object.hasOwn(rigLookup,id)?rigLookup[id]:RIGS[0];
+const getSite=id=>Object.hasOwn(siteLookup,id)?siteLookup[id]:undefined;
+// Permanent parts unlock stations; only an observation on this voyage completes a dive.
+function observedDiveThisVoyage(state,site){return !!site && state.voyage.observed?.includes(site.discoveryId)===true;}
 const event = (type, text, extra = {}) => ({ type, text, ...extra });
 // The level remains a continuous sine wave; a phase name describes its whole quarter,
 // rather than calling the entire falling quarter "high tide".
@@ -26,13 +29,18 @@ export function createState(seed = 1) {
     boat: { ...homeDock, heading: 0, sail: 0, hull: 100, speed: 0 },
     rigId: 'steady', contractId: 'coral-survey', currentIsland: 'harbor', lastSafeIsland: 'harbor',
     discoveries: [], parts: [], completed: [], cargo: [], lighthouseFixed: false, storyComplete: false,
+    storyStage:0,diveTasks:Object.fromEntries(DIVE_SITES.map(s=>[s.id,{completedStationIds:[],opened:false}])),supplyRemaining:900,supplyRefilledStages:[],difficulty:'standard',guardianCooldown:0,guardianWarnedCycle:-1,valveWarnedCycle:-1,
     oxygen: 55, diver: { ...homeDock }, activeDive: null, diveCollected: false,
-    credits: 0, records: { bestTime: null, bestDamage: null, voyages: 0, rescues: 0, byContract: {} },
-    voyage: { active: false, startedAt: 0, elapsed: 0, damage: 0, harvested: [], observed: [], skippedObservations: [], visited: [], rescued: false, legIndex: -1, routeChoices: [], navigation: null },
+    credits: 0, records: { bestTime: null, bestDamage: null, voyages: 0, rescues: 0, byContract: {},byVariant:{} },
+    voyage: { variantId:voyageVariant(seed).id,variantVersion:1,active: false, startedAt: 0, elapsed: 0, damage: 0, harvested: [], observed: [], skippedObservations: [], visited: [], rescued: false, legIndex: -1, routeChoices: [], navigation: null },
     result: null, contactCooldown: 0, warningCooldown: 0, lowHullWarned: false,
   };
 }
 
+export function sampleTideInto(time,out){const phase=((finite(time)%TIDE_PERIOD)+TIDE_PERIOD)%TIDE_PERIOD;out.height=Math.sin(phase/TIDE_PERIOD*Math.PI*2);out.index=Math.floor(phase/(TIDE_PERIOD/4));return out;}
+const supplyWarnings=[120,60,15];
+const guardianScratch={x:0,z:0,radius:6,active:false,warning:false};
+const physicsTide={height:0,index:0},physicsCurrent={x:0,z:0,dx:0,dz:0,strength:0};
 export function tideAt(time) {
   const phase = ((finite(time) % TIDE_PERIOD) + TIDE_PERIOD) % TIDE_PERIOD;
   const quarter = TIDE_PERIOD / 4;
@@ -50,29 +58,30 @@ export function tideAt(time) {
   };
 }
 
-export function currentAt(x, z, time, seed = 1) {
+export function currentAt(x,z,time,seed=1){return currentAtInto(x,z,time,seed,{});}
+export function currentAtInto(x, z, time, seed, out) {
   let dx = 0, dz = 0;
   const strengthScale = 0.88 + seedOf(seed) * 0.015;
-  for (const stream of CURRENTS) {
+  for(let index_stream=0;index_stream<CURRENTS.length;index_stream++){const stream=CURRENTS[index_stream];
     const d = Math.hypot(x - stream.x, z - stream.z);
     if (d >= stream.radius) continue;
-    const phase = Math.sin(time / TIDE_PERIOD * Math.PI * 2 + stream.phase);
+    const phase = Math.sin(time / TIDE_PERIOD * Math.PI * 2 + stream.phase+voyageVariant(seed).hazardPhase);
     const force = (1 - d / stream.radius) * stream.strength * phase * strengthScale;
     dx += stream.dx * force; dz += stream.dz * force;
   }
-  for (const whirl of WHIRLS) {
-    if (!whirlActive(whirl, time)) continue;
+  for(let index_whirl=0;index_whirl<WHIRLS.length;index_whirl++){const whirl=WHIRLS[index_whirl];
+    if (!whirlActive(whirl, time,seed)) continue;
     const vx = x - whirl.x, vz = z - whirl.z, d = Math.hypot(vx, vz);
     if (d < 0.01 || d >= whirl.radius) continue;
     const force = (1 - d / whirl.radius) * whirl.strength;
     dx += (-vz / d - vx / d * 0.18) * force;
     dz += (vx / d - vz / d * 0.18) * force;
   }
-  return { x: dx, z: dz, dx, dz, strength: Math.hypot(dx, dz) };
+  out.x=out.dx=dx;out.z=out.dz=dz;out.strength=Math.hypot(dx,dz);return out;
 }
 
-export function whirlActive(whirl, time) {
-  return Math.sin(time / TIDE_PERIOD * Math.PI * 2 + whirl.phase) > 0.25;
+export function whirlActive(whirl, time,seed=1) {
+  return Math.sin(time / TIDE_PERIOD * Math.PI * 2 + whirl.phase+voyageVariant(seed).hazardPhase) > 0.25;
 }
 
 export function contractProgress(state, contractId = state.contractId) {
@@ -115,10 +124,11 @@ function localRouteOptions(state, gate, direction) {
   });
 }
 
+const pathObstacles=[...ISLANDS.map(item=>({x:item.x,z:item.z,clearance:item.radius+7})),...REEFS.map(item=>({x:item.x,z:item.z,clearance:item.radius+1})),...WHIRLS.map(item=>({x:item.x,z:item.z,clearance:item.radius+1}))];
 function clearLocalPath(origin, waypoints) {
   for (const target of waypoints) {
     const dx = target.x - origin.x, dz = target.z - origin.z, length = dx * dx + dz * dz;
-    for (const obstacle of [...ISLANDS.map((item) => ({ ...item, clearance: item.radius + 7 })), ...REEFS.map((item) => ({ ...item, clearance: item.radius + 1 })), ...WHIRLS.map((item) => ({ ...item, clearance: item.radius + 1 }))]) {
+    for (const obstacle of pathObstacles) {
       const projection = length ? clamp(((obstacle.x - origin.x) * dx + (obstacle.z - origin.z) * dz) / length, 0, 1) : 0;
       if (Math.hypot(obstacle.x - origin.x - projection * dx, obstacle.z - origin.z - projection * dz) < obstacle.clearance - 1e-6) return false;
     }
@@ -130,41 +140,77 @@ function clearLocalPath(origin, waypoints) {
 const validEntry = (entry) => entry && Number.isFinite(entry.x) && Number.isFinite(entry.z) && Number.isFinite(entry.radius) && entry.radius > 0;
 const validOptions = (options) => Array.isArray(options) && options.length >= 2 && options.every((option) => option && typeof option.id === 'string' && Array.isArray(option.waypoints) && option.waypoints.length && option.waypoints.every((point) => point && Number.isFinite(point.x) && Number.isFinite(point.z)));
 
-export function nearestRouteChoice(state, radiusOverride) {
-  const lastChoice = state.voyage.routeChoices?.at(-1);
-  if (state.mode !== 'sailing' || (activeNavigation(state) && lastChoice && state.time - lastChoice.time < 18)) return null;
-  const forward = { x: Math.sin(state.boat.heading), z: -Math.cos(state.boat.heading) };
-  return ROUTE_CHOICES.flatMap((gate) => Object.entries(gate.directions).flatMap(([direction, data]) => {
-    const axis = Object.hasOwn(ROUTE_DIRECTIONS, direction) && ROUTE_DIRECTIONS[direction];
-    const minForwardDot = Number.isFinite(data?.minForwardDot) && data.minForwardDot >= 0 && data.minForwardDot <= 1 ? data.minForwardDot : 0.2;
-    if (!axis || !data || !validOptions(data.options) || forward.x * axis.x + forward.z * axis.z < minForwardDot) return [];
-    const entries = [validEntry(data.entry) ? data.entry : gate, ...(Array.isArray(data.entries) ? data.entries.filter(validEntry) : [])];
-    return entries.flatMap((entry, entryIndex) => {
-    const destinationIslandId = typeof entry.destinationIslandId === 'string' ? entry.destinationIslandId : data.destinationIslandId;
-    const destination = ISLANDS.find((island) => island.id === destinationIslandId);
-    if (destination && Number.isFinite(entry.maxDestinationDistance) && entry.maxDestinationDistance > 0 && distance(state.boat, destination.dock) > entry.maxDestinationDistance) return [];
-    const dx = state.boat.x - entry.x, dz = state.boat.z - entry.z;
-    const along = dx * axis.x + dz * axis.z, across = dx * axis.z - dz * axis.x;
-    const lateralRadius = Number.isFinite(entry.lateralRadius) && entry.lateralRadius > 0 ? entry.lateralRadius : entry.radius;
-    const withinEntry = Math.hypot(along / entry.radius, across / lateralRadius) <= 1;
-    const options = validOptions(entry.options) ? entry.options : data.options;
-    return [{ ...gate, directions: { ...gate.directions, [direction]: { ...data, destinationIslandId, options } }, x: entry.x, z: entry.z, radius: entry.radius, direction, entryIndex, axis, withinEntry, distance: distance(state.boat, entry) }];
-    });
-  }))
-    .filter((gate) => (!(Number.isFinite(radiusOverride) && radiusOverride > 0) ? gate.withinEntry : gate.distance <= radiusOverride)
-      && (state.boat.x - gate.x) * gate.axis.x + (state.boat.z - gate.z) * gate.axis.z <= 2
-      && gate.directions[gate.direction].options.every((option) => clearLocalPath(state.boat, option.waypoints))
-      && !(state.voyage.routeChoices || []).some((choice) => choice.id === gate.id && choice.legIndex === state.voyage.legIndex))
-    .sort((a, b) => a.distance - b.distance)
-    .map((gate) => ({ ...gate, options: localRouteOptions(state, gate, gate.direction) }))[0] || null;
+// Flatten once; entryIndex is the original canonical identity used by saves.
+export function compileRouteChoices(gates=ROUTE_CHOICES){const candidates=[];
+for(const gate of gates)for(const [direction,data]of Object.entries(gate.directions)){
+ const axis=Object.hasOwn(ROUTE_DIRECTIONS,direction)&&ROUTE_DIRECTIONS[direction];
+ if(!axis||!data||!validOptions(data.options))continue;
+ const entries=[validEntry(data.entry)?data.entry:gate,...(Array.isArray(data.entries)?data.entries.filter(validEntry):[])];
+ for(let entryIndex=0;entryIndex<entries.length;entryIndex++){
+  const entry=entries[entryIndex],destinationIslandId=typeof entry.destinationIslandId==='string'?entry.destinationIslandId:data.destinationIslandId,options=validOptions(entry.options)?entry.options:data.options;
+  candidates.push({gate,entry,axis,direction,entryIndex,destination:ISLANDS.find(i=>i.id===destinationIslandId),minForwardDot:Number.isFinite(data.minForwardDot)&&data.minForwardDot>=0&&data.minForwardDot<=1?data.minForwardDot:.2,
+   resolved:{...gate,x:entry.x,z:entry.z,radius:entry.radius,axis,direction,entryIndex,directions:{...gate.directions,[direction]:{...data,destinationIslandId,options}}}});
+ }
+}
+return candidates;
+}
+const routeCandidates=compileRouteChoices(),emptyRouteHistory=Object.freeze([]);
+export function nearestRouteChoice(state, radiusOverride, candidates=routeCandidates) {
+ const history=state.voyage.routeChoices||emptyRouteHistory,lastChoice=history?.at(-1),nav=state.voyage.navigation;
+ if(state.mode!=='sailing'||(nav&&nav.legIndex===state.voyage.legIndex&&nav.waypoints[nav.index]&&lastChoice&&state.time-lastChoice.time<18))return null;
+ const fx=Math.sin(state.boat.heading),fz=-Math.cos(state.boat.heading);let winner=null,best=Infinity,within=false;
+ for(let i=0;i<candidates.length;i++){
+  const c=candidates[i],entry=c.entry,axis=c.axis;
+  if(fx*axis.x+fz*axis.z<c.minForwardDot)continue;
+  let excluded=false;for(let j=0;j<history.length;j++)if(history[j].id===c.gate.id&&history[j].legIndex===state.voyage.legIndex){excluded=true;break;}if(excluded)continue;
+  const dx=state.boat.x-entry.x,dz=state.boat.z-entry.z,along=dx*axis.x+dz*axis.z,across=dx*axis.z-dz*axis.x;
+  if(along>2)continue;
+  const lateral=Number.isFinite(entry.lateralRadius)&&entry.lateralRadius>0?entry.lateralRadius:entry.radius;
+  const inside=Math.hypot(along/entry.radius,across/lateral)<=1,d=Math.hypot(dx,dz);
+  if((Number.isFinite(radiusOverride)&&radiusOverride>0?d>radiusOverride:!inside)||d>=best)continue;
+  if(c.destination&&Number.isFinite(entry.maxDestinationDistance)&&entry.maxDestinationDistance>0&&distance(state.boat,c.destination.dock)>entry.maxDestinationDistance)continue;
+  const options=c.resolved.directions[c.direction].options;let clear=true;
+  for(let j=0;j<options.length;j++)if(!clearLocalPath(state.boat,options[j].waypoints)){clear=false;break;}if(!clear)continue;
+  winner=c;best=d;within=inside;
+ }
+ return winner?{...winner.resolved,distance:best,withinEntry:within,options:localRouteOptions(state,winner.resolved,winner.direction)}:null;
 }
 
+function routeEntries(gate, direction) {
+  if (typeof direction !== 'string' || !Object.hasOwn(ROUTE_DIRECTIONS, direction) || !Object.hasOwn(gate.directions, direction)) return [];
+  const data = gate.directions[direction];
+  return [validEntry(data.entry) ? data.entry : gate, ...(Array.isArray(data.entries) ? data.entries.filter(validEntry) : [])].map(entry => validOptions(entry.options) ? entry.options : data.options);
+}
 function validSavedRouteChoice(choice) {
-  if (!choice || typeof choice.direction !== 'string' || !Object.hasOwn(ROUTE_DIRECTIONS, choice.direction)) return false;
-  const gate = ROUTE_CHOICES.find((item) => item.id === choice.id);
-  if (!gate || !Object.hasOwn(gate.directions, choice.direction)) return false;
-  const options = gate.directions[choice.direction]?.options;
-  return Array.isArray(options) && options.some((option) => option.id === choice.optionId);
+  if (!choice) return false;
+  const gate = ROUTE_CHOICES.find(item => item.id === choice.id);
+  if (!gate) return false;
+  const entries = routeEntries(gate, choice.direction);
+  // Missing entryIndex is the only legacy form; malformed explicit values are rejected.
+  const index = Object.hasOwn(choice, 'entryIndex') ? choice.entryIndex : 0;
+  return Number.isInteger(index) && index >= 0 && !!entries[index]?.some(option => option.id === choice.optionId);
+}
+export function restoreNavigation(saved, voyage) {
+  if (!saved || !Number.isInteger(saved.legIndex) || saved.legIndex !== voyage.legIndex || !Number.isInteger(saved.index) || saved.index < 0) return null;
+  const gate = ROUTE_CHOICES.find(item => item.id === saved.choiceId);
+  if (!gate) return null;
+  const history = voyage.routeChoices.find(item => item.id === gate.id && item.optionId === saved.optionId && item.legIndex === saved.legIndex);
+  if (!history) return null;
+  const legacy = !Object.hasOwn(saved, 'direction') && !Object.hasOwn(saved, 'entryIndex');
+  const direction = legacy ? history.direction : saved.direction;
+  if (direction !== history.direction) return null;
+  const entries = routeEntries(gate, direction);
+  let entryIndex = saved.entryIndex;
+  if (legacy) {
+    const matches = entries.map((options, index) => ({ option: options.find(o => o.id === saved.optionId), index })).filter(({option}) => option && Array.isArray(saved.waypoints) && saved.waypoints.length === option.waypoints.length && saved.waypoints.every((p,i) => p && Number.isFinite(p.x) && Number.isFinite(p.z) && p.x === option.waypoints[i].x && p.z === option.waypoints[i].z));
+    if (!matches.length) return null;
+    // Equivalent duplicate entries share the same canonical option and are safe.
+    entryIndex = matches[0].index;
+  }
+  if (!Number.isInteger(entryIndex) || entryIndex < 0 || (!legacy && entryIndex !== history.entryIndex)) return null;
+  const option = entries[entryIndex]?.find(o => o.id === saved.optionId);
+  if (!option || saved.index >= option.waypoints.length) return null;
+  return { choiceId: gate.id, optionId: option.id, direction, entryIndex, label: option.label, waypoints: option.waypoints.map(p => ({x:p.x,z:p.z})), index:saved.index, legIndex:saved.legIndex };
 }
 
 export function chooseRoute(state, choiceId, optionId) {
@@ -173,8 +219,8 @@ export function chooseRoute(state, choiceId, optionId) {
   const option = gate.options.find((item) => item.id === optionId && item.available);
   if (!option) return [event('info', '請選擇這個導航門提供的航路。')];
   state.voyage.routeChoices ||= [];
-  state.voyage.routeChoices.push({ id: gate.id, choiceId: gate.id, direction: gate.direction, optionId, time: state.time, tideHeight: tideAt(state.time).height, cargoCount: state.cargo.length, legIndex: state.voyage.legIndex });
-  state.voyage.navigation = { choiceId: gate.id, optionId, label: option.label, waypoints: option.waypoints.map((point) => ({ ...point })), index: 0, legIndex: state.voyage.legIndex };
+  state.voyage.routeChoices.push({ id: gate.id, choiceId: gate.id, direction: gate.direction, entryIndex: gate.entryIndex ?? 0, optionId, time: state.time, tideHeight: tideAt(state.time).height, cargoCount: state.cargo.length, legIndex: state.voyage.legIndex });
+  state.voyage.navigation = { choiceId: gate.id, optionId, direction: gate.direction, entryIndex: gate.entryIndex ?? 0, label: option.label, waypoints: option.waypoints.map((point) => ({ ...point })), index: 0, legIndex: state.voyage.legIndex };
   return [event('route-choice', `已選${option.label}。${option.condition} 請手動駛向藍色航路點；隨時可取消引導。`, { choiceId: gate.id, optionId })];
 }
 
@@ -184,14 +230,14 @@ export function cancelRoute(state) {
 }
 
 export function nearestObservation(state, radius = 45, { includeSkipped = false } = {}) {
-  if (state.mode !== 'sailing') return null;
-  return OBSERVATIONS.map((item) => ({ ...item, distance: distance(state.boat, item) }))
-    .filter((item) => item.distance <= radius && !state.voyage.harvested.includes(`observation:${item.id}`) && (includeSkipped || !state.voyage.skippedObservations?.includes(item.id)))
-    .sort((a, b) => a.distance - b.distance)[0] || null;
+ if(state.mode!=='sailing')return null;
+ const points=encounterVariant(state).observations;let best=null,best2=radius*radius;
+ for(let i=0;i<points.length;i++){const p=points[i];if(state.voyage.harvested.includes(`observation:${p.id}`)||(!includeSkipped&&state.voyage.skippedObservations?.includes(p.id)))continue;const dx=p.x-state.boat.x,dz=p.z-state.boat.z,d2=dx*dx+dz*dz;if(d2<=best2&&(!best||d2<best2)){best=p;best2=d2;}}
+ return best?{...best,distance:Math.sqrt(best2)}:null;
 }
 
 export function skipObservation(state, id) {
-  const item = OBSERVATIONS.find((entry) => entry.id === id);
+  const item = encounterVariant(state).observations.find((entry) => entry.id === id);
   if (state.mode !== 'sailing' || !item || distance(state.boat, item) > 45 || state.voyage.harvested.includes(`observation:${id}`)) return [event('info', '靠近尚未取樣的觀測浮標，才能選擇繼續直航。')];
   state.voyage.skippedObservations ||= [];
   addUnique(state.voyage.skippedObservations, id);
@@ -199,7 +245,7 @@ export function skipObservation(state, id) {
 }
 
 export function collectObservation(state, id = nearestObservation(state, 9, { includeSkipped: true })?.id) {
-  const item = OBSERVATIONS.find((entry) => entry.id === id);
+  const item = encounterVariant(state).observations.find((entry) => entry.id === id);
   if (state.mode !== 'sailing' || !item || distance(state.boat, item) > 9) return [event('info', '進入觀測浮標 9 公尺內並收帆，按 E 取樣。')];
   const cargoId = `observation:${id}`;
   if (state.voyage.harvested.includes(cargoId)) return [event('info', '這座浮標本趟已取樣；可繼續直航。')];
@@ -217,7 +263,8 @@ export function depart(state, contractId = state.contractId, rigId = state.rigId
     if (RIGS.some((item) => item.id === rigId)) state.rigId = rigId;
     state.boat.hull = 100;
     state.lowHullWarned = false;
-    state.voyage = { active: true, startedAt: state.time, elapsed: 0, damage: 0, harvested: [], observed: [], skippedObservations: [], visited: ['harbor'], rescued: false, legIndex: 0, routeChoices: [], navigation: null };
+    state.supplyRemaining=900;
+    state.voyage = {variantId:voyageVariant(state.seed).id,variantVersion:1, active: true, startedAt: state.time, elapsed: 0, damage: 0, harvested: [], observed: [], skippedObservations: [], visited: ['harbor'], rescued: false, legIndex: 0, routeChoices: [], navigation: null };
     state.elapsed = 0;
   } else if (!state.voyage.active) {
     state.voyage.active = true;
@@ -276,6 +323,7 @@ export function dock(state) {
     state.credits += contract.reward;
     events.push(event('delivery', `委託完成：${contract.name}，獲得 ${contract.reward} 航海印記。${CREDITS_DESCRIPTION}`, { contractId: contract.id, reward: contract.reward }));
   }
+  const optionalSamples=state.voyage.harvested.filter(id=>id.startsWith('observation:')).length;
   const cargoReward = state.cargo.length * 3;
   state.credits += cargoReward;
   state.cargo = [];
@@ -296,6 +344,11 @@ export function dock(state) {
       voyages: (prior?.voyages || 0) + 1,
     };
   }
+  if(contract&&contractProgress(state).readyToDeliver){
+    const rank=state.voyage.rescued?'bronze':state.voyage.damage>0?'silver':'gold';state.voyage.rank=rank;
+    const contracts=state.records.byVariant[contract.id]||=(Object.create(null)),rigs=contracts[state.rigId]||=(Object.create(null)),id=state.voyage.variantId||1,prior=rigs[id],order={bronze:1,silver:2,gold:3};
+    rigs[id]={bestTime:Math.min(prior?.bestTime??Infinity,state.voyage.elapsed),bestDamage:Math.min(prior?.bestDamage??Infinity,state.voyage.damage),optionalSamples:Math.max(prior?.optionalSamples||0,optionalSamples),rank:prior&&order[prior.rank]>order[rank]?prior.rank:rank};
+  }
   const firstEnding = state.lighthouseFixed && !state.storyComplete;
   if (firstEnding) {
     state.storyComplete = true;
@@ -306,7 +359,7 @@ export function dock(state) {
     text: firstEnding ? '三件零件重新連起七島。繼續自由航行，完成全圖鑑、六份委託，挑戰更快且無損的航線。' : firstDelivery ? `${contract.name}已交付。你的海圖保存了這次發現；可選下一份委託或重走航線挑戰紀錄。` : contract && !contractProgress(state).readyToDeliver ? '本趟委託未完成；下趟需重新完成調查清單，圖鑑與零件保留。所有修復免費。' : '本趟完整調查已完成，委託獎勵不重發；可比較本委託紀錄。圖鑑與主線零件已保存。',
     elapsed: state.voyage.elapsed, damage: state.voyage.damage, reward: (firstDelivery ? contract.reward : 0) + cargoReward,
     creditsDescription: CREDITS_DESCRIPTION,
-    discoveries: state.discoveries.length, parts: state.parts.length, rescued: state.voyage.rescued,
+    rank:state.voyage.rank||null,optionalSamples,discoveries: state.discoveries.length, parts: state.parts.length, rescued: state.voyage.rescued,
   };
   state.mode = 'result';
   state.voyage.active = false;
@@ -335,10 +388,16 @@ export function interact(state) {
   if (state.mode === 'diving') {
     const site = getSite(state.activeDive);
     if (!site) return surface(state);
-    if (distance(state.diver, site.target) > 4.5) return [event('info', '沿發光路標游向金色目標，靠近後按 E；氣泡可補充氧氣。')];
+    const stage=diveStage(state),tasks=state.diveTasks[site.id],target=diveTarget(state);
+    if(distance(state.diver,target)>4.5)return [event('info',`前往${target.name||site.partName}，4.5 公尺內按 E。每站補滿氧氣；可隨時浮出。`)];
+    if(!tasks.opened){
+      if(stage.mechanic==='valves'&&valvePhase(state.time,state.voyage.variantId)>=3)return [event('info',`閥門關閉：${(6-valvePhase(state.time,state.voyage.variantId)).toFixed(1)} 秒後開啟。青綠色時按 E。`)];
+      addUnique(tasks.completedStationIds,target.id);tasks.opened=tasks.completedStationIds.length===stage.stations.length;state.oxygen=site.oxygen;
+      return [event('station',`✓ ${target.name} (${tasks.completedStationIds.length}/${stage.stations.length}) · 氧氣已補滿。${tasks.opened?'零件封印已解開，前往金色物件。':'沿發光引導前往下一站。'}`)];
+    }
     const events = [];
     discover(state, site.discoveryId, events);
-    if (addUnique(state.parts, site.partId)) events.push(event('part', `取得燈塔零件：${site.partName}（${state.parts.length}/3）。主線零件在救援與重載後都會保留。`, { partId: site.partId }));
+    if (addUnique(state.parts, site.partId)){state.storyStage=STORY_STAGES.filter(s=>state.parts.includes(s.partId)).length;if(addUnique(state.supplyRefilledStages,site.id))state.supplyRemaining=900;events.push(event('part', `取得燈塔零件：${site.partName}（${state.parts.length}/3）。主線零件在救援與重載後都會保留。`, { partId: site.partId }));}
     state.diveCollected = true;
     if (!events.length) events.push(event('info', '這片淺灣已完成調查。可回到船旁，或按「浮出回船」。'));
     return events;
@@ -365,12 +424,16 @@ export function interact(state) {
 export function startDive(state, siteId) {
   const site = getSite(siteId);
   if (state.mode !== 'island' || !site || site.islandId !== state.currentIsland) return [event('info', '請先靠岸到該淺水點所在島嶼。')];
+  const stageIndex=STORY_STAGES.findIndex(s=>s.siteId===site.id);if(stageIndex>0&&!state.parts.includes(STORY_STAGES[stageIndex-1].partId)&&!state.parts.includes(site.partId))return [event('info',`先完成${getSite(STORY_STAGES[stageIndex-1].siteId).name}取得零件，再挑戰${site.name}。`)];
+  state.guardianCooldown=diveStage(state,site.id).mechanic==='guardian'?2:0;state.guardianWarnedCycle=-1;state.valveWarnedCycle=-1;
   state.activeDive = site.id;
   state.mode = 'diving';
   state.oxygen = site.oxygen;
   state.diver = { ...site.entry };
-  state.diveCollected = state.parts.includes(site.partId);
-  return [event('dive', `${site.name}：方向鍵／WASD 游動，靠近金色目標按 E；氣泡補氧，隨時可浮出回船。`)];
+  state.diveCollected = observedDiveThisVoyage(state,site);
+  const tasks=state.diveTasks[site.id],name=DISCOVERIES.find(d=>d.id===site.discoveryId).name;
+  const guidance=state.diveCollected?'本趟調查完成，可浮出回船。':tasks.opened?(state.parts.includes(site.partId)?`各站保持解鎖，沿引導前往${name}，按 E 記錄本趟重新調查。`:`各站已解鎖，前往金色目標按 E 取得零件：${site.partName}。`):`依序到發光站按 E，每站補滿 ${site.oxygen} 秒氧氣。最後取得零件；隨時可浮出回船。`;
+  return [event('dive', `${site.name}：${diveStage(state).name}。${guidance}${diveStage(state).mechanic==='guardian'?'入水有 2 秒緩衝，可先離開洋流圈。':''}`)];
 }
 
 export function surface(state) {
@@ -387,14 +450,14 @@ export function surface(state) {
 
 export function rescue(state, reason = '船體受損') {
   const origin = state.mode === 'diving' ? state.diver : state.boat;
-  const island = [...ISLANDS].sort((a, b) => distance(origin, a.dock) - distance(origin, b.dock))[0];
+  const island=reason==='遠航補給耗盡'?getIsland('harbor'):[...ISLANDS].sort((a,b)=>distance(origin,a.dock)-distance(origin,b.dock))[0];
   const lost = Math.ceil(state.cargo.length / 2);
   state.cargo = state.cargo.slice(lost);
   putAtDock(state, island);
   state.boat.hull = 100;
   state.lowHullWarned = false;
   state.voyage.rescued = true;
-  state.records.rescues += 1;
+  state.records.rescues += 1;if(state.supplyRemaining<=0)state.supplyRemaining=900;
   state.mode = island.id === 'harbor' ? 'harbor' : 'island';
   state.result = null;
   state.contactCooldown = 2;
@@ -417,22 +480,24 @@ function damage(state, amount, text, events) {
 }
 
 // 私有零欠帳時計；事件屏障犧牲舊區間，不把新控制回溯。
-function createTideClock(){
+export function createTideClock(){
  let previous=null,anchor=null,mode=null,disposed=false,collecting=false,sum=0,steps=0;
  function reset(){anchor=null;mode=null;}
  function input(now,eligible,currentMode){
   if(disposed||!eligible||previous===null||anchor===null||mode!==currentMode||!Number.isFinite(now)||now<previous){reset();return;}
   anchor=now;
  }
+ const frameResult={raw:NaN,dt:0};
+ function result(raw,dt){frameResult.raw=raw;frameResult.dt=dt;return frameResult;}
  function frame(now,eligible,currentMode){
   const old=previous,raw=old===null?NaN:(now-old)/1000;
-  if(!Number.isFinite(now)){previous=null;reset();return {raw:NaN,dt:0};}
+  if(!Number.isFinite(now)){previous=null;reset();return result(NaN,0);}
   previous=now;
-  if(disposed||!eligible){reset();return {raw,dt:0};}
-  if(old===null||!Number.isFinite(raw)||raw<=0||raw>.5||anchor===null||mode!==currentMode){anchor=now;mode=currentMode;return {raw,dt:0};}
-  if(now<anchor)return {raw,dt:0};
+  if(disposed||!eligible){reset();return result(raw,0);}
+  if(old===null||!Number.isFinite(raw)||raw<=0||raw>.5||anchor===null||mode!==currentMode){anchor=now;mode=currentMode;return result(raw,0);}
+  if(now<anchor)return result(raw,0);
   const elapsed=(now-anchor)/1000;anchor=now;mode=currentMode;
-  return {raw,dt:Number.isFinite(elapsed)&&elapsed>=0&&elapsed<=raw?Math.min(.4,elapsed):0};
+  return result(raw,Number.isFinite(elapsed)&&elapsed>=0&&elapsed<=raw?Math.min(.4,elapsed):0);
  }
  function begin(){if(collecting)throw Error('clock-reentrant');collecting=true;sum=0;steps=0;}
  function consume(dt){if(!collecting)return;if(!Number.isFinite(dt)||dt<0||dt>.05||steps>=8||sum+dt>.400000000000001)throw Error('clock-budget');sum+=dt;steps++;}
@@ -442,21 +507,22 @@ function createTideClock(){
 
 export const __tideClock=createTideClock();
 
-export function step(state, dt, input = {}) {
+export function step(state, dt, input = {}, eventsOut) {
   const __initialMode=state.mode;
-  const events = [];
+  const events = eventsOut||[];events.length=0;
   const duration = clamp(finite(dt), 0, 30);
   if (duration === 0) return events;
   const count = Math.ceil(duration / 0.05), delta = duration / count;
-  const tideBefore = tideAt(state.time).label;
+  const tideBefore=sampleTideInto(state.time,physicsTide).index;
   const forecastWindowBefore = Math.floor((state.time + 30) / (TIDE_PERIOD / 4));
   for (let i = 0; i < count; i += 1) {
-    if(state.mode!==__initialMode||!["sailing","diving"].includes(state.mode))break;
+    if(state.mode!==__initialMode||(state.mode!=='sailing'&&state.mode!=='diving'))break;
     __tideClock.consume(delta);
     state.time += delta;
     state.contactCooldown = Math.max(0, state.contactCooldown - delta);
     state.warningCooldown = Math.max(0, state.warningCooldown - delta);
     if (state.voyage.active) { state.voyage.elapsed += delta; state.elapsed = state.voyage.elapsed; }
+    if(state.difficulty!=='relaxed'&&!state.storyComplete){const prior=state.supplyRemaining;state.supplyRemaining=Math.max(0,prior-delta);for(let wi=0;wi<supplyWarnings.length;wi++){const warning=supplyWarnings[wi];if(prior>warning&&state.supplyRemaining<=warning)events.push(event('warning',`遠航補給剩 ${warning} 秒。完成新潛點補滿，或返回母港。`));}if(state.supplyRemaining===0){events.push(...rescue(state,'遠航補給耗盡'));break;}}
     if (state.mode === 'diving') {
       const site = getSite(state.activeDive);
       if (!site) { events.push(...surface(state)); continue; }
@@ -470,8 +536,18 @@ export function step(state, dt, input = {}) {
         state.diver.x = site.entry.x + (state.diver.x - site.entry.x) / d * site.radius;
         state.diver.z = site.entry.z + (state.diver.z - site.entry.z) / d * site.radius;
       }
-      state.oxygen -= delta;
-      if (site.bubbles.some((bubble) => distance(state.diver, bubble) < 3.5)) {
+      state.oxygen -= delta;state.guardianCooldown=Math.max(0,state.guardianCooldown-delta);
+      const stage=diveStage(state);
+      if(stage.mechanic==='valves'){
+        const phase=valvePhase(state.time,state.voyage.variantId),cycle=Math.floor(state.time/6);if(Math.abs(state.diver.x-(site.entry.x+Math.sin(state.time*.35)*5))<3&&Math.abs(state.diver.z-site.entry.z)<12)state.diver.x+=Math.sin(state.time*.35)*.35*delta;
+        if(phase>=4&&state.valveWarnedCycle!==cycle){state.valveWarnedCycle=cycle;events.push(event('valve-warning','潮汐閥門將於 2 秒內開啟。青綠時按 E。'));}
+      }
+      if(stage.mechanic==='guardian'){
+        guardianInto(state.time,site,guardianScratch,state.voyage.variantId);const cycle=Math.floor((state.time+(state.voyage.variantId===3?2:0))/8);if(guardianScratch.warning&&state.guardianWarnedCycle!==cycle){state.guardianWarnedCycle=cycle;events.push(event('valve-warning','守鐘洋流：2 秒預警。沿圓圈外側通過。'));}
+        if(guardianScratch.active&&distance(state.diver,guardianScratch)<guardianScratch.radius&&state.guardianCooldown===0){state.oxygen-=Math.min(4,state.oxygen);state.guardianCooldown=2;events.push(event('warning','守鐘洋流掃過：氧氣 -4 秒。繞開有色圓圈，琥珀色提示下次橫掃。'));}
+      }
+      let inBubble=false;for(let bi=0;bi<site.bubbles.length;bi++)if(distance(state.diver,site.bubbles[bi])<3.5)inBubble=true;
+      if(inBubble) {
         state.oxygen = Math.min(site.oxygen, state.oxygen + delta * 7);
         if (state.warningCooldown === 0) { events.push(event('bubble', '氣泡正在補充氧氣。')); state.warningCooldown = 5; }
       }
@@ -488,10 +564,10 @@ export function step(state, dt, input = {}) {
     const windEfficiency = 0.52 + 0.48 * (Math.cos(boat.heading - windAngle) + 1) / 2;
     const targetSpeed = rig.speed * boat.sail * windEfficiency;
     boat.speed += (targetSpeed - boat.speed) * Math.min(1, delta * (input.brake ? 5 : 1.35));
-    const current = currentAt(boat.x, boat.z, state.time, state.seed);
+    const current = currentAtInto(boat.x,boat.z,state.time,state.voyage.variantId||state.seed,physicsCurrent);
     boat.x += (Math.sin(boat.heading) * boat.speed + current.x) * delta;
     boat.z += (-Math.cos(boat.heading) * boat.speed + current.z) * delta;
-    for (const island of ISLANDS) {
+    for(let index_island=0;index_island<ISLANDS.length;index_island++){const island=ISLANDS[index_island];
       const d = distance(boat, island), boundary = island.radius + 7;
       if (d >= boundary) continue;
       const vx = d > 0.001 ? (boat.x - island.x) / d : 0;
@@ -503,14 +579,14 @@ export function step(state, dt, input = {}) {
       if (state.mode !== 'sailing') break;
     }
     if (state.mode !== 'sailing') continue;
-    const tide = tideAt(state.time);
-    for (const reef of REEFS) {
+    const tide=sampleTideInto(state.time,physicsTide);
+    for(let index_reef=0;index_reef<REEFS.length;index_reef++){const reef=REEFS[index_reef];
       if (tide.height > reef.safeHeight || distance(boat, reef) >= reef.radius + 1) continue;
       boat.speed *= Math.max(0.5, 1 - delta * 2);
       damage(state, 7, `${reef.name}水位不足，擦礁受損。繞開紅色礁圈或等待漲潮。`, events);
     }
-    for (const whirl of WHIRLS) {
-      if (whirlActive(whirl, state.time) && distance(boat, whirl) < whirl.radius * 0.45) damage(state, 5, `${whirl.name}正活躍，向外圈轉舵脫離。`, events);
+    for(let index_whirl=0;index_whirl<WHIRLS.length;index_whirl++){const whirl=WHIRLS[index_whirl];
+      if (whirlActive(whirl,state.time,state.voyage.variantId||state.seed) && distance(boat, whirl) < whirl.radius * 0.45) damage(state, 5, `${whirl.name}正活躍，向外圈轉舵脫離。`, events);
     }
     if (Math.abs(boat.x) > WORLD_BOUND - 5 || Math.abs(boat.z) > WORLD_BOUND - 5) {
       boat.x = clamp(boat.x, -WORLD_BOUND + 5, WORLD_BOUND - 5);
@@ -527,7 +603,7 @@ export function step(state, dt, input = {}) {
       }
     }
   }
-  if (tideAt(state.time).label !== tideBefore) events.push(event('tide', `潮汐轉為${tideAt(state.time).label}。海圖上的潮流、淺礁與旋流已同步更新。`));
+  if (sampleTideInto(state.time,physicsTide).index !== tideBefore) events.push(event('tide', `潮汐轉為${tideAt(state.time).label}。海圖上的潮流、淺礁與旋流已同步更新。`));
   if (Math.floor((state.time + 30) / (TIDE_PERIOD / 4)) > forecastWindowBefore) {
     const tide = tideAt(state.time);
     events.push(event('tide-forecast', `潮汐預報：約 ${Math.ceil(tide.secondsToChange)} 秒後轉為${tide.nextLabel}。${tide.forecast[0].description}`, { startsIn: tide.secondsToChange, nextLabel: tide.nextLabel }));
@@ -557,6 +633,10 @@ export function restore(raw) {
   state.time = saved.time;
   state.discoveries = cleanIds(saved.discoveries, DISCOVERIES.map((item) => item.id));
   state.parts = cleanIds(saved.parts, DIVE_SITES.map((item) => item.partId));
+  state.guardianCooldown=clamp(finite(saved.guardianCooldown),0,2);state.valveWarnedCycle=Math.floor(finite(saved.valveWarnedCycle,-1));
+  state.difficulty=saved.difficulty==='relaxed'?'relaxed':'standard';state.supplyRemaining=clamp(finite(saved.supplyRemaining,900),0,900);state.supplyRefilledStages=cleanIds(saved.supplyRefilledStages,DIVE_SITES.map(s=>s.id));
+  state.storyStage=STORY_STAGES.filter(s=>state.parts.includes(s.partId)).length;
+  for(const site of DIVE_SITES){const stage=voyageVariant(saved.voyage?.variantId||saved.seed).stages.find(s=>s.siteId===site.id),tasks=state.diveTasks[site.id],complete=state.parts.includes(site.partId);tasks.completedStationIds=complete?stage.stations.map(s=>s.id):cleanIds(saved.diveTasks?.[site.id]?.completedStationIds,stage.stations.map(s=>s.id));tasks.opened=complete||tasks.completedStationIds.length===stage.stations.length;}
   state.completed = cleanIds(saved.completed, CONTRACTS.map((item) => item.id));
   state.rigId = getRig(saved.rigId).id;
   state.contractId = CONTRACTS.some((item) => item.id === saved.contractId) ? saved.contractId : CONTRACTS[0].id;
@@ -572,27 +652,54 @@ export function restore(raw) {
     const record = saved.records?.byContract?.[contract.id];
     if (record && Number.isFinite(record.bestTime) && record.bestTime >= 0 && Number.isFinite(record.bestDamage) && record.bestDamage >= 0) state.records.byContract[contract.id] = { bestTime: record.bestTime, bestDamage: record.bestDamage, voyages: Math.floor(clamp(finite(record.voyages), 0, 1e6)) };
   }
+  for(const contract of CONTRACTS)for(const rig of RIGS)for(const variant of [1,2,3]){const r=saved.records?.byVariant?.[contract.id]?.[rig.id]?.[variant];if(r&&Number.isFinite(r.bestTime)&&r.bestTime>=0&&Number.isFinite(r.bestDamage)&&r.bestDamage>=0&&['gold','silver','bronze'].includes(r.rank)){const c=state.records.byVariant[contract.id]||={},b=c[rig.id]||={};b[variant]={bestTime:r.bestTime,bestDamage:clamp(r.bestDamage,0,1e9),optionalSamples:Math.floor(clamp(finite(r.optionalSamples),0,16)),rank:r.rank};}}
   const previousVoyage = saved.voyage || {};
   state.voyage = {
-    active: previousVoyage.active === true, startedAt: Math.max(0, finite(previousVoyage.startedAt)),
+    variantId:voyageVariant(previousVoyage.variantId||state.seed).id,variantVersion:1,rank:['gold','silver','bronze'].includes(previousVoyage.rank)?previousVoyage.rank:null,active: previousVoyage.active === true, startedAt: Math.max(0, finite(previousVoyage.startedAt)),
     elapsed: Math.max(0, finite(previousVoyage.elapsed)), damage: Math.max(0, finite(previousVoyage.damage)),
     harvested: cleanIds(previousVoyage.harvested, cargoIds),
     observed: cleanIds(previousVoyage.observed ?? previousVoyage.harvested, DISCOVERIES.map((item) => item.id)),
     skippedObservations: cleanIds(previousVoyage.skippedObservations, OBSERVATIONS.map((item) => item.id)),
     legIndex: Math.floor(Math.max(0, finite(previousVoyage.legIndex))),
-    routeChoices: (Array.isArray(previousVoyage.routeChoices) ? previousVoyage.routeChoices : []).filter(validSavedRouteChoice).slice(-100).map((choice) => ({ id: choice.id, choiceId: choice.id, direction: choice.direction, optionId: choice.optionId, time: Math.max(0, finite(choice.time)), tideHeight: clamp(finite(choice.tideHeight), -1, 1), cargoCount: Math.floor(clamp(finite(choice.cargoCount), 0, 14)), legIndex: Math.floor(Math.max(0, finite(choice.legIndex))) })),
+    routeChoices: (Array.isArray(previousVoyage.routeChoices) ? previousVoyage.routeChoices : []).filter(validSavedRouteChoice).slice(-100).map((choice) => ({ id: choice.id, choiceId: choice.id, direction: choice.direction, entryIndex: choice.entryIndex ?? 0, optionId: choice.optionId, time: Math.max(0, finite(choice.time)), tideHeight: clamp(finite(choice.tideHeight), -1, 1), cargoCount: Math.floor(clamp(finite(choice.cargoCount), 0, 14)), legIndex: Math.floor(Math.max(0, finite(choice.legIndex))) })),
     navigation: null,
     visited: cleanIds(previousVoyage.visited, ISLANDS.map((item) => item.id)), rescued: previousVoyage.rescued === true,
   };
+  const restoredNavigation = restoreNavigation(previousVoyage.navigation, state.voyage);
+  // Upgrade legacy history together with its inferred entry. Otherwise a second
+  // save would pair explicit alternate-entry guidance with the legacy default 0.
+  if (restoredNavigation && !Object.hasOwn(previousVoyage.navigation, 'direction') && !Object.hasOwn(previousVoyage.navigation, 'entryIndex')) {
+    const choice = state.voyage.routeChoices.find(item => item.id === restoredNavigation.choiceId && item.direction === restoredNavigation.direction && item.optionId === restoredNavigation.optionId && item.legIndex === restoredNavigation.legIndex);
+    choice.entryIndex = restoredNavigation.entryIndex;
+  }
   state.elapsed = state.voyage.elapsed;
   const safeIsland = getIsland(saved.lastSafeIsland);
   putAtDock(state, safeIsland);
   state.mode = safeIsland.id === 'harbor' ? 'harbor' : 'island';
+  // Restore a finite, physically valid live voyage without spending offline time.
+  const validPoint = point => point && Number.isFinite(point.x) && Number.isFinite(point.z) && Math.abs(point.x) <= WORLD_BOUND && Math.abs(point.z) <= WORLD_BOUND;
   const interrupted = saved.mode === 'sailing' || saved.mode === 'diving';
-  if (interrupted) {
-    state.cargo = state.cargo.slice(Math.ceil(state.cargo.length / 2));
-    state.voyage.rescued = true;
-    return { state, message: `已回到最近安全港${safeIsland.name}。中途離開保留一半普通貨物；圖鑑、主線零件與已交付獎勵完整保留，離線不消耗氧氣或潮汐。` };
+  if (interrupted && validPoint(saved.boat) && Number.isFinite(saved.boat.heading) && Number.isFinite(saved.boat.hull) && saved.boat.hull > 0
+    && ISLANDS.every(island => distance(saved.boat, island) >= island.radius + 6)) {
+    state.boat = { x: saved.boat.x, z: saved.boat.z, heading: saved.boat.heading % (Math.PI * 2), sail: clamp(finite(saved.boat.sail), 0, 1), hull: clamp(saved.boat.hull, 1, 100), speed: clamp(finite(saved.boat.speed), 0, 10) };
+    state.mode = 'sailing';state.currentIsland = null;
+    if(saved.mode === 'diving'){
+      const site=getSite(saved.activeDive);
+      // Diving is entered from a moored boat, so valid dive saves use the safe dock below.
+      if(site && site.islandId===safeIsland.id && validPoint(saved.diver) && distance(saved.diver, site.entry)<=site.radius && finite(saved.oxygen)>0){
+        state.mode='diving';state.currentIsland=safeIsland.id;state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,site.oxygen);state.diveCollected=observedDiveThisVoyage(state,site);
+      }
+    }
+    if (state.mode === 'sailing') state.voyage.navigation = restoredNavigation;
+    return {state,message:'已恢復航程。船位、調查與貨物完整保留；離線不消耗潮汐或氧氣。'};
   }
+  if(saved.mode==='diving'){
+    const site=getSite(saved.activeDive);
+    if(site&&site.islandId===safeIsland.id&&validPoint(saved.diver)&&distance(saved.diver,site.entry)<=site.radius&&finite(saved.oxygen)>0){
+      state.mode='diving';state.activeDive=site.id;state.diver={x:saved.diver.x,z:saved.diver.z};state.oxygen=clamp(saved.oxygen,.1,site.oxygen);state.diveCollected=observedDiveThisVoyage(state,site);
+      return {state,message:'已恢復淺水探索，離線不扣氧氣。'};
+    }
+  }
+  if(interrupted)return {state,message:`已安全回到${safeIsland.name}。無效船位已修復，貨物與主線進度保留。`};
   return { state, message: `已恢復${safeIsland.name}的靠港紀錄。潮汐、圖鑑、零件與獎勵保持不變；船已免費修復。` };
 }

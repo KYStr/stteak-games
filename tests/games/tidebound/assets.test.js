@@ -9,8 +9,8 @@ test('all 33 original model exports have retained sources, exact hashes and sepa
  assert.equal(manifest.assets.length,33);
  for(const a of manifest.assets){assert.ok((await stat(new URL(a.source,source))).size>0);assert.ok(a.provenance.rights);assert.equal(a.spec.up,'+Y');assert.ok(a.spec.triangles>0);assert.ok(a.runtime.some(f=>f.endsWith('.glb')));assert.ok(a.runtime.some(f=>f.endsWith('.collider.json')));for(const p of a.runtime){const bytes=await readFile(new URL(`assets/${p}`,runtime));assert.equal(hash(bytes),a.sha256[p],a.id);}}
 });
-test('seven original sounds have editable PCM sources, matching runtime bytes and meaningful levels',async()=>{
- const assets=JSON.parse(await readFile(new URL('audio-manifest.json',source),'utf8'));assert.equal(assets.length,7);
+test('nine original sounds have editable PCM sources, matching runtime bytes and meaningful levels',async()=>{
+ const assets=JSON.parse(await readFile(new URL('audio-manifest.json',source),'utf8'));assert.equal(assets.length,9);
  for(const a of assets){const raw=await readFile(new URL(a.source,source)),bytes=await readFile(new URL(a.runtime[0],runtime));assert.equal(raw.toString('ascii',0,4),'RIFF');assert.equal(hash(raw),hash(bytes));assert.equal(hash(bytes),a.sha256[a.runtime[0]]);assert.equal(bytes.readUInt32LE(24),22050);let peak=0;for(let i=44;i<bytes.length;i+=2)peak=Math.max(peak,Math.abs(bytes.readInt16LE(i)));assert.ok(peak>100&&peak<32767,`${a.id}: silent or clipped`);assert.ok(a.provenance.rights);assert.ok(Math.abs(a.spec.peakDbFS-20*Math.log10(peak/32768))<.011);}
 });
 test('byte-exact runtime checkout policy and local bundled module prevent mutable external dependencies',async()=>{

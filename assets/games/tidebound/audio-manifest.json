@@ -216,6 +216,76 @@
     "dependencies": []
   },
   {
+    "id": "tidebound.audio.helm",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/helm.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/helm.wav"
+    ],
+    "sha256": {
+      "assets/audio/helm.wav": "931501e966f57f494c849db2405ce49c87c1b1b8348a297c7ef3245fd396a737"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 0.22,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -24.18
+    },
+    "budget": {
+      "runtimeBytes": 9746,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  },
+  {
+    "id": "tidebound.audio.bubble",
+    "version": "1.0.0",
+    "kind": "audio",
+    "source": "sources/bubble.wav",
+    "recipe": "../../../games/tidebound/generate-audio.mjs",
+    "runtime": [
+      "assets/audio/bubble.wav"
+    ],
+    "sha256": {
+      "assets/audio/bubble.wav": "94715b0fd18d5a25a0a2dfdc91d8c06f97b5010ac8f1c2be915113575d9442a1"
+    },
+    "provenance": {
+      "method": "original-procedural",
+      "creator": "Tidebound Maker",
+      "createdAt": "2026-10-25",
+      "tool": "Node PCM synthesis",
+      "referenceSources": [],
+      "rights": "專案原創；無外部取樣"
+    },
+    "spec": {
+      "sampleRate": 22050,
+      "channels": 1,
+      "format": "PCM16 WAV",
+      "duration": 0.45,
+      "loop": false,
+      "loopPoints": null,
+      "peakDbFS": -19.29
+    },
+    "budget": {
+      "runtimeBytes": 19888,
+      "maxSimultaneousInstances": 8
+    },
+    "dependencies": []
+  },
+  {
     "id": "tidebound.audio.gull",
     "version": "1.0.0",
     "kind": "audio",

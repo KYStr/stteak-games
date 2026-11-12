@@ -16,7 +16,7 @@ function harness(){
  let throwRelease=false,throwCapture=false;
  const helm={style,attributes,setAttribute(k,v){attributes[k]=v},setPointerCapture(id){if(throwCapture)throw Error('inactive pointer');capture.add(id)},hasPointerCapture:id=>capture.has(id),releasePointerCapture(id){released.push(id);capture.delete(id);if(throwRelease)throw Error('capture already ended');this.onlostpointercapture?.({pointerId:id})},getBoundingClientRect:()=>({left:10,top:20,width:100,height:100})};
  const knob={style:{setProperty(k,v){this[k]=v}}};
- const context={paused:false,overlay:null,phase:'running',window:new EventTarget(),document:{createElement:()=>helm},steer:{prepend(){}},$:selector=>selector==='#helm'?helm:knob,unlock(){},pause(){context.paused=true},console};
+ const context={pendingInputAt:-1,paused:false,overlay:null,phase:'running',window:new EventTarget(),document:{createElement:()=>helm,querySelectorAll:()=>[]},__tideClock:{reset(){}},physicsScheduler:{invalidate(){}},__tideInput(){},steer:{prepend(){}},$:selector=>selector==='#helm'?helm:knob,input(){},unlock(){},__tideEligible:()=>true,audio:{play(){}},flashControl(){},pause(){context.paused=true},console};
  vm.createContext(context);vm.runInContext(state+clear+binding+blur+'\nglobalThis.snapshot=()=>({owner:helmPointer,x:helmInput.x,y:helmInput.y});globalThis.clear=clearInput;',context);
  const send=(type,id,x=92,y=70)=>{let prevented=false;helm['on'+type]({pointerId:id,clientX:x,clientY:y,preventDefault(){prevented=true}});return prevented};
  return{helm,context,knob,attributes,capture,released,send,state:()=>context.snapshot(),clear:()=>context.clear(),failRelease(){throwRelease=true},failCapture(value=true){throwCapture=value}};
@@ -50,4 +50,23 @@ for(const [x,y,wantX,wantY] of [[60,70,0,0],[92,70,1,0],[28,70,-1,0],[60,38,0,-1
 
 test('failed capture does not throw or claim a fake owner; the next active pointer works',()=>{
  const h=harness();h.failCapture();assert.doesNotThrow(()=>h.send('pointerdown',7));neutral(h);assert.deepEqual([...h.capture],[]);h.failCapture(false);h.send('pointerdown',8,28,70);assert.equal(h.state().owner,8);assert.equal(h.state().x,-1);
+});
+
+function heldHarness(){
+ const source=readFileSync(new URL('../../../games/tidebound/src/main.js',import.meta.url),'utf8');
+ const a=source.indexOf("document.querySelectorAll('[data-hold]').forEach"),b=source.indexOf("document.querySelectorAll('[data-sail]').forEach",a);
+ const buttons=['left','right'].map(hold=>({dataset:{hold},capture:new Set(),setPointerCapture(id){this.capture.add(id)},hasPointerCapture(id){return this.capture.has(id)},releasePointerCapture(id){this.capture.delete(id);this.onlostpointercapture?.({pointerId:id})}}));
+ const c={paused:false,overlay:null,holds:new Map(),holdOwners:new Map(),input(){},document:{querySelectorAll:()=>buttons},input(){},unlock(){},__tideEligible:()=>true,audio:{play(){}},flashControl(){},__tideInput(){}};vm.createContext(c);vm.runInContext(source.slice(a,b),c);
+ const send=(i,type,id)=>buttons[i]['on'+type]({pointerId:id,preventDefault(){}});
+ return{buttons,c,send};
+}
+for(const id of [31,257])test(`held button tracks exact pointer ${id} and ignores end from wrong element`,()=>{const h=heldHarness();h.send(0,'pointerdown',id);assert.equal(h.c.holds.get(id),'left');assert.equal(h.c.holdOwners.get(id),h.buttons[0]);h.send(1,'pointerup',id);assert.equal(h.c.holds.get(id),'left');h.send(0,'pointercancel',id);assert.equal(h.c.holds.size,0);assert.equal(h.c.holdOwners.size,0);});
+test('held action never survives failed pointer capture',()=>{const h=heldHarness();h.buttons[0].setPointerCapture=()=>{throw Error('inactive')};h.send(0,'pointerdown',257);assert.equal(h.c.holds.size,0);assert.equal(h.c.holdOwners.size,0);});
+
+test('lifecycle clear releases held captures 31 and 257 on their actual buttons',()=>{
+ const h=heldHarness(),source=readFileSync(new URL('../../../games/tidebound/src/main.js',import.meta.url),'utf8');
+ const a=source.indexOf('function clearInput(){'),b=source.indexOf('function notify(',a);
+ Object.assign(h.c,{keys:new Set(),orbitPointer:null,helmInput:{x:0,y:0},helmPointer:null,__tideClock:{reset(){}},physicsScheduler:{invalidate(){}},$:()=>({style:{setProperty(){}},setAttribute(){}})});
+ vm.runInContext(source.slice(a,b)+';globalThis.clear=clearInput',h.c);
+ h.send(0,'pointerdown',31);h.send(1,'pointerdown',257);h.c.clear();assert.equal(h.c.holds.size,0);assert.equal(h.c.holdOwners.size,0);assert.equal(h.buttons[0].capture.size,0);assert.equal(h.buttons[1].capture.size,0);
 });
