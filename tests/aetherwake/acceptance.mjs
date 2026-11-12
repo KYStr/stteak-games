@@ -4,7 +4,7 @@ import { spawn } from 'node:child_process';
 import { chromium } from '/workspace/stteak8/tools/node_modules/playwright-core/index.mjs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { instrumentBrowser, summarize } from './browser-instrumentation.mjs';
+import { instrumentBrowser, summarize, sampleAllocations } from './browser-instrumentation.mjs';
 import { browserEnvironment } from './browser-environment.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = process.env.AETHERWAKE_EVIDENCE || '/tmp/aetherwake-acceptance';
@@ -210,15 +210,42 @@ async function measureStability(browser, run) {
     const sample = async () => {
       await cdp.send('HeapProfiler.collectGarbage');
       return {heap:await cdp.send('Runtime.getHeapUsage'),dom:await cdp.send('Memory.getDOMCounters'),
-        performance:await cdp.send('Performance.getMetrics'),metrics:await metrics(page),
-        raf:await page.evaluate(()=>testRAF.pending),status:(await snap(page)).status,elapsed:(await snap(page)).elapsed};
+        performance:await cdp.send('Performance.getMetrics'),metrics:await metrics(page),textureBytes:await page.evaluate(()=>testTextureBytes),
+        raf:await page.evaluate(()=>testRAF.pending - (window.soakEnabled ? 1 : 0)),status:(await snap(page)).status,elapsed:(await snap(page)).activeSeconds,airTime:(await snap(page)).airTime};
     };
+    if (run === 2) {
+      await page.keyboard.press('Escape'); await page.getByRole('button',{name:'重新遠征',exact:true}).click(); await page.getByRole('button',{name:'重新遠征',exact:true}).click();
+      await page.evaluate(() => {
+        let held=new Set(),ex=0,ez=0;
+        const request=window.requestAnimationFrame.bind(window);
+        const key=(type,code)=>document.querySelector('#world').dispatchEvent(new KeyboardEvent(type,{code,bubbles:true}));
+        window.soakEnabled=true;
+        const pilot=()=>{
+          if(window.soakEnabled){
+            const s=__aetherwake.snapshot(),p=s.player;
+            if(s.status==='running') {
+              const angle=s.activeSeconds*.65,target={x:Math.cos(angle)*18,z:Math.sin(angle)*18};
+              const dx=target.x-p.x,dz=target.z-p.z,n=Math.max(.001,Math.hypot(dx,dz));ex+=Math.abs(dx/n);ez+=Math.abs(dz/n);const next=new Set();
+              if(ex>=.7){next.add(dx<0?'KeyA':'KeyD');ex-=1;}if(ez>=.7){next.add(dz<0?'KeyW':'KeyS');ez-=1;}
+              for(const code of held)if(!next.has(code))key('keyup',code);for(const code of next)if(!held.has(code))key('keydown',code);held=next;
+              if(p.grounded||!p.gliding){key('keydown','Space');key('keyup','Space');}
+            }
+          }
+          request(pilot);
+        }; request(pilot);
+      });
+      await page.waitForTimeout(5000);
+    }
     const before = await sample();
     await page.evaluate(()=>{testRAF.frames=[];testRAF.previous=null;testRAF.collecting=true;});
     const duration = Number(process.env.AETHERWAKE_SOAK_MS || 180000);
     const windows=[];let last=0;
     for(let elapsed=0;elapsed<duration;elapsed+=15000) {
       await page.waitForTimeout(Math.min(15000,duration-elapsed));
+      if (run === 2 && elapsed === 90000) {
+        await page.keyboard.press('Escape'); await page.getByRole('button',{name:'重新遠征',exact:true}).click(); await page.getByRole('button',{name:'重新遠征',exact:true}).click();
+        await page.keyboard.press('Escape'); await page.getByRole('button',{name:'操作與航行誌',exact:true}).click(); await page.getByRole('button',{name:'設定與存檔',exact:true}).click(); await page.getByRole('button',{name:'完成',exact:true}).click(); await page.getByRole('button',{name:'繼續航程',exact:true}).click();
+      }
       const frames = await page.evaluate(()=>testRAF.frames.slice());
       const diagnostic = await sample();
       windows.push({elapsedMs:Math.min(elapsed+15000,duration),timing:summarize(frames.slice(last)),...diagnostic});
@@ -239,6 +266,7 @@ async function measureStability(browser, run) {
     // Continued rendering/simulation is required; shared-host frame delay is
     // reference data rather than an implicit minimum-FPS release gate.
     assert.ok(result.timing.frames>0 && after.elapsed>before.elapsed);
+    if (run === 2) assert.ok(after.airTime > 60, 'Sustained ordinary-input airborne play after midpoint restart');
     assert.ok(result.heapGrowth<12*1024*1024);
     assert.ok(result.heapGrowth < before.heap.usedSize * .1, 'Retained heap growth stays below 10%');
     const middle=windows[Math.floor(windows.length/2)];
@@ -254,12 +282,13 @@ async function measureStability(browser, run) {
       const persistentNow = w.dom.jsEventListeners-w.metrics.audio.activeVoices;
       assert.ok(w.dom.jsEventListeners<=persistentBefore+w.metrics.audio.peakVoices+2, 'Total listeners remain bounded by persistent UI and the capped live voice budget');
       assert.ok(persistentNow<=persistentBefore+2, 'Persistent listeners cannot accumulate between sampling windows');
+      assert.ok(w.textureBytes<=256*1024*1024, 'Conservative cumulative texture allocation below 256MB');
       assert.ok(w.metrics.drawCalls<=250 && w.metrics.triangles<=1500000);
       assert.ok(w.metrics.resolutionScale<=2);
       assert.ok(w.metrics.geometries<=before.metrics.geometries+2);
       assert.equal(w.metrics.textures,before.metrics.textures);
       const phases = w.metrics.phases;
-      assert.ok(phases.sceneUpdateMs.p95 + phases.simulationMs.p95 <= 6, 'Update CPU phases exclude renderer.render() and stay within 6 ms');
+      assert.ok(phases.applicationUpdateMs.p95 <= 6, 'Update CPU phases exclude renderer.render() and stay within 6 ms');
     }
     const [warm,first,second]=result.modalCycles;
     // Compare the persistent listeners at equal UI states across music phases.
@@ -271,6 +300,15 @@ async function measureStability(browser, run) {
       assert.ok(entry.dom.jsEventListeners<=warm.dom.jsEventListeners-warm.metrics.audio.activeVoices+entry.metrics.audio.peakVoices+2);
     }
     check(`real-time stability ${run}: avg ${result.timing.averageMs.toFixed(2)}ms, p95 ${result.timing.p95Ms.toFixed(2)}ms; bounded heap, DOM, listeners and one game RAF`);
+    if (run === 2) {
+      await page.evaluate(()=>{window.soakEnabled=false;});
+      await page.keyboard.press('Escape'); await page.getByRole('button',{name:'重新遠征',exact:true}).click(); await page.getByRole('button',{name:'重新遠征',exact:true}).click();
+      await page.keyboard.press('Space'); await page.keyboard.down('KeyW');
+      const allocations=[];
+      for(let i=0;i<2;i++) allocations.push(await sampleAllocations(cdp,15000));
+      await page.keyboard.up('KeyW');
+      await writeFile(path.join(output,'flight-allocations.json'),JSON.stringify(allocations));
+    }
     return result;
   } finally { await soak.close(); }
 }
@@ -302,6 +340,8 @@ try {
   const page = await context.newPage(); watch(page); await ready(page);
   assert.equal((await metrics(page)).audio.contextState, 'uninitialized');
   await screenshot(page, 'menu-1280');
+  report.initialTransfers = await page.evaluate(() => ({navigation:performance.getEntriesByType('navigation')[0].transferSize,resources:performance.getEntriesByType('resource').map(r=>({name:r.name,bytes:r.transferSize}))}));
+  assert.ok(report.initialTransfers.navigation+report.initialTransfers.resources.reduce((n,r)=>n+r.bytes,0)<=30*1024*1024);
   // Reading dialogs begin at the top, keep visible focus and restore the invoker.
   for (const size of [{width:1280,height:720},{width:1920,height:1080}]) {
     await page.setViewportSize(size);
@@ -435,24 +475,29 @@ try {
   await mobileControls(browser);
   // The full campaign below uses ordinary keyboard events and the shipped HUD.
   // RAF timestamps are accelerated only in this context; performance uses a fresh real-time context.
+  for (const variant of [{module:'turn',style:'safe'},{module:'tailwind',style:'shortcut'}]) {
   const campaign = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   await campaign.addInitScript(() => {
     const request = window.requestAnimationFrame.bind(window);
     let origin;
     window.requestAnimationFrame = callback => request(t => { origin ??= t; window.flightPilot?.(); callback(origin + (t-origin)*6); });
   });
-  const flight = await campaign.newPage(); watch(flight); await ready(flight); await flight.click('#start');
+  const flight = await campaign.newPage(); watch(flight); await ready(flight); await flight.locator(`[data-module="${variant.module}"]`).click(); await flight.click('#start');
+  if (variant.style === 'shortcut') await flight.click('#route-toggle');
+  // Logic traversal uses fewer software-rendered pixels; both required desktop
+  // layouts and all terrain fixtures are exercised independently at full size.
+  await flight.setViewportSize({width:640,height:360});
   await flight.evaluate(() => {
     let approach = null, held = new Set(), errorX = 0, errorZ = 0;
     const key = (type, code) => document.querySelector('#world').dispatchEvent(new KeyboardEvent(type, {code, key:code==='Space'?' ':code, bubbles:true}));
     const press = code => { key('keydown', code); key('keyup', code); };
     window.flightPilot = () => {
       const s = __aetherwake.snapshot(), p = s.player;
-      if (s.status === 'complete') { for(const c of held)key('keyup',c); held.clear(); return; }
+      if (['complete','failed'].includes(s.status)) { for(const c of held)key('keyup',c); held.clear(); return; }
       if (s.status === 'paused') { document.querySelector('#modal-actions button')?.click(); return; }
       if (s.nearby?.canInteract) { press('KeyE'); return; }
       const target = s.surveyHint || s.objective;
-      const d = Math.hypot(target.x-p.x,target.z-p.z), landing = !s.surveyHint;
+      const d = Math.hypot(target.x-p.x,target.z-p.z), landing = !s.surveyHint || target.landing;
       let aim = target;
       if (approach?.id !== target.id) approach = null;
       if (!landing && target.heading && d < target.radius*1.6 && !approach) {
@@ -477,18 +522,20 @@ try {
     };
   });
   let lastMission = 0;
-  for (let i = 0; i < 240; i++) {
+  for (let i = 0; i < 1200; i++) {
     await flight.waitForTimeout(1000);
     const s = await snap(flight);
     if (i % 20 === 0) console.log('Flight', s.elapsed.toFixed(1), 's, samples', s.mainSamples.join('/'), 'stalls', s.stalls);
     if (s.activated.length > lastMission) { lastMission = s.activated.length; console.log('Delivered station', lastMission, 'at', s.elapsed.toFixed(1), 'simulation seconds'); }
     if (s.status === 'complete') break;
-    if (i === 239) throw new Error('Keyboard campaign timed out: '+JSON.stringify(s));
+    if (i === 1199) throw new Error('Keyboard campaign timed out: '+JSON.stringify(s));
   }
   const completed = await snap(flight);
   assert.equal(completed.status, 'complete'); assert.deepEqual(completed.mainSamples, [8,8,8]);
-  await screenshot(flight, 'campaign-complete');
-  report.campaign = { elapsed:completed.elapsed, stalls:completed.stalls, samples:completed.mainSamples };
+  await flight.setViewportSize({width:1280,height:720});
+  await screenshot(flight, `campaign-${variant.module}-${variant.style}-complete`);
+  (report.campaigns ||= []).push({ ...variant, elapsed:completed.elapsed, activeSeconds:completed.activeSeconds, stalls:completed.stalls, samples:completed.mainSamples, circuits:completed.campaignCircuitStages, returnSamples:completed.returnSamples });
+  assert.deepEqual(completed.campaignCircuitStages,[3,3,3]); assert.equal(completed.returnSamples,6); assert.ok(completed.activeSeconds>=600); assert.equal(completed.stalls,0);
   await flight.evaluate(() => { window.flightPilot = null; });
   const resultTitle = await flight.locator('#modal-title').innerText();
   const openCompletedSettings = async () => {
@@ -523,8 +570,9 @@ try {
   await flight.keyboard.press('Space'); await flight.keyboard.down('KeyW');
   await flight.waitForTimeout(500); await flight.keyboard.up('KeyW');
   assert.ok((await snap(flight)).distance > 0);
-  check('keyboard-only campaign: 24 survey gates, three station deliveries, return, results and restart');
+  check('keyboard-only campaign: 24 samples + 81 circuit gates + six return beacons, three stations, result and restart');
   await campaign.close();
+  }
   report.stabilityRuns = [];
   for (let run = 1; run <= Number(process.env.AETHERWAKE_SOAK_RUNS || 2); run++) {
     report.stabilityRuns.push(await measureStability(browser, run));

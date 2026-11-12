@@ -7,7 +7,7 @@ import { dt, distance, steer, flyMainSegment, flyCourse, flyToIsland } from './f
 
 const sampleTotals = () => STATIONS.map((_, index) => WORLD.routes.find((route) => route.mission === index + 1 && route.style === 'safe').samples.length);
 function routeSimulation(route, seed = 1, module = 'turn') {
-  return new FlightSimulation({ save: { ...defaultSave(), seed, module, checkpoint: route.from, activated: STATIONS.slice(0, route.mission - 1), mainSamples: sampleTotals().map((total, index) => index < route.mission - 1 ? total : 0) } });
+  return new FlightSimulation({ save: { ...defaultSave(), seed, module, checkpoint: route.from, activated: STATIONS.slice(0, route.mission - 1), campaignCircuitStages: [0,1,2].map(i => i < route.mission - 1 ? 3 : 0), mainSamples: sampleTotals().map((total, index) => index < route.mission - 1 ? total : 0) } });
 }
 function walkTo(sim, target) {
   for (let frame = 0; frame < 1200 && distance(sim.player, target) > 1; frame++) {
@@ -149,7 +149,7 @@ test('v1 migration, corrupt JSON, unavailable storage and quota failure return a
 });
 
 test('all twelve fragments and six wind challenges are collectible through ordinary movement in one full tour', (t) => {
-  const sim = new FlightSimulation({ seed: 402, module: 'turn' }); sim.launch();
+  const sim = new FlightSimulation({ save: { ...defaultSave(), seed: 402, mode: 'exploration', module: 'turn' } }); sim.launch();
   const course = (id) => WORLD.challenges.find((challenge) => challenge.id === `challenge-${id}`);
   function collectIsland(id) {
     const island = islandById(`island-${id}`); assert.equal(sim.checkpoint, island.id); assert.equal(sim.player.grounded, true);
@@ -267,7 +267,7 @@ test('used assistance survives disabling and reload; island, results and migrate
   for (let run = 0; run < 5; run++) {
     const reloaded = new FlightSimulation({ save: sim.saveData() });
     assert.equal(reloaded.state.usedAssist, true); assert.equal(reloaded.assist, false); assert.equal(reloaded.player.grounded, true);
-    const finished = { ...defaultSave(), activated: [...STATIONS], completed: true, relics: ['relic-01'] };
+    const finished = { ...defaultSave(), activated: [...STATIONS], completed: true, mainSamples: sampleTotals(), campaignCircuitStages: [3,3,3], returnSamples: 6, relics: ['relic-01'] };
     const results = new FlightSimulation({ save: finished }); assert.equal(results.status, 'complete'); assert.deepEqual(results.relics, ['relic-01']);
     const migrated = migrateSave({ version: 1, island: 'island-dawn', fragments: ['relic-11', 'relic-11'] });
     const upgraded = new FlightSimulation({ save: migrated.save }); assert.equal(upgraded.player.y, islandById('island-dawn').y); assert.deepEqual(upgraded.relics, ['relic-11']);
@@ -299,7 +299,7 @@ test('data-driven exploration requires added relic and course, preserves their s
   };
   try {
     WORLD.relics.push(extraRelic); WORLD.challenges.push(extraChallenge);
-    const originalComplete = { ...defaultSave(), checkpoint: 'island-camp', activated: [...STATIONS], mainSamples: sampleTotals(), relics: originalRelics, challenges: originalChallenges, completedChallenges: originalChallenges, courseStages: Object.fromEntries(WORLD.challenges.slice(0, challengeCount).map((challenge) => [challenge.id, challenge.stages.length])), completed: true };
+    const originalComplete = { ...defaultSave(), checkpoint: 'island-camp', activated: [...STATIONS], mainSamples: sampleTotals(), campaignCircuitStages: [3,3,3], returnSamples: 6, relics: originalRelics, challenges: originalChallenges, completedChallenges: originalChallenges, courseStages: Object.fromEntries(WORLD.challenges.slice(0, challengeCount).map((challenge) => [challenge.id, challenge.stages.length])), completed: true };
     const missingBoth = new FlightSimulation({ save: originalComplete });
     assert.notEqual(missingBoth.state.rating.exploration, 'S', 'Previous totals cannot complete expanded content');
     assert.equal(missingBoth.state.rating.next, '再找出 1 份文明碎片');
@@ -327,7 +327,7 @@ test('data-driven exploration requires added relic and course, preserves their s
 
 test('existing twelve-relic content retains its A and B exploration thresholds', () => {
   for (const [count, expected] of [[0, 'C'], [3, 'C'], [4, 'B'], [7, 'B'], [8, 'A'], [11, 'A'], [12, 'A']]) {
-    const sim = new FlightSimulation({ save: { ...defaultSave(), checkpoint: 'island-camp', activated: [...STATIONS], completed: true, relics: WORLD.relics.slice(0, count).map((item) => item.id) } });
+    const sim = new FlightSimulation({ save: { ...defaultSave(), checkpoint: 'island-camp', activated: [...STATIONS], completed: true, mainSamples: sampleTotals(), campaignCircuitStages: [3,3,3], returnSamples: 6, relics: WORLD.relics.slice(0, count).map((item) => item.id) } });
     assert.equal(sim.state.rating.exploration, expected, `${count} of twelve relics`);
   }
 });

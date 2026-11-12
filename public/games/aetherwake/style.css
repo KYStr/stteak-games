@@ -1514,3 +1514,8 @@ h2 {
     bottom: calc(var(--mobile-energy-bottom) + var(--mobile-energy-reserve) + var(--mobile-hud-gap));
   }
 }
+
+#weather-clock{font-size:12px;color:#c6e2d3;white-space:nowrap}.weather-warning{color:#ffcc8a!important}#sail-feedback{font-size:11px;color:#ffdf9f;min-height:1em}#touch-glide[data-queued]{border:3px solid #ffe5aa;background:#526c60}.mode-note{font-size:12px;line-height:1.6;color:#c7d4c3;margin:8px 0}#mode{color:#f0ead3;background:#233c3c;border:1px solid #779d8b;border-radius:6px;padding:6px;max-width:100%}
+
+.telemetry-feedback{min-height:16px;flex-wrap:wrap}.telemetry-feedback #sail-feedback{white-space:nowrap}
+@media(max-width:600px){.telemetry{width:calc(100% - 30px);box-sizing:border-box}.telemetry-feedback{gap:10px!important}#course,#guide{top:185px}#weather-clock,#sail-feedback{font-size:10px}}

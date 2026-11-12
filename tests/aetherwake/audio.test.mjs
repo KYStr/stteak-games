@@ -65,3 +65,12 @@ test('completed synthesized and sampled voices release their ended listeners imm
     assert.equal(audio.active.size,0,'Synth completion releases the registered source too');
   } finally { await audio.dispose(); globalThis.AudioContext = old; }
 });
+
+test('distinct accepted sail commands each schedule a cue even within one fast frame', async () => {
+  const old=globalThis.AudioContext; globalThis.AudioContext=Context;
+  const audio=new AudioEngine(); audio.loadSamples=()=>{};
+  try { await audio.unlock(); const before=audio.stats.events;
+    audio.play('glide'); audio.context.currentTime+=.016; audio.play('glide');
+    assert.equal(audio.stats.events-before,2); assert.ok(audio.stats.peakVoices<=20);
+  } finally { await audio.dispose(); globalThis.AudioContext=old; }
+});

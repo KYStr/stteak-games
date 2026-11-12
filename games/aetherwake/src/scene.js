@@ -1,3 +1,4 @@
+import { length2, length3 } from './math.js';
 import * as THREE from "three";
 import {
   createIsland,
@@ -13,7 +14,7 @@ const V = THREE.Vector3;
 // starts at stage zero on a new expedition; completion in this run hides entry.
 export function courseVisualState(challenge, state, world = WORLD) {
   if (!challenge) return null;
-  const saved = state.courseStages?.[challenge.id] || 0;
+  const saved = challenge.campaignIndex != null ? state.campaignCircuitStages[challenge.campaignIndex] : state.courseStages?.[challenge.id] || 0;
   const stages = challenge.stages || [];
   const stageIndex = saved >= stages.length ? 0 : saved;
   const stage = stages[stageIndex];
@@ -25,7 +26,7 @@ export function courseVisualState(challenge, state, world = WORLD) {
     ? { ...challenge, x: from.x + 18, y: from.y + 22, z: from.z - 18 }
     : challenge;
   const gates = stage?.gates || challenge.gates || [];
-  const progress = state.challengeProgress?.[challenge.id] || 0;
+  const progress = challenge.campaignIndex != null ? state.campaignGate : state.challengeProgress?.[challenge.id] || 0;
   return {
     entry,
     stage,
@@ -41,7 +42,7 @@ export function courseVisualState(challenge, state, world = WORLD) {
   };
 }
 
-export function navigationVisualState(state) {
+export function navigationVisualState(state, out = {}) {
   const target = state.challengeHint || state.trackedHint || state.surveyHint;
   const label = state.challengeHint
     ? state.challengeHint.landing
@@ -54,18 +55,16 @@ export function navigationVisualState(state) {
       : state.surveyHint
         ? `${state.surveyHint.name} ${state.surveyHint.step}/${state.surveyHint.total}`
         : null;
-  return {
-    target,
-    label,
-    surveyTarget: state.activeChallenge
+  out.target = target; out.label = label;
+  out.surveyTarget = state.activeChallenge
       ? null
       : state.trackedHint
         ? state.trackedHint.transit
           ? state.trackedHint
           : null
-        : state.surveyHint,
-    mainRouteVisible: !state.activeChallenge && !state.trackedHint,
-  };
+        : state.surveyHint;
+  out.mainRouteVisible = !state.activeChallenge && !state.trackedHint && state.activeCampaignCircuit == null;
+  return out;
 }
 
 export function navigationOverlapsCard(label, card) {
@@ -89,6 +88,8 @@ export class NavigationLabelOcclusion {
     this.card = card;
     this.cards = [card, ...extraCards].filter(Boolean);
     this.anchor = null;
+    this.placedAnchor = { x: 0, y: 0 };
+    this.bounds = { left: 0, right: 0, top: 0, bottom: 0 };
     this.size = null;
     this.origin = { x: 0, y: 0 };
     this.cardRect = null;
@@ -111,24 +112,23 @@ export class NavigationLabelOcclusion {
     this.apply();
   }
   place(x, y) {
-    this.anchor = { x, y };
+    this.anchor = this.placedAnchor; this.anchor.x = x; this.anchor.y = y;
     this.apply();
   }
   apply() {
-    const bounds =
-      this.anchor && this.size
-        ? {
-            left: this.anchor.x + this.origin.x - this.size.width / 2,
-            right: this.anchor.x + this.origin.x + this.size.width / 2,
-            top: this.anchor.y + this.origin.y - this.size.height / 2,
-            bottom: this.anchor.y + this.origin.y + this.size.height / 2,
-          }
-        : null;
-    // Visibility retains measurable bounds and never moves the world anchor.
-    this.label.style.visibility = this.cardRects.some((card) =>
-      navigationOverlapsCard(bounds, card),
-    ) ? "hidden" : "";
+    let bounds = null;
+    if (this.anchor && this.size) {
+      bounds = this.bounds;
+      bounds.left = this.anchor.x + this.origin.x - this.size.width / 2;
+      bounds.right = this.anchor.x + this.origin.x + this.size.width / 2;
+      bounds.top = this.anchor.y + this.origin.y - this.size.height / 2;
+      bounds.bottom = this.anchor.y + this.origin.y + this.size.height / 2;
+    }
+    let hidden = false;
+    for (const card of this.cardRects) if (navigationOverlapsCard(bounds,card)) { hidden = true; break; }
+    this.label.style.visibility = hidden ? 'hidden' : '';
   }
+
   dispose() {
     this.observer.disconnect();
   }
@@ -137,7 +137,7 @@ export class NavigationLabelOcclusion {
 export function createWorldWind(data) {
   const thermal = data.type === "updraft" || data.type === "thermal";
   const length = data.start
-    ? Math.hypot(data.end.x - data.start.x, data.end.z - data.start.z)
+    ? length2(data.end.x - data.start.x, data.end.z - data.start.z)
     : 30;
   const group = createWind(data.type, {
     radius: thermal ? data.radius * 0.65 : 5,
@@ -228,7 +228,7 @@ export class FlightTargetMarker {
     if (!target) return;
     const radius = target.radius || 10;
     const heading = target.heading;
-    const directional = heading && Math.hypot(heading.x, heading.z) > 0;
+    const directional = heading && length2(heading.x, heading.z) > 0;
     this.group.position.set(
       target.x,
       target.y + (target.landing ? 0.25 : 0),
@@ -291,8 +291,12 @@ function sampleForeground(camera, player, meshes, ray = new THREE.Raycaster()) {
 export class ForegroundOcclusion {
   constructor() {
     this.meshes = [];
+    this.bounds = [];
+    this.localRay = new THREE.Ray(); this.direction = new V(); this.hitPoint = new V();
+    this.pose = new Float64Array(6); this.pose.fill(Infinity);
     this.owners = new Map();
     this.materials = new Map();
+    this.materialEntries = [];
     this.targets = new Set();
     this.ray = new THREE.Raycaster();
     this.sinceSample = Infinity;
@@ -319,9 +323,30 @@ export class ForegroundOcclusion {
         )
       )
         return;
+      mesh.geometry.computeBoundingBox();
+      this.bounds.push({ mesh, box: mesh.geometry.boundingBox, inverse: mesh.matrixWorld.clone().invert() });
       this.meshes.push(mesh);
       this.owners.set(mesh, owner);
     });
+  }
+  // Conservative static mesh bounds; rich triangle hits are inspection-only.
+  blockers(camera, player) {
+    this.targets.clear();
+    for (let sample = 0; sample < 3; sample++) {
+      this.direction.set(player.x, player.y + (sample === 0 ? 1.65 : sample === 1 ? 1.05 : .55), player.z).sub(camera.position);
+      const distance = this.direction.length();
+      if (distance <= camera.near + .1) continue;
+      this.ray.set(camera.position,this.direction.normalize());
+      for (const b of this.bounds) {
+        if (!hierarchyVisible(b.mesh)) continue;
+        this.localRay.copy(this.ray.ray).applyMatrix4(b.inverse);
+        if (!this.localRay.intersectBox(b.box,this.hitPoint)) continue;
+        this.hitPoint.applyMatrix4(b.mesh.matrixWorld);
+        const d = this.hitPoint.distanceTo(camera.position);
+        if (d > camera.near && d < distance - .1) this.targets.add(b.mesh);
+        if (this.targets.size >= this.maxFadedMeshes) return;
+      }
+    }
   }
   update(camera, player, dt, enabled = true) {
     const elapsed = Math.max(0, Math.min(dt, 0.1));
@@ -330,18 +355,19 @@ export class ForegroundOcclusion {
       this.targets.clear();
       this.sinceSample = Infinity;
     } else if (this.sinceSample >= 0.075) {
-      this.targets = new Set(
-        sampleForeground(camera, player, this.meshes, this.ray)
-          .slice(0, this.maxFadedMeshes)
-          .map((hit) => hit.object),
-      );
+      const c = camera.position, v = this.pose;
+      if (v[0] !== c.x || v[1] !== c.y || v[2] !== c.z || v[3] !== player.x || v[4] !== player.y || v[5] !== player.z) {
+        this.blockers(camera,player);
+        v[0]=c.x; v[1]=c.y; v[2]=c.z; v[3]=player.x; v[4]=player.y; v[5]=player.z;
+      }
       this.sinceSample = 0;
     }
     // Keep the cap true during a fast camera sweep as well as at rest. If new
     // blockers fill the budget, old nonblocking meshes restore immediately;
     // otherwise their short fade-out is retained.
     let restoringBudget = Math.max(0, this.maxFadedMeshes - this.targets.size);
-    for (const [mesh, entry] of this.materials) {
+    for (const entry of this.materialEntries) {
+      const mesh = entry.mesh;
       if (
         entry.factor < 1 &&
         !this.targets.has(mesh) &&
@@ -363,15 +389,17 @@ export class ForegroundOcclusion {
         copy.depthWrite = false;
         return copy;
       });
-      this.materials.set(mesh, {
-        original,
+      const entry = {
+        mesh, original,
         sources,
         copies,
         factor: 1,
         faded: Array.isArray(original) ? copies : copies[0],
-      });
+      };
+      this.materials.set(mesh,entry); this.materialEntries.push(entry);
     }
-    for (const [mesh, entry] of this.materials) {
+    for (const entry of this.materialEntries) {
+      const mesh = entry.mesh;
       const blocked =
         enabled && this.targets.has(mesh) && hierarchyVisible(mesh);
       entry.factor = blocked
@@ -420,13 +448,14 @@ export class ForegroundOcclusion {
     };
   }
   dispose() {
-    for (const [mesh, entry] of this.materials) {
+    for (const entry of this.materialEntries) {
+      const mesh = entry.mesh;
       mesh.material = entry.original;
       for (const material of entry.copies) material.dispose();
     }
-    this.materials.clear();
+    this.materials.clear(); this.materialEntries.length = 0;
     this.targets.clear();
-    this.meshes.length = 0;
+    this.meshes.length = 0; this.bounds.length = 0;
     this.owners.clear();
   }
 }
@@ -544,9 +573,9 @@ export class AetherScene {
     WORLD.winds.forEach((data) => {
       const group = createWorldWind(data);
       this.scene.add(group);
-      const halfLength = data.start ? Math.hypot(data.end.x - data.start.x, data.end.z - data.start.z) / 2 : 0;
+      const halfLength = data.start ? length2(data.end.x - data.start.x, data.end.z - data.start.z) / 2 : 0;
       // Conservative world bounds include the full corridor, not just its centre.
-      const radius = Math.hypot(halfLength, data.radius || 10, 40);
+      const radius = length3(halfLength, data.radius || 10, 40);
       const bounds = new THREE.Sphere(group.position.clone(), radius);
       this.winds.push({ data, group, halfLength, bounds, animationDt: 0 });
     });
@@ -704,6 +733,11 @@ export class AetherScene {
     this.reduced = false;
     this.menu = true;
     this.target = new V();
+    this.head = new V(); this.desired = new V(); this.look = new V(); this.direction = new V(); this.sunOffset = new V(-70,110,45);
+    this.pilotSample = { grounded: true, gliding: false, speed: 0, mode: 'idle' };
+    this.navigationView = {}; this.navigationHint = undefined; this.navigationPhase = '';
+    this.fallbackNavigation = { x: 0, y: 0, z: 0, label: '' };
+    this.courseViews = new Map();
     this.projection = new V();
     this.worldPoint = new V();
     this.playerPoint = new V();
@@ -784,9 +818,23 @@ export class AetherScene {
     this.routeLine.computeLineDistances();
     this.scene.add(this.routeLine);
   }
+  cachedCourse(course,state,world = WORLD) {
+    if (!course) return null;
+    const saved = course.campaignIndex != null ? state.campaignCircuitStages[course.campaignIndex] : state.courseStages[course.id] || 0;
+    const progress = course.campaignIndex != null ? state.campaignGate : state.challengeProgress[course.id] || 0;
+    const complete = state.challenges.includes(course.id);
+    let entry = this.courseViews.get(course.id);
+    if (!entry || entry.saved !== saved || entry.progress !== progress || entry.complete !== complete) {
+      entry = { saved, progress, complete, view: courseVisualState(course,state,world) }; this.courseViews.set(course.id,entry);
+    }
+    return entry.view;
+  }
   updateCourse(state, world = WORLD) {
-    const course = world.challenges.find((c) => c.id === state.activeChallenge);
-    const visual = courseVisualState(course, state, world);
+    let course = state.activeCampaignCircuit != null ? world.campaignCircuits[state.activeCampaignCircuit] : null;
+    if (!course) for (const c of world.challenges) if (c.id === state.activeChallenge) { course = c; break; }
+    const visual = this.cachedCourse(course, state, world);
+    if (this.courseVisual === visual) return;
+    this.courseVisual = visual;
     const courseKey = visual?.key || null;
     if (this.courseId !== courseKey) {
       if (this.courseLine) {
@@ -822,7 +870,7 @@ export class AetherScene {
     for (const data of visual?.winds || []) {
       const thermal = data.type === "thermal" || data.type === "updraft";
       const length = data.start
-        ? Math.hypot(data.end.x - data.start.x, data.end.z - data.start.z)
+        ? length2(data.end.x - data.start.x, data.end.z - data.start.z)
         : 30;
       const group = createWind(data.type, {
         radius: thermal ? data.radius * 0.6 : 4,
@@ -854,12 +902,12 @@ export class AetherScene {
       const { start, end } = wind.data;
       const dx = end.x - start.x, dz = end.z - start.z;
       const t = THREE.MathUtils.clamp(((state.player.x - start.x) * dx + (state.player.z - start.z) * dz) / (dx * dx + dz * dz || 1), 0, 1);
-      const distance = Math.hypot(state.player.x - start.x - t * dx, state.player.z - start.z - t * dz);
+      const distance = length2(state.player.x - start.x - t * dx, state.player.z - start.z - t * dz);
       if (distance < nearestDistance) { nearest = wind; nearestDistance = distance; }
     }
     for (const wind of this.winds) {
       const { data, group, halfLength, bounds } = wind;
-      const distance = Math.hypot(data.x - state.player.x, data.z - state.player.z);
+      const distance = length2(data.x - state.player.x, data.z - state.player.z);
       const reach = (this.menu ? 850 : 420) + (halfLength || data.radius);
       const localThermal = !data.start && distance < (data.radius || 0) + 30;
       const inView = !low || wind === nearest || localThermal || this.windFrustum.intersectsSphere(bounds);
@@ -904,7 +952,7 @@ export class AetherScene {
       hit = hits[0],
       platform = WORLD.islands.find(
         (island) =>
-          Math.hypot(
+          length3(
             this.camera.position.x - island.x,
             this.camera.position.z - island.z,
           ) < island.radius,
@@ -957,19 +1005,20 @@ export class AetherScene {
     const w = this.viewportWidth, h = this.viewportHeight;
     if (this.reduced) time = 0;
     const p = s.player;
-    const navigationView = navigationVisualState(s);
-    const speed = Math.hypot(p.vx || 0, p.vz || 0);
+    const hint = s.challengeHint || s.trackedHint || s.surveyHint;
+    if (this.navigationHint !== hint || this.navigationPhase !== s.activeChallenge) {
+      navigationVisualState(s,this.navigationView); this.navigationHint = hint; this.navigationPhase = s.activeChallenge;
+    }
+    const navigationView = this.navigationView;
+    const speed = length2(p.vx || 0, p.vz || 0);
     this.pilot.group.position.set(p.x, p.y, p.z);
     this.pilot.group.rotation.y = Math.PI - (p.heading || 0);
     if (p.grounded && !this.wasGrounded) this.landingTime = 0.42;
     this.landingTime = Math.max(0, this.landingTime - dt);
     this.wasGrounded = p.grounded;
-    this.pilot.update(dt, {
-      grounded: p.grounded,
-      gliding: p.gliding,
-      speed,
-      mode:
-        this.landingTime > 0
+    const pilotSample = this.pilotSample;
+    pilotSample.grounded = p.grounded; pilotSample.gliding = p.gliding; pilotSample.speed = speed;
+    pilotSample.mode = this.landingTime > 0
           ? "land"
           : p.gliding
             ? "glide"
@@ -977,8 +1026,8 @@ export class AetherScene {
               ? speed > 0.4
                 ? "run"
                 : "idle"
-              : "jump",
-    });
+              : "jump";
+    this.pilot.update(dt,pilotSample);
     for (const { data, group } of this.relics) {
       group.visible = !s.relics.includes(data.id);
       if (!this.reduced) group.rotation.y = time * 0.7;
@@ -988,9 +1037,9 @@ export class AetherScene {
         (this.reduced ? 0 : Math.sin(time * 1.5 + data.x) * 0.25);
     }
     for (const { data, marker } of this.challenges) {
-      const visual = courseVisualState(data, s);
+      const visual = this.cachedCourse(data, s);
       marker.update(
-        visual.completed
+        visual.completed || s.activeCampaignCircuit != null
           ? null
           : s.activeChallenge === data.id && s.challengeHint
             ? s.challengeHint
@@ -1022,9 +1071,8 @@ export class AetherScene {
     }
     this.scene.fog.density =
       s.hazard === "fog" ? 0.006 : 0.0012 / this.mapScale;
-    const ground = WORLD.islands.find(
-      (i) => Math.hypot(p.x - i.x, p.z - i.z) < i.radius,
-    );
+    let ground = null;
+    for (const i of WORLD.islands) if (length2(p.x-i.x,p.z-i.z) < i.radius) { ground=i; break; }
     this.contactShadow.visible = !!ground;
     if (ground) {
       this.contactShadow.position.set(p.x, ground.y + 0.09, p.z);
@@ -1038,7 +1086,7 @@ export class AetherScene {
       this.marker.position.set(objective.x, objective.y + 0.2, objective.z);
       this.marker.rotation.y = time * 0.2;
     }
-    const head = new V(p.x, p.y + 2, p.z);
+    const head = this.head.set(p.x, p.y + 2, p.z);
     // Static foreground matrices are initialized on registration. Only camera
     // and LOD visibility need refreshing before the two foreground queries.
     this.camera.updateMatrixWorld();
@@ -1047,7 +1095,7 @@ export class AetherScene {
         if (child.isLOD) child.update(this.camera);
     let desired;
     if (this.menu) {
-      desired = new V(82 + Math.sin(time * 0.03) * 10, 74, 112);
+      desired = this.desired.set(82 + Math.sin(time * 0.03) * 10, 74, 112);
       this.target.set(-20, 7, -62);
       this.camera.position.lerp(desired, 1 - Math.exp(-dt * 2));
     } else {
@@ -1057,12 +1105,12 @@ export class AetherScene {
         dist = this.overhead
           ? 65
           : this.distance * (this.camera.aspect < 0.8 ? 1.3 : 1);
-      desired = new V(
+      desired = this.desired.set(
         Math.sin(this.yaw) * Math.cos(pitch) * dist,
         Math.sin(pitch) * dist,
         Math.cos(this.yaw) * Math.cos(pitch) * dist,
       ).add(head);
-      const look = new V(
+      const look = this.look.set(
         p.x + (p.vx || 0) * 0.25,
         p.y + 2,
         p.z + (p.vz || 0) * 0.25,
@@ -1073,18 +1121,24 @@ export class AetherScene {
       this.target.lerp(look, immediate ? 1 : 1 - Math.exp(-dt * 10));
       // Clamp above the platform under the camera; ray shorten protects foreground cliffs.
       for (const i of WORLD.islands)
-        if (Math.hypot(desired.x - i.x, desired.z - i.z) < i.radius + 3)
+        if (length2(desired.x - i.x, desired.z - i.z) < i.radius + 3)
           desired.y = Math.max(desired.y, i.y + 8);
-      this.ray.set(head, new V().subVectors(desired, head).normalize());
-      this.ray.far = head.distanceTo(desired);
-      const hit = this.ray
-        .intersectObjects(this.collidables.filter(hierarchyVisible), false)
-        .find((h) => h.distance > 4);
-      if (hit)
-        desired.lerp(
-          head,
-          Math.min(0.7, 1 - (hit.distance - 2) / this.ray.far),
-        );
+      // Walk the short camera segment against the same tapered island bodies
+      // used by flight collision. No triangle intersection records are created.
+      const cameraDistance = head.distanceTo(desired);
+      let clampDistance = cameraDistance;
+      for (let sample = 1; sample <= 48; sample++) {
+        const t = sample / 48, x = head.x + (desired.x-head.x)*t, y = head.y+(desired.y-head.y)*t, z = head.z+(desired.z-head.z)*t;
+        if (t*cameraDistance <= 4) continue;
+        for (const i of WORLD.islands) {
+          const depth = i.y-y;
+          if (depth <= -.2 || depth >= 38) continue;
+          const radius = i.radius * Math.max(.15,1-Math.max(0,depth-2)/43)+.75;
+          if (length2(x-i.x,z-i.z) < radius) { clampDistance = t*cameraDistance; break; }
+        }
+        if (clampDistance < cameraDistance) break;
+      }
+      if (clampDistance < cameraDistance) desired.lerp(head, Math.min(.7,1-(clampDistance-2)/cameraDistance));
       this.camera.position.lerp(
         desired,
         immediate ? 1 : 1 - Math.exp(-dt * 9),
@@ -1098,24 +1152,22 @@ export class AetherScene {
         if (child.isLOD) child.update(this.camera);
     this.updateWorldWinds(s, dt);
     this.foreground.update(this.camera, p, dt, !this.menu);
-    const route = WORLD.routes.find((r) => r.id === s.objective?.routeId);
+    let route = null;
+    for (const r of WORLD.routes) if (r.id === s.objective?.routeId) { route = r; break; }
     let navigation = navigationView.target;
     if (!navigation && route) {
       let nearest = 0,
         best = Infinity;
-      route.waypoints.forEach((q, i) => {
-        const d = Math.hypot(q.x - p.x, q.z - p.z);
-        if (d < best) {
-          best = d;
-          nearest = i;
-        }
-      });
-      navigation = {
-        ...route.waypoints[Math.min(nearest + 1, route.waypoints.length - 1)],
-        label:
-          nearest + 1 >= route.waypoints.length - 1 ? "目標島" : "風道節點",
-      };
+      for (let i=0;i<route.waypoints.length;i++) {
+        const q=route.waypoints[i], d=length2(q.x-p.x,q.z-p.z);
+        if (d<best) { best=d; nearest=i; }
+      }
+      navigation = this.fallbackNavigation;
+      const point = route.waypoints[Math.min(nearest+1,route.waypoints.length-1)];
+      navigation.x=point.x; navigation.y=point.y; navigation.z=point.z;
+      navigation.label=nearest+1>=route.waypoints.length-1 ? '目標島' : '風道節點';
     }
+
     const nav = this.navTarget;
     const navDisplay = navigation ? "" : "none";
     if (nav.style.display !== navDisplay) nav.style.display = navDisplay;
@@ -1142,7 +1194,7 @@ export class AetherScene {
       if (navText.textContent !== navContent) navText.textContent = navContent;
       this.navOcclusion.place(anchorX, anchorY);
     }
-    this.sun.position.copy(head).add(new V(-70, 110, 45));
+    this.sun.position.copy(head).add(this.sunOffset);
     this.sun.target.position.copy(head);
     this.sun.target.updateMatrixWorld();
     for (const { label, data } of this.labels) {
@@ -1172,13 +1224,8 @@ export class AetherScene {
     this.renderer.render(this.scene, this.camera);
     this.phase.renderCpuMs = performance.now() - renderStart;
     const r = this.renderer.info;
-    this.metrics = {
-      frames: this.metrics.frames + 1,
-      drawCalls: r.render.calls,
-      triangles: r.render.triangles,
-      geometries: r.memory.geometries,
-      textures: r.memory.textures,
-    };
+    this.metrics.frames++; this.metrics.drawCalls = r.render.calls; this.metrics.triangles = r.render.triangles;
+    this.metrics.geometries = r.memory.geometries; this.metrics.textures = r.memory.textures;
   }
   dispose() {
     window.removeEventListener("resize", this.resize);

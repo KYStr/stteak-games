@@ -31,19 +31,19 @@ export function steer(sim, target, { landing = false } = {}) {
     brake }, dt);
 }
 
-export function flyMainSegment(sim, mission, style = 'safe', { maxSeconds = 480 } = {}) {
+export function flyMainSegment(sim, mission, style = 'safe', { maxSeconds = 900 } = {}) {
   sim.setRouteStyle(style);
   const started = sim.elapsed, stalls = sim.stalls;
   for (let frame = 0; frame < maxSeconds * 60; frame++) {
-    if (sim.activated.length >= mission || sim.status === 'complete') return sim.elapsed - started;
+    if ((sim.activated.length >= mission && sim.state.activeCampaignCircuit == null) || sim.status === 'complete') return sim.elapsed - started;
     if (sim.state.activeChallenge || sim.state.trackedHint) {
       assert.equal(sim.player.grounded, true, 'Main-route pilot may leave a course only from a safe landing, never by returning from midair');
       sim.cancelChallenge();
     }
     const target = sim.state.surveyHint;
     const island = islandById(sim.state.objective.islandId);
-    if (!target && sim.player.grounded && distance(sim.player, island) < 8) { sim.interact(); continue; }
-    steer(sim, target || island, { landing: !target });
+    if ((!target || target.landing) && sim.player.grounded && distance(sim.player, island) < 8) { sim.interact(); continue; }
+    steer(sim, target || island, { landing: !target || target.landing });
     assert.equal(sim.stalls, stalls, `Main ${mission}/${style} recovery: ${JSON.stringify(sim.snapshot())}`);
   }
   assert.fail(`Main ${mission}/${style} timeout at ${JSON.stringify(sim.snapshot())}`);

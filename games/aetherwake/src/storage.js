@@ -1,6 +1,6 @@
 import { WORLD, MODULES, STATIONS } from './world.js';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const SAVE_KEY = 'aetherwake-save';
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const finite = (value, fallback = 0, max = 1e9) => Number.isFinite(value) && value >= 0 ? Math.min(max, value) : fallback;
@@ -21,7 +21,7 @@ function cleanRecords(value, validKeys, route = false) {
   }));
 }
 export function defaultSave() {
-  return { schemaVersion: SAVE_VERSION, seed: 1, module: 'turn', checkpoint: 'island-camp', unlocked: ['island-camp'], activated: [], relics: [], mainSamples: [0, 0, 0], courseStages: Object.fromEntries(WORLD.challenges.map((challenge) => [challenge.id, 0])), challenges: [], completedChallenges: [], cargoStability: 100, cargoDamage: 0, elapsed: 0, segmentStart: 0, stalls: 0, assist: false, usedAssist: false, routeStyle: 'safe', completed: false, records: {}, routeRecords: {}, legacyRecords: {}, legacyRouteRecords: {}, legacyChallenges: [], settings: { music: 0.35, sfx: 0.7, reducedMotion: false, camera: 'follow', quality: 'auto' } };
+  return { schemaVersion: SAVE_VERSION, seed: 1, module: 'turn', checkpoint: 'island-camp', unlocked: ['island-camp'], activated: [], relics: [], mainSamples: [0, 0, 0], returnSamples: 0, campaignCircuitStages: [0,0,0], activeCampaignCircuit: null, mode: 'expedition', activeSeconds: 0, failed: false, failureReason: null, courseStages: Object.fromEntries(WORLD.challenges.map((challenge) => [challenge.id, 0])), challenges: [], completedChallenges: [], cargoStability: 100, cargoDamage: 0, elapsed: 0, segmentStart: 0, stalls: 0, assist: false, usedAssist: false, routeStyle: 'safe', completed: false, records: {}, routeRecords: {}, legacyRecords: {}, legacyRouteRecords: {}, legacyChallenges: [], settings: { music: 0.35, sfx: 0.7, reducedMotion: false, camera: 'follow', quality: 'auto' } };
 }
 export function validateSave(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value) || value.schemaVersion !== SAVE_VERSION) return null;
@@ -36,6 +36,14 @@ export function validateSave(value) {
   result.unlocked = [...new Set(['island-camp', ...result.unlocked, value.checkpoint])];
   result.relics = ids(value.relics, WORLD.relics.map((item) => item.id));
   result.mainSamples = result.mainSamples.map((_, index) => count(Array.isArray(value.mainSamples) ? value.mainSamples[index] : 0, sampleCount(index + 1)));
+  result.returnSamples = count(value.returnSamples, 6);
+  result.campaignCircuitStages = [0,1,2].map(i => count(value.campaignCircuitStages?.[i], 3));
+  result.activeCampaignCircuit = [0,1,2].includes(value.activeCampaignCircuit) && result.campaignCircuitStages[value.activeCampaignCircuit] < 3 ? value.activeCampaignCircuit : null;
+  // Infer an unfinished mandatory phase even if a malformed save omitted its marker.
+  result.mode = value.mode === 'exploration' ? 'exploration' : 'expedition';
+  result.activeSeconds = finite(value.activeSeconds, 0, 1e9);
+  result.failed = result.mode === 'expedition' && (value.failed === true || result.activeSeconds >= 2700);
+  result.failureReason = result.failed ? 'weather-window' : null;
   for (const challenge of WORLD.challenges) result.courseStages[challenge.id] = count(record(value.courseStages) ? value.courseStages[challenge.id] : 0, stageCount(challenge));
   const fullCourses = WORLD.challenges.filter((challenge) => stageCount(challenge) > 0 && result.courseStages[challenge.id] === stageCount(challenge)).map((challenge) => challenge.id);
   result.challenges = ids(value.challenges, fullCourses);
@@ -43,6 +51,9 @@ export function validateSave(value) {
   // courses never enter this list: migration archives them separately below.
   result.completedChallenges = [...new Set([...ids(value.completedChallenges, WORLD.challenges.map((item) => item.id)), ...fullCourses])];
   for (const station of STATIONS) { if (value.activated.includes(station)) result.activated.push(station); else break; }
+  result.activeCampaignCircuit = null;
+  for (let i = 0; i < result.activated.length && i < 3; i++) if (result.campaignCircuitStages[i] < 3) { result.activeCampaignCircuit = i; break; }
+
   result.elapsed = finite(value.elapsed); result.stalls = Math.trunc(finite(value.stalls));
   // Older v3 saves did not preserve the active route clock. Unknown is not zero:
   // retain the checkpoint and PBs, but do not invent a shortened route record.
@@ -50,7 +61,7 @@ export function validateSave(value) {
   result.cargoStability = finite(value.cargoStability, 100, 100); result.cargoDamage = finite(value.cargoDamage);
   result.assist = value.assist === true; result.routeStyle = value.routeStyle === 'shortcut' ? 'shortcut' : 'safe';
   result.usedAssist = value.usedAssist === true || result.assist;
-  result.completed = value.completed === true && result.activated.length === STATIONS.length && value.checkpoint === 'island-camp';
+  result.completed = value.completed === true && result.activated.length === STATIONS.length && value.checkpoint === 'island-camp' && !result.failed && result.returnSamples === 6 && result.mainSamples.every(n => n === 8) && result.campaignCircuitStages.every(n => n === 3);
   if (record(value.settings)) {
     const settings = value.settings;
     result.settings.music = finite(settings.music, 0.35, 1); result.settings.sfx = finite(settings.sfx, 0.7, 1);
@@ -69,12 +80,21 @@ export function validateSave(value) {
 }
 export function migrateSave(value) {
   if (value?.schemaVersion === SAVE_VERSION) return { save: validateSave(value), migrated: false };
+  if (record(value) && value.schemaVersion === 3) {
+    const base = defaultSave();
+    const versioned = (records) => Object.fromEntries(Object.entries(records || {}).map(([key, entry]) => [`v3:${key}`, entry]));
+    return { migrated: true, save: validateSave({ ...value, ...base, seed: value.seed, module: value.module,
+      settings: value.settings, relics: value.relics, unlocked: value.unlocked,
+      courseStages: value.courseStages, challenges: value.challenges, completedChallenges: value.completedChallenges,
+      legacyRecords: { ...value.legacyRecords, ...versioned(value.records) },
+      legacyRouteRecords: { ...value.legacyRouteRecords, ...versioned(value.routeRecords) }, legacyChallenges: value.legacyChallenges }) };
+  }
   const v1 = value?.schemaVersion === 1 || (value?.schemaVersion === undefined && value?.version === 1);
   if (record(value) && (v1 || value.schemaVersion === 2)) {
     const base = defaultSave();
     const old = v1 ? { ...base, ...value, checkpoint: value.checkpoint ?? value.island ?? base.checkpoint, relics: value.relics ?? value.fragments ?? [], activated: value.activated ?? [] } : value;
     const converted = validateSave({
-      ...old, schemaVersion: SAVE_VERSION, segmentStart: null, mainSamples: base.mainSamples, courseStages: base.courseStages, cargoStability: 100, cargoDamage: 0,
+      ...old, schemaVersion: SAVE_VERSION, activated: [], completed: false, segmentStart: null, mainSamples: base.mainSamples, courseStages: base.courseStages, cargoStability: 100, cargoDamage: 0,
       challenges: [], completedChallenges: [], records: {}, routeRecords: {},
       legacyRecords: { ...cleanRecords(value.legacyRecords), ...cleanRecords(value.records) },
       legacyRouteRecords: { ...cleanRecords(value.legacyRouteRecords, null, true), ...cleanRecords(value.routeRecords, null, true) },
@@ -102,7 +122,7 @@ export class SaveStore {
       const converted = migrateSave(parsed);
       if (!converted.save) return { save: clone(this.memory), warning: '存檔已損壞或版本不支援；原始存檔仍保留，現在使用安全的新進度。', migrated: false };
       this.memory = converted.save;
-      return { save: clone(this.memory), warning: converted.migrated ? '舊版存檔已安全升級；下一個安全保存點會寫入新格式。' : null, migrated: converted.migrated };
+      return { save: clone(this.memory), warning: converted.migrated ? '舊版紀錄已歸檔；新版加入三區必修巡測與六座返航航標。主線由營地重新開始，碎片、設定與已交付的新版選修階段保留。' : null, migrated: converted.migrated };
     } catch { return { save: clone(this.memory), warning: '無法讀取瀏覽器儲存；本次進度僅保留在記憶體。', migrated: false }; }
   }
   save(data) {

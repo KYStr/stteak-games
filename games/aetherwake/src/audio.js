@@ -14,6 +14,7 @@ const EVENTS = Object.freeze({
 const ALIAS={deploy:'glide',sail:'glide',open:'glide',wind:'tailwind',low:'energy',lowEnergy:'energy',exhausted:'energy',landing:'land',fail:'stall',respawn:'stall',station:'unlock',interact:'ui',collect:'relic',complete:'finish'};
 const clamp=(n,min,max)=>Math.min(max,Math.max(min,Number.isFinite(n)?n:min));
 
+const MELODY = [293.66,0,440,369.99,587.33,0,440,0,329.63,0,493.88,440,369.99,0,293.66,0];
 export class AudioEngine {
   constructor(){this.context=null;this.musicVolume=.55;this.sfxVolume=.7;this.paused=false;this.active=new Set();this.lastEvent=new Map();this.musicTime=0;this.nextNote=0;this.noteIndex=0;this.windFilter=null;this.windGain=null;this.disposed=false;this.sampleBuffers=new Map();this.sampleFailed=false;this.stats={peakVoices:0,events:0,maxVoices:20};}
   async unlock(){
@@ -52,13 +53,13 @@ export class AudioEngine {
   setPaused(value){this.paused=Boolean(value);this.syncContext();}
   register(source){if(this.active.size>=this.stats.maxVoices){const oldest=this.active.values().next().value;try{oldest.stop();}catch{}this.active.delete(oldest);}this.active.add(source);this.stats.peakVoices=Math.max(this.stats.peakVoices,this.active.size);source.onended=()=>{source.onended=null;this.active.delete(source);try{source.disconnect();}catch{}};}
   tone(frequency,start,duration,type,gain,bus){const ctx=this.context,osc=ctx.createOscillator(),env=ctx.createGain();osc.type=type;osc.frequency.setValueAtTime(frequency,start);env.gain.setValueAtTime(.0001,start);env.gain.exponentialRampToValueAtTime(Math.max(.0001,gain),start+.015);env.gain.exponentialRampToValueAtTime(.0001,start+duration);osc.connect(env);env.connect(bus);this.register(osc);const oldEnd=osc.onended;osc.onended=()=>{oldEnd();env.disconnect();};osc.start(start);osc.stop(start+duration+.02);}
-  play(event){if(!this.context||this.context.state!=='running'||this.paused||this.disposed)return;const name=ALIAS[event]||event,setting=EVENTS[name];if(!setting)return;const now=this.context.currentTime,last=this.lastEvent.get(name)??-Infinity,cooldown=name==='energy'?1.6:name==='tailwind'?1.0:.08;if(now-last<cooldown)return;this.lastEvent.set(name,now);this.stats.events++;
+  play(event){if(!this.context||this.context.state!=='running'||this.paused||this.disposed)return;const name=ALIAS[event]||event,setting=EVENTS[name];if(!setting)return;const now=this.context.currentTime,last=this.lastEvent.get(name)??-Infinity,cooldown=name==='glide'?0:name==='energy'?1.6:name==='tailwind'?1.0:.08;if(now-last<cooldown)return;this.lastEvent.set(name,now);this.stats.events++;
     const sample=this.sampleBuffers.get(name);if(sample){const source=this.context.createBufferSource(),env=this.context.createGain();source.buffer=sample;env.gain.value=.6;source.connect(env);env.connect(this.sfxBus);this.register(source);const oldEnd=source.onended;source.onended=()=>{oldEnd();env.disconnect();};source.start();return;}
     setting.notes.forEach((note,i)=>this.tone(note,now+i*setting.duration*.58,setting.duration,setting.type,setting.gain,this.sfxBus));
   }
   update({speed=0,energy=100,wind=0,dt=1/60}={}){if(!this.context||this.context.state!=='running'||this.paused||this.disposed)return;const ctx=this.context,now=ctx.currentTime;const w=typeof wind==='number'?wind:wind?1:0;this.windFilter.frequency.setTargetAtTime(360+clamp(speed,0,30)*28+clamp(w,0,2)*190,now,.2);this.windGain.gain.setTargetAtTime(.07+clamp(speed,0,30)*.007+clamp(w,0,2)*.07,now,.2);if(energy<18&&energy>0)this.play('energy');
     // Original 16-beat D pentatonic phrase. Sparse voicing leaves space for wind.
-    const melody=[293.66,0,440,369.99,587.33,0,440,0,329.63,0,493.88,440,369.99,0,293.66,0];
+    const melody=MELODY;
     if(this.nextNote<now-.5)this.nextNote=now+.06;
     if(this.nextNote<=now+.13){const i=this.noteIndex%melody.length,note=melody[i];if(note)this.tone(note,this.nextNote,1.75,'sine',.065,this.musicBus);if(i%4===0)this.tone(i<8?146.83:164.81,this.nextNote,3.3,'triangle',.028,this.musicBus);this.nextNote+=.8;this.noteIndex++;}
     this.musicTime+=clamp(dt,0,.1);

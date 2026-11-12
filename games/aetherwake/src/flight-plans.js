@@ -112,9 +112,16 @@ export function createMainRoutes(islands) {
   }
   const from = island(islands, 'dawn'), to = island(islands, 'camp');
   for (const style of ['safe', 'shortcut']) {
-    const waypoints = [above(from), above(to)];
+    const start = above(from), end = above(to);
+    const samples = Array.from({ length: 6 }, (_, index) => {
+      const t = (index + 1) / 7;
+      return { id: `sample-return-${index + 1}`, name: `返航航標 ${index + 1}/6`, type: 'return',
+        x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t, z: start.z + (end.z - start.z) * t,
+        radius: 15, instruction: `返航航標 ${index + 1}/6：沿風廊中心通過；完成後在營地中央落地按 E。` };
+    });
+    const waypoints = [start, ...samples, end];
     routes.push({ id: `route-4-${style}`, mission: 4, style, from: from.id, to: to.id,
-      name: `返航 · ${style === 'safe' ? '安全風道' : '穿雲捷徑'}`, title: '帶星圖回家', theme: 'return', samples: [], waypoints,
+      name: `返航 · ${style === 'safe' ? '安全風道' : '穿雲捷徑'}`, title: '帶星圖回家', theme: 'return', samples, waypoints,
       description: style === 'safe' ? '沿寬廣、補能充足的歸航風廊，返回營地中央落地按 E 結算。' : '沿較快的窄風廊返航；預留降落能量，回營地中央按 E 結算。',
       distanceMeters: pathLength(waypoints), decisions: ['選寬風廊穩定返航，或窄風廊快速返航', '提早下降，避免越過營地後回頭'], designBudgetMinutes: [0.8, 1.3] });
   }
@@ -246,14 +253,11 @@ function stageWinds(challengeId, stage, kind, focus) {
   }
   return winds;
 }
-export function createChallenges(islands) {
-  return STAGE_PLANS.map((plans, challengeIndex) => {
-    const id = `challenge-${challengeIndex + 1}`, kind = KINDS[challengeIndex], home = island(islands, ENTRY_ISLANDS[challengeIndex]);
-    const stages = plans.map(([fromId, toId, name, description, profile, altitude, widthRatio, focus], index) => {
+export function createFlightStage({ id, fromId, toId, name, description, profile, altitude, widthRatio, focus, kind }, islands) {
       const from = island(islands, fromId), to = island(islands, toId), forward = direction(from, to);
       const perpendicular = { x: -forward.z, z: forward.x }, direct = Math.hypot(to.x - from.x, to.z - from.z);
       const width = Math.min(620, Math.max(260, direct * widthRatio));
-      const stage = { id: `${id}-stage-${index + 1}`, name, description, fromIslandId: from.id, toIslandId: to.id,
+      const stage = { id: id, name, description, fromIslandId: from.id, toIslandId: to.id,
         focus, landing: true, launch: above(from), gates: [], winds: [],
         decisions: [description, '最後一門位於落點上方；通過後仍需在島中央落地按 E 交付。'] };
       for (let gate = 0; gate < FRACTIONS.length; gate++) {
@@ -272,10 +276,37 @@ export function createChallenges(islands) {
         sample.instruction = `${sample.name}：${conditionText(sample)}。${gate === 8 ? '降落島中央後按 E，才會保存本階段。' : description}`;
         stage.gates.push(sample);
       }
-      stage.winds = stageWinds(id, stage, kind, focus);
+      stage.winds = stageWinds(id.split('-stage-')[0], stage, kind, focus);
+      stage.waypoints = [stage.launch, ...stage.gates, to];
       stage.distanceMeters = pathLength([stage.launch, ...stage.gates]);
       stage.designBudgetMinutes = [1.3, 2.2];
       return stage;
+}
+const CAMPAIGN_PLANS = [
+  [ ['reed','bridge','蓄風讀層','沿補給熱流蓄能，帶餘能交付斷橋。','lee','shelves',.40,'harvest'],
+    ['bridge','archive','越脊預算','用前段蓄能越過高層弱風，保留至少 35% 餘能。','shear','high',.40,'budget'],
+    ['archive','reed','餘能歸庭','沿背風長彎回收能量，返回蘆光庭交付。','rim','descending',.42,'reserve'] ],
+  [ ['storm','reed','左側風切','對齊箭頭，補償左側脈動，在蘆光庭交付。','lee','sweep',.30,'left-shear'],
+    ['reed','dawn','反向剪流','後半段側風反轉，重新讀取箭頭並控制垂直速度。','shear','shelves',.28,'reverse-shear'],
+    ['dawn','storm','背風返台','沿背風脊穩定載儀，返回天文台交付。','ridge','descending',.32,'lee-return'] ],
+  [ ['dawn','archive','視線交會','依實體金環逐次定位，穿霧前確認方向。','lee','sweep',.36,'sightline'],
+    ['archive','camp','低霧航道','低層霧中沿風廊導航，平穩通過方向環。','shear','low',.35,'fog-channel'],
+    ['camp','dawn','風圖復核','從高層重讀地標，返回歸星臺交付完整星圖。','rim','high',.38,'chart-return'] ],
+];
+export function createCampaignCircuits(islands) {
+  return CAMPAIGN_PLANS.map((plans, index) => {
+    const id = `campaign-circuit-${index + 1}`, kind = ['energy','crosswind','fog'][index];
+    const stages = plans.map(([fromId,toId,name,description,profile,altitude,widthRatio,focus], i) =>
+      createFlightStage({ id: `${id}-stage-${i + 1}`, fromId,toId,name,description,profile,altitude,widthRatio,focus,kind }, islands));
+    return { id, kind, campaignIndex: index, name: ['蓄風巡測','側流定向','霧海復核'][index], stages };
+  });
+}
+
+export function createChallenges(islands) {
+  return STAGE_PLANS.map((plans, challengeIndex) => {
+    const id = `challenge-${challengeIndex + 1}`, kind = KINDS[challengeIndex], home = island(islands, ENTRY_ISLANDS[challengeIndex]);
+    const stages = plans.map(([fromId, toId, name, description, profile, altitude, widthRatio, focus], index) => {
+      return createFlightStage({ id: `${id}-stage-${index + 1}`, fromId, toId, name, description, profile, altitude, widthRatio, focus, kind }, islands);
     });
     return { id, islandId: home.id, kind, name: NAMES[challengeIndex], courseRevision: 2,
       description: `${stages.length} 段跨島航程：${stages.map((stage) => stage.name).join(' → ')}。每段完成後在目的島中央落地按 E；失速或重載只重試當前段。`,

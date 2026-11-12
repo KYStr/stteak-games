@@ -1,7 +1,9 @@
+import { length2, length3 } from './math.js';
 // Metres, Y-up. Player and island Y coordinates refer to the walking surface.
 // Content IDs are stable across releases and save migrations.
-import { createMainRoutes, createRouteWinds, createChallenges } from './flight-plans.js';
+import { createMainRoutes, createRouteWinds, createChallenges, createCampaignCircuits } from './flight-plans.js';
 
+export const EXPEDITION_LIMIT_SECONDS = 2700;
 const MAP_SCALE = 4;
 export const MODULES = Object.freeze([
   { id: 'turn', name: '燕翼舵', description: '靈活轉向、精準落島；巡航較慢。', speed: 0.92, turn: 1.6, energy: 1 },
@@ -58,7 +60,7 @@ const relics = islands.flatMap((island, i) => relicOffsets[i].map(([rx, rz, heig
 const challenges = createChallenges(islands);
 export const WORLD = Object.freeze({
   mapScale: MAP_SCALE, boundsRadius: 2600,
-  islands, winds, routes, relics, challenges,
+  islands, winds, routes, relics, challenges, campaignCircuits: createCampaignCircuits(islands),
   hazards: [
     { id: 'hazard-thunder', type: 'thunder', name: '雷雲核心', x: 360, y: 10, z: -680, radius: 80, height: 100, period: 10, description: '雷心每 10 秒脈動；沿上層風廊繞開雷心，閃光期間靠近會加快耗能。' },
     { id: 'hazard-fog', type: 'fog', name: '浮光霧海', x: 868, y: -8, z: -12, radius: 175, height: 100, description: '沿書庫方位與下一個實體航標辨向；霧只遮擋視野，不直接扣能量。' },
@@ -77,14 +79,14 @@ export const STATIONS = islands.filter((island) => island.station).map((island) 
 export const islandById = (id) => islands.find((island) => island.id === id) || islands[0];
 // The selected route style is a connected exploration network. Optional
 // expeditions supply their own wind fields so the two sets cannot stack.
-export const routeWindActive = (wind, state) => !wind.routeId || (!state.activeChallenge && wind.style === (state.trackedHint ? 'safe' : state.routeStyle));
+export const routeWindActive = (wind, state) => !wind.routeId || (!state.activeChallenge && state.activeCampaignCircuit == null && wind.style === (state.trackedHint || state.mainTransit?.[state.mainTransitIndex] ? 'safe' : state.routeStyle));
 export function windWeight(wind, position) {
   if (position.y < wind.y || position.y > wind.y + wind.height) return 0;
   let distance;
   if (wind.start && wind.end) {
     const dx = wind.end.x - wind.start.x, dz = wind.end.z - wind.start.z;
     const t = Math.max(0, Math.min(1, ((position.x - wind.start.x) * dx + (position.z - wind.start.z) * dz) / (dx * dx + dz * dz)));
-    distance = Math.hypot(position.x - wind.start.x - t * dx, position.z - wind.start.z - t * dz);
-  } else distance = Math.hypot(position.x - wind.x, position.z - wind.z);
+    distance = length2(position.x - wind.start.x - t * dx, position.z - wind.start.z - t * dz);
+  } else distance = length2(position.x - wind.x, position.z - wind.z);
   return Math.max(0, 1 - Math.max(0, distance - wind.radius * 0.65) / (wind.radius * 0.35));
 }

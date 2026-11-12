@@ -25,14 +25,15 @@ try {
     }
   }
   assert.match(await (await fetch(url)).text(), /<title>[^<]*Aetherwake<\/title>/i);
-  browserEnv = await browserEnvironment();
   for (const viewport of [{width:1280,height:720},{width:1920,height:1080}]) {
     if(process.env.AETHERWAKE_VISUAL_WIDTH && viewport.width!==Number(process.env.AETHERWAKE_VISUAL_WIDTH)) continue;
     for (const quality of ['auto','high']) {
       if(process.env.AETHERWAKE_VISUAL_QUALITY && quality!==process.env.AETHERWAKE_VISUAL_QUALITY) continue;
-      for (const id of ['camp','reed','bridge','storm','archive','dawn']) {
+      browserEnv = await browserEnvironment();
       browser = await chromium.launch({executablePath:'/usr/bin/google-chrome',headless:true,env:browserEnv.env,
         args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+      try {
+      for (const id of ['camp','reed','bridge','storm','archive','dawn']) {
       const context = await browser.newContext({viewport});
       try {
         // Seed after the old document's pagehide/beforeunload save has run.
@@ -42,16 +43,17 @@ try {
           save.elapsed = 1; save.checkpoint = checkpoint; save.settings.quality = quality;
           localStorage.setItem('aetherwake-save',JSON.stringify(save));
         },{save:defaultSave(),quality});
-          // A fresh browser per fixture bounds software-renderer caches across
-          // the complete sweep while keeping only one browser open at a time.
+          // Fresh contexts isolate checkpoints; the browser/cache is renewed after
+          // each six-island batch to bound both shader caches and process churn.
           const page = await context.newPage();
-          page.setDefaultTimeout(60000);
+          page.setDefaultTimeout(120000);
           page.on('pageerror',e=>report.errors.push(e.message));
           page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
           page.on('requestfailed',r=>report.failures.push(r.url()+': '+r.failure()?.errorText));
           page.on('response',r=>{if(r.status()>=400)report.failures.push(r.status()+' '+r.url());});
           await page.goto(url+`?checkpoint=island-${id}`);
-          await page.waitForFunction(()=>window.__aetherwake);
+          await page.waitForFunction(()=>window.__aetherwake || !document.querySelector('#fatal').classList.contains('hidden'));
+          assert.ok(await page.evaluate(()=>!!window.__aetherwake), 'WebGL game initialization must succeed');
           await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
           await page.locator('#continue').click();
           const settle = () => page.evaluate(() => new Promise(resolve => {
@@ -89,8 +91,9 @@ try {
           report.checks.push({viewport,quality,checkpoint:state.checkpoint,before,after});
           console.log('PASS visual checkpoint',viewport.width,quality,id);
           await page.close();
-      } finally { await context.close(); await browser.close(); browser=undefined; }
+      } finally { await context.close(); }
       }
+      } finally { await browser.close(); browser=undefined; await browserEnv.dispose(); browserEnv=undefined; }
     }
   }
   assert.equal(report.checks.length,(process.env.AETHERWAKE_VISUAL_WIDTH?1:2)*(process.env.AETHERWAKE_VISUAL_QUALITY?1:2)*6);

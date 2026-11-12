@@ -1,6 +1,22 @@
 // Test-only instrumentation: observes real RAF registration and the actual audio
 // master output. It never changes a game timestamp or adds an audible connection.
 export function instrumentBrowser() {
+  window.testTextureBytes = 0;
+  for (const Constructor of [window.WebGLRenderingContext,window.WebGL2RenderingContext]) {
+    if (!Constructor) continue;
+    for (const name of ['texImage2D','texStorage2D']) {
+      const original = Constructor.prototype[name]; if (!original) continue;
+      Constructor.prototype[name] = function(...args) {
+        let width = 0, height = 0;
+        if (name === 'texStorage2D') { width=args[3]; height=args[4]; }
+        else if (args.length >= 9) { width=args[3]; height=args[4]; }
+        else { const source=args[5]; width=source?.width || 0; height=source?.height || 0; }
+        // Conservative 16 bytes per texel, including shadow and render targets.
+        if (Number.isFinite(width) && Number.isFinite(height)) testTextureBytes += width*height*16;
+        return original.apply(this,args);
+      };
+    }
+  }
   const request = window.requestAnimationFrame.bind(window);
   const cancel = window.cancelAnimationFrame.bind(window);
   const pending = new Set();
@@ -47,4 +63,13 @@ export function summarize(frames) {
   const sorted = [...frames].sort((a, b) => a - b);
   return { frames: frames.length, averageMs: frames.reduce((a, b) => a + b, 0) / frames.length,
     p95Ms: sorted[Math.floor(sorted.length * .95)] };
+}
+
+// Profile collected allocations as well as survivors. Do not call snapshot() or
+// metrics() in this interval: instrumentation must not dominate application data.
+export async function sampleAllocations(cdp, durationMs = 15000) {
+  await cdp.send('HeapProfiler.startSampling',{samplingInterval:16384,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});
+  await new Promise(resolve=>setTimeout(resolve,durationMs));
+  const {profile}=await cdp.send('HeapProfiler.stopSampling');
+  return profile;
 }

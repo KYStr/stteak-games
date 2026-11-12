@@ -1,4 +1,5 @@
-import { WORLD, MODULES, islandById } from "./world.js";
+import { length2, length3 } from './math.js';
+import { WORLD, MODULES, islandById, EXPEDITION_LIMIT_SECONDS } from "./world.js";
 import { FlightSimulation } from "./simulation.js";
 import { SaveStore } from "./storage.js";
 import { AetherScene } from "./scene.js";
@@ -53,8 +54,14 @@ let scene,
   previous = performance.now(),
   uiClock = 0;
 const store = new SaveStore();
-const timing = new TimingSamples(["simulationMs", "sceneUpdateMs", "renderCpuMs", "hudMapMs", "rafIntervalMs"]);
-const frames = [];
+const timing = new TimingSamples(["simulationMs", "sceneUpdateMs", "renderCpuMs", "hudMapMs", "rafIntervalMs", "applicationUpdateMs"]);
+const frames = new Float64Array(9000);
+let frameIndex = 0, frameSamples = 0, acknowledgedGlide = 0, queuedGlide = 0, warningLevel = 0;
+const audioSample = { speed: 0, energy: 100, wind: false };
+const timingSample = { simulationMs: 0, sceneUpdateMs: 0, renderCpuMs: 0, hudMapMs: 0, rafIntervalMs: 0, applicationUpdateMs: 0 };
+const feedback = { accepted: 0, applied: 0, receipt: 0, acknowledged: 0, processed: 0, consumed: 0, maxProcessingMs: 0, submitted: 0, submittedId: 0, maxConsumptionProcessingMs: 0, maxAcknowledgementMs: 0, eventCount: 0, maxEventAcknowledgementMs: 0 };
+const terminal = () => sim.status === 'complete' || sim.status === 'failed';
+const terminalResults = () => sim.status === 'failed' ? showFailure() : showResults();
 let frameCount = 0,
   elapsedSample = 0,
   longFrames = 0;
@@ -65,6 +72,7 @@ function notify(message) {
   toastTimer = setTimeout(() => $("#toast").classList.remove("visible"), 4200);
 }
 function resultStorageLabel() {
+  if (sim?.state.mode === "exploration") return "自由探索完成 / 不計排名";
   return currentStorageWarning
     ? "遠征完成 / 本次保存未完成"
     : "遠征完成 / 個人成績已保存";
@@ -107,12 +115,13 @@ function begin(resume = false) {
     selectedModule = loaded.module;
   } else {
     sim.persisted = loaded;
+    sim.state.mode = $("#mode").value;
     sim.reset({
       seed: Number($("#seed").value) || 2718,
       module: selectedModule,
     });
   }
-  if (sim.status === "complete") {
+  if (terminal()) {
     started = true;
     scene.menu = false;
     scene.recenter({ immediate: true });
@@ -120,7 +129,7 @@ function begin(resume = false) {
     show("#landing", false);
     show("#flight-hud");
     updateHud();
-    showResults();
+    terminalResults();
     return;
   }
   sim.launch();
@@ -148,7 +157,7 @@ function begin(resume = false) {
 }
 function pause(reason = "pause") {
   clearTimeout(resultAudioTimer);
-  if (!started || sim.status === "complete") return;
+  if (!started || terminal()) return;
   sim.setPaused(true);
   input.setEnabled(false);
   if (reason === "dialogue")
@@ -163,7 +172,7 @@ function pause(reason = "pause") {
 function resume() {
   if (contextLost) return;
   clearTimeout(resultAudioTimer);
-  if (!started || sim.status === "complete") return;
+  if (!started || terminal()) return;
   closeModal(false);
   sim.setPaused(false);
   input.setEnabled(true);
@@ -185,21 +194,21 @@ function dismissModal() {
   if (modalKind === "context") return;
   if (modalKind === "erase") return openSettings();
   if (modalKind === "settings") return openHelp();
-  if (modalKind === "courses") return started && sim.status === "complete" ? showResults() : openHelp();
+  if (modalKind === "courses") return started && terminal() ? terminalResults() : openHelp();
   if (modalKind === "journal")
-    return started && sim.status === "complete" ? showResults() : openHelp();
+    return started && terminal() ? terminalResults() : openHelp();
   if (modalKind === "restart") return openPause();
-  if (modalKind === "result") {
+  if (modalKind === "result" || modalKind === "failure") {
     menu();
     $("#start").focus();
     return;
   }
   if (modalKind === "help") {
     if (!started) return closeModal();
-    return sim.status === "complete" ? showResults() : openPause();
+    return terminal() ? terminalResults() : openPause();
   }
   if (started) {
-    if (sim.status === "complete") return showResults();
+    if (terminal()) return terminalResults();
     return resume();
   }
   closeModal();
@@ -258,11 +267,18 @@ function closeModal(restore = true) {
     (canRestore ? returnFocus : $(started ? "#world" : "#start")).focus();
   }
   returnFocus = null;
+  $("#modal-body").replaceChildren();
+  $("#modal-actions").replaceChildren();
 }
 function settingsHTML() {
   return `<div class="settings-grid"><label>環境與音樂 <input id="music-volume" type="range" min="0" max="1" step="0.05" value="${settings.music}"></label><label>動作音效 <input id="sfx-volume" type="range" min="0" max="1" step="0.05" value="${settings.sfx}"></label><label>畫質 <select id="quality"><option value="auto">自動 · 依效能調整解析度</option><option value="low">節能 · 關閉即時陰影</option><option value="high">精緻 · 即時陰影</option></select></label><label>鏡頭 <select id="camera-setting"><option value="follow">受控追隨</option><option value="overhead">俯瞰航線</option></select></label><label class="check"><input id="reduced-motion" type="checkbox" ${settings.reducedMotion ? "checked" : ""}>減少動態／視差</label><label class="check"><input id="assist" type="checkbox" ${sim.assist ? "checked" : ""}>風線輔助（獨立標記成績）</label></div><p class="modal-note">將兩個音量滑桿調至 0 可完全靜音。設定會自動保存。</p>`;
 }
 function bindSettings() {
+  if (sim.state.mode === 'expedition') {
+    const b = document.createElement('button'); b.textContent = '永久改為自由探索（本次不排名）';
+    b.onclick = () => { sim.setExploration(); persist(); openSettings(); };
+    $('#modal-body').append(b);
+  }
   $("#quality").value = settings.quality;
   $("#camera-setting").value = settings.camera;
   for (const [id, key] of [
@@ -297,11 +313,11 @@ function bindSettings() {
 }
 function returnToSessionMenu() {
   if (!started) return closeModal();
-  if (sim.status === "complete") return showResults();
+  if (terminal()) return terminalResults();
   return openPause();
 }
 function openPause(title = "在風停下來的地方") {
-  if (started && sim.status === "complete") return showResults();
+  if (started && terminal()) return terminalResults();
   setModal(
     "pause",
     title,
@@ -330,7 +346,7 @@ function confirmRestart() {
 }
 function menu() {
   clearTimeout(resultAudioTimer);
-  if (started && sim.status !== "complete") {
+  if (started && !terminal()) {
     pause("silent");
     persist();
   }
@@ -342,7 +358,7 @@ function menu() {
   show("#flight-hud", false);
   show("#landing");
   show("#continue", loaded.elapsed > 0);
-  text("#continue", loaded.completed ? "查看結算／繼續探索" : "繼續上次航程");
+  text("#continue", loaded.failed ? "查看撤回紀錄" : loaded.completed ? "查看結算／繼續探索" : "繼續上次航程");
   bridge.state("ready");
   text("#objective", "讓沉睡的星圖再次發光");
   text("#objective-sub", "依序修復三座觀測台，返回營地。");
@@ -352,15 +368,15 @@ function openHelp() {
   setModal(
     "help",
     "讀懂風，找到回家的路",
-    `<p class="modal-note">三段主線分別是測風校準、穩定貨運、霧中定位。依序通過帶條件的觀測環，再落到蘆光庭 → 雷雲天文台 → 歸星臺按 E 交付，最後返回晨風營地結算。環上箭頭表示進入方向，直柱表示交付點。</p><div class="control-table"><b>WASD / 方向鍵</b><span>依畫面方向移動。空中放開會保持滑翔。</span><b>Space / 展帆</b><span>地面起跳，空中切換展帆。不必一直按住。</span><b>Shift / 減速</b><span>按住收帆下降。抵島上空時減速，落地後放開。</span><b>E / 互動鍵</b><span>交付觀測資料／測風階段，或回營地結算。</span><b>右鍵拖曳 / 滾輪</b><span>調整鏡頭；C 回正，V 切換俯瞰。</span><b>手機</b><span>左側搖桿＋右側展帆／減速可同時操作；空白場景拖動鏡頭。</span></div><h3>讀風與選路</h3><ul><li>長帶＋箭頭＝順風，持續補能並加速；螺旋環＝熱流，抬升高度。</li><li>橫向擺動標記＝間歇側風；雷心脈動時繞行外緣，霧中參考島名和地圖。</li><li>安全風道較寬，途經補給島；穿雲捷徑路短，需要更精準的方向修正。</li><li>沒有能量或掉落時回最後安全島，加計 8 秒，碎片保留。連續三次失速會提示可開啟輔助。</li><li>碎片靠近自動拾取，航行誌提供地標線索。先在安全地面從「六趟測風遠征」選課，沿安全接駁風標到金環開始。完成本段航門後到指定島中央按 E 交付；已交付階段永久保存。退出會返回最後安全島，不計失速，只放棄未交付段。</li></ul><h3>本機進度與個人成績</h3><p>只有這個瀏覽器保存進度，沒有雲端同步或全球排行榜。種子可重現相同風況；今日風況以台北日期計算。結算分別顯示速度、平穩與探索評級。</p>`,
+    `<p class="modal-note">遠征的天候窗口為 45 分鐘（僅實際航程計時，地面亦計時）；逾時遠征失敗，可重啟或永久轉為不排名的自由探索。三段主線分別是測風校準、穩定貨運、霧中定位。每座觀測台交付後，必須完成三段九門巡測：蓄風預算、側流定向、霧海復核。每段落島按 E 保存，之後才能接續主線。最後沿六座返航航標回營地結算。依序通過帶條件的觀測環，再落到蘆光庭 → 雷雲天文台 → 歸星臺按 E 交付，最後返回晨風營地結算。環上箭頭表示進入方向，直柱表示交付點。</p><div class="control-table"><b>WASD / 方向鍵</b><span>依畫面方向移動。空中放開會保持滑翔。</span><b>Space / 展帆</b><span>地面起跳，空中切換展帆。不必一直按住。</span><b>Shift / 減速</b><span>按住收帆下降。抵島上空時減速，落地後放開。</span><b>E / 互動鍵</b><span>交付觀測資料／測風階段，或回營地結算。</span><b>右鍵拖曳 / 滾輪</b><span>調整鏡頭；C 回正，V 切換俯瞰。</span><b>手機</b><span>左側搖桿＋右側展帆／減速可同時操作；空白場景拖動鏡頭。</span></div><h3>讀風與選路</h3><ul><li>長帶＋箭頭＝順風，持續補能並加速；螺旋環＝熱流，抬升高度。</li><li>橫向擺動標記＝間歇側風；雷心脈動時繞行外緣，霧中參考島名和地圖。</li><li>安全風道較寬，途經補給島；穿雲捷徑路短，需要更精準的方向修正。</li><li>沒有能量或掉落時回最後安全島，加計 8 秒，碎片保留。連續三次失速會提示可開啟輔助。</li><li>碎片靠近自動拾取，航行誌提供地標線索。先在安全地面從「六趟測風遠征」選課，沿安全接駁風標到金環開始。完成本段航門後到指定島中央按 E 交付；已交付階段永久保存。退出會返回最後安全島，不計失速，只放棄未交付段。</li></ul><h3>本機進度與個人成績</h3><p>只有這個瀏覽器保存進度，沒有雲端同步或全球排行榜。種子可重現相同風況；今日風況以台北日期計算。結算分別顯示速度、平穩與探索評級。</p>`,
     [
       {
         label: started ? "回到航程" : "回到準備",
         primary: true,
         action: () =>
           started
-            ? sim.status === "complete"
-              ? showResults()
+            ? terminal()
+              ? terminalResults()
               : resume()
             : closeModal(),
       },
@@ -372,21 +388,23 @@ function openHelp() {
 }
 function openCourses() {
   if (started && sim.status === "running") pause("silent");
-  const canChoose = !started || sim.player.grounded;
+  const mandatory = sim.state.activeCampaignCircuit != null;
+  const canChoose = (!started || sim.player.grounded) && !mandatory && sim.status !== "failed";
   setModal("courses", "帶回下一份風的答案",
-    `<p class="modal-note">${canChoose ? "在安全地面選擇一趟遠征，再沿安全接駁風標到指定島金環開始。" : "請先安全落島，再選擇遠征；空中可先閱讀各課程。"}完成一段後落島按 E 交付；已交付階段保存。退出會返回最後安全島，只放棄未交付段。</p><div class="journal-list">${WORLD.challenges.map(c => `<div><b>${escape(c.name)} · ${sim.state.courseStages[c.id] || 0}/${c.stages?.length || 1} 段</b><p>${escape(c.description)}<br>下一出發點：${escape(islandById(sim.courseStage(c)?.fromIslandId || c.islandId).name)}${sim.state.completedChallenges.includes(c.id) ? " · 已取得完成徽記" : ""}</p></div>`).join("")}</div>`,
+    `<p class="modal-note">${mandatory ? "目前必修巡測進行中，請先完成三段交付，再選擇選修遠征。" : canChoose ? "在安全地面選擇一趟遠征，再沿安全接駁風標到指定島金環開始。" : "請先安全落島，再選擇遠征；空中可先閱讀各課程。"}完成一段後落島按 E 交付；已交付階段保存。退出會返回最後安全島，只放棄未交付段。</p><div class="journal-list">${WORLD.challenges.map(c => `<div><b>${escape(c.name)} · ${sim.state.courseStages[c.id] || 0}/${c.stages?.length || 1} 段</b><p>${escape(c.description)}<br>下一出發點：${escape(islandById(sim.courseStage(c)?.fromIslandId || c.islandId).name)}${sim.state.completedChallenges.includes(c.id) ? " · 已取得完成徽記" : ""}</p></div>`).join("")}</div>`,
     [{ label: sim.state.activeChallenge || sim.state.trackedHint ? "退出遠征並自由探索（保留進度）" : "自由探索（保留進度）", primary: true, action: () => {
       if (!started) begin(loaded.elapsed > 0);
       if (sim.state.activeChallenge || sim.state.trackedHint) {
         sim.cancelChallenge();
         handleEvents();
       }
-      if (sim.status === "complete") { sim.status = "paused"; guideHidden = true; }
+      sim.setExploration();
+      if (terminal()) { sim.status = "paused"; guideHidden = true; }
       resume(); persist(); updateHud();
     } }, ...WORLD.challenges.filter(c => !sim.challenges.includes(c.id)).map(c => ({ label: `標記 ${c.name}`, disabled: !canChoose, action: () => {
       if (!started) begin(loaded.elapsed > 0);
       if (!sim.trackChallenge(c.id)) return;
-      if (sim.status === "complete") { sim.status = "paused"; guideHidden = true; }
+      if (terminal()) { sim.setExploration(); sim.status = "paused"; guideHidden = true; }
       resume(); updateHud();
     } })), { label: "返回航行誌", action: openHelp }], "測風遠征 / 階段永久保存");
 }
@@ -394,7 +412,7 @@ function openSettings() {
   setModal(
     "settings",
     "調整你的航程",
-    `${settingsHTML()}<h3>安全保存</h3><p>存檔格式 v3；落島、觀測樣本、碎片、階段交付、結算及設定變更時保存。舊版短程成績與徽記保留在歷史紀錄，新航程獨立計分。損壞存檔不會讓遊戲卡住，儲存失敗會明確提示。</p>${legacyHistoryHTML()}`,
+    `${settingsHTML()}<h3>安全保存</h3><p>存檔格式 v4；落島、觀測樣本、碎片、階段交付、結算及設定變更時保存。舊版短程成績與徽記保留在歷史紀錄，新航程獨立計分。損壞存檔不會讓遊戲卡住，儲存失敗會明確提示。</p>${legacyHistoryHTML()}`,
     [
       {
         label: "完成",
@@ -450,10 +468,23 @@ function showDialogue(dialogue) {
   setModal(
     "dialogue",
     dialogue.title,
-    `<p class="modal-note">${escape(dialogue.text)}</p><p>這段故事可跳過；下一個航標已在地圖上亮起。</p>`,
+    `<p class="modal-note">${escape(dialogue.text)}</p><p><strong>接續必修巡測：${escape(sim.campaignStage()?.name || "返航")}</strong><br>${escape(sim.campaignStage()?.description || "沿金色航標回家。")}</p><p>這段故事可跳過；下一個航標已在地圖上亮起。</p>`,
     [{ label: "繼續航程 / 跳過", primary: true, action: resume }],
     "✧ / 觀測台記錄",
   );
+}
+function showFailure(playCue = false) {
+  input.setEnabled(false); accumulator = 0;
+  clearTimeout(resultAudioTimer);
+  if (playCue) { audio.setPaused(false); audio.play('stall'); resultAudioTimer = setTimeout(() => audio.setPaused(true), 1400); }
+  else audio.setPaused(true);
+  bridge.state('paused');
+  setModal('failure', '天候窗口已關閉', `<p>已飛行 ${clock(sim.state.activeSeconds)}。強風封閉了航域，本次遠征結束。已交付資料、碎片與選修徽記已保存；本次不寫入勝利成績。</p>`, [
+    { label: '重新遠征', primary: true, action: () => begin(false) },
+    { label: '改為自由探索', action: () => { sim.setExploration(); persist(); resume(); updateHud(); } },
+    { label: '設定與存檔', action: openSettings },
+    { label: '返回準備畫面', action: menu }
+  ], '遠征未完成 / 安全撤回');
 }
 function showResults(playCue = false) {
   const s = sim.state,
@@ -469,7 +500,7 @@ function showResults(playCue = false) {
   setModal(
     "result",
     WORLD.ending.title,
-    `<p>${escape(WORLD.ending.text)}</p><div class="stats-grid"><div><strong>${r.speed}</strong><small>速度 · ${clock(s.elapsed)}</small></div><div><strong>${r.stability}</strong><small>平穩 · ${s.stalls} 次失速</small></div><div><strong>${r.exploration}</strong><small>探索 · ${s.relics.length}/${WORLD.relics.length}</small></div></div><p>測風挑戰 ${s.challenges.length}/${WORLD.challenges.length} · 本局航跡 ${Math.round(s.distance)}m · 種子 ${s.seed}<br>模組：${MODULES.find((m) => m.id === s.module).name} · ${r.assisted ? "風線輔助已使用，成績獨立標示" : "未使用風線輔助"}</p><p class="modal-note">下一趟目標：${escape(r.next)}</p>`,
+    `<p>${escape(WORLD.ending.text)}</p><div class="stats-grid"><div><strong>${r.speed}</strong><small>速度 · ${clock(s.elapsed)}</small></div><div><strong>${r.stability}</strong><small>平穩 · ${s.stalls} 次失速</small></div><div><strong>${r.exploration}</strong><small>探索 · ${s.relics.length}/${WORLD.relics.length}</small></div></div><p>選修測風 ${s.challenges.length}/${WORLD.challenges.length} · 本局航跡 ${Math.round(s.distance)}m · 種子 ${s.seed}<br>模組：${MODULES.find((m) => m.id === s.module).name} · ${r.assisted ? "風線輔助已使用，成績獨立標示" : "未使用風線輔助"}</p><p class="modal-note">下一趟目標：${escape(r.next)}</p>`,
     [
       { label: "再飛一趟", primary: true, action: () => begin(false) },
       { label: "繼續探索", action: openCourses },
@@ -491,7 +522,7 @@ function toggleView() {
   );
 }
 function routeToggle() {
-  if (sim.state.trackedHint || sim.state.activeChallenge) return;
+  if (sim.state.trackedHint || sim.state.surveyHint?.mainTransit || sim.state.activeChallenge || sim.state.activeCampaignCircuit != null) return;
   sim.setRouteStyle(sim.routeStyle === "safe" ? "shortcut" : "safe");
   persist();
   updateHud();
@@ -508,7 +539,7 @@ function updateHud() {
     route = WORLD.routes.find((r) => r.id === objective.routeId),
     hint = s.challengeHint || s.trackedHint || s.surveyHint,
     navigation = hint || objective,
-    distance = Math.round(Math.hypot(p.x - navigation.x, p.z - navigation.z)),
+    distance = Math.round(length2(p.x - navigation.x, p.z - navigation.z)),
     touch = matchMedia("(pointer: coarse)").matches,
     glideControl = touch ? "展帆鍵" : "Space",
     brakeControl = touch ? "減速鍵" : "Shift",
@@ -516,12 +547,12 @@ function updateHud() {
   if (started) {
     text(
       "#objective",
-      `${s.challengeHint || s.trackedHint ? `測風 ${hint.stage}/${hint.stageTotal} · ` : s.activated.length < 3 ? `${s.activated.length + 1}/3 · ` : "返航 · "}${hint?.stageName || hint?.name || objective.name}  ${distance}m`,
+      `${hint?.campaign ? `第 ${s.activeCampaignCircuit + 1} 航區 / 測風 ${hint.stage}/3 · ` : s.challengeHint || s.trackedHint ? `測風 ${hint.stage}/${hint.stageTotal} · ` : s.activated.length < 3 ? `${s.activated.length + 1}/3 · ` : "返航 · "}${hint?.stageName || hint?.name || objective.name}  ${distance}m`,
     );
     text(
       "#objective-sub",
       s.nearby?.canInteract
-        ? `安全落地 · 按 ${interactControl} ${s.activeChallenge ? "交付本階段" : "啟動航標"}`
+        ? `安全落地 · 按 ${interactControl} ${(s.activeChallenge || s.activeCampaignCircuit != null) ? "交付本階段" : "啟動航標"}`
         : p.grounded
           ? `${glideControl} 起航 · ${s.surveyHint ? "依序完成觀測環" : "地圖可切換航線"}`
           : hint?.landing ? `抵島上空按住 ${brakeControl} 下降` : hint ? sampleConditions(hint) || "穿過前方觀測環，記錄風況" : `抵島上空按住 ${brakeControl} 下降`,
@@ -542,7 +573,7 @@ function updateHud() {
           : `自由落體 · ${glideControl} 展帆`,
   );
   text("#altitude", `${Math.round(p.y)} m 高度`);
-  text("#speed", `${Math.round(Math.hypot(p.vx, p.vz))} m/s`);
+  text("#speed", `${Math.round(length2(p.vx, p.vz))} m/s`);
   text("#clock", clock(s.elapsed));
   text(
     "#flight-tip",
@@ -567,30 +598,37 @@ function updateHud() {
               ? "↔ 側風修正"
               : "風帶外 · 持續耗能",
   );
+  const remaining = Math.max(0, EXPEDITION_LIMIT_SECONDS - s.activeSeconds);
+  text('#weather-clock', s.mode === 'exploration' ? '自由探索 · 不限時' : `天候 ${clock(remaining)}`);
+  $('#weather-clock').classList.toggle('weather-warning', s.mode === 'expedition' && remaining <= 300);
+  const level = remaining <= 60 ? 2 : remaining <= 300 ? 1 : 0;
+  if (s.status === 'running' && s.mode === 'expedition' && level > warningLevel) notify(level === 2 ? '天候窗口剩 1 分鐘：請盡快返航。' : '天候窗口剩 5 分鐘：可在設定轉為自由探索。');
+  warningLevel = level;
   text("#station-count", `觀測台 ${s.activated.length} / 3`);
   text("#relic-count", `碎片 ${s.relics.length} / ${WORLD.relics.length}`);
   text(
     "#challenge-count",
-    `測風 ${s.challenges.length} / ${WORLD.challenges.length}`,
+    `選修 ${s.challenges.length} / ${WORLD.challenges.length}`,
   );
-  text("#route-label", s.activeChallenge ? "測風遠征航道" : s.trackedHint ? "安全接駁風道" : s.routeStyle === "safe" ? "安全風道" : "穿雲捷徑");
-  $("#route-toggle").disabled = !!s.trackedHint || !!s.activeChallenge;
+  text("#route-label", s.activeCampaignCircuit != null ? "必修巡測風廊" : s.activeChallenge ? "測風遠征航道" : s.trackedHint || s.surveyHint?.mainTransit ? "安全接駁風道" : s.routeStyle === "safe" ? "安全風道" : "穿雲捷徑");
+  $("#route-toggle").disabled = !!s.trackedHint || !!s.surveyHint?.mainTransit || !!s.activeChallenge || s.activeCampaignCircuit != null;
   text(
     "#route-toggle",
-    s.activeChallenge ? "跟隨本段航門" : s.trackedHint ? "接駁使用安全風道" : s.routeStyle === "safe" ? "切換：技巧捷徑" : "切換：安全風道",
+    s.activeChallenge ? "跟隨本段航門" : s.trackedHint || s.surveyHint?.mainTransit ? "接駁使用安全風道" : s.routeStyle === "safe" ? "切換：技巧捷徑" : "切換：安全風道",
   );
   show("#interact", !!s.nearby?.canInteract && s.status === "running");
   text(
     "#interact",
-    s.activeChallenge
+    s.activeChallenge || s.activeCampaignCircuit != null
       ? `${touch ? "" : "E · "}交付本階段`
       : s.activated.length === 3
       ? `${touch ? "" : "E · "}返回營地結算`
       : `${touch ? "" : "E · "}啟動觀測台`,
   );
-  if (lastRoute !== objective.routeId) {
-    scene.setRoute(route);
-    lastRoute = objective.routeId;
+  const routeKey = objective.routeId + (s.surveyHint?.mainTransit ? ':connection' : '');
+  if (lastRoute !== routeKey) {
+    scene.setRoute(s.surveyHint?.mainTransit ? { waypoints: s.mainTransit, style: 'safe' } : route);
+    lastRoute = routeKey;
   }
   show("#course", !!hint);
   show("#leave-course", !!s.activeChallenge || !!s.trackedHint);
@@ -598,13 +636,13 @@ function updateHud() {
   if (hint) {
     const h = hint;
     const carrying = s.activeChallenge ? ["crosswind", "stability"].includes(WORLD.challenges.find(c => c.id === s.activeChallenge)?.kind) : s.activated.length === 1;
-    text("#course-kicker", s.activeChallenge || s.trackedHint ? "選擇性測風遠征" : "主線觀測 · 不需停留等待");
-    text("#course-title", h.transit ? `安全接駁 ${h.transitStep}/${h.transitTotal}` : `${s.challengeHint || s.trackedHint ? `${h.stageName} · ` : "航線觀測 · "}${h.entry ? "前往入口" : `${h.step}/${h.total}`}`);
+    text("#course-kicker", h.mainTransit ? "主線安全接駁 · 觀測進度保留" : h.campaign ? "必修巡測 · 每段落島交付" : s.activeChallenge || s.trackedHint ? "選擇性測風遠征" : "主線觀測 · 不需停留等待");
+    text("#course-title", h.mainTransit ? `安全接駁 ${h.step}/${h.total}` : h.transit ? `安全接駁 ${h.transitStep}/${h.transitTotal}` : `${hint?.campaign ? `第 ${s.activeCampaignCircuit + 1} 航區 / 測風 ${hint.stage}/3 · ` : h.campaign || s.challengeHint || s.trackedHint ? `${h.stageName} · ` : "航線觀測 · "}${h.entry ? "前往入口" : `${h.step}/${h.total}`}`);
     text(
       "#course-detail",
       `${p.grounded && !h.landing ? `${glideControl} 展帆起航，${touch ? "左搖桿" : "WASD"} 對準金環。` : ""}${h.transit ? `沿風標前進，目標高度 ${Math.round(h.y)}m。抵島後進金環。` : h.entry ? h.instruction : h.landing ? `落到島中央，按 ${interactControl} 交付；已完成階段保留。` : `目標高度 ${Math.round(h.y)}m；${p.y < h.y - h.radius ? "保持展帆，沿青色風帶抬升。" : p.y > h.y + h.radius ? `按住 ${brakeControl} 降低高度。` : "高度已對準，穿過金環中央。"}`}${carrying && !h.entry && !h.transit ? ` 儀器穩定 ${Math.round(s.cargoStability)}%。` : ""}`,
     );
-    const speed = Math.hypot(p.vx, p.vz);
+    const speed = length2(p.vx, p.vz);
     const checks = [];
     if (!h.landing) checks.push([Math.abs(p.y - h.y) < (h.radius || 15), `高度 ${Math.round(p.y)} / ${Math.round(h.y)}m`]);
     if (h.minSpeed) checks.push([speed >= h.minSpeed, `速度 ≥${h.minSpeed}m/s`]);
@@ -612,7 +650,7 @@ function updateHud() {
     if (h.minEnergy) checks.push([p.energy >= h.minEnergy, `能量 ≥${h.minEnergy}%`]);
     if (h.maxVerticalSpeed) checks.push([Math.abs(p.vy) <= h.maxVerticalSpeed, `升降 ≤${h.maxVerticalSpeed}m/s`]);
     if (h.heading) {
-      const dot = (p.vx * h.heading.x + p.vz * h.heading.z) / Math.max(0.001, speed * Math.hypot(h.heading.x, h.heading.z));
+      const dot = (p.vx * h.heading.x + p.vz * h.heading.z) / Math.max(0.001, speed * length2(h.heading.x, h.heading.z));
       checks.push([dot >= (h.heading.minDot ?? 0.5), "順箭頭入環"]);
     }
     const conditionHTML = checks.map(([ok, label]) => `<span class="${ok ? "met" : "unmet"}">${ok ? "✓" : "○"} ${label}</span>`).join("");
@@ -690,9 +728,9 @@ function drawMap() {
     ctx.lineTo(c.width, y);
     ctx.stroke();
   }
-  const course = WORLD.challenges.find(c => c.id === s.activeChallenge), stage = sim.courseStage(course);
+  const course = WORLD.challenges.find(c => c.id === s.activeChallenge), stage = sim.campaignStage() || sim.courseStage(course);
   const tracked = WORLD.challenges.find(c => c.id === s.trackedHint?.id);
-  const route = stage ? { waypoints: [islandById(stage.fromIslandId), ...stage.gates, islandById(stage.toIslandId)] } : tracked ? { waypoints: [s.player, ...s.transitWaypoints.slice(s.transitIndex), sim.courseEntry(tracked)] } : WORLD.routes.find((r) => r.id === s.objective.routeId);
+  const route = stage ? stage : s.surveyHint?.mainTransit ? { waypoints: [s.player, ...s.mainTransit.slice(s.mainTransitIndex)] } : tracked ? { waypoints: [s.player, ...s.transitWaypoints.slice(s.transitIndex), sim.courseEntry(tracked)] } : WORLD.routes.find((r) => r.id === s.objective.routeId);
   if (route) {
     ctx.strokeStyle = tracked || s.routeStyle === "safe" ? "#bcdfd0" : "#e6c17e";
     ctx.lineWidth = 2;
@@ -750,7 +788,12 @@ function drawMap() {
 function handleEvents() {
   for (const e of sim.drainEvents()) {
     if (e.type === "save") persist();
-    if (e.type === "glide") audio.play("glide");
+    const eventStart = e.emittedAt || performance.now();
+    if (e.type === 'glide') {
+      if (!e.requestId || e.requestId !== acknowledgedGlide) audio.play('glide');
+      feedback.applied = e.requestId; feedback.consumed = performance.now();
+      if (queuedGlide === e.requestId) { queuedGlide = 0; text('#sail-feedback', e.open ? '已展帆' : '已收帆'); $('#touch-glide').removeAttribute('data-queued'); }
+    }
     if (e.type === "wind") audio.play("tailwind");
     if (e.type === "land") {
       audio.play("land");
@@ -775,7 +818,7 @@ function handleEvents() {
       notify(`測風挑戰完成 · ${e.name} · 全部階段已保存`);
     }
     if (e.type === "challenge-start") { audio.play("ui"); notify(e.message); }
-    if (e.type === "challenge-gate") audio.play("relic");
+    if (e.type === "challenge-gate") { audio.play("relic"); if (e.message) notify(e.message); }
     if (e.type === "survey") { audio.play("relic"); notify(e.message); }
     if (e.type === "challenge-stage") { audio.play("unlock"); notify(e.message); }
     if (e.type === "challenge-reset" && e.reason === "cancel")
@@ -784,9 +827,14 @@ function handleEvents() {
       audio.play("unlock");
       showDialogue(e.dialogue);
     }
+    if (e.type === 'campaign-stage') { audio.play('unlock'); notify(e.message); }
+    if (e.type === 'failed') { persist(); updateHud(); showFailure(true); }
     if (e.type === "complete") {
       persist();
       showResults(true);
+    }
+    if (['glide','survey','land','stall','station','complete','failed'].includes(e.type)) {
+      feedback.eventCount++; feedback.maxEventAcknowledgementMs = Math.max(feedback.maxEventAcknowledgementMs, performance.now()-eventStart);
     }
   }
 }
@@ -801,18 +849,20 @@ function tick(now) {
     accumulator += dt;
     let steps = 0;
     while (accumulator >= 1 / 60 && steps++ < 9) {
-      sim.step(input.read(scene.yaw), 1 / 60);
+      const sample = input.read(scene.yaw), processingStart = performance.now();
+      sim.step(sample, 1 / 60);
+      if (sample.glide) feedback.maxConsumptionProcessingMs = Math.max(feedback.maxConsumptionProcessingMs,performance.now()-processingStart);
       accumulator -= 1 / 60;
     }
     handleEvents();
   }
   const simulationMs = performance.now() - simulationStart;
   scene.update(sim.state, Math.min(dt, 0.05), now / 1000, sim.state.objective);
-  audio.update({
-    speed: Math.hypot(sim.player.vx, sim.player.vz),
-    energy: sim.player.energy,
-    wind: sim.state.wind.length > 0,
-  });
+  if (feedback.applied !== feedback.submittedId) { feedback.submittedId = feedback.applied; feedback.submitted = performance.now(); }
+  const audioStart = performance.now();
+  audioSample.speed = length2(sim.player.vx, sim.player.vz); audioSample.energy = sim.player.energy; audioSample.wind = sim.state.wind.length > 0;
+  audio.update(audioSample);
+  const audioMs = performance.now()-audioStart;
   const hudStart = performance.now();
   uiClock += dt;
   if (uiClock > 0.1) {
@@ -820,13 +870,13 @@ function tick(now) {
     uiClock = 0;
   }
   if (started && sim.status === "running") {
-    timing.push({ simulationMs, sceneUpdateMs: scene.phase.sceneUpdateMs,
-      renderCpuMs: scene.phase.renderCpuMs, hudMapMs: performance.now() - hudStart,
-      rafIntervalMs: rawFrameMs });
+    timingSample.simulationMs = simulationMs; timingSample.sceneUpdateMs = scene.phase.sceneUpdateMs;
+    timingSample.renderCpuMs = scene.phase.renderCpuMs; timingSample.hudMapMs = performance.now()-hudStart;
+    timingSample.rafIntervalMs = rawFrameMs; timingSample.applicationUpdateMs = simulationMs + scene.phase.sceneUpdateMs + audioMs + timingSample.hudMapMs;
+    timing.push(timingSample);
     frameCount++;
     elapsedSample += dt;
-    frames.push(rawFrameMs);
-    if (frames.length > 9000) frames.shift();
+    frames[frameIndex] = rawFrameMs; frameIndex = (frameIndex + 1) % frames.length; frameSamples = Math.min(frameSamples+1,frames.length);
     if (dt > 0.0333) longFrames++;
   }
   raf = requestAnimationFrame(tick);
@@ -844,6 +894,18 @@ async function initialize() {
   audio = new AudioEngine();
   applySettings();
   input = new FlightInput($("#world"), {
+    glideQueued: (id) => {
+      if (sim.status !== 'running') return;
+      feedback.receipt = performance.now(); feedback.accepted = id; queuedGlide = id;
+      const count = audio.stats.events; audio.play('glide');
+      if (audio.stats.events > count) acknowledgedGlide = id;
+      text('#sail-feedback', sim.player.gliding ? '收帆指令已接收' : '展帆指令已接收');
+      $('#touch-glide').setAttribute('data-queued', 'true');
+      feedback.acknowledged = performance.now(); feedback.processed = performance.now();
+      feedback.maxAcknowledgementMs = Math.max(feedback.maxAcknowledgementMs,feedback.acknowledged-feedback.receipt);
+      feedback.maxProcessingMs = Math.max(feedback.maxProcessingMs,feedback.processed-feedback.receipt);
+    },
+    glideCleared: () => { queuedGlide = 0; text('#sail-feedback', ''); $('#touch-glide').removeAttribute('data-queued'); },
     pause: togglePause,
     help: () => { if (!modalKind) openHelp(); },
     view: () => { if (!modalKind) toggleView(); },
@@ -876,11 +938,12 @@ async function initialize() {
   document
     .querySelectorAll(".module")
     .forEach((b) => (b.onclick = () => selectModule(b.dataset.module)));
+  $("#mode").value = loaded.mode;
   $("#seed").value = loaded.elapsed ? loaded.seed : 2718;
   $("#start").onclick = () => begin(false);
   $("#continue").onclick = () => begin(true);
   show("#continue", loaded.elapsed > 0);
-  text("#continue", loaded.completed ? "查看結算／繼續探索" : "繼續上次航程");
+  text("#continue", loaded.failed ? "查看撤回紀錄" : loaded.completed ? "查看結算／繼續探索" : "繼續上次航程");
   $("#daily-seed").onclick = () => {
     $("#seed").value =
       Number(
@@ -923,7 +986,7 @@ async function initialize() {
   $("#world").addEventListener("webglcontextlost", (event) => {
     event.preventDefault();
     contextLost = true;
-    if (started && sim.status !== "complete") pause("silent");
+    if (started && !terminal()) pause("silent");
     input.setEnabled(false);
     audio.setPaused(true);
     setModal("context", "正在重新接住這陣風", "<p>繪圖裝置暫時中斷，航程已凍結。恢復後可從目前位置繼續；若需重新載入，會返回最後安全島，保留已取得的觀測與碎片。</p>", [{label: "從安全島重新載入", primary: true, action: () => location.reload()}], "繪圖裝置恢復中");
@@ -933,8 +996,8 @@ async function initialize() {
     previous = performance.now();
     accumulator = 0;
     applySettings();
-    if (started && sim.status !== "complete") openPause("風已回來，準備繼續航程");
-    else if (started) showResults();
+    if (started && !terminal()) openPause("風已回來，準備繼續航程");
+    else if (started) terminalResults();
     else { closeModal(); notify("繪圖裝置已恢復，可準備啟程。"); }
   });
   $("#modal").addEventListener("keydown", (e) => {
@@ -959,15 +1022,15 @@ async function initialize() {
       build: Object.freeze({ ...BUILD }),
       snapshot: () => sim.snapshot(),
       metrics: () => {
-        const sorted = [...frames].sort((a, b) => a - b);
+        const sorted = Array.from(frames.subarray(0,frameSamples)).sort((a, b) => a - b);
         const gl = scene.renderer.getContext(),
           debug = gl.getExtension("WEBGL_debug_renderer_info");
         return {
-          ...scene.metrics,
+          ...scene.metrics, feedback: { ...feedback },
           phases: timing.summary(),
           camera: scene.inspectCamera(sim.player),
           frameCount,
-          averageMs: frames.length ? frames.reduce((a, b) => a + b, 0) / frames.length : null,
+          averageMs: frameSamples ? sorted.reduce((a, b) => a + b, 0) / frameSamples : null,
           contextLost,
           quality: scene.quality,
           inputListeners: input.listeners.length,
