@@ -22,7 +22,7 @@
         "colliders/comet.json"
       ],
       "sha256": {
-        "models/comet.gltf": "0394a54b95585d93b5430c1dddf1148398b1616f783e237c36c622eff6398e9a",
+        "models/comet.gltf": "be5fb4a171b617ad21a0a3f9240614897f471ddf0111b00d7e29d862795afe0b",
         "colliders/comet.json": "e4e934cdc7ef416d0ccf203904c556e362b4b072d801b8651f0a824716bf9b0f"
       },
       "provenance": {
@@ -121,7 +121,7 @@
         "colliders/stinger.json"
       ],
       "sha256": {
-        "models/stinger.gltf": "096ae2f40c50891cd2ca941ee4b2d6727fe3346f8bf9612fd9fcbda46562b787",
+        "models/stinger.gltf": "a0b399542b0373ba435274792a0341e3ddc3fd6ca1fb651093d0ec20d958dbb0",
         "colliders/stinger.json": "9984d1555965d8ad75eae2670d93655941e5cfb974b80e31438c0b77e82b9bef"
       },
       "provenance": {
@@ -220,7 +220,7 @@
         "colliders/phantom.json"
       ],
       "sha256": {
-        "models/phantom.gltf": "01329e7e1367d469a72a0e8b0f76373deb8dcd69f20b9bb7f78d29c62b8cc4fe",
+        "models/phantom.gltf": "3d3e3d957ea0425a6a969d2a5546cf791a293e30fac26dab70a2ba920d3b2715",
         "colliders/phantom.json": "fc0778c0e3a401c56e5d87f7afd04ad91a652bb86391be03faedd24d2049b4ca"
       },
       "provenance": {
@@ -318,7 +318,7 @@
         "models/dock-warehouse.gltf"
       ],
       "sha256": {
-        "models/dock-warehouse.gltf": "7132ca37cf6b68f7621503fb1fc7469fbbad0b9d94acd50127ae5aef9d993334"
+        "models/dock-warehouse.gltf": "f05577bb66f3e1bce1fdc480a7a6974d35a17a274747ab3d5bc653c04a4ef731"
       },
       "provenance": {
         "method": "original-procedural",
@@ -372,7 +372,7 @@
         "grid": 1
       },
       "budget": {
-        "runtimeBytes": 4980,
+        "runtimeBytes": 4982,
         "maxSimultaneousInstances": 160
       },
       "reuse": {
@@ -399,7 +399,7 @@
         "models/highway-tower.gltf"
       ],
       "sha256": {
-        "models/highway-tower.gltf": "17ddc06c685b6655cc269c8b4bb91ef4c193718a9182e820772444ebbdb32545"
+        "models/highway-tower.gltf": "86830d6d46ea3f0c922e1aa5ed41d99354e6e1f07dc13390ff41ae21606537b0"
       },
       "provenance": {
         "method": "original-procedural",
@@ -453,7 +453,7 @@
         "grid": 1
       },
       "budget": {
-        "runtimeBytes": 4974,
+        "runtimeBytes": 4976,
         "maxSimultaneousInstances": 160
       },
       "reuse": {
@@ -480,7 +480,7 @@
         "models/oldtown-shop.gltf"
       ],
       "sha256": {
-        "models/oldtown-shop.gltf": "f0108d0e1f0f64ea3e051b02ae6abb40b669b134d5b1ecf674d0baac234a58b0"
+        "models/oldtown-shop.gltf": "26ac6e30319da66b1ab900bcf136bdb403a974edaf31bcc4d6fbd8815f1a5aef"
       },
       "provenance": {
         "method": "original-procedural",
@@ -534,7 +534,7 @@
         "grid": 1
       },
       "budget": {
-        "runtimeBytes": 4972,
+        "runtimeBytes": 4974,
         "maxSimultaneousInstances": 160
       },
       "reuse": {
@@ -575,8 +575,8 @@
     {
       "id": "neon-drift.road-kit",
       "source": "games/neon-drift/src/renderer.js",
-      "sha256": "8c1845d493278ed310c96f1eafbb7fc68432b13a4d7ec2bbe9173026cb633c71",
-      "bytes": 36078,
+      "sha256": "2d4c5a60415a60519b1bcbd7612a383356fe836185bcb71b035d22072125fd0d",
+      "bytes": 50415,
       "description": "Editable road ribbons, ramps, 3D curbs, armco, posts, road details (lane paint / kerbs / guide lamps / chevrons / puddles / start checkers / drain grates), contact shadows and district instancing. Bundled into runtime game.js.",
       "provenance": {
         "method": "original-procedural",
@@ -591,8 +591,8 @@
     {
       "id": "neon-drift.track-layouts",
       "source": "games/neon-drift/src/content.js",
-      "sha256": "1e94a18b886ef2eb4b2eba3afa8d4f945b6bbc540c8fd833b3cc1dc71c787d9f",
-      "bytes": 7905,
+      "sha256": "2f106e7523ee4bff9b8b334a73ea7dd96b9efcf3b44864c1cd00e7ae417e94f8",
+      "bytes": 11483,
       "description": "Three authored closed courses with elevation, width, checkpoint distances and optional legal offset corridors. Also supplies independent collision and recovery coordinates.",
       "provenance": {
         "method": "original-procedural",

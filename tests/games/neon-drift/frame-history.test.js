@@ -69,7 +69,7 @@ test('actual diagnostics, summary and window performance keep their external arr
   const history=createFrameHistory(4);for(let i=0;i<8;i++)history.push(i+.1234567890123);
   let blockSnapshot=false;
   const guardedHistory={snapshot(){if(blockSnapshot)throw new Error('summary requested complete history');return history.snapshot();},summary:history.summary};
-  const env={BUILD:'fixture',VERSION:'fixture',navigator:{userAgent:'fixture'},innerWidth:1920,innerHeight:1080,devicePixelRatio:1,phase:'paused',frameSamples:guardedHistory,frameGaps:[],events:[],renderer:{stats:{calls:1},summary:{calls:1}},profiler:{snapshot:()=>({rows:[]}),summary:()=>({rows:{omitted:true,retainedCount:0}})},completedFrameProfile:null,browserTiming:null,lastCompletedRun:null,window:{},runFrames:8};
+  const env={clockReadCount:()=>0,presentationCounts:{hud:0,map:0,events:0},updateSamples:history,updateCpu:{},profilingEnabled:false,BUILD:'fixture',VERSION:'fixture',navigator:{userAgent:'fixture'},innerWidth:1920,innerHeight:1080,devicePixelRatio:1,phase:'paused',frameSamples:guardedHistory,frameGaps:[],events:[],renderer:{stats:{calls:1},summary:{calls:1}},profiler:{snapshot:()=>({rows:[]}),summary:()=>({rows:{omitted:true,retainedCount:0}})},completedFrameProfile:null,browserTiming:null,lastCompletedRun:null,window:{},runFrames:8};
   const start=mainSource.indexOf('function diagnostics(){'),end=mainSource.indexOf('\nconst track=',start);
   assert.ok(start>=0&&end>start);
   const apiSource=mainSource.slice(mainSource.indexOf("Object.defineProperty(window,'neonDrift'"));
@@ -84,8 +84,8 @@ test('actual diagnostics, summary and window performance keep their external arr
 
 test('actual sample condition and settings p95 retain cross-run history and the original precision',()=>{
   const history=createFrameHistory(4);
-  const sampleLine=mainSource.split('\n').find(line=>line.includes('frameSamples.push(rawDt*1000)'));
-  assert.ok(sampleLine);const append=new Function('frameSamples','state',`let {phase,rawDt,race}=state;let runFrames=0;${sampleLine}\nreturn runFrames;`);
+  const sampleLine=mainSource.split('\n').find(line=>line.includes('frameSamples.pushFrom(timing,0)'));
+  assert.ok(sampleLine);const append=new Function('frameSamples','state',`let {phase,rawDt,race}=state;const N={countdown:0},raceNumbers=Float64Array.of(race.countdown),timing=new Float64Array(24);timing[10]=rawDt;let runFrames=0;${sampleLine}\nreturn runFrames;`);
   assert.equal(append(history,{phase:'running',rawDt:.0166666666666667,race:{countdown:0}}),1);
   for(const state of [{phase:'paused',rawDt:.2,race:{countdown:0}},{phase:'menu',rawDt:.3,race:{countdown:0}},{phase:'running',rawDt:0,race:{countdown:0}},{phase:'running',rawDt:.4,race:{countdown:1}}])assert.equal(append(history,state),0);
   assert.equal(append(history,{phase:'running',rawDt:.0234567890123456,race:{countdown:0}}),1);
@@ -95,4 +95,10 @@ test('actual sample condition and settings p95 retain cross-run history and the 
   assert.ok(settingsLine);const label={textContent:''};new Function('frameSamples','renderer','frameGaps','BUILD','$',settingsLine)(history,{summary:{calls:1,triangles:2}},[],'fixture',()=>label);
   assert.match(label.textContent,new RegExp(`已量測 2 遊玩影格，p95 ${p95(history.snapshot()).toFixed(1).replace('.','\\.')} ms`));
   assert.deepEqual(history.snapshot(),[.0166666666666667*1000,.0234567890123456*1000]);
+});
+
+test('buffer/index history append retains full doubles and wrap order without copying the input',()=>{
+  const history=createFrameHistory(2),buffer=Float64Array.of(Math.PI,1/3);
+  history.pushFrom(buffer,0);history.pushFrom(buffer,1);buffer[0]=Number.MIN_VALUE;history.pushFrom(buffer,0);
+  assert.deepEqual(history.snapshot(),[1/3,Number.MIN_VALUE]);buffer[1]=Infinity;assert.throws(()=>history.pushFrom(buffer,1),TypeError);assert.deepEqual(history.snapshot(),[1/3,Number.MIN_VALUE]);
 });

@@ -12,11 +12,16 @@ export function createFrameHistory(capacity=FRAME_HISTORY_CAPACITY){
     if(size<capacity)size++;
     return size;
   }
+  function pushFrom(buffer,index){
+    const value=buffer[index];if(typeof value!=='number'||value!==value||value===Infinity||value===-Infinity)throw new TypeError('Frame history values must be finite numbers.');
+    values[next]=value;next++;if(next===capacity)next=0;if(size<capacity)size++;
+    return size;
+  }
   function snapshot(){
     const result=new Array(size),oldest=size===capacity?next:0;
     for(let i=0;i<size;i++)result[i]=values[(oldest+i)%capacity];
     return result;
   }
   function summary(){return {omitted:true,retainedCount:size,note:'完整資料保留於診斷匯出檔'};}
-  return Object.freeze({push,snapshot,summary,get length(){return size;}});
+  return Object.freeze({push,pushFrom,snapshot,summary,get length(){return size;}});
 }

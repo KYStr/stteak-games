@@ -43,3 +43,22 @@
 #garage .segmented{grid-template-columns:repeat(2,minmax(0,1fr))} /* 模式仍兩欄，字大時各自正常換行而非固定高度。 */
 #garage .track-options button{overflow:visible} /* 明確解除原track button的hidden裁切，保SVG與文字自然流，不以未新增clip當作沒裁字的證明。 */
 #garage .tutorial-progress{margin:10px 0 0;color:#c0d0d6;font-size:max(12px,.75rem);line-height:1.5;overflow-wrap:anywhere} /* 0015：進度提示保12px下限與自然換行；不設固定高度、不改焦點或原捲動容器。 */
+.continue-race{display:block;width:100%;margin-top:18px;border-color:var(--mint);color:var(--mint);text-align:left;line-height:1.6}
+#route-cue{position:absolute;left:50%;top:100px;transform:translateX(-50%);padding:9px 16px;background:#0c1821e8;border:1px solid #80b9b344;border-radius:4px;color:#e0f5e9;font-size:14px;letter-spacing:.08em;white-space:nowrap}
+#race-event{position:absolute;top:190px;left:50%;transform:translateX(-50%);color:#b5ffd9;text-shadow:0 2px 6px #000;font-size:19px;font-weight:700;opacity:0;pointer-events:none}
+#race-event.show{animation:race-feedback 2.5s ease-out forwards}
+@keyframes race-feedback{0%{opacity:0}12%,65%{opacity:1}100%{opacity:0}}
+@media(min-width:701px) and (max-height:760px){#garage{width:620px}#garage h1{font-size:36px}#garage .eyebrow{display:none}#garage .intro{margin:10px 0}#garage .garage-sections{gap:10px}#garage .track-options button{padding:9px}#garage .track-options svg{height:24px;margin:6px 0}#garage .launch-row{margin-top:12px}#garage .save-note{margin:10px 0}#garage .section-heading{margin-bottom:6px}}
+@media(max-width:700px){#route-cue{top:178px;font-size:12px;padding:6px 10px}#race-event{top:225px;font-size:15px}#tutorial-hint:not([hidden])~#race-event{display:none}}
+@media(max-height:480px){#route-cue{top:130px}#race-event{top:165px}}
+@media(prefers-reduced-motion:reduce){#race-event.show{animation:none;opacity:1}}
+/* The driving-school panel supplies its own route instructions and feedback. */
+#hud:has(#tutorial-hint:not([hidden])) #route-cue,#hud:has(#tutorial-hint:not([hidden])) #race-event{display:none}
+
+#finish-school{position:absolute;top:365px;left:30px;pointer-events:auto;font-size:14px;max-width:calc(100% - 60px)}
+@media(max-width:700px){#finish-school{top:375px;left:18px;max-width:calc(100% - 36px)}}
+@media(max-height:480px){#finish-school{top:245px;left:18px;padding:8px 12px}}
+
+.reduced-motion #race-event.show{animation:none;opacity:1}
+
+#tour-launch{width:100%;margin:10px 0}.tour-seed{display:flex;align-items:center;gap:12px;font-size:12px}.tour-seed input{width:145px;background:#152335;color:#d9ffef;border:1px solid #607886;padding:7px}#control-state{position:fixed;bottom:18px;left:50%;color:#b5ffd9;font-size:12px;z-index:4;pointer-events:none}

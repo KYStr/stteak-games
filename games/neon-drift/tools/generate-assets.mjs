@@ -13,6 +13,8 @@ globalThis.FileReader=class {
   readAsArrayBuffer(blob){blob.arrayBuffer().then(result=>{this.result=result;this.onloadend?.();});}
   readAsDataURL(blob){blob.arrayBuffer().then(buffer=>{this.result=`data:${blob.type||'application/octet-stream'};base64,${Buffer.from(buffer).toString('base64')}`;this.onloadend?.();});}
 };
+let assetSeed=17391;
+Math.random=()=>{assetSeed=(Math.imul(assetSeed,1664525)+1013904223)>>>0;return assetSeed/4294967296;};
 const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../..');
 const assets=path.join(repo,'assets/games/neon-drift'),out=path.join(assets,'generated');
 await fs.mkdir(path.join(out,'models'),{recursive:true});await fs.mkdir(path.join(out,'colliders'),{recursive:true});

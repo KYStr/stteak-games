@@ -20,7 +20,7 @@ function menuFixture(save){ // 載入實際選單函式，DOM替身只記錄呈�
   const progressNode={get textContent(){return progress;},set textContent(value){progress=value;writes++;}}; // 模擬狀態節點。
   nodes.set('#tutorial-progress',progressNode); // 與正式HTML使用相同ID。
   const $=selector=>{if(!nodes.has(selector))nodes.set(selector,{});return nodes.get(selector);}; // 其他既有選單節點維持可寫。
-  const context=vm.createContext({save,$,TRACKS,CARS,trackId:'harbor',carId:'comet',mode:'time',trackMenuLabel,trackPath:()=>'',track:()=>TRACKS[0],car:()=>CARS[0],record:()=>null,fmt:String,document:{querySelectorAll:()=>[]}}); // 隔離選單依賴，不觸發輸入或渲染。
+  const context=vm.createContext({pendingSession:null,save,$,TRACKS,CARS,trackId:'harbor',carId:'comet',mode:'time',trackMenuLabel,trackPath:()=>'',track:()=>TRACKS[0],car:()=>CARS[0],record:()=>null,fmt:String,document:{querySelectorAll:()=>[]}}); // 隔離選單依賴，不觸發輸入或渲染。
   vm.runInContext(refreshSource,context); // 執行原檔案中的函式定義。
   return {refresh(next=save){context.save=next;vm.runInContext('refreshMenu()',context);},get text(){return progress;},get writes(){return writes;}}; // 測試介面只存在於測試檔。
 } // 實際產品不提供新debug API。
@@ -94,6 +94,6 @@ test('新提示保留原按鈕、12px下限與自然換行，不新增焦點或�
   assert.doesNotMatch(node,/tabindex|autofocus|hidden/); // 不增加焦點或隱藏顯示。
   const rule=css.match(/#garage \.tutorial-progress\{([^}]+)\}/)[1];assert.match(rule,/font-size:max\(12px,\.75rem\)/);assert.match(rule,/overflow-wrap:anywhere/); // 窄螢幕不靠縮字塞入。
   assert.doesNotMatch(rule,/(?:^|;)(?:height:|overflow:hidden|position:)/);assert.match(css,/#garage\{[^}]*overflow-y:auto/); // 沿正常文流與既有車庫捲動，不把line-height誤當固定高度。
-  assert.match(source,/BUILD='neon-drift-tutorial-progress-0015',VERSION='1\.0\.13'/); // 不冒用0014候選身份。
-  assert.doesNotMatch(refreshSource,/localStorage|saveRace\(|saveSettings\(|focus\(|scrollTo\(|scrollTop\s*=/); // 顯示不寫入、移焦或重設捲動。
+  assert.match(source,/BUILD='neon-drift-rebuild-r5',VERSION='1\.5\.0'/); // 不冒用0014候選身份。
+  assert.doesNotMatch(refreshSource,/localStorage|saveRace\(|saveSettings\(|scrollTo\(|scrollTop\s*=/); // 顯示不寫入、移焦或重設捲動。
 }); // 靜態契約案例結束。

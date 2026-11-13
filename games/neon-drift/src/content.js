@@ -36,7 +36,7 @@ const rawTracks = [
     description: '坡頂前穩住方向；斜坡內線是高風險高速捷徑。',
     nodes: [[0,3,0],[-20,5,145],[75,16,255],[235,20,270],[335,16,180],[360,9,20],[295,3,-135],[120,3,-195],[-35,3,-110]],
     shortcutRange: [0.2,0.37], shortcutOffset: 26,
-    medals: { time: [95,120,160], drift: [1000,450,120] } },
+    medals: { time: [95,120,160], drift: [1000,450,50] } },
   { id: 'oldtown', name: '舊城連續彎', subtitle: 'OLD TOWN / 連段考驗', theme: 'oldtown', difficulty: '連段考驗', width: 17, // 原三賽道的幾何與物理數值均不修改。
     description: '兩組反向彎提早換重心；巷道切線需要精準控制。',
     nodes: [[0,1,0],[-15,2,90],[40,5,145],[130,6,120],[165,4,200],[250,3,205],[285,2,135],[235,0,55],[290,0,-25],[230,1,-100],[120,3,-65],[55,2,-125],[-30,1,-100]],
@@ -44,6 +44,7 @@ const rawTracks = [
     medals: { time: [115,145,190], drift: [6000,2400,650] } },
 ];
 
+const trackSamples=new WeakMap();
 const modulo = (n, m) => ((n % m) + m) % m;
 const angleDelta = (a, b) => Math.atan2(Math.sin(a-b), Math.cos(a-b));
 function catmull(p0,p1,p2,p3,t) {
@@ -76,11 +77,15 @@ export function buildTrack(raw) { // 讓新增資料使用唯一的正式賽道�
     const middle=sampleTrack(track,(start+end)/2);
     track.shortcut={start,end,side:Math.sign(middle.curvature)||1,offset:raw.shortcutOffset,width:9,name:raw.theme==='harbor'?'貨櫃內線':raw.theme==='skyway'?'高架切線':'夜市巷道'};
   }
-  return track;
+  const numericPoints=new Float64Array(points.length*5);
+  for(let i=0;i<points.length;i++){const p=points[i],j=i*5;numericPoints[j]=p.x;numericPoints[j+1]=p.y;numericPoints[j+2]=p.z;numericPoints[j+3]=p.s;numericPoints[j+4]=p.heading;}
+  trackSamples.set(track,numericPoints);return track;
 }
 
 /** s is arc distance, wrapping around a closed course. Never a normalized percentage. */
-export function sampleTrack(trackOrId,s) {
+export function sampleTrack(trackOrId,s) {return sampleTrackInto(trackOrId,s,{});}
+export const TRACK_SAMPLE=Object.freeze({x:0,y:1,z:2,heading:3,width:4,curvature:5,slope:6,s:7});
+export function sampleTrackInto(trackOrId,s,out) {
   const track=typeof trackOrId==='string'?TRACKS.find(t=>t.id===trackOrId):trackOrId;
   if(!track) throw new Error('Unknown track');
   const distance=modulo(Number.isFinite(s)?s:0,track.length),p=track.points;
@@ -88,8 +93,9 @@ export function sampleTrack(trackOrId,s) {
   while(lo+1<hi) { const mid=(lo+hi)>>1;if(p[mid].s<=distance)lo=mid;else hi=mid; }
   const a=p[lo],b=p[hi],span=b.s-a.s||1,t=(distance-a.s)/span;
   const heading=a.heading+angleDelta(b.heading,a.heading)*t;
-  return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,z:a.z+(b.z-a.z)*t,heading,
-    width:track.width,curvature:angleDelta(b.heading,a.heading)/span,slope:(b.y-a.y)/span,s:distance};
+  if(out instanceof Float64Array){out[0]=a.x+(b.x-a.x)*t;out[1]=a.y+(b.y-a.y)*t;out[2]=a.z+(b.z-a.z)*t;out[3]=heading;out[4]=track.width;out[5]=angleDelta(b.heading,a.heading)/span;out[6]=(b.y-a.y)/span;out[7]=distance;return out;}
+  out.x=a.x+(b.x-a.x)*t;out.y=a.y+(b.y-a.y)*t;out.z=a.z+(b.z-a.z)*t;out.heading=heading;
+  out.width=track.width;out.curvature=angleDelta(b.heading,a.heading)/span;out.slope=(b.y-a.y)/span;out.s=distance;return out;
 }
 export const TRACKS=rawTracks.map(buildTrack);
 /** A separate, broad and speed-limited driving school; never a seventh challenge card. */
@@ -108,9 +114,44 @@ export function shortcutOffset(track,s) {
   if(d<q.start||d>q.end)return null;
   return q.side*q.offset*Math.sin(Math.PI*(d-q.start)/(q.end-q.start));
 }
-export function roadStatus(track,s,lateral) {
+export function roadStatus(track,s,lateral) {return roadStatusInto(track,s,lateral,{});}
+export function roadStatusInto(track,s,lateral,out) {
   const offset=shortcutOffset(track,s);
   const main=Math.abs(lateral)<=track.width/2-0.9;
   const shortcut=offset!==null&&Math.abs(lateral-offset)<=track.shortcut.width/2-0.9;
-  return {legal:main||shortcut,main,shortcut:shortcut&&!main,offset};
+  out.legal=main||shortcut;out.main=main;out.shortcut=shortcut&&!main;out.offset=offset;return out;
+}
+
+export const TOUR_STAGES=TRACKS.flatMap(t=>[
+  {trackId:t.id,mode:'time',hint:t.description+' 按順序通過八個檢查點，300 秒內完成兩圈。'},
+  {trackId:t.id,mode:'drift',hint:`${t.id==='skyway'?'高速考驗：入彎前保持約 90–100 km/h，穩住高速側滑。':''}120 秒內入袋至少 ${t.medals.drift[2]} 分；放開手煞車並回穩即可入袋。`}
+]);
+const tourLayouts=new Map();
+export function resolveTourTrack(id,seed){
+  const index=TRACKS.findIndex(t=>t.id===id);if(index<0)throw Error('Unknown Tour district');
+  const mirrored=!!((seed>>>index)&1),layoutId=`${id}:${mirrored?'mirrored':'original'}:v1`;
+  if(!tourLayouts.has(layoutId)){const raw=rawTracks[index];const built=buildTrack({...raw,nodes:raw.nodes.map(([x,y,z])=>[mirrored?-x:x,y,z])});built.layoutId=layoutId;tourLayouts.set(layoutId,built);}
+  return tourLayouts.get(layoutId);
+}
+
+// Physics scratch buffers avoid boxed numeric stores in generic sample objects.
+export const ROAD_SAMPLE=Object.freeze({legal:0,main:1,shortcut:2,offset:3});
+export function roadStatusBufferInto(track,s,lateral,out){
+  const offset=shortcutOffset(track,s),main=Math.abs(lateral)<=track.width/2-0.9;
+  const shortcut=offset!==null&&Math.abs(lateral-offset)<=track.shortcut.width/2-0.9;
+  out[0]=Number(main||shortcut);out[1]=Number(main);out[2]=Number(shortcut&&!main);out[3]=offset===null?NaN:offset;return out;
+}
+
+/** Physics-only sampler takes a reusable position buffer, avoiding boxed float call arguments. */
+export function sampleTrackBufferAt(track,positions,index,out){
+  const p=trackSamples.get(track),length=p[p.length-2],s=positions[index],distance=(((Number.isFinite(s)?s:0)%length)+length)%length;
+  let lo=0,hi=p.length/5-1;
+  while(lo+1<hi){const mid=(lo+hi)>>1;if(p[mid*5+3]<=distance)lo=mid;else hi=mid;}
+  const a=lo*5,b=hi*5,span=p[b+3]-p[a+3]||1,t=(distance-p[a+3])/span;
+  const turn=Math.atan2(Math.sin(p[b+4]-p[a+4]),Math.cos(p[b+4]-p[a+4]));
+  out[0]=p[a]+(p[b]-p[a])*t;out[1]=p[a+1]+(p[b+1]-p[a+1])*t;out[2]=p[a+2]+(p[b+2]-p[a+2])*t;
+  out[3]=p[a+4]+turn*t;out[4]=track.width;out[5]=turn/span;out[6]=(p[b+1]-p[a+1])/span;out[7]=distance;return out;
+}
+export function roadStatusBufferAt(track,positions,sIndex,lateralIndex,out){
+  const s=positions[sIndex],lateral=positions[lateralIndex],q=track.shortcut,d=((s%track.length)+track.length)%track.length,offset=!q||d<q.start||d>q.end?NaN:q.side*q.offset*Math.sin(Math.PI*(d-q.start)/(q.end-q.start)),main=Math.abs(lateral)<=track.width/2-0.9,shortcut=!Number.isNaN(offset)&&Math.abs(lateral-offset)<=q.width/2-0.9;out[0]=Number(main||shortcut);out[1]=Number(main);out[2]=Number(shortcut&&!main);out[3]=offset;return out;
 }

@@ -1,0 +1,7041 @@
+{
+  "digest": "545210a60c89549574a864b81cc339931408bb73682e0a5303262b8f3d3a3e3c",
+  "results": [
+    {
+      "car": "comet",
+      "layout": "harbor:original:v1",
+      "mode": "time",
+      "ticks": 16658,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1460
+        ],
+        [
+          2,
+          2,
+          2532
+        ],
+        [
+          3,
+          3,
+          3568
+        ],
+        [
+          4,
+          4,
+          4580
+        ],
+        [
+          5,
+          5,
+          5596
+        ],
+        [
+          6,
+          6,
+          6560
+        ],
+        [
+          7,
+          7,
+          7520
+        ],
+        [
+          8,
+          0,
+          8576
+        ],
+        [
+          9,
+          1,
+          9544
+        ],
+        [
+          10,
+          2,
+          10616
+        ],
+        [
+          11,
+          3,
+          11652
+        ],
+        [
+          12,
+          4,
+          12660
+        ],
+        [
+          13,
+          5,
+          13680
+        ],
+        [
+          14,
+          6,
+          14644
+        ],
+        [
+          15,
+          7,
+          15604
+        ],
+        [
+          16,
+          0,
+          16658
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "harbor",
+        "carId": "comet",
+        "time": 135.8167,
+        "score": 0,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          68.4583,
+          67.3583
+        ],
+        "bestLap": 67.3583,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 9.15
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.9333
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.65
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8.4084
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.4833
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 8.025
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.7916
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 8.05
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.9333
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.6584
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8.4
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.4833
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 8.0167
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.7916
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "harbor:original:v1",
+        "activeSeconds": 135.8167
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "harbor:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1364
+        ],
+        [
+          2,
+          2,
+          2452
+        ],
+        [
+          3,
+          3,
+          3480
+        ],
+        [
+          4,
+          4,
+          4436
+        ],
+        [
+          5,
+          5,
+          5380
+        ],
+        [
+          6,
+          6,
+          6192
+        ],
+        [
+          7,
+          7,
+          6988
+        ],
+        [
+          8,
+          0,
+          7976
+        ],
+        [
+          9,
+          1,
+          8828
+        ],
+        [
+          10,
+          2,
+          9916
+        ],
+        [
+          11,
+          3,
+          10944
+        ],
+        [
+          12,
+          4,
+          11900
+        ],
+        [
+          13,
+          5,
+          12844
+        ],
+        [
+          14,
+          6,
+          13656
+        ],
+        [
+          15,
+          7,
+          14452
+        ]
+      ],
+      "score": 989,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "harbor",
+        "carId": "comet",
+        "time": 120,
+        "score": 989,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          63.4667
+        ],
+        "bestLap": 63.4667,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.3667
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 9.05
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.5583
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.9667
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.8666
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.775
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.65
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.2334
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "harbor:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "harbor:mirrored:v1",
+      "mode": "time",
+      "ticks": 16658,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1460
+        ],
+        [
+          2,
+          2,
+          2532
+        ],
+        [
+          3,
+          3,
+          3568
+        ],
+        [
+          4,
+          4,
+          4580
+        ],
+        [
+          5,
+          5,
+          5596
+        ],
+        [
+          6,
+          6,
+          6560
+        ],
+        [
+          7,
+          7,
+          7520
+        ],
+        [
+          8,
+          0,
+          8576
+        ],
+        [
+          9,
+          1,
+          9544
+        ],
+        [
+          10,
+          2,
+          10616
+        ],
+        [
+          11,
+          3,
+          11652
+        ],
+        [
+          12,
+          4,
+          12660
+        ],
+        [
+          13,
+          5,
+          13680
+        ],
+        [
+          14,
+          6,
+          14644
+        ],
+        [
+          15,
+          7,
+          15604
+        ],
+        [
+          16,
+          0,
+          16658
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "harbor",
+        "carId": "comet",
+        "time": 135.8167,
+        "score": 0,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          68.4583,
+          67.3583
+        ],
+        "bestLap": 67.3583,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 9.15
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.9333
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.65
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8.4084
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.4833
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 8.025
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.7916
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 8.05
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.9333
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.6584
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8.4
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.4833
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 8.0167
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.7916
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "harbor:mirrored:v1",
+        "activeSeconds": 135.8167
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "harbor:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1364
+        ],
+        [
+          2,
+          2,
+          2452
+        ],
+        [
+          3,
+          3,
+          3480
+        ],
+        [
+          4,
+          4,
+          4436
+        ],
+        [
+          5,
+          5,
+          5380
+        ],
+        [
+          6,
+          6,
+          6192
+        ],
+        [
+          7,
+          7,
+          6988
+        ],
+        [
+          8,
+          0,
+          7976
+        ],
+        [
+          9,
+          1,
+          8828
+        ],
+        [
+          10,
+          2,
+          9916
+        ],
+        [
+          11,
+          3,
+          10944
+        ],
+        [
+          12,
+          4,
+          11900
+        ],
+        [
+          13,
+          5,
+          12844
+        ],
+        [
+          14,
+          6,
+          13656
+        ],
+        [
+          15,
+          7,
+          14452
+        ]
+      ],
+      "score": 989,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "harbor",
+        "carId": "comet",
+        "time": 120,
+        "score": 989,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          63.4667
+        ],
+        "bestLap": 63.4667,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.3667
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 9.05
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.5583
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.9667
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.8666
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.775
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.65
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.2334
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "harbor:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "skyway:original:v1",
+      "mode": "time",
+      "ticks": 16000,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1460
+        ],
+        [
+          2,
+          2,
+          2424
+        ],
+        [
+          3,
+          3,
+          3388
+        ],
+        [
+          4,
+          4,
+          4348
+        ],
+        [
+          5,
+          5,
+          5308
+        ],
+        [
+          6,
+          6,
+          6272
+        ],
+        [
+          7,
+          7,
+          7232
+        ],
+        [
+          8,
+          0,
+          8248
+        ],
+        [
+          9,
+          1,
+          9212
+        ],
+        [
+          10,
+          2,
+          10180
+        ],
+        [
+          11,
+          3,
+          11140
+        ],
+        [
+          12,
+          4,
+          12100
+        ],
+        [
+          13,
+          5,
+          13060
+        ],
+        [
+          14,
+          6,
+          14024
+        ],
+        [
+          15,
+          7,
+          14988
+        ],
+        [
+          16,
+          0,
+          16000
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "skyway",
+        "carId": "comet",
+        "time": 130.3333,
+        "score": 0,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          65.725,
+          64.6083
+        ],
+        "bestLap": 64.6083,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 9.15
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.05
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.025
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.0083
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.4583
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 8.0333
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.05
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 8.0167
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.4583
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "skyway:original:v1",
+        "activeSeconds": 130.3333
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "skyway:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1376
+        ],
+        [
+          2,
+          2,
+          2180
+        ],
+        [
+          3,
+          3,
+          2988
+        ],
+        [
+          4,
+          4,
+          3784
+        ],
+        [
+          5,
+          5,
+          4576
+        ],
+        [
+          6,
+          6,
+          5380
+        ],
+        [
+          7,
+          7,
+          6180
+        ],
+        [
+          8,
+          0,
+          7120
+        ],
+        [
+          9,
+          1,
+          7960
+        ],
+        [
+          10,
+          2,
+          8764
+        ],
+        [
+          11,
+          3,
+          9572
+        ],
+        [
+          12,
+          4,
+          10368
+        ],
+        [
+          13,
+          5,
+          11160
+        ],
+        [
+          14,
+          6,
+          11964
+        ],
+        [
+          15,
+          7,
+          12764
+        ],
+        [
+          16,
+          0,
+          13704
+        ],
+        [
+          17,
+          1,
+          14544
+        ]
+      ],
+      "score": 171,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "skyway",
+        "carId": "comet",
+        "time": 120,
+        "score": 171,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          56.3167,
+          54.8667
+        ],
+        "bestLap": 54.8667,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.4417
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 6.7166
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.7167
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.65
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 6.6083
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6834
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.6666
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.8334
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.9917
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 6.7166
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.7167
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.65
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 6.6083
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.6834
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 6.6666
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.8334
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "skyway:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "skyway:mirrored:v1",
+      "mode": "time",
+      "ticks": 16000,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1460
+        ],
+        [
+          2,
+          2,
+          2424
+        ],
+        [
+          3,
+          3,
+          3388
+        ],
+        [
+          4,
+          4,
+          4348
+        ],
+        [
+          5,
+          5,
+          5308
+        ],
+        [
+          6,
+          6,
+          6272
+        ],
+        [
+          7,
+          7,
+          7232
+        ],
+        [
+          8,
+          0,
+          8248
+        ],
+        [
+          9,
+          1,
+          9212
+        ],
+        [
+          10,
+          2,
+          10180
+        ],
+        [
+          11,
+          3,
+          11140
+        ],
+        [
+          12,
+          4,
+          12100
+        ],
+        [
+          13,
+          5,
+          13060
+        ],
+        [
+          14,
+          6,
+          14024
+        ],
+        [
+          15,
+          7,
+          14988
+        ],
+        [
+          16,
+          0,
+          16000
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "skyway",
+        "carId": "comet",
+        "time": 130.3333,
+        "score": 0,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          65.725,
+          64.6083
+        ],
+        "bestLap": 64.6083,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 9.15
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.05
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.025
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.0083
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.4583
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 8.0333
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.05
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 8.0167
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.4583
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "skyway:mirrored:v1",
+        "activeSeconds": 130.3333
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "skyway:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1376
+        ],
+        [
+          2,
+          2,
+          2180
+        ],
+        [
+          3,
+          3,
+          2988
+        ],
+        [
+          4,
+          4,
+          3784
+        ],
+        [
+          5,
+          5,
+          4576
+        ],
+        [
+          6,
+          6,
+          5380
+        ],
+        [
+          7,
+          7,
+          6180
+        ],
+        [
+          8,
+          0,
+          7120
+        ],
+        [
+          9,
+          1,
+          7960
+        ],
+        [
+          10,
+          2,
+          8764
+        ],
+        [
+          11,
+          3,
+          9572
+        ],
+        [
+          12,
+          4,
+          10368
+        ],
+        [
+          13,
+          5,
+          11160
+        ],
+        [
+          14,
+          6,
+          11964
+        ],
+        [
+          15,
+          7,
+          12764
+        ],
+        [
+          16,
+          0,
+          13704
+        ],
+        [
+          17,
+          1,
+          14544
+        ]
+      ],
+      "score": 171,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "skyway",
+        "carId": "comet",
+        "time": 120,
+        "score": 171,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          56.3167,
+          54.8667
+        ],
+        "bestLap": 54.8667,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.4417
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 6.7166
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.7167
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.65
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 6.6083
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6834
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.6666
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.8334
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.9917
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 6.7166
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.7167
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.65
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 6.6083
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.6834
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 6.6666
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.8334
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "skyway:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "oldtown:original:v1",
+      "mode": "time",
+      "ticks": 14957,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1352
+        ],
+        [
+          2,
+          2,
+          2312
+        ],
+        [
+          3,
+          3,
+          3204
+        ],
+        [
+          4,
+          4,
+          4072
+        ],
+        [
+          5,
+          5,
+          5016
+        ],
+        [
+          6,
+          6,
+          5884
+        ],
+        [
+          7,
+          7,
+          6812
+        ],
+        [
+          8,
+          0,
+          7728
+        ],
+        [
+          9,
+          1,
+          8584
+        ],
+        [
+          10,
+          2,
+          9544
+        ],
+        [
+          11,
+          3,
+          10436
+        ],
+        [
+          12,
+          4,
+          11304
+        ],
+        [
+          13,
+          5,
+          12248
+        ],
+        [
+          14,
+          6,
+          13116
+        ],
+        [
+          15,
+          7,
+          14044
+        ],
+        [
+          16,
+          0,
+          14957
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "oldtown",
+        "carId": "comet",
+        "time": 121.6417,
+        "score": 0,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          61.375,
+          60.2667
+        ],
+        "bestLap": 60.2667,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.2417
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.025
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.425
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.2333
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.8667
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.225
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.75
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.6083
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.1333
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.425
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.225
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.8667
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.2333
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.75
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.6084
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "oldtown:original:v1",
+        "activeSeconds": 121.6417
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "oldtown:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1340
+        ],
+        [
+          2,
+          2,
+          2312
+        ],
+        [
+          3,
+          3,
+          3184
+        ],
+        [
+          4,
+          4,
+          4012
+        ],
+        [
+          5,
+          5,
+          4976
+        ],
+        [
+          6,
+          6,
+          5780
+        ],
+        [
+          7,
+          7,
+          6724
+        ],
+        [
+          8,
+          0,
+          7600
+        ],
+        [
+          9,
+          1,
+          8408
+        ],
+        [
+          10,
+          2,
+          9380
+        ],
+        [
+          11,
+          3,
+          10252
+        ],
+        [
+          12,
+          4,
+          11080
+        ],
+        [
+          13,
+          5,
+          12044
+        ],
+        [
+          14,
+          6,
+          12848
+        ],
+        [
+          15,
+          7,
+          13792
+        ],
+        [
+          16,
+          0,
+          14668
+        ]
+      ],
+      "score": 1074,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "oldtown",
+        "carId": "comet",
+        "time": 120,
+        "score": 1074,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          60.325,
+          58.9
+        ],
+        "bestLap": 58.9,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.1417
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.1083
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.275
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.9083
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.7167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.8583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.3
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.7167
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.1083
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.275
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.9083
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.0167
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.7167
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.8583
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.3
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "oldtown:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "oldtown:mirrored:v1",
+      "mode": "time",
+      "ticks": 14957,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1352
+        ],
+        [
+          2,
+          2,
+          2312
+        ],
+        [
+          3,
+          3,
+          3204
+        ],
+        [
+          4,
+          4,
+          4072
+        ],
+        [
+          5,
+          5,
+          5016
+        ],
+        [
+          6,
+          6,
+          5884
+        ],
+        [
+          7,
+          7,
+          6812
+        ],
+        [
+          8,
+          0,
+          7728
+        ],
+        [
+          9,
+          1,
+          8584
+        ],
+        [
+          10,
+          2,
+          9544
+        ],
+        [
+          11,
+          3,
+          10436
+        ],
+        [
+          12,
+          4,
+          11304
+        ],
+        [
+          13,
+          5,
+          12248
+        ],
+        [
+          14,
+          6,
+          13116
+        ],
+        [
+          15,
+          7,
+          14044
+        ],
+        [
+          16,
+          0,
+          14957
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "oldtown",
+        "carId": "comet",
+        "time": 121.6417,
+        "score": 0,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          61.375,
+          60.2667
+        ],
+        "bestLap": 60.2667,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.2417
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.025
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.425
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.2333
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.8667
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.225
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.75
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.6083
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.1333
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.025
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.425
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.225
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.8667
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.2333
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.75
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.6084
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "oldtown:mirrored:v1",
+        "activeSeconds": 121.6417
+      }
+    },
+    {
+      "car": "comet",
+      "layout": "oldtown:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1340
+        ],
+        [
+          2,
+          2,
+          2312
+        ],
+        [
+          3,
+          3,
+          3184
+        ],
+        [
+          4,
+          4,
+          4012
+        ],
+        [
+          5,
+          5,
+          4976
+        ],
+        [
+          6,
+          6,
+          5780
+        ],
+        [
+          7,
+          7,
+          6724
+        ],
+        [
+          8,
+          0,
+          7600
+        ],
+        [
+          9,
+          1,
+          8408
+        ],
+        [
+          10,
+          2,
+          9380
+        ],
+        [
+          11,
+          3,
+          10252
+        ],
+        [
+          12,
+          4,
+          11080
+        ],
+        [
+          13,
+          5,
+          12044
+        ],
+        [
+          14,
+          6,
+          12848
+        ],
+        [
+          15,
+          7,
+          13792
+        ],
+        [
+          16,
+          0,
+          14668
+        ]
+      ],
+      "score": 1074,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "oldtown",
+        "carId": "comet",
+        "time": 120,
+        "score": 1074,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          60.325,
+          58.9
+        ],
+        "bestLap": 58.9,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.1417
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.1083
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.275
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.9083
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.0167
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.7167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.8583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.3
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.7167
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.1083
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.275
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.9083
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.0167
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.7167
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.8583
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.3
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "oldtown:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "harbor:original:v1",
+      "mode": "time",
+      "ticks": 16473,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1416
+        ],
+        [
+          2,
+          2,
+          2476
+        ],
+        [
+          3,
+          3,
+          3504
+        ],
+        [
+          4,
+          4,
+          4504
+        ],
+        [
+          5,
+          5,
+          5512
+        ],
+        [
+          6,
+          6,
+          6464
+        ],
+        [
+          7,
+          7,
+          7420
+        ],
+        [
+          8,
+          0,
+          8468
+        ],
+        [
+          9,
+          1,
+          9424
+        ],
+        [
+          10,
+          2,
+          10484
+        ],
+        [
+          11,
+          3,
+          11512
+        ],
+        [
+          12,
+          4,
+          12512
+        ],
+        [
+          13,
+          5,
+          13520
+        ],
+        [
+          14,
+          6,
+          14472
+        ],
+        [
+          15,
+          7,
+          15428
+        ],
+        [
+          16,
+          0,
+          16473
+        ]
+      ],
+      "score": 3,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "harbor",
+        "carId": "stinger",
+        "time": 134.275,
+        "score": 3,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          67.5417,
+          66.7333
+        ],
+        "bestLap": 66.7333,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.775
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.5583
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8.3417
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.3916
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9584
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.7167
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.975
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.55
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8.3416
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.3917
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9583
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9584
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.7166
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": false,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "harbor:original:v1",
+        "activeSeconds": 134.275
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "harbor:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1304
+        ],
+        [
+          2,
+          2,
+          2332
+        ],
+        [
+          3,
+          3,
+          3292
+        ],
+        [
+          4,
+          4,
+          4224
+        ],
+        [
+          5,
+          5,
+          5124
+        ],
+        [
+          6,
+          6,
+          5928
+        ],
+        [
+          7,
+          7,
+          6720
+        ],
+        [
+          8,
+          0,
+          7680
+        ],
+        [
+          9,
+          1,
+          8508
+        ],
+        [
+          10,
+          2,
+          9532
+        ],
+        [
+          11,
+          3,
+          10492
+        ],
+        [
+          12,
+          4,
+          11428
+        ],
+        [
+          13,
+          5,
+          12328
+        ],
+        [
+          14,
+          6,
+          13132
+        ],
+        [
+          15,
+          7,
+          13920
+        ]
+      ],
+      "score": 2121,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "harbor",
+        "carId": "stinger",
+        "time": 120,
+        "score": 2121,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          60.975
+        ],
+        "bestLap": 60.975,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.85
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.5667
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.9916
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.7834
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.5083
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6917
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.5833
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "harbor:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "harbor:mirrored:v1",
+      "mode": "time",
+      "ticks": 16473,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1416
+        ],
+        [
+          2,
+          2,
+          2476
+        ],
+        [
+          3,
+          3,
+          3504
+        ],
+        [
+          4,
+          4,
+          4504
+        ],
+        [
+          5,
+          5,
+          5512
+        ],
+        [
+          6,
+          6,
+          6464
+        ],
+        [
+          7,
+          7,
+          7420
+        ],
+        [
+          8,
+          0,
+          8468
+        ],
+        [
+          9,
+          1,
+          9424
+        ],
+        [
+          10,
+          2,
+          10484
+        ],
+        [
+          11,
+          3,
+          11512
+        ],
+        [
+          12,
+          4,
+          12512
+        ],
+        [
+          13,
+          5,
+          13520
+        ],
+        [
+          14,
+          6,
+          14472
+        ],
+        [
+          15,
+          7,
+          15428
+        ],
+        [
+          16,
+          0,
+          16473
+        ]
+      ],
+      "score": 3,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "harbor",
+        "carId": "stinger",
+        "time": 134.275,
+        "score": 3,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          67.5417,
+          66.7333
+        ],
+        "bestLap": 66.7333,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.775
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.5583
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8.3417
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.3916
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9584
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.7167
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.975
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.55
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8.3416
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.3917
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9583
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9584
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.7166
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": false,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "harbor:mirrored:v1",
+        "activeSeconds": 134.275
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "harbor:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1304
+        ],
+        [
+          2,
+          2,
+          2332
+        ],
+        [
+          3,
+          3,
+          3292
+        ],
+        [
+          4,
+          4,
+          4224
+        ],
+        [
+          5,
+          5,
+          5124
+        ],
+        [
+          6,
+          6,
+          5928
+        ],
+        [
+          7,
+          7,
+          6720
+        ],
+        [
+          8,
+          0,
+          7680
+        ],
+        [
+          9,
+          1,
+          8508
+        ],
+        [
+          10,
+          2,
+          9532
+        ],
+        [
+          11,
+          3,
+          10492
+        ],
+        [
+          12,
+          4,
+          11428
+        ],
+        [
+          13,
+          5,
+          12328
+        ],
+        [
+          14,
+          6,
+          13132
+        ],
+        [
+          15,
+          7,
+          13920
+        ]
+      ],
+      "score": 2121,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "harbor",
+        "carId": "stinger",
+        "time": 120,
+        "score": 2121,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          60.975
+        ],
+        "bestLap": 60.975,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.85
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.5667
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.9916
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.7834
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.5083
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6917
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.5833
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "harbor:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "skyway:original:v1",
+      "mode": "time",
+      "ticks": 15842,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1416
+        ],
+        [
+          2,
+          2,
+          2372
+        ],
+        [
+          3,
+          3,
+          3328
+        ],
+        [
+          4,
+          4,
+          4280
+        ],
+        [
+          5,
+          5,
+          5236
+        ],
+        [
+          6,
+          6,
+          6188
+        ],
+        [
+          7,
+          7,
+          7144
+        ],
+        [
+          8,
+          0,
+          8152
+        ],
+        [
+          9,
+          1,
+          9108
+        ],
+        [
+          10,
+          2,
+          10064
+        ],
+        [
+          11,
+          3,
+          11020
+        ],
+        [
+          12,
+          4,
+          11972
+        ],
+        [
+          13,
+          5,
+          12928
+        ],
+        [
+          14,
+          6,
+          13884
+        ],
+        [
+          15,
+          7,
+          14836
+        ],
+        [
+          16,
+          0,
+          15842
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "skyway",
+        "carId": "stinger",
+        "time": 129.0167,
+        "score": 0,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          64.9167,
+          64.1
+        ],
+        "bestLap": 64.1,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.775
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9833
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.9584
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.9416
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.95
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9584
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.3917
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.9667
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.9833
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.9583
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.9417
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.95
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9583
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9584
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.3833
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "skyway:original:v1",
+        "activeSeconds": 129.0167
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "skyway:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1304
+        ],
+        [
+          2,
+          2,
+          2100
+        ],
+        [
+          3,
+          3,
+          2896
+        ],
+        [
+          4,
+          4,
+          3688
+        ],
+        [
+          5,
+          5,
+          4472
+        ],
+        [
+          6,
+          6,
+          5264
+        ],
+        [
+          7,
+          7,
+          6056
+        ],
+        [
+          8,
+          0,
+          6972
+        ],
+        [
+          9,
+          1,
+          7792
+        ],
+        [
+          10,
+          2,
+          8588
+        ],
+        [
+          11,
+          3,
+          9384
+        ],
+        [
+          12,
+          4,
+          10172
+        ],
+        [
+          13,
+          5,
+          10960
+        ],
+        [
+          14,
+          6,
+          11752
+        ],
+        [
+          15,
+          7,
+          12544
+        ],
+        [
+          16,
+          0,
+          13460
+        ],
+        [
+          17,
+          1,
+          14276
+        ]
+      ],
+      "score": 282,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "skyway",
+        "carId": "stinger",
+        "time": 120,
+        "score": 282,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          55.0917,
+          54.0583
+        ],
+        "bestLap": 54.0583,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.85
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 6.6333
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.6417
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.5833
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 6.55
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6084
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.6
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.625
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.825
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 6.6333
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.6334
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.5833
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 6.5583
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.6
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 6.6084
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.6166
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "skyway:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "skyway:mirrored:v1",
+      "mode": "time",
+      "ticks": 15842,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1416
+        ],
+        [
+          2,
+          2,
+          2372
+        ],
+        [
+          3,
+          3,
+          3328
+        ],
+        [
+          4,
+          4,
+          4280
+        ],
+        [
+          5,
+          5,
+          5236
+        ],
+        [
+          6,
+          6,
+          6188
+        ],
+        [
+          7,
+          7,
+          7144
+        ],
+        [
+          8,
+          0,
+          8152
+        ],
+        [
+          9,
+          1,
+          9108
+        ],
+        [
+          10,
+          2,
+          10064
+        ],
+        [
+          11,
+          3,
+          11020
+        ],
+        [
+          12,
+          4,
+          11972
+        ],
+        [
+          13,
+          5,
+          12928
+        ],
+        [
+          14,
+          6,
+          13884
+        ],
+        [
+          15,
+          7,
+          14836
+        ],
+        [
+          16,
+          0,
+          15842
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "skyway",
+        "carId": "stinger",
+        "time": 129.0167,
+        "score": 0,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          64.9167,
+          64.1
+        ],
+        "bestLap": 64.1,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.775
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9833
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.9584
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.9416
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.95
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9584
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.3917
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.9667
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.9833
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.9583
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.9417
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.95
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9583
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9584
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.3833
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": false,
+          "control": false,
+          "exit": false,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "skyway:mirrored:v1",
+        "activeSeconds": 129.0167
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "skyway:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1304
+        ],
+        [
+          2,
+          2,
+          2100
+        ],
+        [
+          3,
+          3,
+          2896
+        ],
+        [
+          4,
+          4,
+          3688
+        ],
+        [
+          5,
+          5,
+          4472
+        ],
+        [
+          6,
+          6,
+          5264
+        ],
+        [
+          7,
+          7,
+          6056
+        ],
+        [
+          8,
+          0,
+          6972
+        ],
+        [
+          9,
+          1,
+          7792
+        ],
+        [
+          10,
+          2,
+          8588
+        ],
+        [
+          11,
+          3,
+          9384
+        ],
+        [
+          12,
+          4,
+          10172
+        ],
+        [
+          13,
+          5,
+          10960
+        ],
+        [
+          14,
+          6,
+          11752
+        ],
+        [
+          15,
+          7,
+          12544
+        ],
+        [
+          16,
+          0,
+          13460
+        ],
+        [
+          17,
+          1,
+          14276
+        ]
+      ],
+      "score": 282,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "skyway",
+        "carId": "stinger",
+        "time": 120,
+        "score": 282,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          55.0917,
+          54.0583
+        ],
+        "bestLap": 54.0583,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.85
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 6.6333
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.6417
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.5833
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 6.55
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6084
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.6
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.625
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.825
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 6.6333
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.6334
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.5833
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 6.5583
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.6
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 6.6084
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.6166
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "skyway:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "oldtown:original:v1",
+      "mode": "time",
+      "ticks": 14762,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1304
+        ],
+        [
+          2,
+          2,
+          2260
+        ],
+        [
+          3,
+          3,
+          3140
+        ],
+        [
+          4,
+          4,
+          4000
+        ],
+        [
+          5,
+          5,
+          4928
+        ],
+        [
+          6,
+          6,
+          5788
+        ],
+        [
+          7,
+          7,
+          6708
+        ],
+        [
+          8,
+          0,
+          7612
+        ],
+        [
+          9,
+          1,
+          8460
+        ],
+        [
+          10,
+          2,
+          9412
+        ],
+        [
+          11,
+          3,
+          10292
+        ],
+        [
+          12,
+          4,
+          11152
+        ],
+        [
+          13,
+          5,
+          12084
+        ],
+        [
+          14,
+          6,
+          12944
+        ],
+        [
+          15,
+          7,
+          13860
+        ],
+        [
+          16,
+          0,
+          14762
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "oldtown",
+        "carId": "stinger",
+        "time": 120.0167,
+        "score": 0,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          60.4167,
+          59.6
+        ],
+        "bestLap": 59.6,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.8667
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9416
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.3417
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.1667
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.75
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.1583
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.6583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.5334
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.0583
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.9417
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.3333
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.175
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.7584
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.1583
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.65
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.525
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": false,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "oldtown:original:v1",
+        "activeSeconds": 120.0167
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "oldtown:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1252
+        ],
+        [
+          2,
+          2,
+          2176
+        ],
+        [
+          3,
+          3,
+          3008
+        ],
+        [
+          4,
+          4,
+          3800
+        ],
+        [
+          5,
+          5,
+          4696
+        ],
+        [
+          6,
+          6,
+          5472
+        ],
+        [
+          7,
+          7,
+          6360
+        ],
+        [
+          8,
+          0,
+          7200
+        ],
+        [
+          9,
+          1,
+          7972
+        ],
+        [
+          10,
+          2,
+          8900
+        ],
+        [
+          11,
+          3,
+          9728
+        ],
+        [
+          12,
+          4,
+          10520
+        ],
+        [
+          13,
+          5,
+          11420
+        ],
+        [
+          14,
+          6,
+          12192
+        ],
+        [
+          15,
+          7,
+          13084
+        ],
+        [
+          16,
+          0,
+          13924
+        ],
+        [
+          17,
+          1,
+          14692
+        ]
+      ],
+      "score": 2329,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "oldtown",
+        "carId": "stinger",
+        "time": 120,
+        "score": 2329,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          57,
+          56.025
+        ],
+        "bestLap": 56.025,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.4167
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.7166
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.9084
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.6083
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.4833
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.45
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.4167
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.4167
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.725
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.9
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.6083
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.5
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.45
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.425
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "oldtown:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "oldtown:mirrored:v1",
+      "mode": "time",
+      "ticks": 14762,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1304
+        ],
+        [
+          2,
+          2,
+          2260
+        ],
+        [
+          3,
+          3,
+          3140
+        ],
+        [
+          4,
+          4,
+          4000
+        ],
+        [
+          5,
+          5,
+          4928
+        ],
+        [
+          6,
+          6,
+          5788
+        ],
+        [
+          7,
+          7,
+          6708
+        ],
+        [
+          8,
+          0,
+          7612
+        ],
+        [
+          9,
+          1,
+          8460
+        ],
+        [
+          10,
+          2,
+          9412
+        ],
+        [
+          11,
+          3,
+          10292
+        ],
+        [
+          12,
+          4,
+          11152
+        ],
+        [
+          13,
+          5,
+          12084
+        ],
+        [
+          14,
+          6,
+          12944
+        ],
+        [
+          15,
+          7,
+          13860
+        ],
+        [
+          16,
+          0,
+          14762
+        ]
+      ],
+      "score": 0,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "oldtown",
+        "carId": "stinger",
+        "time": 120.0167,
+        "score": 0,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          60.4167,
+          59.6
+        ],
+        "bestLap": 59.6,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.8667
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9416
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.3417
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.1667
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.75
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.1583
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.6583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.5334
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.0583
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.9417
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.3333
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.175
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.7584
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.1583
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.65
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.525
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": false,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "oldtown:mirrored:v1",
+        "activeSeconds": 120.0167
+      }
+    },
+    {
+      "car": "stinger",
+      "layout": "oldtown:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1252
+        ],
+        [
+          2,
+          2,
+          2176
+        ],
+        [
+          3,
+          3,
+          3008
+        ],
+        [
+          4,
+          4,
+          3800
+        ],
+        [
+          5,
+          5,
+          4696
+        ],
+        [
+          6,
+          6,
+          5472
+        ],
+        [
+          7,
+          7,
+          6360
+        ],
+        [
+          8,
+          0,
+          7200
+        ],
+        [
+          9,
+          1,
+          7972
+        ],
+        [
+          10,
+          2,
+          8900
+        ],
+        [
+          11,
+          3,
+          9728
+        ],
+        [
+          12,
+          4,
+          10520
+        ],
+        [
+          13,
+          5,
+          11420
+        ],
+        [
+          14,
+          6,
+          12192
+        ],
+        [
+          15,
+          7,
+          13084
+        ],
+        [
+          16,
+          0,
+          13924
+        ],
+        [
+          17,
+          1,
+          14692
+        ]
+      ],
+      "score": 2329,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "oldtown",
+        "carId": "stinger",
+        "time": 120,
+        "score": 2329,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          57,
+          56.025
+        ],
+        "bestLap": 56.025,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.4167
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.7166
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.9084
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.6083
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.4833
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.45
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.4167
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.4167
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.725
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.9
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.6083
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.5
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.45
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.425
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "oldtown:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "harbor:original:v1",
+      "mode": "time",
+      "ticks": 16468,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1432
+        ],
+        [
+          2,
+          2,
+          2496
+        ],
+        [
+          3,
+          3,
+          3528
+        ],
+        [
+          4,
+          4,
+          4524
+        ],
+        [
+          5,
+          5,
+          5532
+        ],
+        [
+          6,
+          6,
+          6480
+        ],
+        [
+          7,
+          7,
+          7428
+        ],
+        [
+          8,
+          0,
+          8476
+        ],
+        [
+          9,
+          1,
+          9428
+        ],
+        [
+          10,
+          2,
+          10488
+        ],
+        [
+          11,
+          3,
+          11520
+        ],
+        [
+          12,
+          4,
+          12520
+        ],
+        [
+          13,
+          5,
+          13524
+        ],
+        [
+          14,
+          6,
+          14472
+        ],
+        [
+          15,
+          7,
+          15424
+        ],
+        [
+          16,
+          0,
+          16468
+        ]
+      ],
+      "score": 382,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "harbor",
+        "carId": "phantom",
+        "time": 134.2333,
+        "score": 382,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          67.6167,
+          66.6167
+        ],
+        "bestLap": 66.6167,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.9333
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.6083
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8.3167
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.375
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9083
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.7167
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.9333
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.6
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8.325
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.3667
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9166
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9084
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.725
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "harbor:original:v1",
+        "activeSeconds": 134.2333
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "harbor:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1328
+        ],
+        [
+          2,
+          2,
+          2368
+        ],
+        [
+          3,
+          3,
+          3348
+        ],
+        [
+          4,
+          4,
+          4284
+        ],
+        [
+          5,
+          5,
+          5196
+        ],
+        [
+          6,
+          6,
+          5996
+        ],
+        [
+          7,
+          7,
+          6780
+        ],
+        [
+          8,
+          0,
+          7752
+        ],
+        [
+          9,
+          1,
+          8580
+        ],
+        [
+          10,
+          2,
+          9620
+        ],
+        [
+          11,
+          3,
+          10600
+        ],
+        [
+          12,
+          4,
+          11536
+        ],
+        [
+          13,
+          5,
+          12448
+        ],
+        [
+          14,
+          6,
+          13248
+        ],
+        [
+          15,
+          7,
+          14032
+        ]
+      ],
+      "score": 5213,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "harbor",
+        "carId": "phantom",
+        "time": 120,
+        "score": 5213,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          61.5917
+        ],
+        "bestLap": 61.5917,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.0667
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.6583
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.1667
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.7916
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.6084
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6666
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.5334
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.1
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "harbor:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "harbor:mirrored:v1",
+      "mode": "time",
+      "ticks": 16468,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1432
+        ],
+        [
+          2,
+          2,
+          2496
+        ],
+        [
+          3,
+          3,
+          3528
+        ],
+        [
+          4,
+          4,
+          4524
+        ],
+        [
+          5,
+          5,
+          5532
+        ],
+        [
+          6,
+          6,
+          6480
+        ],
+        [
+          7,
+          7,
+          7428
+        ],
+        [
+          8,
+          0,
+          8476
+        ],
+        [
+          9,
+          1,
+          9428
+        ],
+        [
+          10,
+          2,
+          10488
+        ],
+        [
+          11,
+          3,
+          11520
+        ],
+        [
+          12,
+          4,
+          12520
+        ],
+        [
+          13,
+          5,
+          13524
+        ],
+        [
+          14,
+          6,
+          14472
+        ],
+        [
+          15,
+          7,
+          15424
+        ],
+        [
+          16,
+          0,
+          16468
+        ]
+      ],
+      "score": 382,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "harbor",
+        "carId": "phantom",
+        "time": 134.2333,
+        "score": 382,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          67.6167,
+          66.6167
+        ],
+        "bestLap": 66.6167,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.9333
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.6083
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 8.3167
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 8.375
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9167
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9083
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.7167
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.9333
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8.8417
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 8.6
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 8.325
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 8.3667
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9166
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9084
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.725
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "harbor:mirrored:v1",
+        "activeSeconds": 134.2333
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "harbor:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1328
+        ],
+        [
+          2,
+          2,
+          2368
+        ],
+        [
+          3,
+          3,
+          3348
+        ],
+        [
+          4,
+          4,
+          4284
+        ],
+        [
+          5,
+          5,
+          5196
+        ],
+        [
+          6,
+          6,
+          5996
+        ],
+        [
+          7,
+          7,
+          6780
+        ],
+        [
+          8,
+          0,
+          7752
+        ],
+        [
+          9,
+          1,
+          8580
+        ],
+        [
+          10,
+          2,
+          9620
+        ],
+        [
+          11,
+          3,
+          10600
+        ],
+        [
+          12,
+          4,
+          11536
+        ],
+        [
+          13,
+          5,
+          12448
+        ],
+        [
+          14,
+          6,
+          13248
+        ],
+        [
+          15,
+          7,
+          14032
+        ]
+      ],
+      "score": 5213,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "harbor",
+        "carId": "phantom",
+        "time": 120,
+        "score": 5213,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          61.5917
+        ],
+        "bestLap": 61.5917,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.0667
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 8.6583
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 8.1667
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.7916
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.6084
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.6666
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.5334
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.1
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "harbor:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "skyway:original:v1",
+      "mode": "time",
+      "ticks": 15784,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1432
+        ],
+        [
+          2,
+          2,
+          2388
+        ],
+        [
+          3,
+          3,
+          3336
+        ],
+        [
+          4,
+          4,
+          4284
+        ],
+        [
+          5,
+          5,
+          5232
+        ],
+        [
+          6,
+          6,
+          6180
+        ],
+        [
+          7,
+          7,
+          7128
+        ],
+        [
+          8,
+          0,
+          8136
+        ],
+        [
+          9,
+          1,
+          9084
+        ],
+        [
+          10,
+          2,
+          10036
+        ],
+        [
+          11,
+          3,
+          10988
+        ],
+        [
+          12,
+          4,
+          11936
+        ],
+        [
+          13,
+          5,
+          12884
+        ],
+        [
+          14,
+          6,
+          13832
+        ],
+        [
+          15,
+          7,
+          14780
+        ],
+        [
+          16,
+          0,
+          15784
+        ]
+      ],
+      "score": 46,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "skyway",
+        "carId": "phantom",
+        "time": 128.5333,
+        "score": 46,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          64.775,
+          63.7583
+        ],
+        "bestLap": 63.7583,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.9333
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9417
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.9167
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.8916
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.9
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9084
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9083
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.375
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.925
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.9333
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.9167
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.8917
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.9
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9083
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9083
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.375
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": false,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "skyway:original:v1",
+        "activeSeconds": 128.5333
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "skyway:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1336
+        ],
+        [
+          2,
+          2,
+          2128
+        ],
+        [
+          3,
+          3,
+          2920
+        ],
+        [
+          4,
+          4,
+          3704
+        ],
+        [
+          5,
+          5,
+          4484
+        ],
+        [
+          6,
+          6,
+          5276
+        ],
+        [
+          7,
+          7,
+          6060
+        ],
+        [
+          8,
+          0,
+          6980
+        ],
+        [
+          9,
+          1,
+          7796
+        ],
+        [
+          10,
+          2,
+          8588
+        ],
+        [
+          11,
+          3,
+          9380
+        ],
+        [
+          12,
+          4,
+          10168
+        ],
+        [
+          13,
+          5,
+          10948
+        ],
+        [
+          14,
+          6,
+          11736
+        ],
+        [
+          15,
+          7,
+          12524
+        ],
+        [
+          16,
+          0,
+          13440
+        ],
+        [
+          17,
+          1,
+          14260
+        ]
+      ],
+      "score": 763,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "skyway",
+        "carId": "phantom",
+        "time": 120,
+        "score": 763,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          55.15,
+          53.8417
+        ],
+        "bestLap": 53.8417,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.1167
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 6.6083
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.6
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.5417
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 6.5
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.575
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.5583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.65
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.8083
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 6.6
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.6084
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.5416
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 6.5
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.5667
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 6.5667
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.65
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "skyway:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "skyway:mirrored:v1",
+      "mode": "time",
+      "ticks": 15784,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1432
+        ],
+        [
+          2,
+          2,
+          2388
+        ],
+        [
+          3,
+          3,
+          3336
+        ],
+        [
+          4,
+          4,
+          4284
+        ],
+        [
+          5,
+          5,
+          5232
+        ],
+        [
+          6,
+          6,
+          6180
+        ],
+        [
+          7,
+          7,
+          7128
+        ],
+        [
+          8,
+          0,
+          8136
+        ],
+        [
+          9,
+          1,
+          9084
+        ],
+        [
+          10,
+          2,
+          10036
+        ],
+        [
+          11,
+          3,
+          10988
+        ],
+        [
+          12,
+          4,
+          11936
+        ],
+        [
+          13,
+          5,
+          12884
+        ],
+        [
+          14,
+          6,
+          13832
+        ],
+        [
+          15,
+          7,
+          14780
+        ],
+        [
+          16,
+          0,
+          15784
+        ]
+      ],
+      "score": 46,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "skyway",
+        "carId": "phantom",
+        "time": 128.5333,
+        "score": 46,
+        "medal": "bronze",
+        "success": true,
+        "lapTimes": [
+          64.775,
+          63.7583
+        ],
+        "bestLap": 63.7583,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.9333
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9417
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.9167
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.8916
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.9
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.9084
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.9083
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 8.375
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.925
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.9333
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.9167
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.8917
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.9
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.9083
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.9083
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 8.375
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": false,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "skyway:mirrored:v1",
+        "activeSeconds": 128.5333
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "skyway:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1336
+        ],
+        [
+          2,
+          2,
+          2128
+        ],
+        [
+          3,
+          3,
+          2920
+        ],
+        [
+          4,
+          4,
+          3704
+        ],
+        [
+          5,
+          5,
+          4484
+        ],
+        [
+          6,
+          6,
+          5276
+        ],
+        [
+          7,
+          7,
+          6060
+        ],
+        [
+          8,
+          0,
+          6980
+        ],
+        [
+          9,
+          1,
+          7796
+        ],
+        [
+          10,
+          2,
+          8588
+        ],
+        [
+          11,
+          3,
+          9380
+        ],
+        [
+          12,
+          4,
+          10168
+        ],
+        [
+          13,
+          5,
+          10948
+        ],
+        [
+          14,
+          6,
+          11736
+        ],
+        [
+          15,
+          7,
+          12524
+        ],
+        [
+          16,
+          0,
+          13440
+        ],
+        [
+          17,
+          1,
+          14260
+        ]
+      ],
+      "score": 763,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "skyway",
+        "carId": "phantom",
+        "time": 120,
+        "score": 763,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          55.15,
+          53.8417
+        ],
+        "bestLap": 53.8417,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.1167
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 6.6083
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.6
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.5417
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 6.5
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.575
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 6.5583
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.65
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.8083
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 6.6
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.6084
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.5416
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 6.5
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.5667
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 6.5667
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.65
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "skyway:mirrored:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "oldtown:original:v1",
+      "mode": "time",
+      "ticks": 14786,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1324
+        ],
+        [
+          2,
+          2,
+          2284
+        ],
+        [
+          3,
+          3,
+          3164
+        ],
+        [
+          4,
+          4,
+          4020
+        ],
+        [
+          5,
+          5,
+          4956
+        ],
+        [
+          6,
+          6,
+          5812
+        ],
+        [
+          7,
+          7,
+          6728
+        ],
+        [
+          8,
+          0,
+          7636
+        ],
+        [
+          9,
+          1,
+          8476
+        ],
+        [
+          10,
+          2,
+          9436
+        ],
+        [
+          11,
+          3,
+          10316
+        ],
+        [
+          12,
+          4,
+          11172
+        ],
+        [
+          13,
+          5,
+          12108
+        ],
+        [
+          14,
+          6,
+          12964
+        ],
+        [
+          15,
+          7,
+          13880
+        ],
+        [
+          16,
+          0,
+          14786
+        ]
+      ],
+      "score": 634,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "oldtown",
+        "carId": "phantom",
+        "time": 120.2167,
+        "score": 634,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          60.6167,
+          59.6
+        ],
+        "bestLap": 59.6,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.0333
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9917
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.325
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.1333
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.7917
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.1417
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.6416
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.5584
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.0167
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.325
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.1333
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.7917
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.1333
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.6417
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.5583
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "oldtown:original:v1",
+        "activeSeconds": 120.2167
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "oldtown:original:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1288
+        ],
+        [
+          2,
+          2,
+          2240
+        ],
+        [
+          3,
+          3,
+          3076
+        ],
+        [
+          4,
+          4,
+          3872
+        ],
+        [
+          5,
+          5,
+          4796
+        ],
+        [
+          6,
+          6,
+          5572
+        ],
+        [
+          7,
+          7,
+          6480
+        ],
+        [
+          8,
+          0,
+          7328
+        ],
+        [
+          9,
+          1,
+          8104
+        ],
+        [
+          10,
+          2,
+          9056
+        ],
+        [
+          11,
+          3,
+          9892
+        ],
+        [
+          12,
+          4,
+          10688
+        ],
+        [
+          13,
+          5,
+          11612
+        ],
+        [
+          14,
+          6,
+          12388
+        ],
+        [
+          15,
+          7,
+          13296
+        ],
+        [
+          16,
+          0,
+          14144
+        ]
+      ],
+      "score": 6309,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "oldtown",
+        "carId": "phantom",
+        "time": 120,
+        "score": 6309,
+        "medal": "gold",
+        "success": true,
+        "lapTimes": [
+          58.0667,
+          56.8
+        ],
+        "bestLap": 56.8,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.725
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9167
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.9666
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.6417
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.7
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.4833
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.5584
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.075
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.45
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.925
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.9667
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.6416
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.7
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.4834
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.5583
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.075
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 0,
+        "layoutId": "oldtown:original:v1",
+        "activeSeconds": 120
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "oldtown:mirrored:v1",
+      "mode": "time",
+      "ticks": 14786,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1324
+        ],
+        [
+          2,
+          2,
+          2284
+        ],
+        [
+          3,
+          3,
+          3164
+        ],
+        [
+          4,
+          4,
+          4020
+        ],
+        [
+          5,
+          5,
+          4956
+        ],
+        [
+          6,
+          6,
+          5812
+        ],
+        [
+          7,
+          7,
+          6728
+        ],
+        [
+          8,
+          0,
+          7636
+        ],
+        [
+          9,
+          1,
+          8476
+        ],
+        [
+          10,
+          2,
+          9436
+        ],
+        [
+          11,
+          3,
+          10316
+        ],
+        [
+          12,
+          4,
+          11172
+        ],
+        [
+          13,
+          5,
+          12108
+        ],
+        [
+          14,
+          6,
+          12964
+        ],
+        [
+          15,
+          7,
+          13880
+        ],
+        [
+          16,
+          0,
+          14786
+        ]
+      ],
+      "score": 634,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "time",
+        "trackId": "oldtown",
+        "carId": "phantom",
+        "time": 120.2167,
+        "score": 634,
+        "medal": "silver",
+        "success": true,
+        "lapTimes": [
+          60.6167,
+          59.6
+        ],
+        "bestLap": 59.6,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 8.0333
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9917
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 7.325
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 7.1333
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.7917
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 7.1417
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.6416
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.5584
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 7.0167
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 8
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 7.325
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 7.1333
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.7917
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 7.1333
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.6417
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.5583
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "oldtown:mirrored:v1",
+        "activeSeconds": 120.2167
+      }
+    },
+    {
+      "car": "phantom",
+      "layout": "oldtown:mirrored:v1",
+      "mode": "drift",
+      "ticks": 14760,
+      "checkpoints": [
+        [
+          1,
+          1,
+          1288
+        ],
+        [
+          2,
+          2,
+          2240
+        ],
+        [
+          3,
+          3,
+          3076
+        ],
+        [
+          4,
+          4,
+          3872
+        ],
+        [
+          5,
+          5,
+          4796
+        ],
+        [
+          6,
+          6,
+          5572
+        ],
+        [
+          7,
+          7,
+          6480
+        ],
+        [
+          8,
+          0,
+          7328
+        ],
+        [
+          9,
+          1,
+          8104
+        ],
+        [
+          10,
+          2,
+          9056
+        ],
+        [
+          11,
+          3,
+          9892
+        ],
+        [
+          12,
+          4,
+          10688
+        ],
+        [
+          13,
+          5,
+          11612
+        ],
+        [
+          14,
+          6,
+          12388
+        ],
+        [
+          15,
+          7,
+          13296
+        ],
+        [
+          16,
+          0,
+          14144
+        ]
+      ],
+      "score": 6309,
+      "collisions": 0,
+      "penalty": 0,
+      "result": {
+        "mode": "drift",
+        "trackId": "oldtown",
+        "carId": "phantom",
+        "time": 120,
+        "score": 6309,
+        "medal": "gold",
+        "success": true,
+        "lapTimes": [
+          58.0667,
+          56.8
+        ],
+        "bestLap": 56.8,
+        "penalty": 0,
+        "collisions": 0,
+        "resets": 0,
+        "sectors": [
+          {
+            "lap": 1,
+            "sector": 1,
+            "time": 7.725
+          },
+          {
+            "lap": 1,
+            "sector": 2,
+            "time": 7.9167
+          },
+          {
+            "lap": 1,
+            "sector": 3,
+            "time": 6.9666
+          },
+          {
+            "lap": 1,
+            "sector": 4,
+            "time": 6.6417
+          },
+          {
+            "lap": 1,
+            "sector": 5,
+            "time": 7.7
+          },
+          {
+            "lap": 1,
+            "sector": 6,
+            "time": 6.4833
+          },
+          {
+            "lap": 1,
+            "sector": 7,
+            "time": 7.5584
+          },
+          {
+            "lap": 1,
+            "sector": 8,
+            "time": 7.075
+          },
+          {
+            "lap": 2,
+            "sector": 1,
+            "time": 6.45
+          },
+          {
+            "lap": 2,
+            "sector": 2,
+            "time": 7.925
+          },
+          {
+            "lap": 2,
+            "sector": 3,
+            "time": 6.9667
+          },
+          {
+            "lap": 2,
+            "sector": 4,
+            "time": 6.6416
+          },
+          {
+            "lap": 2,
+            "sector": 5,
+            "time": 7.7
+          },
+          {
+            "lap": 2,
+            "sector": 6,
+            "time": 6.4834
+          },
+          {
+            "lap": 2,
+            "sector": 7,
+            "time": 7.5583
+          },
+          {
+            "lap": 2,
+            "sector": 8,
+            "time": 7.075
+          }
+        ],
+        "tutorial": {
+          "accelerate": true,
+          "entry": true,
+          "control": true,
+          "exit": true,
+          "recover": false
+        },
+        "physicsVersion": "neon-tire-1.0.1",
+        "trackVersion": "neon-courses-1.0.1",
+        "seed": 7,
+        "layoutId": "oldtown:mirrored:v1",
+        "activeSeconds": 120
+      }
+    }
+  ]
+}
