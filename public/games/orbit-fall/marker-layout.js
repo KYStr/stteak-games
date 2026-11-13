@@ -96,22 +96,31 @@ export function layoutClampedDockingMarkers(target, crate, viewportWidth, obstac
 
 // Runtime workspace: reused projections and interval buffers, no per-frame arrays.
 // Public pure layout helpers above remain available to existing callers/tests.
+export function markerCandidateFits(items,index,x,y){
+ const p=items[index];
+ for(let j=0;j<index;j++){
+  const q=items[j];if(q.hidden||y<=q.y-q.height-8||y-p.height>=q.y+8)continue;
+  if(Math.abs(x-q.x)<(p.width+q.width)/2+8-1e-7)return false;
+ }
+ return true;
+}
 export function placeRuntimeMarkers(items,width){
  for(let i=0;i<items.length;i++){
-  const p=items[i];p.x=p.anchorX;p.displaced=false;if(p.hidden)continue;
+  const p=items[i];p.x=p.anchorX;p.displaced=false;p.crowded=false;if(p.hidden)continue;
   const min=Math.max(55,p.width/2+8),max=Math.min(width-55,width-p.width/2-8);
+  if(min>max){p.crowded=true;continue}
   let preferred=p.anchorX;
   if(Number.isFinite(p.avoidX)){for(let j=0;j<i;j++){const q=items[j];if(!q.hidden&&p.y>q.y-q.height-24&&p.y-p.height<q.y+24&&Math.abs(p.anchorX-q.x)<(p.width+q.width)/2+24){preferred=p.avoidX;break}}}
-  let candidate=Math.max(min,Math.min(max,preferred));
-  for(let pass=0;pass<items.length;pass++){
-   let conflict=false;
-   for(let j=0;j<i;j++){
-    const q=items[j];if(q.hidden||p.y<=q.y-q.height-8||p.y-p.height>=q.y+8)continue;
-    const gap=(p.width+q.width)/2+8;
-    if(Math.abs(candidate-q.x)<gap){const left=q.x-gap,right=q.x+gap;candidate=left>=min&&(right>max||Math.abs(left-preferred)<Math.abs(right-preferred))?left:right;candidate=Math.max(min,Math.min(max,candidate));conflict=true;}
-   }
-   if(!conflict)break;
+  preferred=clamp(preferred,min,max);let best=NaN,distance=Infinity;
+  // The nearest feasible point is the preference, a viewport edge or an
+  // obstacle boundary. Check every boundary against every earlier label.
+  for(let n=-3;n<i*2;n++){
+   let candidate;
+   if(n===-3)candidate=preferred;else if(n===-2)candidate=min;else if(n===-1)candidate=max;
+   else{const q=items[n>>1];if(q.hidden||p.y<=q.y-q.height-8||p.y-p.height>=q.y+8)continue;candidate=q.x+(n%2?1:-1)*((p.width+q.width)/2+8)}
+   if(candidate<min-1e-7||candidate>max+1e-7||!markerCandidateFits(items,i,candidate,p.y))continue;
+   const d=Math.abs(candidate-preferred);if(d<distance-1e-7||Math.abs(d-distance)<1e-7&&candidate<best){best=candidate;distance=d}
   }
-  p.x=candidate;p.displaced=Math.abs(candidate-p.anchorX)>.1;p.avoidX=p.displaced?candidate:NaN;
+  p.crowded=!Number.isFinite(best);p.x=p.crowded?preferred:best;p.displaced=Math.abs(p.x-p.anchorX)>.1;p.avoidX=p.displaced?p.x:NaN;
  }
 }

@@ -11,3 +11,4 @@
  * 原授權：Apache-2.0；完整文本 ./rapier-LICENSE.txt；https://www.apache.org/licenses/LICENSE-2.0
  * 保留既有上游版權、歸屬與授權文本；本通知不捏造作者、版權或新增授權。
  */
+// Orbit/Fall 2026-11-13: optional non-reentrant rbTranslationInto/rbLinvelInto; borrowed RawVector pointers freed in finally, no wrapper/finalizer per read. Public API and embedded WASM unchanged. Recipe: rapier-vector-patch.mjs.

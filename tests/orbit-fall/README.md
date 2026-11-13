@@ -46,9 +46,9 @@ at `ORBIT_SOAK_WALL_SECONDS` (default max(900, requested active seconds * 5)).
 Forced GC is limited to retained-heap endpoints. `gc-trace.json` retains V8 GC
 events grouped into equal 60-active-second windows; non-growing GC rates,
 listeners, pending RAFs and renderer resources are required. Separate allocation
-profiles cover steady optics, restart construction and moving cargo. Public Rapier
-getters still allocate binding objects; snapshots remove redundant consumer reads,
-not the underlying allocation. Sampling attribution separates application, Three,
+profiles cover steady optics, restart construction and moving cargo. Public Rapier getters retain their original semantics; the hot path uses optional
+guarded copy-into adapters and owned native velocity/gravity vectors. A deterministic
+600-step audit requires zero wrapper creation or FinalizationRegistry registration. Sampling attribution separates application, Three,
 Rapier and Playwright/setup. SwiftShader frame times never affect the pass gate.
 
 To reproduce stack attribution from retained raw samples without opening a browser:
@@ -56,3 +56,26 @@ To reproduce stack attribution from retained raw samples without opening a brows
 This writes `allocation-attribution.json`, separating diagnostic/evaluator
 serialization, save/setup boundaries, authored updates, Rapier and Three stacks.
 A zero shader-setup sample does not claim zero allocations across the application.
+
+Round 5 adds an independently runnable `round5` group for semantic B6 controls,
+compatible/incompatible prefix reload, optical-isolation interruption/reload,
+diagnostics report/download and 48 settled expanded-room marker layouts plus the
+unsolved variant-1 B5 reproduction. `campaign` runs three zero-progress campaigns:
+a fresh random journey and labelled seed 3095359210/1853268288 saved-state setups. Each
+requires all repairs, both endings, >=600 active/simulation seconds and <=180s
+mechanic gaps including the final introduction-to-ending interval. The required
+original six groups remain intact. `build-reproduction.json` hashes every generated
+code/vendor/license file from a clean isolated build.
+
+The competent controller selects control approaches outside live arc volumes and
+low debris-corridor stops, and visits the normal supply room when suit integrity
+is low. Cargo route comparisons retain their direct/rail/bypass behavior. Campaign
+seeds run independently so one failed trial cannot conceal the remaining trials.
+
+Campaign/bot contexts install a test-only controller heartbeat. After a missing
+1.5-second heartbeat, the page clicks the normal Pause button, releases captured
+input through the game's own lifecycle flow, and logs a controller-delay event.
+The controller resumes through the visible Resume button. Neither run state nor
+clocks are assigned. This prevents host scheduling gaps from leaving thrust held
+unattended. Paused time contributes no active/simulation time; all >=600s and
+<=180s assertions remain unchanged. The normal performance group has no watchdog.

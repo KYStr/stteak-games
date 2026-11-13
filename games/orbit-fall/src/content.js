@@ -77,7 +77,7 @@ for(let deck=1;deck<=3;deck++){
   const id=old?.id||`puzzle-d${deck}-work-${n+1}`;
   const name=old?.name||names[deck-1][n-2];
   const types=family==='mixed'?(deck===3?['momentum','reflection','airlock','reflection','momentum']:deck===2?['airlock','momentum','reflection','momentum']:['momentum','airlock','reflection','momentum']):Array(deck===3&&n===4?4:3).fill(family);
-  const phases=types.map((type,i)=>({type,cycle:i,objectId:`crate-cell-${i+1}`,label:type==='momentum'?`電芯 ${i+1} → 獨立插座`:type==='reflection'?`迴路 ${i+1} → 接收器`:`壓力腔 ${i+1} · 隔離 / 檢查 / 等壓 / 開門`}));
+  const phases=types.map((type,i)=>({type,cycle:i,objectId:`crate-cell-${i+1}`,label:type==='momentum'?`電芯 ${i+1} → 獨立插座`:type==='reflection'?`迴路 ${i+1} → 接收器`:`壓力腔 ${i+1} · 隔離 / 通風 / 檢查 / 再隔離`}));
   puzzles[id]={...(old||{}),id,roomId,deck,name,type:family,requiredTool:family==='momentum'||family==='mixed'?'tether':undefined,phases,objective:`${name}：完成 ${phases.length} 組現場作業。`,reward:`${name}已恢復`,briefing:'每組作業在不同位置；完成後保存並切換下一組。H 可查看目前步驟。',stage:{hazardPeriod:deck===3?6.5:7,warningSeconds:1.2,damage:18,cargoMass:deck===1?1.6:deck===2?1.8:2,dockTolerance:1.3}};
   decks[deck-1].puzzleIds.push(id);
   const room=old?{...repairs[n]}:{id:roomId,deck,type:'puzzle',puzzleId:id,name:`${'ABC'[deck-1]}${n+2} · ${name}`,description:family==='mixed'?'貨運、隔離與光路必須依次重啟。規劃你的能源接力。':'三個分離工作點，各有獨立迴路與狀態。',hazard:family==='momentum'?'debris':family==='reflection'?'arc':'leak'};

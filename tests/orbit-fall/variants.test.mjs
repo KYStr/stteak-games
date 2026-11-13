@@ -60,3 +60,67 @@ test('upper freight rail lifts the load clear of waiting cells before crossing',
   }finally{physics.dispose()}
  }
 });
+
+test('semantic extended interlocks accept isolation/vent/inspection/transfer in every phase and reject unsafe order',async()=>{
+ const {operatePressure,pressureState}=await import('../../public/games/orbit-fall/pressure.js');let count=0;
+ for(const seed of [0,1,123,456,421,17,29,43,61,89,131,263])for(const variantVersion of [1,2])for(const room of ['room-d2-work-5','room-d3-work-5']){
+  const r=createRun('story',{seed,variantVersion}),base=getCampaign().puzzles[getCampaign().roomById[room].puzzleId];
+  for(let phase=0;phase<base.phases.length;phase++){const p=resolveRepair(r,room,phase),vent=p.valveLabels.findIndex(x=>x.includes('通風')),inspect=p.valveLabels.findIndex(x=>x.includes('檢查')),transfer=p.valveLabels.findIndex(x=>x.includes('腔間轉接')),sequence=[];
+   assert.equal(operatePressure(p,sequence,0).ok,true);assert.equal(operatePressure(p,sequence,inspect).ok,false);assert.equal(operatePressure(p,sequence,vent).ok,true);assert.equal(operatePressure(p,sequence,inspect).ok,true);assert.equal(operatePressure(p,sequence,transfer).ok,false);
+   for(const index of [0,transfer,vent]){assert.equal(operatePressure(p,sequence,index).ok,true);const q=pressureState(sequence,{},6);assert.equal(q.outerOpen&&q.innerOpen,false)}assert.equal(sequence.length,6);assert.match(p.hint,/隔離 → 通風 → 檢查 → 再隔離 → 腔間轉接 → 通風確認/);assert.doesNotMatch(p.hint,/開啟內門/);count++;
+  }
+ }assert.equal(count,168);
+});
+
+test('v2 new journeys, v1 saved layouts, inherited challenge variants and record separation',()=>{
+ assert.equal(createRun().variantVersion,2);assert.equal(createRun('story',{campaignVersion:1}).variantVersion,0);
+ const old=createRun('story',{seed:123,variantVersion:1});delete old.variantVersion;const restored=sanitizeRun(old);assert.equal(restored.variantVersion,1);
+ const next=createRun('story',{seed:123});for(const r of [restored,next]){r.endings=['beacon'];const challenge=startChallenge('challenge-core',r).run;assert.equal(challenge.variantVersion,r.variantVersion);challenge.status='completed';challenge.result={type:'challenge'};recordChallenge(r,challenge);assert.ok(sanitizeRun(r).challengeRecords[challengeRecordKey(challenge)])}
+ assert.notEqual(challengeRecordKey(startChallenge('challenge-core',restored).run),challengeRecordKey(startChallenge('challenge-core',next).run));
+ const a=resolveRepair(restored,'room-d3-work-5',0),b=resolveRepair(next,'room-d3-work-5',0);assert.notEqual(a.cacheKey,b.cacheKey);assert.notDeepEqual(a.valvePositions,b.valvePositions);assert.deepEqual(a.valvePositions[3],[6,6,3]);assert.deepEqual(b.valvePositions[3],[0,4.8,3.8]);
+ assert.throws(()=>sanitizeRun({...next,variantVersion:3}),/unsupported-schema/);
+ for(const r of [restored,next]){const p=resolveRepair(r,'room-d3-work-3',0);assert.equal(Boolean(p.requiresIsolation),r.variantVersion===2);if(p.requiresIsolation){assert.deepEqual(p.powerPosition,[0,1.5,4]);assert.match(p.objective,/斷電 → 調整鏡面 → 復電/);storeSnapshot(r,'room-d1-cargo',{circuitPowered:false,angles:[1,2,3],phaseIndex:1});assert.equal(sanitizeRun(r).snapshots['room-d1-cargo'].circuitPowered,false)}}
+});
+
+test('runtime marker search checks all obstacles, retains the player and reports impossible bands',async()=>{
+ const {placeRuntimeMarkers}=await import('../../public/games/orbit-fall/marker-layout.js');
+ const points=[{anchorX:545,y:406,width:42.734,height:25.594},{anchorX:628,y:382,width:90,height:25},{anchorX:560,y:409,width:203.625,height:27.594},{anchorX:710,y:407,width:90,height:26}];
+ const check=()=>{for(let i=0;i<points.length;i++){const p=points[i];assert.equal(p.crowded,false);assert.ok(p.x-p.width/2>=8&&p.x+p.width/2<=1272);for(let j=0;j<i;j++){const q=points[j];if(p.y>q.y-q.height-8&&p.y-p.height<q.y+8)assert.ok(Math.abs(p.x-q.x)>=(p.width+q.width)/2+8-1e-7)}}assert.equal(points[0].x,545)};
+ placeRuntimeMarkers(points,1280);check();const first=points.map(p=>p.x);for(let i=0;i<5;i++){placeRuntimeMarkers(points,1280);assert.deepEqual(points.map(p=>p.x),first)}points[1].anchorX+=.01;placeRuntimeMarkers(points,1280);check();
+ const impossible=[{anchorX:60,y:100,width:90,height:20},{anchorX:60,y:100,width:90,height:20}];placeRuntimeMarkers(impossible,120);assert.equal(impossible[1].crowded,true);
+});
+
+test('owned typed counters match public tick precision, pauses, saves and challenge expiry',async()=>{
+ const {enableRunCounters,advanceRun}=await import('../../public/games/orbit-fall/rules.js');const a=createRun('standard',{seed:123}),b=createRun('standard',{seed:123});a.roomId=b.roomId='room-d1-cargo';a.challengeId=b.challengeId='challenge-cargo';a.challengeTime=b.challengeTime=12;enableRunCounters(b);const outA={},outB={};
+ for(let i=0;i<900;i++){a.paused=b.paused=i>100&&i<150;advanceRun(a,1/60,i%2===0,outA);advanceRun(b,1/60,i%2===0,outB);assert.deepEqual(outA,outB);assert.deepEqual(JSON.parse(JSON.stringify(b)),JSON.parse(JSON.stringify(a)))}assert.equal(b.status,'failed');
+});
+
+test('guarded Rapier adapter preserves values and avoids vector wrappers/finalizers over 600 hot steps',async()=>{
+ const {PhysicsRoom,initializePhysics,RAPIER}=await import('../../public/games/orbit-fall/physics.js');await initializePhysics();const p=resolveRepair(createRun('story',{seed:123}),'room-d1-cargo'),physics=new PhysicsRoom(p);let wrappers=0,registrations=0;
+ const probe=RAPIER.VectorOps.intoRaw({x:0,y:0,z:0}),rawClass=probe.constructor,original=rawClass.__wrap,intoRaw=RAPIER.VectorOps.intoRaw,register=FinalizationRegistry.prototype.register;probe.free();
+ try{
+  const raw=physics.player.rawSet,handle=physics.player.handle,out={};assert.deepEqual(raw.rbTranslationInto(handle,out),{...physics.player.translation()});assert.deepEqual(raw.rbLinvelInto(handle,out),{...physics.player.linvel()});
+  assert.throws(()=>raw.rbTranslationInto(1e100,out));assert.deepEqual(raw.rbTranslationInto(handle,out),{...physics.player.translation()},'bad handle cannot leave borrowed pointer/busy flag set');
+  rawClass.__wrap=function(...args){wrappers++;return original.apply(this,args)};RAPIER.VectorOps.intoRaw=function(...args){wrappers++;return intoRaw.apply(this,args)};FinalizationRegistry.prototype.register=function(...args){registrations++;return register.apply(this,args)};
+  const input={x:1,y:0,z:0,brake:false};for(let i=0;i<600;i++){input.brake=i>300;physics.step(input)}assert.equal(wrappers,0);assert.equal(registrations,0);assert.ok(physics.playerPosition.x>0);
+ }finally{rawClass.__wrap=original;RAPIER.VectorOps.intoRaw=intoRaw;FinalizationRegistry.prototype.register=register;physics.dispose()}
+});
+
+test('vendor allocation patches refuse changed source and preserve the init patch and WASM',async()=>{
+ const {readFile}=await import('node:fs/promises'),{patchRapierInit}=await import('../../games/orbit-fall/rapier-init-patch.mjs'),{patchRapierVectors,RAPIER_VECTOR_PATCH}=await import('../../games/orbit-fall/rapier-vector-patch.mjs'),{patchThreeUniforms,THREE_UNIFORM_PATCH}=await import('../../games/orbit-fall/three-uniform-patch.mjs'),{sha256}=await import('../../games/orbit-fall/rapier-init-patch.mjs');
+ const raw=await readFile(new URL('../../assets/games/orbit-fall/vendor-sources/rapier-0.19.0.mjs',import.meta.url)),init=patchRapierInit(raw),vendor=patchRapierVectors(init.vendor);assert.equal(sha256(vendor),RAPIER_VECTOR_PATCH.outputSha256);assert.ok(vendor.includes(init.wasm.toString('base64')));
+ const three=await readFile(new URL('../../assets/games/orbit-fall/vendor-sources/three-0.180.0.module.js',import.meta.url));assert.equal(sha256(patchThreeUniforms(three)),THREE_UNIFORM_PATCH.outputSha256);for(const [source,patch] of [[init.vendor,patchRapierVectors],[three,patchThreeUniforms]]){const changed=Buffer.from(source);changed[0]^=1;assert.throws(()=>patch(changed),/refuse unknown upstream/);assert.throws(()=>patch(patch(source)),/refuse unknown upstream/)}
+});
+
+test('owned native vectors are freed on repeated room and restart disposal',async()=>{
+ const {initializePhysics,PhysicsRoom,RAPIER}=await import('../../public/games/orbit-fall/physics.js');await initializePhysics();const original=RAPIER.VectorOps.intoRaw,owned=[];RAPIER.VectorOps.intoRaw=function(...args){const raw=original.apply(this,args);owned.push(raw);return raw};
+ try{for(let i=0;i<12;i++){const p=resolveRepair(createRun('story',{seed:i}),'room-d2-cargo',i%3),room=new PhysicsRoom(p);room.step({x:0,y:0,z:0,brake:true});room.dispose();assert.ok(owned.every(raw=>raw.__wbg_ptr===0))}}finally{RAPIER.VectorOps.intoRaw=original}
+});
+
+test('fixed double uniform caches preserve comparison precision and stable rendering order',async()=>{
+ const {readFile}=await import('node:fs/promises'),vm=await import('node:vm'),{patchThreeUniforms}=await import('../../games/orbit-fall/three-uniform-patch.mjs'),{patchThreeHot}=await import('../../games/orbit-fall/three-hot-patch.mjs');const raw=await readFile(new URL('../../assets/games/orbit-fall/vendor-sources/three-0.180.0.module.js',import.meta.url)),s=patchThreeHot(patchThreeUniforms(raw)).toString();assert.throws(()=>patchThreeHot(raw),/refuses unknown upstream/);
+ const begin=s.indexOf('function orbitStableSort'),end=s.indexOf('class PureArrayUniform',begin),setterStart=s.indexOf('function setValueV3f'),setterEnd=s.indexOf('function setValueV4f',setterStart),sandbox=vm.createContext({getSingularSetter:()=>()=>{}});vm.runInContext(s.slice(setterStart,setterEnd)+s.slice(begin,end)+';globalThis.SingleUniform=SingleUniform;',sandbox);
+ for(const [type,width] of [[5126,1],[35664,2],[35665,3],[35666,4],[35674,4],[35675,9],[35676,16]]){const u=new sandbox.SingleUniform('test',{type},7);assert.equal(u.cache.length,width);assert.equal(u.cache.BYTES_PER_ELEMENT,8);assert.ok([...u.cache].every(Number.isNaN));u.cache[0]=.1;assert.equal(u.cache[0],.1)}
+ const u=new sandbox.SingleUniform('test',{type:35665},7),calls=[],gl={uniform3f:(addr,x,y,z)=>calls.push([addr,...new Float32Array([x,y,z])])},setter=sandbox.setValueV3f.bind(u),value={x:.1,y:.2,z:.3};setter(gl,value);assert.deepEqual(calls,[[7,...new Float32Array([.1,.2,.3])]]);setter(gl,value);assert.equal(calls.length,1);value.x+=1e-12;setter(gl,value);assert.equal(calls.length,2,'float32 rounding must not suppress double changes');assert.deepEqual([...u.cache],[value.x,.2,.3]);
+ const a=Array.from({length:80},(_,id)=>({id,key:id*17%11})),expected=[...a].sort((a,b)=>a.key-b.key);sandbox.orbitStableSort(a,(a,b)=>a.key-b.key);assert.deepEqual(a,expected);
+});

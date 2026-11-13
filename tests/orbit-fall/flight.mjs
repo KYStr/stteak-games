@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
-export const snapshot=page=>page.evaluate(()=>window.__orbitDiagnostics.snapshot());
+export const snapshot=page=>page.evaluate(()=>{window.testControllerHeartbeat?.();return window.__orbitDiagnostics.snapshot()});
+export const controllerPaused=(page,s)=>s.modal==='pause'?page.evaluate(()=>Boolean(window.testControllerWatchdog?.paused)):false;
 export async function dismissInterruption(page){
- const s=await snapshot(page);if(s.modal!=='interruption')return false;
- await page.evaluate(s=>{(window.testHostInterruptions ||= []).push(s);document.querySelector('.overlay[data-screen="interruption"] #resume')?.click()},s);return true;
+ const s=await snapshot(page);if(s.modal!=='interruption'&&!await controllerPaused(page,s))return false;
+ await page.evaluate(s=>{(window.testHostInterruptions ||= []).push({...s,controllerDelay:!!window.testControllerWatchdog?.paused});if(window.testControllerWatchdog)window.testControllerWatchdog.paused=false;document.querySelector('#overlay #resume')?.click()},s);return true;
 }
 export async function resumeGame(page){
  await dismissInterruption(page);const s=await snapshot(page);if(s.modal===null)return;
@@ -21,6 +22,7 @@ export function obstaclesFor(s){
  for(const d of s.devices){const [x,y,z]=d.position;
   // Hazards are contact regions, never hard colliders. PhysicsRoom fixtures only.
   if(d.id==='signal')add(x,1.05,z,.78,1.05,.55);
+  if(d.id==='power')add(x,1,z,.78,1.05,.55);
   if(d.id==='tools')add(x,1.05,z,.78,1.05,.55);
   if(d.id==='oxygen')add(x,1.3,z,1,1.3,.7);
   if(d.id==='ending')add(x,1.3,z,1,1.3,.8);
@@ -47,14 +49,14 @@ export function routeFor(s,goal){
 export async function fly(page,goal,options={}){
  try{
   for(let retry=0;retry<5;retry++){
-   try{const route=routeFor(await snapshot(page),goal);let result;for(let i=0;i<route.length;i++)result=await flyLeg(page,route[i],{...options,radius:i===route.length-1?(options.radius??.65):.2});return result}
+   try{const route=routeFor(await snapshot(page),goal);let result;for(let i=0;i<route.length;i++){result=await flyLeg(page,route[i],{...options,radius:i===route.length-1?(options.radius??.65):.2});if(options.until?.(result))return result;}return result}
    catch(error){if(error.code!=='STALLED'||retry===4)throw error;
     const s=await snapshot(page),escape=[s.position.x,Math.max(1.2,Math.min(6.9,s.position.y+(s.position.y>5.4?-1.5:1.5))),s.position.z];
     await page.evaluate(v=>(window.testFlightRecoveries ||= []).push(v),{goal,escape,room:s.roomId,elapsed:s.elapsed});
     await flyLeg(page,escape,{radius:.25,timeout:12000,recover:false});
    }
   }
- }catch(error){const s=await snapshot(page);error.message+=' Controller diagnostics: '+JSON.stringify({goal,colliders:obstaclesFor(s),nearest:nearestFor(s)?.id,snapshot:s});if(process.env.ORBIT_TEST_EVIDENCE)await page.screenshot({path:join(process.env.ORBIT_TEST_EVIDENCE,`flight-failure-${Date.now()}.png`)}).catch(()=>{});throw error}
+ }catch(error){const s=await snapshot(page);error.controllerDiagnostics={goal,colliders:obstaclesFor(s),nearest:nearestFor(s)?.id,snapshot:s};if(process.env.ORBIT_TEST_EVIDENCE)await page.screenshot({path:join(process.env.ORBIT_TEST_EVIDENCE,`flight-failure-${Date.now()}.png`)}).catch(()=>{});throw error}
 }
 export function steeringFor(s,goal,radius=.65){
  const p=s.position,v=s.velocity,d=goal.map((n,i)=>n-p[['x','y','z'][i]]),distance=Math.hypot(...d);
@@ -76,9 +78,8 @@ async function flyLeg(page,goal,{radius=.65,timeout=120000,tetherApproach=false,
   const wallStart=Date.now(),started=performance.now(),initial=await snapshot(page);let last=null,held=new Set(),watchPosition=initial.position,watchTime=initial.elapsed;
   try {
     while(performance.now()-started<3600000){
-      const s=await snapshot(page);if(s.modal==='interruption'){await page.evaluate(s=>{(window.testHostInterruptions ||= []).push(s)},s);for(const k of held)await page.keyboard.up(k);held.clear();await page.evaluate(()=>document.getElementById('resume').click());continue;}assert.equal(s.modal,null,`Flight interrupted: ${JSON.stringify({modal:s.modal,hidden:s.hidden,longGaps:s.longGaps,elapsed:s.elapsed,simulationSteps:s.simulationSteps})}`);
+      const s=await snapshot(page);if(until?.(s))return s;if(s.modal==='interruption'||await controllerPaused(page,s)){for(const k of held)await page.keyboard.up(k);held.clear();await dismissInterruption(page);continue;}assert.equal(s.modal,null,`Flight interrupted: ${JSON.stringify({modal:s.modal,hidden:s.hidden,longGaps:s.longGaps,elapsed:s.elapsed,simulationSteps:s.simulationSteps})}`);
       if(s.elapsed-initial.elapsed>timeout/1000)throw Error('Flight simulation budget exhausted: '+JSON.stringify({goal,last:s}));
-      if(until?.(s))return s;
       const p=s.position,v=s.velocity,d=goal.map((n,i)=>n-p[['x','y','z'][i]]),distance=Math.hypot(...d),speed=Math.hypot(v.x,v.y,v.z);
       if(tetherApproach&&s.crate&&Math.hypot(p.x-s.crate.x,p.y-s.crate.y,p.z-s.crate.z)<3.5&&speed<.4)return s;
       if(distance<radius&&speed<(radius<=.2?.1:.4))return s;
@@ -100,7 +101,7 @@ export async function openMap(page){
  throw Error('Map did not open: '+JSON.stringify(await snapshot(page)));
 }
 export async function travel(page,id){
-  let s=await snapshot(page);if(!s.roomId.endsWith('safe'))await fly(page,[0,1.8,5],{radius:.6});
+  let s=await snapshot(page);if(!s.roomId.endsWith('safe'))await fly(page,[0,1.8,s.repair?.requiresIsolation?6:5],{radius:.6});
   await openMap(page);await page.click(`[data-room="${id}"]`);await page.waitForTimeout(200);assert.equal((await snapshot(page)).roomId,id);
 }
 const distanceTo=(point,d)=>Math.hypot(point[0]-d.position[0],point[1]-d.position[1],point[2]-d.position[2]);
@@ -110,6 +111,11 @@ export function nearestFor(s,point=[s.position.x,s.position.y,s.position.z]){
  return s.devices.filter(d=>eligible(s,d)&&distanceTo(point,d)<(d.range??3)).sort((a,b)=>distanceTo(point,a)-distanceTo(point,b))[0];
 }
 function airflowAt(s,point){return point[0]>3.8&&point[2]<1.2&&s.devices.some(d=>d.id==='hazard'&&d.position[0]===7&&d.position[2]===-5)}
+export function unsafeControlAt(s,point){
+ if(s.repair?.type==='momentum')return false;
+ if(s.devices.some(d=>d.id==='hazard'&&d.position[0]===0&&d.position[1]===1&&d.position[2]===-4)&&point[1]<4&&Math.hypot(point[0],point[2]+4)<2.35)return true;
+ return s.roomId==='room-d3-airlock'&&point[1]<6.3&&Math.abs(point[2]+1)<1.5;
+}
 export function approachFor(s,d){
  const [x,y,z]=d.position,height=Math.max(1.3,y),boxes=obstaclesFor(s),candidates=[];
  for(const radius of [1.8,2.1,1.45])for(const [dx,dz]of [[0,1],[1,0],[-1,0],[0,-1],[.707,.707],[-.707,.707],[.707,-.707],[-.707,-.707]])candidates.push([x+radius*dx,height,z+radius*dz]);
@@ -117,20 +123,21 @@ export function approachFor(s,d){
  for(const goal of candidates){
   const distance=distanceTo(goal,d);if(Math.abs(goal[0])>7.5||Math.abs(goal[2])>7.5||distance>(d.range??3)-.25||!clearLine(goal,goal,boxes))continue;
   if(s.devices.some(other=>other.id!==d.id&&eligible(s,other)&&distanceTo(goal,other)<(other.range??3)&&distanceTo(goal,other)<distance+.35))continue;
-  try{const route=routeFor(s,goal);let prev=[s.position.x,s.position.y,s.position.z],cost=0;for(const q of route){cost+=Math.hypot(...q.map((n,i)=>n-prev[i]));prev=q}if(airflowAt(s,goal))cost+=1000;if(!best||cost<best.cost)best={goal,route,cost}}catch{}
+  try{const route=routeFor(s,goal);let prev=[s.position.x,s.position.y,s.position.z],cost=0;for(const q of route){cost+=Math.hypot(...q.map((n,i)=>n-prev[i]));prev=q}if(airflowAt(s,goal)||unsafeControlAt(s,goal))cost+=1000;if(!best||cost<best.cost)best={goal,route,cost}}catch{}
  }
  if(best)return best;throw Error('No reachable unambiguous device approach: '+JSON.stringify({id:d.id,room:s.roomId,position:s.position,device:d,boxes}));
 }
 export async function device(page,id){
  await dismissInterruption(page);let s=await snapshot(page);const phase=s.phaseIndex,solved=s.solvedPuzzles.length,phaseDone=q=>q.phaseIndex!==phase||q.solvedPuzzles.length!==solved;let d=s.devices.find(d=>d.id===id);assert.ok(d,`Missing ${id}`);
  const point=[s.position.x,s.position.y,s.position.z];
- if(nearestFor(s)?.id!==id||distanceTo(point,d)>(d.range??3)-.25||airflowAt(s,point)){const {goal}=approachFor(s,d);await fly(page,goal,{radius:.12,until:phaseDone});if(phaseDone(await snapshot(page)))return}
+ if(nearestFor(s)?.id!==id||distanceTo(point,d)>(d.range??3)-.25||airflowAt(s,point)||unsafeControlAt(s,point)){const {goal}=approachFor(s,d);await fly(page,goal,{radius:.12,until:phaseDone});if(phaseDone(await snapshot(page)))return}
  await page.keyboard.down('Space');
  try{
   for(let i=0;i<100;i++){await dismissInterruption(page);await page.keyboard.down('Space');s=await snapshot(page);if(phaseDone(s))return;if(Math.hypot(s.velocity.x,s.velocity.y,s.velocity.z)<.1)break;await page.waitForTimeout(100)}
   s=await snapshot(page);if(phaseDone(s))return;assert.ok(Math.hypot(s.velocity.x,s.velocity.y,s.velocity.z)<.1,'Brake before interaction');assert.equal(nearestFor(s)?.id,id,`Nearest device must be intended ${id}: ${JSON.stringify(s)}`);
   const before=s;await press(page,'f');s=await snapshot(page);
-  if(id.startsWith('mirror')&&s.phaseIndex===before.phaseIndex&&s.solvedPuzzles.length===before.solvedPuzzles.length){const i=Number(id.slice(7));assert.equal(s.angles[i],(before.angles[i]+1)%8,`Intended ${id} dial must turn exactly once`)}
+  if(await controllerPaused(page,s)){await dismissInterruption(page);const unchanged=s.phaseIndex===before.phaseIndex&&s.solvedPuzzles.length===before.solvedPuzzles.length&&JSON.stringify(s.angles)===JSON.stringify(before.angles)&&JSON.stringify(s.sequence)===JSON.stringify(before.sequence)&&s.circuitPowered===before.circuitPowered&&s.railIndex===before.railIndex&&s.bypass===before.bypass&&s.tethered===before.tethered&&JSON.stringify(s.tools)===JSON.stringify(before.tools);if(unchanged)return device(page,id)}
+  if(id.startsWith('mirror')&&(!before.repair.requiresIsolation||!before.circuitPowered)&&s.phaseIndex===before.phaseIndex&&s.solvedPuzzles.length===before.solvedPuzzles.length){const i=Number(id.slice(7));assert.equal(s.angles[i],(before.angles[i]+1)%8,`Intended ${id} dial must turn exactly once`)}
  }finally{await page.keyboard.up('Space')}
 }
 

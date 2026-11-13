@@ -80,3 +80,20 @@ load to the upper transfer line before crossing. This keeps waiting cells clear
 of the route and trades travel time for lower oxygen and thrust use. A towed cell
 cannot push a braking suit through their mutual contact; releasing restores normal
 contact, and cargo still collides with the station and other cargo.
+
+New expanded journeys use layout variant 2. C4 and the final relay introduce optical
+power isolation: F at the power station to switch off, adjust the mirrors, then
+return to restore power and light the receiver. Powered mirrors are locked; a
+correct unpowered trace cannot complete a phase. Power and angles survive reload.
+C6 retains four chambers with closer consoles. Saved expanded variant-1 journeys
+retain their geometry and work phases. A rejected obsolete pressure prefix alone
+is safely reset and explained; permanent progress remains. Unknown future layout
+versions receive the same write protection as future schemas.
+
+Round 5 uses optional guarded Rapier vector-copy adapters, owned native velocity
+and gravity vectors, typed hot counters, fixed Float64 Three uniform caches, stable in-place renderer sorting.
+The public Rapier getters and original embedded WASM remain unchanged. Recipes
+verify exact upstream/output SHA-256, retain upstream originals and fail closed.
+See `rapier-vector-patch.mjs`, `three-uniform-patch.mjs`, `three-hot-patch.mjs` and the original init patch.
+The acceptance suite reproduces all generated application/vendor/license files in
+an isolated directory and compares them byte-for-byte. No external services are used.

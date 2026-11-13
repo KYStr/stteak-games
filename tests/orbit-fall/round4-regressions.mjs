@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {snapshot,press,device,resumeGame,pauseMenu,openMap} from './flight.mjs';
+import {challengeRecordKey} from '../../public/games/orbit-fall/run-variants.js';
 import {unlockFixture} from './fixtures.mjs';
 import {solveRepair} from './campaign-bots.mjs';
 export async function round4Regressions(browser,url,evidence){
@@ -10,7 +11,7 @@ export async function round4Regressions(browser,url,evidence){
  await context.tracing.start({screenshots:true,snapshots:true});
  try{
   await page.goto(url);await page.locator('#story').waitFor({timeout:60000});
-  const records={};for(const [seed,mode,elapsed,oxygenUsed,thrustSeconds]of [[123,'standard',88,12,9],[456,'standard',77,0,0],[123,'story',66,8,7]])records[`challenge-cargo|${mode}|v1|${seed}`]={elapsed,oxygenUsed,thrustSeconds};
+  const records={};for(const [seed,mode,elapsed,oxygenUsed,thrustSeconds]of [[123,'standard',88,12,9],[456,'standard',77,0,0],[123,'story',66,8,7]])records[challengeRecordKey({campaignVersion:2,variantVersion:2,challengeId:'challenge-cargo',mode,seed})]={elapsed,oxygenUsed,thrustSeconds};
   await unlockFixture(page,{records});
   const openChallenges=async()=>{await openMap(page);await page.click('.overlay[data-screen=map] #challenge-menu')};
   const checkRecords=async()=>{
@@ -29,6 +30,7 @@ export async function round4Regressions(browser,url,evidence){
   result.checks.push('real completed challenge returns to matching best metrics in menu');
   // Reload while the active run is frozen before replacing the storage fixture.
   await page.reload();await unlockFixture(page,{campaignVersion:1,records:{'challenge-cargo':{elapsed:42,oxygenUsed:0,thrustSeconds:0}}});await page.click('#continue');await openChallenges();assert.equal(await page.locator('[data-record-for=challenge-cargo]').innerText(),'最佳 0:42 / 耗氧 0.0 / 推進 0.0 s');await page.fill('#challenge-seed','0');await page.selectOption('#challenge-mode','story');assert.match(await page.locator('[data-record-for=challenge-cargo]').innerText(),/0:42/);result.checks.push('legacy unqualified best remains visible');
+  await page.reload();await unlockFixture(page,{variantVersion:1,records:{'challenge-cargo|standard|v1|123':{elapsed:55,oxygenUsed:0,thrustSeconds:0}}});await page.click('#continue');await openChallenges();assert.equal(await page.locator('[data-record-for=challenge-cargo]').innerText(),'最佳 0:55 / 耗氧 0.0 / 推進 0.0 s');result.checks.push('saved expanded variant-1 records still resolve');
   for(const version of [1,2]){
    await page.reload();await unlockFixture(page,{campaignVersion:version});await page.click('#continue');await openMap(page);const labels=await page.locator('[data-room]').allTextContents();const codes=labels.map(s=>s.match(/[ABC]\d+/)[0]);assert.equal(new Set(codes).size,version===1?12:24);assert.deepEqual(codes,Array.from('ABC',letter=>Array.from({length:version===1?4:8},(_,i)=>letter+(i+1))).flat());await press(page,'Escape');await press(page,'?');assert.match(await page.locator('#panel').innerText(),new RegExp(version===1?'C4 · 訊號核心':'C8 · 訊號核心'));await press(page,'Escape');
    for(const width of [1280,1920]){await page.setViewportSize({width,height:width*9/16});await openMap(page);await page.screenshot({path:fileURLToPath(new URL(`map-v${version}-${width}.png`,evidence))});await press(page,'Escape')}

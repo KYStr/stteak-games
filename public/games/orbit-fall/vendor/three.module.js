@@ -1,3 +1,4 @@
+// Orbit/Fall modification: guarded Float64 caches, stable in-place sorting; retained upstream and MIT license.
 /**
  * @license
  * Copyright 2010-2025 Three.js Authors
@@ -5363,13 +5364,19 @@ function getPureArraySetter( type ) {
 
 // --- Uniform Classes ---
 
+// Stable in-place ordering avoids native Array.sort temporary workspaces.
+function orbitStableSort( list, compare ) {
+ for(let i=1;i<list.length;i++){const item=list[i];let j=i-1;while(j>=0&&compare(list[j],item)>0){list[j+1]=list[j];j--}list[j+1]=item}
+}
 class SingleUniform {
 
 	constructor( id, activeInfo, addr ) {
 
 		this.id = id;
 		this.addr = addr;
-		this.cache = [];
+		// Fixed double caches avoid boxing every animated uniform upload.
+		const widths = { 5126:1, 35664:2, 35665:3, 35666:4, 35674:4, 35675:9, 35676:16 };
+		this.cache = widths[activeInfo.type] ? new Float64Array( widths[activeInfo.type] ).fill( NaN ) : [];
 		this.type = activeInfo.type;
 		this.setValue = getSingularSetter( activeInfo.type );
 
@@ -7641,9 +7648,9 @@ function WebGLRenderList() {
 
 	function sort( customOpaqueSort, customTransparentSort ) {
 
-		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
-		if ( transmissive.length > 1 ) transmissive.sort( customTransparentSort || reversePainterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+		if ( opaque.length > 1 ) orbitStableSort( opaque, customOpaqueSort || painterSortStable );
+		if ( transmissive.length > 1 ) orbitStableSort( transmissive, customTransparentSort || reversePainterSortStable );
+		if ( transparent.length > 1 ) orbitStableSort( transparent, customTransparentSort || reversePainterSortStable );
 
 	}
 

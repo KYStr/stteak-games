@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-13",
+  "rapier": {
+    "id": "compat-0.19.0-owned-vectors-1",
+    "inputSha256": "79187dfd61b8f1b04b730992c2d8f1c0014265f5afee0d64021c32f06cba4f97",
+    "outputSha256": "1f10a132194bcb4a75a9048558aaa745d2cdba3eac44d8b21c6b78ea34775306"
+  },
+  "three": {
+    "id": "three-0.180.0-double-uniform-cache-1",
+    "inputSha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a",
+    "outputSha256": "cebab00f7194088cfef916d3aecd08c3d5bca7fca75a609412e68fcc24e1fccd"
+  },
+  "threeHot": {
+    "id": "three-0.180.0-stable-sort-1",
+    "inputSha256": "cebab00f7194088cfef916d3aecd08c3d5bca7fca75a609412e68fcc24e1fccd",
+    "outputSha256": "ae0ee628814fc76311972460c65f06c70be69ca3bf53dadc6893aa7c472d185b"
+  },
+  "rapierPublicDistributionSha256": "855e6c0b39e90d24e3a4150f11fbffb4be9e5ed1310566441b937da1d2751a71",
+  "threePublicDistributionSha256": "a80bc6dc7e56a8ce3f1998acf95ed8e424de1c2bb890b855c3125d75fd352a36",
+  "notes": "Applied after the retained init-only patch. The original manifest describes that historical init-only payload. Public Rapier API and embedded WASM unchanged; original Three module retained with MIT license. Application uses owned raw velocity/gravity vectors and typed numeric storage."
+}

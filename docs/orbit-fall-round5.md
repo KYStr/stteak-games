@@ -1,0 +1,26 @@
+# Orbit / Fall — round 5 (build 0024)
+
+The independent round-4 fix plan is implemented in authoritative `games/orbit-fall/src/` and reproduced into the static runtime by the pinned build.
+
+- Extended pressure controls use semantic vent/inspection indices in both orientations. Hints follow the six-step interlock. A rejected old current-room prefix alone resets, saves and explains the recovery; completed work remains.
+- New campaigns use variant 2. Expanded saves without a variant remain variant 1, with their original layouts, phases and record buckets. Legacy campaigns remain variant 0. Future variants receive future-save write protection.
+- C4 and final-relay reflection phases require power isolation. Energized mirrors reject rotation; isolated mirrors retain angles without completing; restoring power checks the real optical trace. Power state survives interruption/reload. C6 retains four cycles with closer controls.
+- Protected bypass/anchored-rail movement shares the same hazard immunity for damage and eligible corridor occupancy telemetry. This occupancy counter is not a physical-contact duration.
+- Diagnostics observe active gameplay through the existing one-second throttle; normal gameplay creates no diagnostic panel or periodic JSON serialization. The unused PRE, observation function and camera state are removed.
+- Marker placement checks every feasible horizontal boundary against every prior label. Player priority, 8px separation, 24px hysteresis, device identity and existing leaders remain; impossible fits are explicit.
+
+The original init-only Rapier recipe and manifest remain available. New guarded recipes add optional copy-into vector adapters (with native-pointer cleanup), fixed Float64 uniform caches and stable in-place Three render sorting. The application owns/frees persistent native velocity/gravity vectors and uses typed hot counters. Original vendor source, original embedded WASM, notices and licenses are retained. `assets/games/orbit-fall/vendor-sources/allocation-patches.json` identifies the complete derivation and public hashes.
+
+Unit acceptance counts wrappers/finalizer registrations over 600 actual physics steps, validates invalid-handle cleanup, repeats native-vector disposal and compares upstream/candidate binary physics snapshots. Shader caches retain double comparison precision; stable painter ordering matches native stable sort. A more invasive float-upload experiment was removed after profiles did not show a reliable improvement.
+
+Run `npm --prefix games/orbit-fall test`. It builds, runs unit checks, reproduces generated code/vendor/license files in a clean isolated directory, then runs one Chrome through independent browser groups. Final evidence is in `/workspace/stteak8/work/orbit-fall/rounds/r5/candidate24/`. Development attempts remain separately labelled and are not relabelled as passing final runs.
+
+The final command runs three zero-progress campaigns (one random, seeded setups 3095359210 and 1853268288), both endings, all 30 challenge seed/tier trials, three repeats of each freight route, equal-seed competent/idle/random bots, lifecycle/audio/keyboard/marker regressions, and a 180-active-second resource soak with restart. Cadence includes the last mechanic introduction to ending. Raw sampling profiles, unforced heap/GC trace and two retained-heap endpoints are distinct evidence. The strict recurring-allocation gate is retained; SwiftShader frame times are informational.
+
+The original final attempt retained a controller failure at C4: its exit staging point at z=5 entered the conservative power-console clearance. Isolation-room exit staging now uses z=6; controller unit coverage includes the captured point and every seeded isolation phase, and browser coverage completes C4 and travels out. The captured C4 seed 4019130972 has an explicit completion-and-exit browser regression. Seed 1853268288 exposed the old controller ignoring suit damage; its full zero-progress reproduction now uses safe control approaches and normal supply-room visits.
+
+Test-only campaign/bot heartbeats pause via the visible Pause control after 1.5 seconds without controller observation. Missing-controller intervals are logged and resumed through the visible Resume control; no game clock, health or progression is assigned. This addresses observed host input stalls while preserving all active-time duration and cadence assertions. The watchdog has unit and real-browser regressions and is absent from production and cost measurements.
+
+The first full seed-3095359210 run completed all 18 repairs, recordings and both endings in 1,684.9 simulation / 1,686.3 active seconds. Its final introduction-to-ending interval was 180.5 seconds and remained a failure. Build 0023 shortens actual C7 non-cargo control spacing to 80%, and gives C6 more margin (45% x/z; transfer z=3.5), retaining all heights, work phases and operations. The <=180 assertion is unchanged.
+
+Measured spacing comparison on seed3095359210: C6 at 55%/z3.8 took 172.3 seconds; 45%/z3.5 took 191.8 seconds because approach routing was less efficient. Build0024 retains 55%/z3.8. The C7 80% control spacing reduced the full final interval from 180.5 to 154.8 seconds and is retained. All prior measurements remain failed attempts where an assertion failed.
