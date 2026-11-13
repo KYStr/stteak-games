@@ -1,6 +1,6 @@
 export const SETTINGS_KEY = 'stteak:orbit-fall:settings';
 
-const defaults = reducedMotion => ({ music: 0.28, sfx: 0.55, quality: 'high', reducedMotion: reducedMotion === true, assist: true });
+const defaults = reducedMotion => ({ music: 0.28, sfx: 0.55, quality: 'high', reducedMotion: reducedMotion === true, assist: true, directHints: false });
 const owns = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 const supportedSchema = raw => ['schema', 'schemaVersion'].every(key => !owns(raw, key) || raw[key] === 1);
 
@@ -11,7 +11,7 @@ export function sanitizeSettings(raw, prefersReducedMotion = false) {
   // Do not merge persisted data: unknown keys and __proto__ stay outside settings.
   for (const key of ['music', 'sfx']) if (owns(raw, key) && Number.isFinite(raw[key])) settings[key] = Math.max(0, Math.min(1, raw[key]));
   if (owns(raw, 'quality') && ['low', 'high'].includes(raw.quality)) settings.quality = raw.quality;
-  for (const key of ['reducedMotion', 'assist']) if (owns(raw, key) && typeof raw[key] === 'boolean') settings[key] = raw[key];
+  for (const key of ['reducedMotion', 'assist', 'directHints']) if (owns(raw, key) && typeof raw[key] === 'boolean') settings[key] = raw[key];
   return settings;
 }
 

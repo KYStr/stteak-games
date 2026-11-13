@@ -177,13 +177,13 @@ test('actual main.animate keeps about 600 physics steps over 10 seconds while th
     const input = { x: 1, y: 0, z: 0, brake: false, thrusting: true };
     const sandbox = vm.createContext({
       measurement: h.panel, ready: true, started: true, modal: null, run: { status: 'running' },
-      last: 1000 - 1000 / 165, accumulator: 0, simTime: 0, state: {},
+      performance: {now:()=>0}, frameClock:Float64Array.of(Infinity,0,0,0,1000-1000/165,0,0,0), updateSamples: [], totalActiveFrames: 0, longGaps: [], document: {hidden:false}, state: {},
       frameSamples: [], sampleCursor: 0, physics: { anchored: false }, toastUntil: Infinity,
       requestAnimationFrame(callback) { assert.equal(typeof callback, 'function'); counts.scheduled++; },
-      inputState() { return input; },
-      step(value) { assert.equal(value, input); counts.steps++; sandbox.simTime += 1 / 60; },
+      zeroInput:input,movement:input,inputState() { return input; },
+      step(value) { assert.equal(value, input); counts.steps++; sandbox.frameClock[2] += 1 / 60; },
       audio: { update() { counts.audioUpdates++; } },
-      view: { update(_physics, _run, _state, _simTime, dt) { counts.renders++; counts.renderedSeconds += dt; } },
+      view: {render(){}, update(_physics, _run, _state, _simTime, dt) { counts.renders++; counts.renderedSeconds += dt; } },
       updateHud() {}, $() { return { classList: { remove() {} } }; },
     });
     vm.runInContext(animateSource, sandbox);

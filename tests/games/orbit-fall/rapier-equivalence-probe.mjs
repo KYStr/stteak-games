@@ -3,7 +3,7 @@ import {tmpdir} from 'node:os'; // 使用程序暫存區，不改任何持久環
 import {join,resolve} from 'node:path'; // 以受控路徑建立及清除本測試副本。
 import {pathToFileURL} from 'node:url'; // 以真正ESM載入衍生的依賴路徑。
 import {createHash} from 'node:crypto'; // 每120步核對Rapier二進位snapshot。
-import {rooms,puzzles} from '../../../public/games/orbit-fall/content.js'; // 重用正式十二房及六謎題資料。
+import {getCampaign} from '../../../public/games/orbit-fall/content.js';const {rooms,puzzles}=getCampaign(1); // 重用正式十二房及六謎題資料。
 const variant=process.argv[2];if(!['upstream','candidate'].includes(variant))throw Error('Expected upstream or candidate'); // 只允許兩個固定被比較來源。
 const engine=new URL(variant==='upstream'?'../../../assets/games/orbit-fall/vendor-sources/rapier-0.19.0.mjs':'../../../public/games/orbit-fall/vendor/rapier.mjs',import.meta.url); // 原件與候選各在fresh程序載入。
 const physics=await readFile(new URL('../../../public/games/orbit-fall/physics.js',import.meta.url),'utf8'),first="import RAPIER from './vendor/rapier.mjs';"; // 使用真正PhysicsRoom實作而非仿寫物理規則。

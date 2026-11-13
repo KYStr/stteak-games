@@ -1,0 +1,14 @@
+/*!
+ * MODIFIED FILE / 已修改檔案：Orbit / Fall public-source.2。
+ * 本發行版本修改 @dimforge/rapier3d-compat 0.19.0 上游檔案，非原樣上游副本。
+ * 既有修改 compat-0.19.0-init-object-1：把同一內部 ArrayBuffer 初始化實參
+ * 包入 {module_or_path: ...} 物件（較上游增加17個ASCII bytes）；公開 init() API
+ * 與內嵌 WASM bytes 保持原樣。本次 public-source.2 僅新增這段醒目修改通知。
+ * 上游套件來源：https://registry.npmjs.org/@dimforge/rapier3d-compat/-/rapier3d-compat-0.19.0.tgz
+ * 保留上游原件：../../../../assets/games/orbit-fall/vendor-sources/rapier-0.19.0.mjs
+ * 上游SHA256：1ade6875c663c1398f490d4fa67837386b2d7e0aad45fe54e9b7af52b8198a49
+ * 重現配方：../../../../games/orbit-fall/rapier-init-patch.mjs
+ * 原授權：Apache-2.0；完整文本 ./rapier-LICENSE.txt；https://www.apache.org/licenses/LICENSE-2.0
+ * 保留既有上游版權、歸屬與授權文本；本通知不捏造作者、版權或新增授權。
+ */
+// Orbit/Fall 2026-11-13: optional non-reentrant rbTranslationInto/rbLinvelInto; borrowed RawVector pointers freed in finally, no wrapper/finalizer per read. Public API and embedded WASM unchanged. Recipe: rapier-vector-patch.mjs.

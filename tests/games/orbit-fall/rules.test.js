@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { rooms, roomById, puzzles, signals, endings, decks, challenges } from '../../../public/games/orbit-fall/content.js';
-import { createRun, enterRoom, grantTool, solvePuzzle, collectSignal, finishEnding, continueRun, getProgress, tick, setPaused, respawn, damage, resetPuzzle, startChallenge, recordChallenge, legalizeSnapshot, storeSnapshot } from '../../../public/games/orbit-fall/rules.js';
+import {getCampaign,signals,endings,challenges} from '../../../public/games/orbit-fall/content.js';
+const {rooms,roomById,puzzles,decks}=getCampaign(1);
+import { createRun as makeRun, enterRoom, grantTool, solvePuzzle, collectSignal, finishEnding, continueRun, getProgress, tick, setPaused, respawn, damage, resetPuzzle, startChallenge, recordChallenge, legalizeSnapshot, storeSnapshot } from '../../../public/games/orbit-fall/rules.js';
+
+const createRun=mode=>makeRun(mode,{campaignVersion:1,seed:0});
 
 function equipped(mode = 'standard') {
   const run = createRun(mode);

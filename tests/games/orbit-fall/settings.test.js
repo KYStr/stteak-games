@@ -22,7 +22,7 @@ test('corrupt settings JSON falls back while the existing story still loads and 
   const storage = storyStorage(); storage.setItem(SETTINGS_KEY, '{broken');
   const initialized = initializeSettings(() => storage, true);
   assert.equal(initialized.storage, storage); assert.equal(initialized.status, 'invalid');
-  assert.deepEqual(initialized.settings, { music: 0.28, sfx: 0.55, quality: 'high', reducedMotion: true, assist: true });
+  assert.deepEqual(initialized.settings, { music: 0.28, sfx: 0.55, quality: 'high', reducedMotion: true, assist: true, directHints: false });
   const loaded = loadRun(initialized.storage);
   assert.equal(loaded.ok, true); assert.deepEqual(loaded.run.solvedPuzzles, ['puzzle-momentum-1']); assert.deepEqual(loaded.run.signals, ['signal-1']);
   loaded.run.elapsed = 75;
@@ -36,7 +36,7 @@ test('valid settings retain supported preferences and zero volume without touchi
   storage.setItem(SETTINGS_KEY, JSON.stringify({ music: 0, sfx: 0.7, quality: 'low', reducedMotion: true, assist: false }));
   const result = initializeSettings(() => storage);
   assert.equal(result.status, 'loaded');
-  assert.deepEqual(result.settings, { music: 0, sfx: 0.7, quality: 'low', reducedMotion: true, assist: false });
+  assert.deepEqual(result.settings, { music: 0, sfx: 0.7, quality: 'low', reducedMotion: true, assist: false, directHints: false });
   for (const [key, value] of before) assert.equal(storage.getItem(key), value);
 });
 
@@ -64,13 +64,13 @@ test('bad field types and unknown or prototype keys cannot pollute runtime setti
   const settings = sanitizeSettings(raw, true);
   assert.deepEqual(settings, sanitizeSettings(null, true));
   assert.equal(Object.getPrototypeOf(settings), Object.prototype); assert.equal(settings.polluted, undefined);
-  assert.deepEqual(Object.keys(settings).sort(), ['assist', 'music', 'quality', 'reducedMotion', 'sfx']);
+  assert.deepEqual(Object.keys(settings).sort(), ['assist', 'directHints', 'music', 'quality', 'reducedMotion', 'sfx']);
   assert.deepEqual(sanitizeSettings(Object.create({ music: 0, quality: 'low', assist: false })), sanitizeSettings(null));
   assert.deepEqual(sanitizeSettings({ music: Infinity, sfx: NaN, assist: [], reducedMotion: {} }), sanitizeSettings(null));
 });
 
 test('finite volumes are clamped and invalid fields fall back independently', () => {
-  assert.deepEqual(sanitizeSettings({ schema: 1, music: -3, sfx: 4, quality: 'ultra', reducedMotion: false, assist: true }, true), { music: 0, sfx: 1, quality: 'high', reducedMotion: false, assist: true });
+  assert.deepEqual(sanitizeSettings({ schema: 1, music: -3, sfx: 4, quality: 'ultra', reducedMotion: false, assist: true, directHints: false }, true), { music: 0, sfx: 1, quality: 'high', reducedMotion: false, assist: true, directHints: false });
   assert.equal(sanitizeSettings({ music: 0.4, sfx: false }).music, 0.4);
   assert.equal(sanitizeSettings({ music: 0.4, sfx: false }).sfx, 0.55);
 });

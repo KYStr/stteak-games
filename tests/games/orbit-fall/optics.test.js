@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { traceOptics } from '../../../games/orbit-fall/optics.js';
-import { puzzles } from '../../../public/games/orbit-fall/content.js';
+import {getCampaign} from '../../../public/games/orbit-fall/content.js';
+const {puzzles}=getCampaign(1);
 
 const reflectionPuzzles = Object.values(puzzles).filter(puzzle => puzzle.type === 'reflection');
 const distance = (a, b) => Math.hypot(...a.map((value, axis) => value - b[axis]));

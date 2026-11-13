@@ -1,13 +1,75 @@
 import * as THREE from './vendor/three.module.js';
-import {createAstronaut,animateAstronaut,createRoomKit,createDevice,setDeviceState,animateDevice} from './models.js';
+import {createAstronaut,animateAstronaut,createRoomKit,createDevice,setDeviceState,animateDevice,cacheDeviceNodes,createRoomDetails} from './models.js';
+import {pressureState} from './pressure.js';
 import {traceOptics} from './optics.js';
 import {arcPhase,debrisPosition} from './hazards.js';
-import {layoutDockingMarkers,layoutClampedDockingMarkers} from './marker-layout.js'; // 近停靠pair與分離貼邊避讓分開處理，保留既有契約。
+import {mergeGeometries} from './assets/runtime/buffer-geometry-utils.js';
+import {placeRuntimeMarkers} from './marker-layout.js'; // 近停靠pair與分離貼邊避讓分開處理，保留既有契約。
+// Room architecture never animates. Batch by material, retaining instanced transforms.
+function batchArchitecture(group) {
+  group.updateMatrixWorld(true);
+  const buckets=new Map(), matrix=new THREE.Matrix4(), combined=new THREE.Matrix4();
+  group.traverse(object=>{
+    if(!object.isMesh||Array.isArray(object.material))return;
+    const list=buckets.get(object.material)||[];buckets.set(object.material,list);
+    for(let i=0;i<(object.isInstancedMesh?object.count:1);i++){
+      if(object.isInstancedMesh){object.getMatrixAt(i,matrix);combined.multiplyMatrices(object.matrixWorld,matrix)}else combined.copy(object.matrixWorld);
+      const geometry=object.geometry.index?object.geometry.toNonIndexed():object.geometry.clone();
+      geometry.applyMatrix4(combined);list.push(geometry);
+    }
+  });
+  const result=new THREE.Group();
+  for(const [material,list] of buckets){const geometry=mergeGeometries(list);for(const item of list)item.dispose();const mesh=new THREE.Mesh(geometry,material);mesh.castShadow=true;mesh.receiveShadow=true;result.add(mesh)}
+  return result;
+}
+const lightMaterials=new WeakMap();
+function useVertexLighting(root){
+  root.traverse(object=>{if(!object.isMesh)return;const convert=material=>{
+    if(!material.isMeshStandardMaterial)return material;
+    if(!lightMaterials.has(material))lightMaterials.set(material,new THREE.MeshLambertMaterial({name:material.name,color:material.color,emissive:material.emissive,emissiveIntensity:material.emissiveIntensity,transparent:material.transparent,opacity:material.opacity,side:material.side,depthWrite:material.depthWrite}));
+    return lightMaterials.get(material);
+  };object.material=Array.isArray(object.material)?object.material.map(convert):convert(object.material)});return root;
+}
+// Merge immutable software-lit surfaces with vertex colours; emission and
+// transparency remain separate compatible material groups.
+const vertexMaterials=new Map(),skinnedTransparentMaterials=new WeakMap();
+function colouredGeometry(object,matrix){const geometry=object.geometry.index?object.geometry.toNonIndexed():object.geometry.clone();geometry.applyMatrix4(matrix);const c=object.material.color,normal=geometry.attributes.normal,colors=new Float32Array(geometry.attributes.position.count*3);for(let i=0;i<colors.length;i+=3){const n=i/3,shade=object.material.emissive?.getHex()?1.2:.72+.45*Math.max(0,normal.getX(n)*.25+normal.getY(n)*.85+normal.getZ(n)*.46);colors[i]=c.r*shade;colors[i+1]=c.g*shade;colors[i+2]=c.b*shade}geometry.setAttribute('color',new THREE.BufferAttribute(colors,3));for(const key of Object.keys(geometry.attributes))if(!['position','normal','color'].includes(key))geometry.deleteAttribute(key);return geometry;}
+function compatibleMaterial(material,family='static'){
+ if(material.transparent){
+  if(family==='static')return material;
+  if(!skinnedTransparentMaterials.has(material))skinnedTransparentMaterials.set(material,material.clone());
+  return skinnedTransparentMaterials.get(material);
+ }
+ const key=`${family}:${material.emissive?.getHex()||0}:${material.emissiveIntensity||0}:${material.side}:${material.alphaTest}:${material.toneMapped}`;
+ if(!vertexMaterials.has(key))vertexMaterials.set(key,new THREE.MeshBasicMaterial({color:0xffffff,vertexColors:true,side:material.side,alphaTest:material.alphaTest,toneMapped:material.toneMapped}));
+ return vertexMaterials.get(key);
+}
+function batchDevice(root,software){
+ const buckets=new Map(),remove=[];root.updateMatrixWorld(true);
+ root.traverse(o=>{if(!o.isMesh||Array.isArray(o.material)||o.material.transparent)return;
+  let node=o;while(node!==root){if(/^(mirror-pivot|mirror-stalk|rotation-knob|state-light|gate-status|terminal-face|memory-|arc-segment|airflow-stream|gate-leaf)/.test(node.name))return;node=node.parent;}
+  const material=software?compatibleMaterial(o.material):o.material,list=buckets.get(material)||[];buckets.set(material,list);list.push(software?colouredGeometry(o,o.matrixWorld):o.geometry.clone().applyMatrix4(o.matrixWorld));remove.push(o);
+ });
+ for(const o of remove)o.removeFromParent();
+ for(const [material,list] of buckets){const mesh=new THREE.Mesh(mergeGeometries(list),material);mesh.castShadow=true;mesh.receiveShadow=true;root.add(mesh);for(const g of list)g.dispose();}
+ if(software){const pivots=[];root.traverse(o=>{if(o!==root&&/^(mirror-pivot|gate-leaf)/.test(o.name))pivots.push(o)});for(const pivot of pivots){const parent=pivot.parent,position=pivot.position.clone(),quaternion=pivot.quaternion.clone();pivot.removeFromParent();pivot.position.set(0,0,0);pivot.quaternion.identity();batchDevice(pivot,true);pivot.position.copy(position);pivot.quaternion.copy(quaternion);parent.add(pivot);}}batchSharedAnimations(root);cacheDeviceNodes(root);return root;
+}
+function batchSharedAnimations(root){
+ const parents=[];root.traverse(o=>{if(o.children.length)parents.push(o)});
+ for(const parent of parents){const buckets=new Map();for(const o of [...parent.children]){if(!o.isMesh||o.material.transparent)continue;const name=o.name.startsWith('arc-segment')?'arc-segment':/^(state-light|gate-status|terminal-face)/.test(o.name)?'state-light':null;if(!name)continue;const key=o.material,list=buckets.get(key)||[];list.push({o,name});buckets.set(key,list);}for(const [material,list] of buckets){if(list.length<2)continue;const geometries=list.map(({o})=>{o.updateMatrix();return o.geometry.clone().applyMatrix4(o.matrix)});const mesh=new THREE.Mesh(mergeGeometries(geometries),material);mesh.name=list[0].name+'-batch';mesh.userData.uniqueStateMaterial=true;parent.add(mesh);for(const {o} of list)o.removeFromParent();for(const g of geometries)g.dispose();}}
+}
+function batchSuit(root){
+ root.updateMatrixWorld(true);let skeleton;root.traverse(o=>{if(o.isSkinnedMesh)skeleton=o.skeleton});if(!skeleton)return root;
+ const buckets=new Map(),remove=[];root.traverse(o=>{if(!o.isMesh||o.isSkinnedMesh||o.name.startsWith('thruster-plume'))return;let bone=o.parent;while(bone&&!bone.isBone)bone=bone.parent;if(!bone)return;
+ const geometry=colouredGeometry(o,o.matrixWorld),count=geometry.attributes.position.count,indices=new Uint16Array(count*4),weights=new Float32Array(count*4),index=skeleton.bones.indexOf(bone);for(let i=0;i<count;i++){indices[i*4]=index;weights[i*4]=1}geometry.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(indices,4));geometry.setAttribute('skinWeight',new THREE.Float32BufferAttribute(weights,4));const material=compatibleMaterial(o.material,'skinned'),list=buckets.get(material)||[];buckets.set(material,list);list.push(geometry);remove.push(o);
+ });for(const o of remove)o.removeFromParent();for(const [material,list] of buckets){const mesh=new THREE.SkinnedMesh(mergeGeometries(list),material);root.add(mesh);mesh.bind(skeleton);mesh.frustumCulled=false;for(const g of list)g.dispose();}return root;
+}
 export class StationView {
   constructor(canvas,settings){
     this.canvas=canvas;this.settings=settings;this.scene=new THREE.Scene();this.scene.background=new THREE.Color('#06131f');this.scene.fog=new THREE.FogExp2('#071421',.014);
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.15;
-    this.renderer.shadowMap.enabled=settings.quality!=='low';this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    const gl=this.renderer.getContext(),debug=gl.getExtension('WEBGL_debug_renderer_info');this.software=/swiftshader|llvmpipe|software/i.test(debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):'');
+    this.renderer.shadowMap.enabled=settings.quality!=='low'&&!this.software;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     this.camera=new THREE.PerspectiveCamera(44,1,.1,300);this.camera.position.set(15,17,22);this.target=new THREE.Vector3(0,2,0);this.mode='fixed';this.yaw=0;
     this.scene.add(new THREE.HemisphereLight('#c6e9ee','#18304a',2));
     this.key=new THREE.DirectionalLight('#d1ebff',3.1);this.key.position.set(3,15,8);this.key.castShadow=true;this.key.shadow.mapSize.set(1024,1024);Object.assign(this.key.shadow.camera,{left:-12,right:12,top:12,bottom:-12,near:1,far:45});this.key.shadow.bias=-.001;this.scene.add(this.key);
@@ -16,53 +78,38 @@ export class StationView {
     const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(stars,3));this.scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:'#bfd3e7',size:.14,sizeAttenuation:true})));
     const planet=new THREE.Mesh(new THREE.SphereGeometry(24,40,24),new THREE.MeshStandardMaterial({color:'#253f56',roughness:.95,metalness:.1}));planet.position.set(-45,-11,-70);this.scene.add(planet);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(32,.2,8,120),new THREE.MeshBasicMaterial({color:'#7a9bab'}));ring.rotation.x=1.2;ring.position.copy(planet.position);this.scene.add(ring);
-    this.astronaut=createAstronaut();this.astronaut.scale.setScalar(.75);this.scene.add(this.astronaut);this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();this.devices=[];this.frames=[];this.cache=new Map();this.roomGroup=null;this.beam=null;this.lastFrame=performance.now();this.resize();
+    this.astronaut=createAstronaut();if(this.software){useVertexLighting(this.astronaut);batchSuit(this.astronaut);}this.astronaut.scale.setScalar(.75);this.scene.add(this.astronaut);this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();this.devices=[];this.cache=new Map();this.roomGroup=null;this.beam=null;this.lastFrame=performance.now();this.resize();
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(canvas);
     this.markerLayer=document.createElement('div');this.markerLayer.id='world-markers';canvas.parentElement.append(this.markerLayer);
     this.playerMarker=document.createElement('span');this.playerMarker.className='player-marker';this.playerMarker.textContent='▽ 你';this.markerLayer.append(this.playerMarker);
-    this.altitudeLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#8dc5d0',transparent:true,opacity:.5,depthTest:false}));this.scene.add(this.altitudeLine);this.labels=[];
+    this.altitudeLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:'#8dc5d0',transparent:true,opacity:.5,depthTest:false}));this.scene.add(this.altitudeLine);this.labels=[];this.projection=new THREE.Vector3();this.playerPosition=new THREE.Vector3();this.debrisScratch=[0,0,0];this.pressureScratch={};
   }
-  resize(){const w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.viewport={width:w,height:h};this.markerSizesDirty=true;this.renderer.setPixelRatio(Math.min(devicePixelRatio||1,this.settings.quality==='low'?1:1.6));this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.renderer.shadowMap.enabled=this.settings.quality!=='low'}
-  addDevice(kind,pos,data={},state='offline'){const mesh=createDevice(kind,state);mesh.position.fromArray(pos);this.roomGroup.add(mesh);const d={kind,mesh,pos:new THREE.Vector3(...pos),...data};mesh.userData.interaction=d;this.devices.push(d);return d}
-  createMarkers(){for(const l of this.labels)l.remove();this.labels=[];this.dockingMarkerOrder=0;this.dockingMarkerCenter=null;this.clampedMarkerCenters={target:null,crate:null};this.markerSizesDirty=true;for(const d of this.devices){if(d.id==='oxygen'||d.id==='light-target')continue;const el=document.createElement('span');el.className='world-marker';el.textContent=d.id==='tools'?'◆ 裝備架 · F':d.id==='exit'?'↗ 艙門':d.id==='signal'?'≋ 訊號':d.id==='crate'?'▣ 電池':d.id==='target'?'▧ 停靠接點':d.id==='ending'?'◆ 能源終端':d.id==='hazard'?(this.room.hazard==='arc'?'⚡ 電弧':this.room.hazard==='debris'?'◇ 碎片':'≋ 洩漏'):d.id.startsWith('mirror')?`鏡 ${d.index+1}`:d.id.startsWith('valve')?`閥 ${d.index+1}`:d.label;if(d.id==='crate'||d.id==='target'){const line=document.createElement('span');line.className='marker-leader';line.dataset.marker=d.id;line.hidden=true;line.setAttribute('aria-hidden','true');this.markerLayer.append(line);this.labels.push(line);d.markerLeader=line}this.markerLayer.append(el);this.labels.push(el);d.marker=el}} // 換房時同時清除貼邊避讓記憶，其他文字及leader建立方式不變。
+  resize(){const w=this.canvas.clientWidth,h=this.canvas.clientHeight;this.viewport={width:w,height:h};this.markerSizesDirty=true;this.renderer.setPixelRatio(this.software?Math.min(1,(this.settings.quality==='low'?640:Math.max(960,w*2/3))*(this.settings.quality==='low'?(this.renderScale||1):Math.max(1,this.renderScale||1))/w):Math.min(devicePixelRatio||1,this.settings.quality==='low'?1:1.6));this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();this.renderer.shadowMap.enabled=this.settings.quality!=='low'&&!this.software;this.dirty=true}
+  addDevice(kind,pos,data={},state='offline'){const mesh=createDevice(kind,state);if(this.software)useVertexLighting(mesh);batchDevice(mesh,this.software);mesh.position.fromArray(pos);this.roomGroup.add(mesh);const d={kind,mesh,pos:new THREE.Vector3(...pos),anchor:{x:0,y:0,anchorX:0,width:100,height:24,hidden:false,displaced:false,avoidX:NaN},...data};mesh.userData.interaction=d;this.devices.push(d);return d}
+  createMarkers(){for(const l of this.labels)l.remove();this.labels=[];this.dockingMarkerOrder=0;this.dockingMarkerCenter=null;this.clampedMarkerCenters={target:null,crate:null};this.markerSizesDirty=true;this.markerItems=[];this.playerAnchor={x:0,y:0,anchorX:0,width:45,height:20,hidden:false};this.markerItems.push(this.playerAnchor);for(const d of this.devices){if(d.id==='oxygen'||d.id==='light-target')continue;const el=document.createElement('span');el.className='world-marker';el.textContent=d.id==='tools'?'◆ 裝備架 · F':d.id==='exit'?'↗ 艙門':d.id==='signal'?'≋ 訊號':d.id==='crate'?`▣ ${this.puzzle?.activeObjectId?.replace('crate-cell-','電芯 ')||'電池'}`:d.id==='target'?`▧ 插座 ${this.puzzle?.phaseIndex!==undefined?this.puzzle.phaseIndex+1:''}`:d.id==='ending'?'◆ 能源終端':d.id==='hazard'?(this.room.hazard==='arc'?'⚡ 電弧':this.room.hazard==='debris'?'◇ 碎片':'≋ 洩漏'):d.id.startsWith('mirror')?`鏡 ${d.index+1}`:d.id.startsWith('valve')?`閥 ${d.index+1}`:d.label;if(d.id==='crate'||d.id==='target'){const line=document.createElement('span');line.className='marker-leader';line.dataset.marker=d.id;line.hidden=true;line.setAttribute('aria-hidden','true');this.markerLayer.append(line);this.labels.push(line);d.markerLeader=line}this.markerLayer.append(el);this.labels.push(el);d.marker=el;d.markerPower=undefined;d.markerAngle=undefined;d.direct=undefined;d.anchor.avoidX=NaN;d.anchor.lastX=NaN;d.anchor.lastY=NaN;d.anchor.element=el;d.anchor.device=d;this.initMarkerTransform(d.anchor);this.markerItems.push(d.anchor)}this.playerAnchor.element=this.playerMarker;this.initMarkerTransform(this.playerAnchor)} // 換房時同時清除貼邊避讓記憶，其他文字及leader建立方式不變。
+  initMarkerTransform(point){if(typeof CSSTranslate!=='function')return;point.cssX=CSS.px(0);point.cssY=CSS.px(0);point.cssTransform=new CSSTransformValue([new CSSTranslate(point.cssX,point.cssY),new CSSTranslate(CSS.percent(-50),CSS.percent(-100))]);const d=point.device;if(d?.markerLeader){d.leaderX=CSS.px(0);d.leaderY=CSS.px(0);d.leaderAngle=CSS.rad(0);d.leaderScale=new CSSScale(1,1);d.leaderTransform=new CSSTransformValue([new CSSTranslate(d.leaderX,d.leaderY),new CSSRotate(d.leaderAngle),d.leaderScale])}}
+  projectMarker(position,lift,out){const v=this.projection;v.copy(position);v.y+=lift;v.project(this.camera);const {width,height}=this.viewport;const x=(v.x*.5+.5)*width,y=(-v.y*.5+.5)*height;out.x=out.anchorX=THREE.MathUtils.clamp(x,55,width-55);out.y=THREE.MathUtils.clamp(y,110,height-100);out.hidden=v.z>1;out.endpointX=x;out.endpointY=y}
+  placeMarker(point){const el=point.element;el.hidden=point.hidden;const x=Math.round(point.x),y=Math.round(point.y);if(x!==point.lastX||y!==point.lastY){if(point.cssTransform){point.cssX.value=x;point.cssY.value=y;el.attributeStyleMap.set('transform',point.cssTransform)}else el.style.transform=`translate3d(${x}px,${y}px,0) translate(-50%,-100%)`;point.lastX=x;point.lastY=y}}
   updateMarkers(player,puzzleState){
-    const {width,height}=this.viewport;
-    const hasPair=this.devices.some(d=>d.id==='target'&&d.markerLeader)&&this.devices.some(d=>d.id==='crate'&&d.markerLeader);
-    // Update dynamic text before measuring. Only docking rooms need dimensions;
-    // stable frames and rooms without a pair perform no layout reads.
-    for(const d of this.devices)if(d.marker&&d.id.startsWith('mirror')){const text=`鏡 ${d.index+1} · ${puzzleState.angles[d.index]} / ${this.puzzle.targetAngles[d.index]}`;if(d.marker.textContent!==text){d.marker.textContent=text;this.markerSizesDirty=true}}
-    if(hasPair&&this.markerSizesDirty){
-      const markers=this.devices.filter(d=>d.marker),elements=[...markers.map(d=>d.marker),this.playerMarker],hidden=elements.map(el=>el.hidden);
-      for(const el of elements)el.hidden=false;
-      const sizes=elements.map(el=>({width:el.offsetWidth,height:el.offsetHeight}));
-      markers.forEach((d,i)=>{d.markerSize=sizes[i]});this.playerMarkerSize=sizes.at(-1);
-      elements.forEach((el,i)=>{el.hidden=hidden[i]});this.markerSizesDirty=false;
+    this.playerPosition.set(player.x,player.y,player.z);this.projectMarker(this.playerPosition,1.4,this.playerAnchor);
+    for(let i=0;i<this.devices.length;i++){const d=this.devices[i];if(!d.marker)continue;
+      if(d.id.startsWith('mirror')&&(d.markerAngle!==puzzleState.angles[d.index]||d.direct!==this.settings.directHints)){d.markerAngle=puzzleState.angles[d.index];d.direct=this.settings.directHints;d.marker.textContent=`鏡 ${d.index+1} · 刻度 ${d.markerAngle}${d.direct?' / '+this.puzzle.targetAngles[d.index]:''}`;this.markerSizesDirty=true}
+      if(d.id==='power'&&d.markerPower!==puzzleState.circuitPowered){d.markerPower=puzzleState.circuitPowered;d.marker.textContent=d.markerPower?'光路供電 · F 斷電':'光路供電 · F 復電';this.markerSizesDirty=true}
+      this.projectMarker(d.pos,d.id.startsWith('mirror')||d.id.startsWith('valve')?1.2:2.8,d.anchor);
     }
-    const project=(position,lift=0,clamped=true)=>{const screen=position.clone();screen.y+=lift;screen.project(this.camera);const x=(screen.x*.5+.5)*width,y=(-screen.y*.5+.5)*height;return {x:clamped?THREE.MathUtils.clamp(x,55,width-55):x,y:clamped?THREE.MathUtils.clamp(y,110,height-100):y,hidden:screen.z>1,edgeClamped:clamped&&(x<55||x>width-55||y<110||y>height-100)}}; // 保留原投影與hidden判定，另記錄是否真的被邊界夾住。
-    const place=(element,point)=>{element.hidden=point.hidden;element.style.transform=`translate3d(${point.x}px,${point.y}px,0) translate(-50%,-100%)`};
-    const playerAnchor=project(new THREE.Vector3(player.x,player.y,player.z),1.4);place(this.playerMarker,playerAnchor);
-    const obstacles=hasPair?[{...playerAnchor,...this.playerMarkerSize}]:[];
-    let target,crate;
-    for(const d of this.devices){
-      if(!d.marker)continue;
-      const anchor=project(d.pos,d.id.startsWith('mirror')||d.id.startsWith('valve')?1.2:2.8);
-      if(d.markerLeader){const item={device:d,...anchor,...d.markerSize};if(d.id==='target')target=item;else crate=item}else{place(d.marker,anchor);if(hasPair)obstacles.push({...anchor,...d.markerSize})}
-    }
-    const layout=layoutDockingMarkers(target,crate,width,this.dockingMarkerOrder,obstacles,this.dockingMarkerCenter);this.dockingMarkerOrder=layout.order;this.dockingMarkerCenter=layout.center;
-    const edgeLayout=layout.order?null:layoutClampedDockingMarkers(layout.target,layout.crate,width,obstacles,this.clampedMarkerCenters); // 只有近pair已分離時才處理原P3反例，不改近pair演算法。
-    this.clampedMarkerCenters=edgeLayout?.centers||{target:null,crate:null}; // 清楚分開兩種避讓記憶，近pair重新接近時不沿用舊貼邊位置。
-    for(const point of [edgeLayout?.target||layout.target,edgeLayout?.crate||layout.crate])if(point){ // 使用避讓後字框，未改動的標籤仍沿用原投影。
-      const d=point.device;place(d.marker,point);const endpoint=project(d.pos,0,false);d.markerLeader.hidden=!(layout.order||point.displaced)||point.hidden||endpoint.hidden; // 個別貼邊位移也必須保留指向原裝置的leader。
-      if(!d.markerLeader.hidden){const dx=endpoint.x-point.x,dy=endpoint.y-point.y;d.markerLeader.style.transform=`translate3d(${point.x}px,${point.y}px,0) rotate(${Math.atan2(dy,dx)}rad) scaleX(${Math.hypot(dx,dy)})`}
-    }
+    if(this.markerSizesDirty){for(let i=0;i<this.markerItems.length;i++){const p=this.markerItems[i];p.element.hidden=false;p.width=p.element.offsetWidth;p.height=p.element.offsetHeight}this.markerSizesDirty=false}
+    placeRuntimeMarkers(this.markerItems,this.viewport.width);
+    for(let i=0;i<this.markerItems.length;i++){const p=this.markerItems[i];this.placeMarker(p);const d=p.device;if(!d?.markerLeader)continue;d.markerLeader.hidden=!p.displaced||p.hidden;if(!d.markerLeader.hidden){const dx=p.endpointX-p.x,dy=p.endpointY-p.y;if(d.leaderTransform){d.leaderX.value=p.x;d.leaderY.value=p.y;d.leaderAngle.value=Math.atan2(dy,dx);d.leaderScale.x=Math.hypot(dx,dy);d.markerLeader.attributeStyleMap.set('transform',d.leaderTransform)}else d.markerLeader.style.transform=`translate3d(${p.x}px,${p.y}px,0) rotate(${Math.atan2(dy,dx)}rad) scaleX(${Math.hypot(dx,dy)})`}}
   }
+
   load(room,puzzle,run){
+    const identity=`${run.campaignVersion}:v${run.variantVersion}:${run.seed}`;if(this.cacheIdentity!==identity){this.clearRoomCache();this.cacheIdentity=identity}this.dirty=true;this.opticsKey=-1;this.optics=null;
     if(this.beam){this.beam.parent?.remove(this.beam);this.beam.geometry.dispose();this.beam.material.dispose();this.beam=null}
     if(this.roomGroup)this.scene.remove(this.roomGroup);
-    // Only one room is rendered. Cached rooms bound allocation to the authored 12-room station.
-    if(this.cache.has(room.id)){const cached=this.cache.get(room.id);this.roomGroup=cached.group;this.devices=cached.devices;this.scene.add(this.roomGroup);this.room=room;this.puzzle=puzzle;this.refresh(run);this.createMarkers();return}
+    // Only one room is rendered. Cached rooms and work phases bound allocation to authored campaign content.
+    const cacheKey=puzzle?.cacheKey||`${run.campaignVersion}:v${run.variantVersion}:${run.seed}:${room.id}`;if(this.cache.has(cacheKey)){const cached=this.cache.get(cacheKey);this.roomGroup=cached.group;this.devices=cached.devices;this.scene.add(this.roomGroup);this.room=room;this.puzzle=puzzle;this.refresh(run);this.createMarkers();this.cacheReferences();return}
     this.room=room;this.puzzle=puzzle;this.roomGroup=new THREE.Group();this.devices=[];this.scene.add(this.roomGroup);
-    const theme=room.type==='safe'?'airlock':room.type==='signal'?'habitat':room.deck===3?'core':'maintenance';this.roomGroup.add(createRoomKit(theme));
+    const theme=room.type==='safe'?'airlock':room.type==='signal'?'habitat':room.deck===3?'core':'maintenance';const architecture=batchArchitecture(createRoomKit(theme));if(this.software){useVertexLighting(architecture);batchDevice(architecture,true);}this.roomGroup.add(architecture);const details=batchArchitecture(createRoomDetails(room));if(this.software){useVertexLighting(details);batchDevice(details,true);}this.roomGroup.add(details);
     const exit=this.addDevice('gate',[0,0,6.7],{id:'exit',label:'艙門 · 開啟航行圖',range:3.3},'powered');exit.mesh.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.28;o.material.depthWrite=false}});
     if(room.type==='safe'){
       this.addDevice('oxygen',[-5,0,-3],{id:'oxygen',label:'安全補給 · 氧氣與艙服已回復',range:3},'powered');
@@ -71,43 +118,67 @@ export class StationView {
     if(room.signalId)this.addDevice('console',[-5,0,3],{id:'signal',label:'文字訊號 · F 讀取',range:3},'powered');
     if(room.endingTerminal)this.addDevice('beacon',[3,0,-3],{id:'ending',label:'能源終端 · 選擇訊號的去向',range:3.5},'powered');
     if(puzzle?.type==='momentum'){
-      this.addDevice('crate',puzzle.crateStart,{id:'crate',label:'電池 · 滑鼠或牽引鍵連接',range:4.2}).mesh.scale.setScalar(.7333);
+      for(const object of puzzle.objects||[{id:'crate-battery',start:puzzle.crateStart}])this.addDevice('crate',object.start,{id:object.id===(puzzle.activeObjectId||'crate-battery')?'crate':object.id,objectId:object.id,label:object.id===(puzzle.activeObjectId||'crate-battery')?'目前電芯 · T 連接':`${Number(object.id.split('-').at(-1))<puzzle.phaseIndex+1?'✓':'▣'} 電芯 ${object.id.split('-').at(-1)} · ${Number(object.id.split('-').at(-1))<puzzle.phaseIndex+1?'已接通':'待運'}`,range:object.id===(puzzle.activeObjectId||'crate-battery')?4.2:0}).mesh.scale.setScalar(.7333);
       const receiver=this.addDevice('receiver',[puzzle.target[0],puzzle.target[1]-.72,puzzle.target[2]],{id:'target',label:'低速停靠接點 · 煞車保持 1.5 秒',range:3});receiver.pos.fromArray(puzzle.target);
       const ring=new THREE.Mesh(new THREE.BoxGeometry(2.1,2.1,2.1),new THREE.MeshBasicMaterial({color:'#e8bc78',wireframe:true}));receiver.mesh.add(ring);ring.position.y=.72;
-      
+      if(puzzle.routeEnabled){
+        puzzle.railPoints.forEach((goal,index)=>{const pos=index===0?puzzle.railStartPosition||goal:goal;const d=this.addDevice('magnetic',[pos[0],pos[1]-.4,pos[2]],{id:`rail-${index}`,index,label:index===0?'磁軌升降 · F 進入上層 / Shift 離軌':`磁軌 ${index+1} · F 轉運 / Shift 離軌`,range:index===0?3.2:16},'ready');d.pos.fromArray(pos)});
+        const line=new THREE.BufferGeometry().setFromPoints((puzzle.railStartPosition?[puzzle.railStartPosition,...puzzle.railPoints]:puzzle.railPoints).map(p=>new THREE.Vector3(...p)));this.roomGroup.add(new THREE.Line(line,new THREE.LineBasicMaterial({color:'#83d4e4'})));
+        this.addDevice('console',[0,4.9,3],{id:'bypass',label:'上層旁路 · F 隔離本次危險',range:2.5},'ready').pos.fromArray(puzzle.bypassPosition);
+      }
     }
     if(puzzle?.type==='reflection'){
       puzzle.mirrorPositions.forEach((pos,i)=>{const d=this.addDevice('mirror',[pos[0],0,pos[2]],{id:`mirror-${i}`,index:i,label:`鏡面 ${i+1} · F 旋轉刻度`,range:2.6});d.pos.fromArray(pos);const pivot=d.mesh.getObjectByName('mirror-pivot');if(pivot)pivot.position.y=pos[1];const stalk=d.mesh.getObjectByName('mirror-stalk');if(stalk){stalk.scale.y=pos[1]/1.65;stalk.position.y=pos[1]/2}const knob=d.mesh.getObjectByName('rotation-knob');if(knob)knob.position.y=pos[1];});
       const endpoint=[6,puzzle.mirrorPositions.at(-1)[1],-6];this.addDevice('receiver',[endpoint[0],endpoint[1]-.72,endpoint[2]],{id:'light-target',label:'光路接收器',range:0});
-      const emitter=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.7,12),new THREE.MeshStandardMaterial({color:'#e4b978',emissive:'#ad682a',emissiveIntensity:1}));emitter.position.set(-7,puzzle.mirrorPositions[0][1],-5);emitter.rotation.z=Math.PI/2;this.roomGroup.add(emitter);
+      if(puzzle.requiresIsolation){const d=this.addDevice('console',[0,-.1,4],{id:'power',label:'光路供電 · 斷電 → 調整鏡面 → 復電確認接收器',range:2.5},'powered');d.pos.fromArray(puzzle.powerPosition)}
+      const emitter=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,.7,12),new THREE.MeshStandardMaterial({color:'#e4b978',emissive:'#ad682a',emissiveIntensity:1}));emitter.position.set(-7,puzzle.mirrorPositions[0][1],-5);emitter.rotation.z=Math.PI/2;emitter.name='optical-emitter';this.roomGroup.add(emitter);
     }
     if(puzzle?.type==='airlock')puzzle.valvePositions.forEach((pos,i)=>{const d=this.addDevice('console',[pos[0],pos[1]-1.6,pos[2]],{id:`valve-${i}`,index:i,label:`閥 ${i+1} · ${puzzle.valveLabels[i]}`,range:2.5});d.pos.fromArray(pos)});
+    if(puzzle?.type==='airlock'&&run.campaignVersion===2){for(let i=0;i<2;i++)this.addDevice('gate',[i?4:-4,0,-6.5],{id:`chamber-${i}`,label:i?'內腔 · 互鎖門':'外腔 · 互鎖門',range:0})}
     if(room.hazard)this.addDevice(room.hazard,room.hazard==='leak'?[7,2,-5]:room.hazard==='arc'?[0,1,-4]:[0,4,0],{id:'hazard',label:room.hazard==='arc'?'電弧 · 等待脈衝空檔':room.hazard==='debris'?'碎片 · 避開移動軌跡':'洩漏 · 遠離吸流區',range:2});
-    this.cache.set(room.id,{group:this.roomGroup,devices:this.devices});this.refresh(run);this.createMarkers();
+    this.cache.set(cacheKey,{group:this.roomGroup,devices:this.devices});if(this.cache.size>16){const key=this.cache.keys().next().value,cached=this.cache.get(key);this.releaseRoom(cached.group);this.cache.delete(key)}this.refresh(run);this.createMarkers();this.cacheReferences();
   }
+  cacheReferences(){this.objectDevices=new Map(this.devices.filter(d=>d.objectId).map(d=>[d.objectId,d]));this.rails=this.devices.filter(d=>d.id.startsWith('rail-'));this.crateDevice=this.devices.find(d=>d.id==='crate');this.hazardDevice=this.devices.find(d=>d.id==='hazard');this.powerDevice=this.devices.find(d=>d.id==='power');this.emitter=this.roomGroup.getObjectByName('optical-emitter');this.mirrors=this.devices.filter(d=>d.id.startsWith('mirror'));for(const d of this.mirrors)d.pivot=d.mesh.getObjectByName('mirror-pivot');}
   refresh(run){for(const d of this.devices)if(['target','ending','light-target'].includes(d.id)||d.id.startsWith('mirror')||d.id.startsWith('valve'))setDeviceState(d.mesh,run.solvedPuzzles.includes(this.puzzle?.id)?'powered':'offline')}
-  nearest(pos){return this.devices.filter(d=>!['hazard','target','light-target'].includes(d.id)&&d.pos.distanceTo(pos)<(d.range||3)).sort((a,b)=>a.pos.distanceToSquared(pos)-b.pos.distanceToSquared(pos))[0]}
+  screenPosition(pos){const point=this.screenScratch ||=new THREE.Vector3();point.copy(pos).project(this.camera);return {x:(point.x*.5+.5)*this.canvas.clientWidth,y:(-.5*point.y+.5)*this.canvas.clientHeight};}
+  nearest(pos,ignoreCargo=false){let best=null,min=Infinity;for(let i=0;i<this.devices.length;i++){const d=this.devices[i];if((ignoreCargo&&d.id==='crate')||d.id==='hazard'||d.id==='target'||d.id==='light-target'||d.id.startsWith('crate-cell-')||d.id.startsWith('chamber-')||d.disabled)continue;const dx=d.pos.x-pos.x,dy=d.pos.y-pos.y,dz=d.pos.z-pos.z,dist=dx*dx+dy*dy+dz*dz,range=d.range??3;if(dist<range*range&&dist<min){best=d;min=dist}}return best}
   pick(x,y){const rect=this.canvas.getBoundingClientRect();this.pointer.set((x-rect.left)/rect.width*2-1,-(y-rect.top)/rect.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);const hits=this.raycaster.intersectObjects(this.devices.map(d=>d.mesh),true);for(const hit of hits){let p=hit.object;while(p){if(p.userData.interaction)return p.userData.interaction;p=p.parent}}return null}
   update(physics,run,puzzleState,time,dt,input){
-    const p=physics.player.translation(),v=physics.player.linvel();this.astronaut.position.set(p.x,p.y,p.z);const moving=Math.hypot(v.x,v.z)>.15;if(moving)this.astronaut.rotation.y=Math.atan2(v.x,v.z);
-    animateAstronaut(this.astronaut,run.status==='failed'?'damaged':physics.anchored?'anchored':input.brake?'brake':input.thrusting?'thrust':'idle',time,run.paused?0:dt);
-    const crate=this.devices.find(d=>d.id==='crate');if(crate&&physics.crate){const c=physics.crate.translation();crate.mesh.position.set(c.x,c.y-.5133,c.z);crate.pos.set(c.x,c.y,c.z)}
-    const optics=this.puzzle?.type==='reflection'?traceOptics(this.puzzle,puzzleState.angles):null;
-    for(const d of this.devices){if(d.id==='hazard'&&this.room.hazard==='arc')setDeviceState(d.mesh,arcPhase(time)==='active'?'danger':arcPhase(time)==='warning'?'ready':'offline');animateDevice(d.mesh,this.settings.reducedMotion?0:time);if(d.id.startsWith('mirror')){const pivot=d.mesh.getObjectByName('mirror-pivot');if(pivot&&optics?.normals[d.index]){const n=new THREE.Vector3(...optics.normals[d.index]);pivot.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);pivot.position.set(-n.x*.12,this.puzzle.mirrorPositions[d.index][1]-n.y*.12,-n.z*.12);}}if(d.id==='hazard'&&this.room.hazard==='debris')d.mesh.position.fromArray(debrisPosition(time))}
-    const points=[];
-    if(physics.tethered&&physics.crate){const c=physics.crate.translation();points.push(new THREE.Vector3(p.x,p.y,p.z),new THREE.Vector3(c.x,c.y,c.z))}
-    else if(this.puzzle?.type==='reflection'){
-      points.push(...optics.path.map(p=>new THREE.Vector3(...p)));
+    const stamp=performance.now(),frameMs=Math.min(250,stamp-this.lastFrame);this.lastFrame=stamp;
+    if(run.paused)this.frameAverage=0;
+    else if(this.software){
+      this.frameAverage=this.frameAverage?this.frameAverage*.95+frameMs*.05:frameMs;
+      if(stamp-(this.lastTune||0)>5000){
+        const scale=this.renderScale||1,min=this.settings.quality==='low'?.85:1,next=this.frameAverage>38?Math.max(min,scale-.1):this.frameAverage<24?Math.min(1.2,scale+.1):scale;
+        if(next!==scale){this.renderScale=next;this.resize()}this.lastTune=stamp;
+      }
     }
-    if(!this.beam){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(18),3));this.beam=new THREE.Line(g,new THREE.LineBasicMaterial({color:'#ffc078',transparent:true,opacity:.95}));this.beam.frustumCulled=false;this.roomGroup.add(this.beam)}this.beam.visible=points.length>0;if(points.length){const a=this.beam.geometry.attributes.position;points.forEach((p,i)=>a.setXYZ(i,p.x,p.y,p.z));a.needsUpdate=true;this.beam.geometry.setDrawRange(0,points.length);this.beam.material.color.set(physics.tethered?'#83d4e4':'#ffc078')}
-    let goal,look;
-    if(this.mode==='fixed'){const narrow=this.camera.aspect<.85;goal=new THREE.Vector3(narrow?22:15,narrow?25:17,narrow?32:22);look=new THREE.Vector3(0,2.5,0)}
-    else {goal=new THREE.Vector3(p.x+Math.sin(this.yaw)*7,p.y+4,p.z+Math.cos(this.yaw)*7);goal.x=THREE.MathUtils.clamp(goal.x,-8,8);goal.y=Math.min(goal.y,7.7);goal.z=THREE.MathUtils.clamp(goal.z,-7.7,12);look=new THREE.Vector3(p.x,p.y,p.z)}
+    this.needsRender=false;if(this.contextLost||(run.paused&&!this.dirty))return;this.dirty=false;this.needsRender=true;
+    const p=physics.playerPosition,v=physics.playerVelocity;this.astronaut.position.set(p.x,p.y,p.z);const moving=Math.hypot(v.x,v.z)>.15;if(moving)this.astronaut.rotation.y=Math.atan2(v.x,v.z);
+    animateAstronaut(this.astronaut,run.status==='failed'?'damaged':physics.anchored?'anchored':input.brake?'brake':input.thrusting?'thrust':'idle',this.settings.reducedMotion?0:time,run.paused?0:dt);
+    for(let i=0;i<physics.objects.length;i++){const object=physics.objects[i];const d=this.objectDevices.get(object.id);if(d){const c=object.position;d.mesh.position.set(c.x,c.y-.5133,c.z);d.pos.set(c.x,c.y,c.z)}}
+    for(let i=0;i<this.rails.length;i++)this.rails[i].disabled=this.rails[i].index!==puzzleState.railIndex+1;
+    const key=puzzleState.revision;
+    if(this.puzzle?.type==='reflection'&&key!==this.opticsKey){this.opticsKey=key;this.optics=traceOptics(this.puzzle,puzzleState.angles);if(this.puzzle.requiresIsolation&&!puzzleState.circuitPowered){this.optics.powered=false;this.optics.hitCount=0}if(this.emitter)this.emitter.visible=!this.puzzle.requiresIsolation||puzzleState.circuitPowered;if(this.powerDevice){setDeviceState(this.powerDevice.mesh,puzzleState.circuitPowered?'powered':'offline');this.powerDevice.label=(puzzleState.circuitPowered?'光路供電 · F 斷電':'光路供電 · F 復電')+' · 斷電 → 調整鏡面 → 復電確認接收器'}for(const d of this.mirrors)setDeviceState(d.mesh,this.optics.powered?'powered':d.index<this.optics.hitCount?'ready':'offline');const receiver=this.devices.find(d=>d.id==='light-target');if(receiver)setDeviceState(receiver.mesh,this.optics.powered?'powered':'offline');const n=this.normalScratch ||= new THREE.Vector3(),axis=this.axisScratch ||=new THREE.Vector3(0,0,1);for(const d of this.mirrors){const pivot=d.pivot;if(pivot&&this.optics.normals[d.index]){n.fromArray(this.optics.normals[d.index]);pivot.quaternion.setFromUnitVectors(axis,n);pivot.position.set(-n.x*.12,this.puzzle.mirrorPositions[d.index][1]-n.y*.12,-n.z*.12);}}}
+    const optics=this.optics;
+    if(this.puzzle?.type==='airlock'){const chamber=pressureState(puzzleState.sequence,this.pressureScratch,this.puzzle.sequence.length);for(const d of this.devices)if(d.id==='chamber-0'||d.id==='chamber-1')setDeviceState(d.mesh,(d.id==='chamber-0'?chamber.outerOpen:chamber.innerOpen)?'powered':chamber.isolated?'ready':'offline')}
+    for(let i=0;i<this.devices.length;i++){const d=this.devices[i];if(d.id==='hazard'&&this.room.hazard==='arc')setDeviceState(d.mesh,arcPhase(time,this.puzzle?.stage)==='active'?'danger':arcPhase(time,this.puzzle?.stage)==='warning'?'ready':'offline');animateDevice(d.mesh,this.settings.reducedMotion?0:time);if(d.id==='hazard'&&this.room.hazard==='debris'){d.mesh.visible=!puzzleState.bypass;d.mesh.position.fromArray(debrisPosition(time,this.debrisScratch,this.puzzle?.stage));d.pos.copy(d.mesh.position)}}
+    if(!this.beam){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(18),3));this.beam=new THREE.Line(g,new THREE.LineBasicMaterial({color:'#ffc078',transparent:true,opacity:.95}));this.beam.frustumCulled=false;this.roomGroup.add(this.beam)}
+    const beamPosition=this.beam.geometry.attributes.position;let count=0;
+    if(physics.tethered&&physics.crate){const c=physics.cratePosition;beamPosition.setXYZ(0,p.x,p.y,p.z);beamPosition.setXYZ(1,c.x,c.y,c.z);count=2}
+    else if(this.puzzle?.type==='reflection'&&optics&&(!this.puzzle.requiresIsolation||puzzleState.circuitPowered)){for(let i=0;i<optics.path.length;i++){const point=optics.path[i];beamPosition.setXYZ(i,point[0],point[1],point[2])}count=optics.path.length}
+    this.beam.visible=count>0;if(count){beamPosition.needsUpdate=true;this.beam.geometry.setDrawRange(0,count);this.beam.material.color.setHex(physics.tethered?0x83d4e4:0xffc078)}
+    const goal=this.goalScratch ||=new THREE.Vector3(),look=this.lookScratch ||=new THREE.Vector3();
+    if(this.mode==='fixed'){const narrow=this.camera.aspect<.85;goal.set(narrow?22:15,narrow?25:17,narrow?32:22);look.set(0,2.5,0)}
+    else {goal.set(p.x+Math.sin(this.yaw)*7,p.y+4,p.z+Math.cos(this.yaw)*7);goal.x=THREE.MathUtils.clamp(goal.x,-8,8);goal.y=Math.min(goal.y,7.7);goal.z=THREE.MathUtils.clamp(goal.z,-7.7,12);look.set(p.x,p.y,p.z)}
     const blend=this.settings.reducedMotion?1:1-Math.exp(-dt*6);this.camera.position.lerp(goal,blend);this.target.lerp(look,blend);this.camera.lookAt(this.target);
     this.camera.updateMatrixWorld();this.updateMarkers(p,puzzleState);
     const altitude=this.altitudeLine.geometry.attributes.position;altitude.setXYZ(0,p.x,.05,p.z);altitude.setXYZ(1,p.x,p.y,p.z);altitude.needsUpdate=true;this.altitudeLine.frustumCulled=false;
-    this.renderer.render(this.scene,this.camera);
+    this.updateMs=performance.now()-stamp;
   }
+  releaseRoom(group){const geometries=new Set(),materials=new Set();group.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.userData.uniqueStateMaterial&&o.material)materials.add(o.material);if(o.material?.transparent&&o.material.opacity===.28)materials.add(o.material)});for(const g of geometries)g.dispose();for(const m of materials)m.dispose();group.removeFromParent()}
+  clearRoomCache(){for(const item of this.cache.values())this.releaseRoom(item.group);this.cache.clear()}
+  render(){if(this.needsRender&&!this.contextLost){this.renderCount=(this.renderCount||0)+1;this.renderer.render(this.scene,this.camera);this.needsRender=false}}
   dispose(){this.resizeObserver.disconnect();this.markerLayer.remove();const gs=new Set(),ms=new Set(),ts=new Set();const collect=g=>g.traverse(o=>{if(o.geometry)gs.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[]){ms.add(m);for(const v of Object.values(m))if(v?.isTexture)ts.add(v)}});collect(this.scene);for(const c of this.cache.values())collect(c.group);for(const t of ts)t.dispose();for(const m of ms)m.dispose();for(const g of gs)g.dispose();this.cache.clear();this.renderer.dispose()}
-  telemetry(){if(!this.gpu){const gl=this.renderer.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');this.gpu={vendor:ext?gl.getParameter(ext.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),renderer:ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)}}return {gpu:this.gpu,drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,quality:this.settings.quality,dpr:this.renderer.getPixelRatio(),camera:this.mode}}
+  telemetry(){if(!this.gpu){const gl=this.renderer.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');this.gpu={vendor:ext?gl.getParameter(ext.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),renderer:ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)}}return {updateMs:this.updateMs,renderCount:this.renderCount,roomCache:this.cache.size,gpu:this.gpu,drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,geometries:this.renderer.info.memory.geometries,textures:this.renderer.info.memory.textures,quality:this.settings.quality,software:this.software,drawingBuffer:[this.canvas.width,this.canvas.height],dpr:this.renderer.getPixelRatio(),camera:this.mode}}
 }
