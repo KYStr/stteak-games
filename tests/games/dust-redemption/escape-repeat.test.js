@@ -11,7 +11,11 @@ function harness(mode='playing',saved=null){
  const classList=()=>{const set=new Set(['hidden']);return{add:k=>set.add(k),remove:k=>set.delete(k),contains:k=>set.has(k),toggle(k,v){if(v)set.add(k);else set.delete(k)}}};
  const calls={pause:0,resume:0,unlock:0,interact:0,reload:0,vault:0,item:0,rotations:[],states:[],fieldClose:0,storage:0};
  const listeners={},profile={activeRun:null,wallet:123},run={missionId:'test-only'},knob={style:{}};
- const context={mode,previousMode:null,pauseReturn:saved,lastTime:5,profile,run,mouseActive:true,keys:new Set(['KeyD']),firing:true,aiming:true,joystick:{x:1,y:0},overlay:{innerHTML:'original',classList:classList(),querySelector:()=>({focus(){}})},document:{body:{classList:classList()}},canvas:{focus(){}},$:()=>({querySelector:()=>knob}),audio:{pause(){calls.pause++},resume(){calls.resume++},unlock(){calls.unlock++}},bridge:{state:v=>calls.states.push(v)},window:{addEventListener:(type,fn)=>listeners[type]=fn},queueMicrotask:fn=>fn(),showHub(){context.mode='hub'},interact(){calls.interact++},reloadWeapon(){calls.reload++},vault(){calls.vault++},useItem(){calls.item++},world:{rotate:v=>calls.rotations.push(v)},localStorage:{setItem(){calls.storage++},getItem(){calls.storage++}},updateHud(){},console};
+ const context={mousePointerId:null,contextLost:false,clearingInputs:false,mouseButtons:0,firePointers:new Set(),aimPadActive:false,padResets:[],mode,previousMode:null,pauseReturn:saved,lastTime:5,profile,run,mouseActive:true,keys:new Set(['KeyD']),firing:true,aiming:true,joystick:{x:1,y:0},overlay:{innerHTML:'original',classList:classList(),querySelector:()=>({focus(){}})},document:{body:{classList:classList()}},canvas:{focus(){}},$:()=>({querySelector:()=>knob}),audio:{pause(){calls.pause++},resume(){calls.resume++},unlock(){calls.unlock++}},bridge:{state:v=>calls.states.push(v)},window:{addEventListener:(type,fn)=>listeners[type]=fn},queueMicrotask:fn=>fn(),showHub(){context.mode='hub'},interact(){calls.interact++},reloadWeapon(){calls.reload++},vault(){calls.vault++},useItem(){calls.item++},world:{invalidate(){},rotate:v=>calls.rotations.push(v)},localStorage:{setItem(){calls.storage++},getItem(){calls.storage++}},updateHud(){},console};
+ context.captureOverlayState=()=>({parent:context.pauseReturn,mode:context.mode,html:context.overlay.innerHTML,hidden:context.overlay.classList.contains('hidden')});
+ context.restoreOverlayState=saved=>{context.overlay.innerHTML=saved.html;context.overlay.classList.toggle('hidden',saved.hidden);context.clearInputs?.()};
+ context.syncAudioForMode=()=>{if(!['paused','help','settings'].includes(context.mode))context.audio.resume()};
+ context.syncCombatInput=()=>{context.firing=Boolean(context.mouseButtons&1)||context.firePointers.size>0;context.aiming=Boolean(context.mouseButtons&2)||context.aimPadActive||context.firePointers.size>0};
  vm.createContext(context);
  const fieldClose=section('    close() {\n      mode = "playing";','    effect: applyFieldEffect,');
  vm.runInContext(section('function button(', 'function toast(')+section('function closeSheet() {','function failure(')+section('window.addEventListener("keydown",','function syncMouseButtons(')+'\nglobalThis.closeField=({'+fieldClose+'}).close;',context);
@@ -39,8 +43,8 @@ test('field close uses the actual close callback once; held repeat cannot pause 
 test('keyup and a deliberate new Escape press still resume once',()=>{
  const h=harness();h.key();h.key('Escape',true);h.up();assert.equal(h.context.mode,'paused');h.key();assert.equal(h.context.mode,'playing');h.key('Escape',true);assert.equal(h.context.mode,'playing');assert.deepEqual(h.calls.states,['paused','running']);
 });
-for(const tag of ['INPUT','SELECT'])test(`${tag} keeps its original Escape exemption`,()=>{
- const h=harness();assert.equal(h.key('Escape',false,tag),false);assert.equal(h.key('Escape',true,tag),false);assert.equal(h.context.mode,'playing');assert.deepEqual(h.calls.states,[]);
+for(const tag of ['INPUT','SELECT'])test(`${tag} permits one Escape route before native form handling`,()=>{
+ const h=harness();assert.equal(h.key('Escape',false,tag),true);assert.equal(h.key('Escape',true,tag),true);assert.equal(h.context.mode,'paused');assert.deepEqual(h.calls.states,['paused']);
 });
 for(const mode of ['loading','title'])test(`${mode} stays unchanged on fresh and repeated Escape`,()=>{
  const h=harness(mode);h.key();h.key('Escape',true);assert.equal(h.context.mode,mode);assert.deepEqual(h.calls.states,[]);

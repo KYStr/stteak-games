@@ -1,70 +1,20 @@
-import { mkdir, copyFile, readFile, writeFile } from "node:fs/promises";
-const root = new URL("../../", import.meta.url);
-const out = new URL("public/games/dust-redemption/vendor/", root);
-await mkdir(out, { recursive: true });
-for (const file of ["three.module.js", "three.core.js"])
-  await copyFile(
-    new URL(`node_modules/three/build/${file}`, import.meta.url),
-    new URL(file, out),
-  );
-await copyFile(
-  new URL("node_modules/three/LICENSE", import.meta.url),
-  new URL("THREE-LICENSE.txt", out),
-);
-for (const [source, target] of [
-  ["loaders/GLTFLoader.js", "GLTFLoader.js"],
-  ["utils/BufferGeometryUtils.js", "BufferGeometryUtils.js"],
-  ["utils/SkeletonUtils.js", "SkeletonUtils.js"],
-]) {
-  const { readFile, writeFile } = await import("node:fs/promises");
-  let code = await readFile(
-    new URL(`node_modules/three/examples/jsm/${source}`, import.meta.url),
-    "utf8",
-  );
-  code = code
+import { mkdir, copyFile, readFile, writeFile, readdir, cp } from 'node:fs/promises';
+const source = new URL('./', import.meta.url);
+const runtime = new URL('../../public/games/dust-redemption/', source);
+const vendor = new URL('vendor/', runtime);
+await mkdir(vendor, { recursive: true });
+for (const file of ['three.module.js', 'three.core.js'])
+  await copyFile(new URL(`node_modules/three/build/${file}`, source), new URL(file, vendor));
+await copyFile(new URL('node_modules/three/LICENSE', source), new URL('THREE-LICENSE.txt', vendor));
+for (const [from, to] of [['loaders/GLTFLoader.js','GLTFLoader.js'],['utils/BufferGeometryUtils.js','BufferGeometryUtils.js'],['utils/SkeletonUtils.js','SkeletonUtils.js']]) {
+  const code = (await readFile(new URL(`node_modules/three/examples/jsm/${from}`, source), 'utf8'))
     .replaceAll("from 'three'", "from './three.module.js'")
-    .replaceAll(
-      "'../utils/BufferGeometryUtils.js'",
-      "'./BufferGeometryUtils.js'",
-    );
-  await writeFile(new URL(target, out), code);
+    .replaceAll("'../utils/BufferGeometryUtils.js'", "'./BufferGeometryUtils.js'");
+  await writeFile(new URL(to, vendor), code);
 }
-console.log("Bundled pinned Three.js 0.180.0 runtime and loaders.");
-for (const file of [
-  "expansion-content.js",
-  "field-props.js",
-  "field-system.js",
-  "render-batches.js",
-  "mission-flow.js",
-  "mission-flow-v1.js",
-  "mission-props.js",
-  "departure-guidance.js",
-  "mission-system.js",
-  "water-flow.js",
-  "water-props.js",
-  "water-system.js",
-  "signal-flow.js",
-  "signal-props.js",
-  "signal-system.js",
-  "ledger-flow.js",
-  "ledger-props.js",
-  "ledger-system.js",
-  "night-flow.js",
-  "night-props.js",
-  "night-system.js",
-  "pact-flow.js",
-  "pact-props.js",
-  "pact-system.js",
-  "cargo-tether.js",
-  "enemy-tactics.js",
-  "game.js",
-]) {
-  const source = await readFile(new URL(file, import.meta.url), "utf8");
-  await writeFile(
-    new URL(`public/games/dust-redemption/${file}`, root),
-    source.replace(/\r\n?/g, "\n"),
-  );
+for (const file of await readdir(source)) {
+  if (/\.(js|html|css)$/.test(file))
+    await writeFile(new URL(file, runtime), (await readFile(new URL(file, source), 'utf8')).replace(/\r\n?/g, '\n'));
 }
-console.log(
-  "Copied authored fieldwork sources into the fingerprinted runtime.",
-);
+await cp(new URL('assets/', source), new URL('assets/', runtime), { recursive: true });
+console.log('Built complete Dust & Redemption runtime with pinned Three.js 0.180.0.');

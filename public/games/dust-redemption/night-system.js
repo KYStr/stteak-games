@@ -10,11 +10,19 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
+const vectorCache = new WeakMap();
 const point = (p) => [p.x, p.z],
-  vector = (p) => new THREE.Vector3(p[0], 0, p[1]),
+  vector = (p) => {
+    let v = vectorCache.get(p);
+    if (!v || v.x !== p[0] || v.z !== p[1]) {
+      v = new THREE.Vector3(p[0], 0, p[1]);
+      vectorCache.set(p, v);
+    }
+    return v;
+  },
   gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z),
   same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const esc = (v) =>
@@ -110,7 +118,7 @@ export class NightSystem {
           }
         : c,
     );
-    this.props = createNightProps(THREE, world, this.flow);
+    this.props = createNightProps(world.graphics || THREE, world, this.flow);
     this.props.bindField(
       { route: this.routeTask, brace: this.brace, escort: this.escort },
       player,
@@ -355,6 +363,11 @@ export class NightSystem {
     const t =
       this.field.traversal?.task === this.escort ? this.field.traversal : null;
     if (!t) return;
+    if (
+      t.index <= this.status.checkpoint + 1 &&
+      t.paused === this.status.paused
+    )
+      return;
     const s = this.partySnapshot();
     if (t.index > this.status.checkpoint + 1) {
       if (t.index !== this.status.checkpoint + 2)
@@ -434,6 +447,7 @@ export class NightSystem {
     }
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     try {
       if (action === "field-close" || action === "field-view") return true;
       const task = this.field.active || this.field.traversal?.task;
@@ -500,7 +514,9 @@ export class NightSystem {
   }
   syncBridge() {
     if (!this.status.routeId) return;
-    const snapshot = this.props.readBrace();
+    const snapshot = this.props.readBrace(
+      (this.braceStatus ??= { endDistances: [0, 0] }),
+    );
     if (!snapshot) throw Error("無法讀取原斜撐與試重板。");
     if (
       this.pendingBridgeTest &&
@@ -509,7 +525,7 @@ export class NightSystem {
     ) {
       if (!this.testStart) throw Error("缺少實際試走起點。");
       this.dispatch("bridge-tested", {
-        snapshot,
+        snapshot: structuredClone(snapshot),
         fromPosition: this.testStart,
         playerPosition: point(this.player.position),
       });
@@ -518,10 +534,14 @@ export class NightSystem {
     } else if (
       (this.brace.touched.has("brace") || this.status.bridgeTested) &&
       this.near(this.flow.brace.position) &&
-      !same(this.lastBrace, snapshot)
+      (!this.lastBrace ||
+        this.lastBrace.angle !== snapshot.angle ||
+        this.lastBrace.boardHeight !== snapshot.boardHeight ||
+        this.lastBrace.endDistances[0] !== snapshot.endDistances[0] ||
+        this.lastBrace.endDistances[1] !== snapshot.endDistances[1])
     ) {
       this.dispatch("brace-observed", {
-        snapshot,
+        snapshot: structuredClone(snapshot),
         playerPosition: point(this.player.position),
       });
       this.lastBrace = structuredClone(snapshot);
@@ -635,7 +655,7 @@ export class NightSystem {
       this.flow.arrival.position,
       this.flow.arrival.playerRadius,
     );
-    if (!this.field.complete || this.field.pendingEffects.length)
+    if (!this.field.baseComplete || this.field.pendingEffects.length)
       throw Error("先完成原三工作並返回現場，結清一次工作效果。");
     const kills = this.callbacks.kills?.() ?? this.status.defeatedActors.length;
     if (
@@ -745,13 +765,7 @@ export class NightSystem {
     const next = cache.path[0];
     if (
       !next ||
-      !tacticalSegmentClear({
-        from,
-        to: next,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, next, colliders, 0.38)
     ) {
       if (next) delete enemy.nightPath;
       this.world.animate(enemy.actor, "idle");
@@ -770,6 +784,7 @@ export class NightSystem {
         colliders,
         0.38,
         23,
+        (enemy.moveOut ??= {}),
       );
       from.x = p.x;
       from.z = p.z;
@@ -778,11 +793,20 @@ export class NightSystem {
     this.world.animate(enemy.actor, "walk");
   }
   occupants() {
-    const enemyObjects = new Set(this.enemies.map((e) => e.actor.object));
-    return [
-      ...this.world.actors.filter((a) => !enemyObjects.has(a.object)),
-      ...this.enemies.filter((e) => e.hp > 0).map((e) => e.actor),
-    ];
+    const result = (this.occupantBuffer ??= []);
+    result.length = 0;
+    const enemies = this.enemies;
+    for (let i = 0; i < this.world.actors.length; i++) {
+      const actor = this.world.actors[i];
+      let include = true;
+      for (let j = 0; j < enemies.length; j++)
+        if (enemies[j].actor === actor && enemies[j].hp <= 0) {
+          include = false;
+          break;
+        }
+      if (include) result.push(actor);
+    }
+    return result;
   }
   update(dt) {
     if (this.disposed || !Number.isFinite(dt) || dt <= 0) return;

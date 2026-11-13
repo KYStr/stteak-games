@@ -1,8 +1,10 @@
+import { createBoundsTracker } from "./collision-bounds.js";
 /** Source-only original ledger attachments. Metres, +Y up, +Z forward.
  * The original ledger and copy are borrowed real Field meshes, never cloned.
  * Controller owns evidence, events, Field cargo motion and final story choice.
  */
 export function createLedgerProps(THREE, world, flow, { field, player } = {}) {
+  const trackedBounds = createBoundsTracker(THREE);
   const carriage = field?.tasks.find((t) => t.id === "ledger-carriage"),
     carbon = field?.tasks.find((t) => t.id === "ledger-carbon"),
     press = field?.tasks.find((t) => t.id === "ledger-copy");
@@ -164,13 +166,14 @@ export function createLedgerProps(THREE, world, flow, { field, player } = {}) {
     return n;
   }
   function bounds(box, object) {
-    object.updateWorldMatrix(true, true);
-    const b = new THREE.Box3().setFromObject(object),
-      s = b.getSize(new THREE.Vector3()),
-      c = b.getCenter(new THREE.Vector3());
-    Object.assign(box, { x: c.x, z: c.z, w: s.x, h: s.y, d: s.z });
-    Object.assign(box.min, b.min);
-    Object.assign(box.max, b.max);
+    const value = trackedBounds(object, box.id, box.kind);
+    box.x = value.x;
+    box.z = value.z;
+    box.w = value.w;
+    box.h = value.h;
+    box.d = value.d;
+    Object.assign(box.min, value.min);
+    Object.assign(box.max, value.max);
     return box;
   }
   function snapshot(node) {

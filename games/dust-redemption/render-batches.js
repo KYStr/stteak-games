@@ -1,3 +1,23 @@
+const depthOrder = (a, b) => b.depth - a.depth || a.sequence - b.sequence;
+const buildingDepthOrder = (a, b) =>
+  b.depth - a.depth || a.source.id - b.source.id;
+// Current-frame membership without allocating a fresh Set backing table on clear.
+export class FrameMeshSet {
+  constructor() {
+    this.marks = new WeakMap();
+    this.generation = 0;
+  }
+  clear() {
+    this.generation++;
+  }
+  add(mesh) {
+    this.marks.set(mesh, this.generation);
+    return this;
+  }
+  has(mesh) {
+    return this.marks.get(mesh) === this.generation;
+  }
+}
 /** Render-only batching. Original scene meshes remain the collision/fade authority. */
 export class BuildingBatches {
   constructor(THREE, buildings, parent) {
@@ -14,9 +34,12 @@ export class BuildingBatches {
           !source.isMesh ||
           source.geometry.type !== "BoxGeometry" ||
           Array.isArray(material) ||
-          !material.isMeshStandardMaterial ||
-          material.roughness !== 0.94 ||
-          material.metalness !== 0 ||
+          !(
+            material.isMeshLambertMaterial ||
+            (material.isMeshStandardMaterial &&
+              material.roughness === 0.94 &&
+              material.metalness === 0)
+          ) ||
           material.emissive.getHex() !== 0 ||
           material.map ||
           material.normalMap ||
@@ -25,7 +48,7 @@ export class BuildingBatches {
           material.alphaMap
         )
           throw new Error(
-            "Building batch requires the authored untextured .94/0 boxes",
+            "Building batch requires untextured authored boxes with diffuse or .94/0 physical materials",
           );
         const { width, height, depth } = source.geometry.parameters;
         this.records.push({
@@ -79,7 +102,9 @@ export class BuildingBatches {
     mesh.name = name;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.instanceMatrix.setUsage(T.DynamicDrawUsage);
+    mesh.instanceMatrix.setUsage(
+      material.transparent ? T.DynamicDrawUsage : T.StaticDrawUsage,
+    );
     mesh.count = 0;
     mesh.visible = false;
     // A faded batch sorts near its own building, not at the world origin.
@@ -106,32 +131,57 @@ export class BuildingBatches {
     // Allocate colour once; subsequent frames only update existing storage.
     mesh.setColorAt(0, new T.Color(0xffffff));
     mesh.instanceColor.setUsage(T.DynamicDrawUsage);
-    const bucket = { mesh, inverse, members: [], sourceOrder: [], key: null };
+    const bucket = {
+      mesh,
+      inverse,
+      members: [],
+      count: 0,
+      sourceOrder: [],
+      orderCount: 0,
+      key: null,
+    };
     this.buckets.push(bucket);
     return bucket;
   }
   sync(hits, camera) {
     if (this.disposed) throw new Error("Building batch has been disposed");
-    for (const bucket of this.buckets) bucket.members.length = 0;
+    for (let i = 0; i < this.buckets.length; i++) this.buckets[i].count = 0;
     camera.updateMatrixWorld();
-    for (const record of this.records) {
+    for (let i = 0; i < this.records.length; i++) {
+      const record = this.records[i];
       if (hits.has(record.source)) {
         record.depth = this.projected.copy(record.center).project(camera).z;
-        this.faded[record.buildingIndex].members.push(record);
-      } else this.opaque.members.push(record);
+        const bucket = this.faded[record.buildingIndex];
+        bucket.members[bucket.count++] = record;
+      } else this.opaque.members[this.opaque.count++] = record;
     }
-    for (const bucket of this.faded)
-      bucket.members.sort(
-        (a, b) => b.depth - a.depth || a.source.id - b.source.id,
-      );
-    for (const bucket of this.buckets) {
-      const key = bucket.members.map((record) => record.source.id).join(",");
-      if (key === bucket.key) continue;
-      bucket.key = key;
-      bucket.sourceOrder = bucket.members.map((record) => record.source);
-      bucket.mesh.count = bucket.members.length;
-      bucket.mesh.visible = bucket.members.length > 0;
-      for (const [index, record] of bucket.members.entries()) {
+    for (let i = 0; i < this.faded.length; i++) {
+      const bucket = this.faded[i];
+      // Sort the active prefix without trimming/refilling its backing store.
+      for (let j = 1; j < bucket.count; j++) {
+        const record = bucket.members[j];
+        let k = j - 1;
+        while (k >= 0 && buildingDepthOrder(bucket.members[k], record) > 0) {
+          bucket.members[k + 1] = bucket.members[k];
+          k--;
+        }
+        bucket.members[k + 1] = record;
+      }
+    }
+    for (let i = 0; i < this.buckets.length; i++) {
+      const bucket = this.buckets[i];
+      const order = (bucket.sourceOrder ??= []);
+      let changed = bucket.orderCount !== bucket.count;
+      for (let i = 0; i < bucket.count && !changed; i++)
+        if (order[i] !== bucket.members[i].source) changed = true;
+      if (!changed) continue;
+      bucket.orderCount = bucket.count;
+      for (let i = 0; i < bucket.count; i++)
+        order[i] = bucket.members[i].source;
+      bucket.mesh.count = bucket.count;
+      bucket.mesh.visible = bucket.count > 0;
+      for (let index = 0; index < bucket.count; index++) {
+        const record = bucket.members[index];
         this.localMatrix.multiplyMatrices(bucket.inverse, record.worldMatrix);
         bucket.mesh.setMatrixAt(index, this.localMatrix);
         bucket.mesh.setColorAt(index, record.color);
@@ -161,6 +211,8 @@ export class TracerBatch {
   constructor(THREE, parent, initialCapacity = 32) {
     this.THREE = THREE;
     this.effects = [];
+    this.pool = [];
+    this.ordered = [];
     this.capacity = 0;
     this.disposed = false;
     this.color = new THREE.Color();
@@ -213,25 +265,41 @@ export class TracerBatch {
   add(a, b, color = 0xffd69a) {
     if (this.disposed) throw new Error("Tracer batch has been disposed");
     this.color.set(color);
-    this.effects.push({
-      a: [a.x, a.y, a.z],
-      b: [b.x, b.y, b.z],
-      color: [this.color.r, this.color.g, this.color.b],
-      time: 0.1,
-      alpha: 0.85,
-      sequence: this.sequence++,
+    const effect = this.pool.pop() || {
+      a: [0, 0, 0],
+      b: [0, 0, 0],
+      color: [0, 0, 0],
+      time: 0,
+      alpha: 0,
+      sequence: 0,
       depth: 0,
-    });
+    };
+    effect.a[0] = a.x;
+    effect.a[1] = a.y;
+    effect.a[2] = a.z;
+    effect.b[0] = b.x;
+    effect.b[1] = b.y;
+    effect.b[2] = b.z;
+    effect.color[0] = this.color.r;
+    effect.color[1] = this.color.g;
+    effect.color[2] = this.color.b;
+    effect.time = 0.1;
+    effect.alpha = 0.85;
+    effect.sequence = this.sequence++;
+    effect.depth = 0;
+    this.effects.push(effect);
     this.ensureCapacity(this.effects.length);
     this.upload();
   }
   update(dt, camera = this.camera) {
     this.camera = camera;
+    if (!this.effects.length && !this.mesh.visible) return;
     let kept = 0;
     for (const effect of this.effects) {
       effect.time -= dt;
       effect.alpha = Math.max(0, effect.time * 8);
       if (effect.time > 0) this.effects[kept++] = effect;
+      else this.pool.push(effect);
     }
     this.effects.length = kept;
     this.upload();
@@ -243,7 +311,9 @@ export class TracerBatch {
     // Three sorts each original Line by its bounding-sphere centre, then ID.
     // Match that order inside this batch; other transparent draws cannot be
     // interleaved between individual segments of a single draw.
-    const ordered = this.effects.slice();
+    const ordered = this.ordered;
+    ordered.length = this.effects.length;
+    for (let i = 0; i < ordered.length; i++) ordered[i] = this.effects[i];
     if (this.camera) {
       this.camera.updateMatrixWorld();
       for (const effect of ordered)
@@ -255,16 +325,18 @@ export class TracerBatch {
           )
           .applyMatrix4(this.mesh.parent.matrixWorld)
           .project(this.camera).z;
-      ordered.sort((a, b) => b.depth - a.depth || a.sequence - b.sequence);
+      ordered.sort(depthOrder);
     }
     this.bounds.makeEmpty();
-    for (const [index, effect] of ordered.entries()) {
+    for (let index = 0; index < ordered.length; index++) {
+      const effect = ordered[index];
       p.array.set(effect.a, index * 6);
       p.array.set(effect.b, index * 6 + 3);
-      c.array.set(
-        [...effect.color, effect.alpha, ...effect.color, effect.alpha],
-        index * 8,
-      );
+      const offset = index * 8;
+      c.array[offset] = c.array[offset + 4] = effect.color[0];
+      c.array[offset + 1] = c.array[offset + 5] = effect.color[1];
+      c.array[offset + 2] = c.array[offset + 6] = effect.color[2];
+      c.array[offset + 3] = c.array[offset + 7] = effect.alpha;
       this.bounds.expandByPoint(this.projected.fromArray(effect.a));
       this.bounds.expandByPoint(this.projected.fromArray(effect.b));
     }
@@ -276,6 +348,7 @@ export class TracerBatch {
     this.mesh.visible = this.effects.length > 0;
   }
   clear() {
+    for (const effect of this.effects) this.pool.push(effect);
     this.effects.length = 0;
     this.upload();
   }

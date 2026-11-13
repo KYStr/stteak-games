@@ -1,0 +1,20 @@
+# Round 2 implementation and review map
+
+Source is authored in `games/dust-redemption/` and copied by its build. Generated runtime edits are not authoritative. All original effect WAVs, GLB/textures, CC0 origin statements and the pinned Three.js MIT notice are retained.
+
+| QA finding | Implementation | Automated evidence |
+| --- | --- | --- |
+| Q03: denied purchase looked permanent | Persist the pure candidate before adopting it; preserve wallet/level on failure; workshop status and retry; coalesce double clicks. | `regressions.mjs`: funded fixture, quota/security denial, disk and memory invariance, reachable retry, successful one-level reload. |
+| Q01: Help discarded draft loadout | Capture live form values/selection/checked state, details, scroll and escaped invoking-control identity. Restore before focus through the existing parent stack. | Rifle/smoke Help and blur round trips, deployment equipment, nested field Pause/Help/Settings and scroll. |
+| Q02: native keyboard input intercepted | Escape routes before native control handling; gameplay captures Space/arrows only when its canvas owns input. | Real Space on buttons/details, native range arrows, Escape on checkbox/range; repeat-Escape unit cases retained. |
+| Q04: paused audio resumed through sheets | One mode/foreground/context policy after dispatch, Escape and non-input mode changes. Normal browser autoplay policy. Death feedback has a bounded tail. | Suspended paused context with zero voices, real gesture decode, externally suspended recovery, continuously processing mute analyser. |
+| Q06: internal slot names displayed | Explicit Chinese/glyph labels, unchanged canonical IDs and carriage evidence strings. | Signal wrong-slot recovery, localized panel text, canonical physical streams and inspection screenshots. |
+| Q05: rendering cost and inspection clarity | Cache actor shadow transforms and foreground rays; update HUD/map on a 100ms budget; retain unchanged modal frames. Separate software lighting from a visible 1120/960 overview setting; inspect at up to 1600 pixels. Mask the player's render layer during inspection so it cannot cover markings. Collision and evidence geometry remain authoritative. | Before/after CDP profiles, raw intervals, JS update budgets excluding draw submission, two 180s resource runs, ten rebuilds, four cameras and WebGL recovery. |
+| Q08: music metadata stale | The project and both manifests describe the actual 16-step .68s motif, both plucks and both drone layers. | Metadata/source agreement and all eleven original WAV SHA-256 checks. |
+| Q07: incomplete acceptance | Configurable validated port, skip-build/equality mode, explicit request/error assertions, continuous six-contract physical campaign, ending/replays, death/retry, combat delivery, labelled alternate-route fixtures and successful/reordered event streams. | One acceptance command; earned histories, screenshots and JSON evidence written to the selected directory. |
+
+The current shared rubric explicitly treats SwiftShader average/p95 as reference data because eight games share a CPU renderer. The release gate therefore retains those values and all raw intervals, while asserting measurable JS, rendering-complexity and resource budgets. It does not assert an absolute SwiftShader frame-time score.
+
+Full physical testing also found a cart grip defect: the carrying fallback replaced a valid push offset over 2.3m with a .75m carry offset. Pushing now preserves its actual offset through its 2.6m reach. A grip check reserves the real cart's turning clearance with a visible recoverable instruction, and resume uses the same push reach. The browser test rejects the close grip, backs away, retains the original offset, releases/reacquires the same cart, and parks its entire body before handoff. Original solid geometry, inventory and canonical receipts remain required.
+
+Run `npm --prefix games/dust-redemption run acceptance`. Configuration, fixture limits and the separate CDP profiler are documented in the game's README. Passing this command is evidence for independent QA, not a self-assigned score.

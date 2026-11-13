@@ -11,11 +11,19 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
+const vectorCache = new WeakMap();
 const point = (p) => [p.x, p.z],
-  vector = (p) => new THREE.Vector3(p[0], 0, p[1]),
+  vector = (p) => {
+    let v = vectorCache.get(p);
+    if (!v || v.x !== p[0] || v.z !== p[1]) {
+      v = new THREE.Vector3(p[0], 0, p[1]);
+      vectorCache.set(p, v);
+    }
+    return v;
+  },
   gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const esc = (v) =>
   String(v ?? "").replace(
@@ -105,7 +113,10 @@ export class PactSystem {
       "完整交涉保留車上全部剩餘彈藥；掩體用途會封存其中六發，不能再算作整車可交涉物資。",
       "E可放手，回同車把手旁續推；沒有第二輛車或補一趟物資。",
     ];
-    this.props = createPactProps(THREE, world, this.flow, { field, player });
+    this.props = createPactProps(world.graphics || THREE, world, this.flow, {
+      field,
+      player,
+    });
     this.originalMethods = new Map();
     const wrap = (key, handler) => {
       const old = field[key],
@@ -117,7 +128,7 @@ export class PactSystem {
       "cargoColliders",
       (old) => (task, colliders) =>
         task === this.cart
-          ? old(task, colliders).filter((b) => b !== this.cart.collider)
+          ? this.withoutCart(old(task, colliders))
           : old(task, colliders),
     );
     wrap("moveSafe", (old) => (object, dx, dz, colliders, radius) => {
@@ -127,7 +138,7 @@ export class PactSystem {
         dx,
         dz,
         Math.atan2(dx, dz),
-        colliders.filter((b) => b !== this.cart.collider),
+        this.withoutCart(colliders),
       );
     });
     wrap("removeCargoCollider", (old) => (task) => {
@@ -390,9 +401,23 @@ export class PactSystem {
     }
     return "";
   }
+  withoutCart(colliders) {
+    const cache = (this.cartCollisionCache ??= {
+      source: null,
+      count: 0,
+      items: [],
+    });
+    if (cache.source !== colliders || cache.count !== colliders.length) {
+      cache.source = colliders;
+      cache.count = colliders.length;
+      cache.items.length = 0;
+      for (let i = 0; i < colliders.length; i++)
+        if (colliders[i] !== this.cart.collider) cache.items.push(colliders[i]);
+    }
+    return cache.items;
+  }
   syncFeed() {
-    this.props.update();
-    const s = this.props.readFeedSnapshot();
+    const s = this.props.readFeedSnapshot((this.feedStatus ??= {}));
     if (
       !this.status.feedCut &&
       !s.militaryPowered &&
@@ -401,7 +426,7 @@ export class PactSystem {
       this.near(this.flow.feed.position)
     )
       this.dispatch("feed-confirmed", {
-        feedSnapshot: s,
+        feedSnapshot: { ...s },
         playerPosition: point(this.player.position),
       });
   }
@@ -423,6 +448,7 @@ export class PactSystem {
     });
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     this.interactionNotice = null;
     this.pendingFieldTask = this.field.active || this.field.traversal?.task;
     const task = this.pendingFieldTask;
@@ -461,6 +487,19 @@ export class PactSystem {
           !this.status.localChoices.siding
         )
           throw Error("先選這一趟礦車的停靠用途。");
+        if (task === this.cart && step?.id === "push-cart") {
+          // A grip inside the cart's swept footprint traps the player against
+          // its conservative movement proxy on the first steering change.
+          // Reserve real turning clearance; keep the original collider solid.
+          const clearance =
+            Math.max(
+              ...this.props.localCorners.map(([x, z]) => Math.hypot(x, z)),
+            ) + 0.46;
+          if (gap(this.player.position, this.cart.cargo.position) < clearance)
+            throw Error(
+              "先沿雙把手向後退半步，留出車身轉向空間，再握住推車。煞車與所選側線均已保留。",
+            );
+        }
         if (task === this.cart && step?.id === "park-cart") {
           const bay = this.flow.bays[this.status.localChoices.siding];
           if (
@@ -640,7 +679,9 @@ export class PactSystem {
   handoff() {
     this.requireDesk();
     if (!this.field.complete || this.field.pendingEffects.length)
-      throw Error("三項工作須實際完成並返回現場結清，才能盤點與領地契。");
+      throw Error(
+        "先完成第一階段與兩庫實體授權核帳，返回現場結清後才能領地契。",
+      );
     const kills = this.callbacks.kills?.();
     if (
       !Number.isInteger(kills) ||
@@ -772,7 +813,7 @@ export class PactSystem {
       return true;
     }
     if (
-      !["resupply", "withdraw"].includes(a.order) ||
+      (a.order !== "resupply" && a.order !== "withdraw") ||
       this.callbacks.secured?.() ||
       enemy.engaged ||
       enemy.suppressed > 0
@@ -836,13 +877,7 @@ export class PactSystem {
     const next = cache.path[0];
     if (
       !next ||
-      !tacticalSegmentClear({
-        from,
-        to: next,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, next, colliders, 0.38)
     ) {
       this.world.animate(enemy.actor, "idle");
       return;
@@ -860,6 +895,7 @@ export class PactSystem {
         colliders,
         0.38,
         23,
+        (enemy.moveOut ??= {}),
       );
       from.x = p.x;
       from.z = p.z;

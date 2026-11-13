@@ -1,8 +1,13 @@
+import { FieldPropLibrary } from "./field-prop-library.js";
 import * as THREE from "./vendor/three.module.js";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
 import { clone } from "./vendor/SkeletonUtils.js";
 import { firstHit, makeBox } from "./physics.js";
-import { BuildingBatches, TracerBatch } from "./render-batches.js";
+import {
+  BuildingBatches,
+  TracerBatch,
+  FrameMeshSet,
+} from "./render-batches.js";
 
 const palettes = {
   station: { ground: 0xc19b68, sky: 0xcfb78e, rock: 0xb47950 },
@@ -18,11 +23,76 @@ export class World {
   constructor(canvas) {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: false,
       alpha: false,
       powerPreference: "high-performance",
     });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+    const gl = this.renderer.getContext();
+    const debug = gl.getExtension("WEBGL_debug_renderer_info");
+    this.softwareRenderer = /swiftshader|llvmpipe|software/i.test(
+      debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : "",
+    );
+    // The software path uses the same colors, textures and animated geometry
+    // with diffuse lighting, avoiding a physical BRDF on every fragment.
+    const DiffuseMaterial = class extends THREE.MeshLambertMaterial {
+      constructor(options = {}) {
+        const {
+          roughness,
+          metalness,
+          roughnessMap,
+          metalnessMap,
+          normalMap,
+          ...diffuse
+        } = options;
+        super(diffuse);
+      }
+    };
+    this.graphics = this.softwareRenderer
+      ? { ...THREE, MeshStandardMaterial: DiffuseMaterial }
+      : THREE;
+    this.fieldProps = new FieldPropLibrary(this.graphics);
+    this.lowQuality = this.softwareRenderer;
+    this.lowSetting = false;
+    this.adaptiveReduced = false;
+    this.slowFrameCount = 0;
+    this.inspection = false;
+    this.dirty = true;
+    this.occlusionKey = null;
+    this.cameraState = new Float64Array(32);
+    this.cameraRevision = 0;
+    this.fadeState = { x: NaN, y: NaN, z: NaN, revision: -1 };
+    this.updateMs = 0;
+    this.renderedFrames = 0;
+    this.skippedFrames = 0;
+    this.fadeRaycasts = 0;
+    this.shadowWrites = 0;
+    this.shadowPosition = new THREE.Vector3();
+    this.shadowScale = new THREE.Vector3(0.55, 0.4, 1);
+    this.fadeDirection = new THREE.Vector3();
+    this.fadeOrigin = new THREE.Vector3();
+    this.traceOrigin = new THREE.Vector3();
+    this.traceDirection = new THREE.Vector3();
+    this.localRay = new THREE.Ray();
+    this.rayPoint = new THREE.Vector3();
+    this.worldPoint = new THREE.Vector3();
+    this.triangleA = new THREE.Vector3();
+    this.triangleB = new THREE.Vector3();
+    this.triangleC = new THREE.Vector3();
+    this.traceResult = {};
+    this.proxyResult = {};
+    this.fadeHits = [];
+    this.fadedMeshes = new FrameMeshSet();
+    this.collisionRecords = new WeakMap();
+    this.colliderState = new WeakMap();
+    this.lastColliderArray = null;
+    this.lastColliderCount = -1;
+    this.collisionRevision = 0;
+    this.matricesReady = false;
+    this.projectVector = new THREE.Vector3();
+    this.fadeMaterials = new WeakMap();
+    this.fadeEligible = new WeakSet();
+    this.shadowTransforms = [];
+    this.renderer.setPixelRatio(1);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -30,6 +100,7 @@ export class World {
     this.renderer.toneMappingExposure = 1.22;
     this.scene = new THREE.Scene();
     this.camera = new THREE.OrthographicCamera(-24, 24, 20, -20, 0.1, 160);
+    this.camera.layers.enable(1);
     this.cameraIndex = 0;
     this.scene.add(new THREE.HemisphereLight(0xf3ddbd, 0x78624c, 2.5));
     this.sun = new THREE.DirectionalLight(0xffdfad, 3.4);
@@ -43,7 +114,7 @@ export class World {
       near: 1,
       far: 85,
     });
-    this.sun.shadow.mapSize.set(2048, 2048);
+    this.sun.shadow.mapSize.set(1024, 1024);
     this.sun.shadow.bias = -0.0004;
     this.sun.shadow.normalBias = 0.045;
     this.scene.add(this.sun);
@@ -67,6 +138,8 @@ export class World {
     this.buildingBatches = null;
     this.tracerBatch = null;
     this.sharedTextures = new Set();
+    this.environmentCache = new Map();
+    this.activeEnvironment = null;
     this.resize();
   }
   async load() {
@@ -85,12 +158,43 @@ export class World {
           for (const value of Object.values(material))
             if (value?.isTexture) this.sharedTextures.add(value);
     });
+    if (this.softwareRenderer) {
+      const converted = new Map();
+      gltf.scene.traverse((node) => {
+        if (!node.material) return;
+        const convert = (material) => {
+          if (!material.isMeshStandardMaterial) return material;
+          if (!converted.has(material)) {
+            converted.set(
+              material,
+              new this.graphics.MeshStandardMaterial({
+                color: material.color,
+                map: material.map,
+                emissive: material.emissive,
+                emissiveMap: material.emissiveMap,
+                emissiveIntensity: material.emissiveIntensity,
+                transparent: material.transparent,
+                opacity: material.opacity,
+                alphaTest: material.alphaTest,
+                side: material.side,
+                vertexColors: material.vertexColors,
+              }),
+            );
+          }
+          return converted.get(material);
+        };
+        node.material = Array.isArray(node.material)
+          ? node.material.map(convert)
+          : convert(node.material);
+      });
+      for (const original of converted.keys()) original.dispose();
+    }
   }
   resize() {
     const canvas = this.renderer.domElement,
       w = Math.max(1, canvas.clientWidth),
       h = Math.max(1, canvas.clientHeight);
-    this.renderer.setSize(w, h, false);
+    this.resizeBuffer(w, h);
     const aspect = w / h,
       half = aspect < 1 ? 26 : 22;
     this.camera.left = -half * aspect;
@@ -100,7 +204,62 @@ export class World {
     this.camera.updateProjectionMatrix();
     this.orient();
   }
+  invalidate(occlusion = false) {
+    this.dirty = true;
+    if (occlusion) this.occlusionKey = null;
+  }
+  resizeBuffer(
+    w = this.renderer.domElement.clientWidth,
+    h = this.renderer.domElement.clientHeight,
+  ) {
+    // Inspection always preserves the symbols, including on the software path.
+    const limit = this.inspection
+      ? 1600
+      : this.lowSetting
+        ? 960
+        : this.adaptiveReduced
+          ? 1024
+          : this.softwareRenderer
+            ? 1120
+            : 1440;
+    const scale = Math.min(
+      devicePixelRatio,
+      this.softwareRenderer ? 1 : 1.5,
+      limit / Math.max(1, w),
+    );
+    this.renderer.setPixelRatio(scale);
+    this.renderer.setSize(w, h, false);
+    this.invalidate();
+  }
+  noteFrame(seconds) {
+    if (this.inspection || this.adaptiveReduced) return;
+    this.slowFrameCount =
+      seconds > 0.075
+        ? this.slowFrameCount + 1
+        : Math.max(0, this.slowFrameCount - 2);
+    if (this.slowFrameCount < 90) return;
+    this.adaptiveReduced = true;
+    this.lowQuality = true;
+    this.renderer.shadowMap.enabled = false;
+    if (this.groundShadows) this.groundShadows.visible = true;
+    if (this.actorShadows) this.actorShadows.visible = true;
+    this.resizeBuffer();
+  }
+  setInspection(value) {
+    if (this.inspection === value) return;
+    // A close camera sees the mechanism through the player's render layer.
+    // Keep object.visible and all collision/evidence geometry authoritative.
+    for (const actor of this.actors)
+      if (actor.name === "hero")
+        actor.object.traverse((node) => node.layers.set(1));
+    if (value) this.camera.layers.disable(1);
+    else this.camera.layers.enable(1);
+    this.inspection = value;
+    this.occlusionKey = null;
+    this.resizeBuffer();
+  }
   orient() {
+    this.invalidate(true);
     const a = Math.PI / 4 + (this.cameraIndex * Math.PI) / 2;
     this.camera.position.set(Math.sin(a) * 42, 48, Math.cos(a) * 42);
     this.camera.lookAt(0, 0, 0);
@@ -111,8 +270,13 @@ export class World {
     this.orient();
   }
   quality(low) {
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, low ? 1 : 1.6));
-    this.renderer.shadowMap.enabled = !low;
+    this.lowSetting = Boolean(low);
+    this.lowQuality = Boolean(
+      low || this.softwareRenderer || this.adaptiveReduced,
+    );
+    this.renderer.shadowMap.enabled = !this.lowQuality;
+    if (this.groundShadows) this.groundShadows.visible = this.lowQuality;
+    if (this.actorShadows) this.actorShadows.visible = this.lowQuality;
     this.resize();
   }
   model(name, x = 0, z = 0, scale = 1) {
@@ -144,7 +308,7 @@ export class World {
   box(w, h, d, color, x, y, z, parent = this.level) {
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(w, h, d),
-      new THREE.MeshStandardMaterial({ color, roughness: 0.94 }),
+      new this.graphics.MeshStandardMaterial({ color, roughness: 0.94 }),
     );
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
@@ -175,14 +339,23 @@ export class World {
     // Dispose only lights owned by these roots; the scene sun has its own owner.
     for (const shadow of shadows) shadow.dispose();
     for (const skeleton of skeletons) skeleton.dispose();
-    for (const geometry of geometries) geometry.dispose();
+    for (const geometry of geometries)
+      if (!this.fieldProps?.geometries.has(geometry)) geometry.dispose();
     for (const material of materials) material.dispose();
     for (const texture of maps) texture.dispose();
   }
   clear() {
+    this.invalidate(true);
+    this.shadowTransforms.length = 0;
+    this.textureEstimate = null;
     // Helpers own and detach their GPU resources before the generic scene sweep.
     // Building sources are restored, then disposed exactly once with the level.
-    this.buildingBatches?.dispose();
+    if (this.activeEnvironment) {
+      // Only roots captured at build completion belong to this static cache.
+      // Mission controllers/fieldwork are added later and remain scene-owned.
+      for (const root of this.activeEnvironment.roots) root.removeFromParent();
+    } else this.buildingBatches?.dispose();
+    this.activeEnvironment = null;
     this.buildingBatches = null;
     this.tracerBatch?.dispose();
     this.tracerBatch = null;
@@ -200,10 +373,20 @@ export class World {
     this.solids = [];
     this.solidBoxes = new WeakMap();
     this.renderer.renderLists.dispose();
+    this.groundShadows = null;
+    this.actorShadows = null;
   }
   dispose() {
     this.clear();
     this.disposeObjects([...this.templates.values()]);
+    this.fieldProps.dispose();
+    for (const record of this.environmentCache.values()) {
+      for (const root of record.roots) this.level.add(root);
+      record.buildingBatches?.dispose();
+      this.disposeObjects([this.level]);
+      this.level.clear();
+    }
+    this.environmentCache.clear();
     for (const texture of this.sharedTextures) texture.dispose();
     this.sharedTextures.clear();
     this.templates.clear();
@@ -213,6 +396,7 @@ export class World {
     this.renderer.dispose();
   }
   solid(object, box = null, { occludes = true } = {}) {
+    this.matricesReady = false;
     object.updateWorldMatrix(true, true);
     if (!box) {
       const bounds = new THREE.Box3().setFromObject(object),
@@ -240,7 +424,12 @@ export class World {
         }
       }
     });
-    if (occludes) this.occluders.push(object);
+    if (occludes) {
+      this.occluders.push(object);
+      object.traverse((node) => {
+        if (node.isMesh) this.fadeEligible.add(node);
+      });
+    }
     return object;
   }
   scenery(name, x, z, scale = 1) {
@@ -250,10 +439,32 @@ export class World {
     return object;
   }
   build(sceneName, points = []) {
+    this.matricesReady = false;
+    this.collisionRecords = new WeakMap();
+    this.fadeMaterials = new WeakMap();
+    this.collisionRevision++;
     this.clear();
     const p = palettes[sceneName] || palettes.station;
     this.scene.background = new THREE.Color(p.sky);
     this.scene.fog = new THREE.Fog(p.sky, 70, 140);
+    const environmentKey = JSON.stringify([sceneName, points]);
+    const cached = this.environmentCache.get(environmentKey);
+    if (cached) {
+      for (const root of cached.roots) this.level.add(root);
+      this.colliders = cached.colliders.slice();
+      this.solids = cached.solids.slice();
+      this.occluders = cached.occluders.slice();
+      this.solidBoxes = new WeakMap(cached.boxes);
+      this.buildingBatches = cached.buildingBatches;
+      this.groundShadows = cached.groundShadows;
+      this.groundShadows.visible = this.lowQuality;
+      this.shadowMatrix = cached.shadowMatrix;
+      this.shadowRotation = cached.shadowRotation;
+      this.addActorShadows(this.groundShadows.material);
+      this.activeEnvironment = cached;
+      this.level.updateMatrixWorld(true);
+      return;
+    }
     const ground = this.box(58, 0.4, 58, p.ground, 0, -0.22, 0);
     ground.castShadow = false;
     this.solid(ground, null, { occludes: false });
@@ -365,7 +576,10 @@ export class World {
       ]) {
         const mesh = new THREE.Mesh(
           new THREE.IcosahedronGeometry(7, detail),
-          new THREE.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
+          new this.graphics.MeshStandardMaterial({
+            color: p.rock,
+            roughness: 1,
+          }),
         );
         mesh.scale.set(1, 1.4, 0.8);
         lod.addLevel(mesh, distance);
@@ -378,9 +592,74 @@ export class World {
       (object) => object.name === "frontier-building",
     );
     if (buildings.length) {
-      this.buildingBatches = new BuildingBatches(THREE, buildings, this.level);
+      this.buildingBatches = new BuildingBatches(
+        this.graphics,
+        buildings,
+        this.level,
+      );
       this.buildingBatches.sync(new Set(), this.camera);
     }
+    this.addGroundShadows();
+    // Six authored mission layouts plus town; never retain unbounded variants.
+    if (this.environmentCache.size < 8) {
+      const record = {
+        roots: this.level.children.slice(),
+        colliders: this.colliders.slice(),
+        solids: this.solids.slice(),
+        occluders: this.occluders.slice(),
+        boxes: this.solids.map((mesh) => [mesh, this.solidBoxes.get(mesh)]),
+        buildingBatches: this.buildingBatches,
+        groundShadows: this.groundShadows,
+        shadowMatrix: this.shadowMatrix,
+        shadowRotation: this.shadowRotation,
+      };
+      this.environmentCache.set(environmentKey, record);
+      this.activeEnvironment = record;
+    }
+  }
+  addGroundShadows() {
+    // One draw call supplies stylized contact shadows when dynamic maps are off.
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x5b4028,
+      transparent: true,
+      opacity: 0.19,
+      depthWrite: false,
+    });
+    const boxes = this.colliders.filter((b) => b.h > 0.8);
+    this.groundShadows = new THREE.InstancedMesh(
+      new THREE.PlaneGeometry(1, 1),
+      material,
+      Math.max(1, boxes.length),
+    );
+    this.groundShadows.count = boxes.length;
+    const matrix = new THREE.Matrix4(),
+      rotation = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(-Math.PI / 2, 0, 0),
+      );
+    boxes.forEach((b, i) => {
+      matrix.compose(
+        new THREE.Vector3(b.x + b.h * 0.35, 0.032, b.z - b.h * 0.2),
+        rotation,
+        new THREE.Vector3(b.w + b.h * 0.55, b.d + b.h * 0.35, 1),
+      );
+      this.groundShadows.setMatrixAt(i, matrix);
+    });
+    this.groundShadows.visible = this.lowQuality;
+    this.level.add(this.groundShadows);
+    this.shadowMatrix = matrix;
+    this.shadowRotation = rotation;
+    this.addActorShadows(material);
+  }
+  addActorShadows(material) {
+    this.actorShadows = new THREE.InstancedMesh(
+      new THREE.CircleGeometry(1, 16),
+      material.clone(),
+      32,
+    );
+    this.actorShadows.count = 0;
+    this.actorShadows.visible = this.lowQuality;
+    this.shadowTransforms.length = 0;
+    this.dynamic.add(this.actorShadows);
   }
   dressGround(p, sceneName, points) {
     const matrix = new THREE.Matrix4(),
@@ -391,7 +670,7 @@ export class World {
     // Low raised patches, stone clusters and grass are instanced volumetric dressing.
     const patches = new THREE.InstancedMesh(
       new THREE.IcosahedronGeometry(1, 0),
-      new THREE.MeshStandardMaterial({ color: p.ground, roughness: 1 }),
+      new this.graphics.MeshStandardMaterial({ color: p.ground, roughness: 1 }),
       46,
     );
     for (let i = 0; i < 46; i++) {
@@ -412,7 +691,7 @@ export class World {
     this.level.add(patches);
     const rocks = new THREE.InstancedMesh(
       new THREE.IcosahedronGeometry(0.35, 0),
-      new THREE.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
+      new this.graphics.MeshStandardMaterial({ color: p.rock, roughness: 1 }),
       150,
     );
     for (let i = 0; i < 150; i++) {
@@ -429,7 +708,7 @@ export class World {
     this.level.add(rocks);
     const grass = new THREE.InstancedMesh(
       new THREE.ConeGeometry(0.09, 0.5, 3),
-      new THREE.MeshStandardMaterial({
+      new this.graphics.MeshStandardMaterial({
         color: sceneName === "mine" ? 0x80765a : 0x8d8654,
         roughness: 1,
       }),
@@ -489,7 +768,10 @@ export class World {
             depth: 0.012,
             bevelEnabled: false,
           }),
-          new THREE.MeshStandardMaterial({ color: 0x424d43, roughness: 1 }),
+          new this.graphics.MeshStandardMaterial({
+            color: 0x424d43,
+            roughness: 1,
+          }),
         );
         badge.position.set(x, 1.39, z + 0.067);
         sign.add(badge);
@@ -558,6 +840,7 @@ export class World {
         actor,
         name === "enemy-sniper" || name === "enemy-shotgun" ? "rifle" : weapon,
       );
+    if (name === "hero") object.traverse((node) => node.layers.set(1));
     this.animate(actor, "idle");
     return actor;
   }
@@ -609,7 +892,7 @@ export class World {
     group.add(ring);
     const pin = new THREE.Mesh(
       new THREE.OctahedronGeometry(0.24),
-      new THREE.MeshStandardMaterial({
+      new this.graphics.MeshStandardMaterial({
         color,
         emissive: color,
         emissiveIntensity: 0.25,
@@ -655,34 +938,156 @@ export class World {
     }
     return this.raycaster.ray.intersectPlane(this.plane, this.target)?.clone();
   }
-  project(position) {
-    const p = new THREE.Vector3(
-      position.x,
-      position.y ?? 1.8,
-      position.z,
-    ).project(this.camera);
-    return {
-      x: (p.x * 0.5 + 0.5) * this.renderer.domElement.clientWidth,
-      y: (-0.5 * p.y + 0.5) * this.renderer.domElement.clientHeight,
-    };
+  project(position, out = {}) {
+    const p = this.projectVector
+      .set(position.x, position.y ?? 1.8, position.z)
+      .project(this.camera);
+    out.x = (p.x * 0.5 + 0.5) * this.renderer.domElement.clientWidth;
+    out.y = (-p.y * 0.5 + 0.5) * this.renderer.domElement.clientHeight;
+    return out;
   }
-  trace(a, b, extraBoxes = []) {
-    const origin = new THREE.Vector3(a.x, a.y, a.z),
-      direction = new THREE.Vector3(b.x - a.x, b.y - a.y, b.z - a.z),
+  beginCollisionUpdate() {
+    delete this.colliders.collisionRevision;
+    this.matricesReady = false;
+  }
+  syncCollisionMatrices(force = false) {
+    if (this.matricesReady && !force) return;
+    this.level.updateWorldMatrix(true, true);
+    let changed = false;
+    for (let i = 0; i < this.solids.length; i++) {
+      const mesh = this.solids[i],
+        matrix = mesh.matrixWorld.elements;
+      let record = this.collisionRecords.get(mesh);
+      if (!record || record.geometry !== mesh.geometry) {
+        if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+        record = {
+          geometry: mesh.geometry,
+          inverse: new THREE.Matrix4(),
+          matrix: new Float64Array(16).fill(NaN),
+        };
+        this.collisionRecords.set(mesh, record);
+      }
+      let dirty = false;
+      for (let j = 0; j < 16; j++)
+        if (matrix[j] !== record.matrix[j]) {
+          dirty = true;
+          record.matrix[j] = matrix[j];
+        }
+      if (dirty) {
+        record.inverse.copy(mesh.matrixWorld).invert();
+        changed = true;
+      }
+    }
+    if (
+      this.lastColliderArray !== this.colliders ||
+      this.lastColliderCount !== this.colliders.length
+    ) {
+      changed = true;
+      this.lastColliderArray = this.colliders;
+      this.lastColliderCount = this.colliders.length;
+    }
+    for (let i = 0; i < this.colliders.length; i++) {
+      const b = this.colliders[i];
+      let values = this.colliderState.get(b);
+      if (!values) {
+        values = new Float64Array(6).fill(NaN);
+        this.colliderState.set(b, values);
+      }
+      for (let j = 0; j < 6; j++) {
+        const axis = j % 3,
+          value =
+            j < 3
+              ? axis === 0
+                ? b.min.x
+                : axis === 1
+                  ? b.min.y
+                  : b.min.z
+              : axis === 0
+                ? b.max.x
+                : axis === 1
+                  ? b.max.y
+                  : b.max.z;
+        if (values[j] !== value) {
+          values[j] = value;
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      this.collisionRevision++;
+      this.occlusionKey = null;
+    }
+    this.colliders.collisionRevision = this.collisionRevision;
+    this.matricesReady = true;
+  }
+  // Allocation-free exact mesh triangles. Local-space bounds are only a broad
+  // phase; transparent/faded walls still block, and no coarse box replaces them.
+  meshDistance(mesh, origin, maxDistance) {
+    const record = this.collisionRecords.get(mesh);
+    if (!record || !mesh.geometry.attributes.position) return Infinity;
+    const ray = this.localRay
+        .copy(this.shotRaycaster.ray)
+        .applyMatrix4(record.inverse),
+      geometry = record.geometry;
+    if (!ray.intersectsBox(geometry.boundingBox)) return Infinity;
+    const positions = geometry.attributes.position,
+      index = geometry.index,
+      end = Math.min(
+        index ? index.count : positions.count,
+        geometry.drawRange.start + geometry.drawRange.count,
+      );
+    let closest = maxDistance;
+    for (let i = geometry.drawRange.start; i + 2 < end; i += 3) {
+      this.triangleA.fromBufferAttribute(positions, index ? index.getX(i) : i);
+      this.triangleB.fromBufferAttribute(
+        positions,
+        index ? index.getX(i + 1) : i + 1,
+      );
+      this.triangleC.fromBufferAttribute(
+        positions,
+        index ? index.getX(i + 2) : i + 2,
+      );
+      if (
+        ray.intersectTriangle(
+          this.triangleA,
+          this.triangleB,
+          this.triangleC,
+          false,
+          this.rayPoint,
+        )
+      ) {
+        const distance = this.worldPoint
+          .copy(this.rayPoint)
+          .applyMatrix4(mesh.matrixWorld)
+          .distanceTo(origin);
+        if (distance < closest) closest = distance;
+      }
+    }
+    return closest < maxDistance ? closest : Infinity;
+  }
+  trace(a, b, extraBoxes = World.emptyBoxes) {
+    const origin = this.traceOrigin.set(a.x, a.y, a.z),
+      direction = this.traceDirection.set(b.x - a.x, b.y - a.y, b.z - a.z),
       distance = direction.length();
     if (distance < 1e-8) return null;
-    this.level.updateWorldMatrix(true, true);
+    this.syncCollisionMatrices();
     this.shotRaycaster.set(origin, direction.divideScalar(distance));
-    this.shotRaycaster.near = 0;
-    this.shotRaycaster.far = distance;
-    // Material opacity never bypasses geometry: faded foreground walls still stop bullets.
-    const meshHit = this.shotRaycaster.intersectObjects(this.solids, false)[0],
-      proxyHit = firstHit(a, b, extraBoxes);
-    if (proxyHit && (!meshHit || proxyHit.distance < meshHit.distance - 1e-5))
-      return proxyHit;
-    return meshHit
-      ? { box: this.solidBoxes.get(meshHit.object), distance: meshHit.distance }
-      : proxyHit;
+    let closest = distance + 1e-8,
+      box = null;
+    for (let i = 0; i < this.solids.length; i++) {
+      const mesh = this.solids[i],
+        hit = this.meshDistance(mesh, origin, closest);
+      if (hit < closest) {
+        closest = hit;
+        box = this.solidBoxes.get(mesh);
+      }
+    }
+    const proxy = firstHit(a, b, extraBoxes, this.proxyResult);
+    if (proxy && (!box || proxy.distance < closest - 1e-5)) return proxy;
+    if (!box) return null;
+    this.traceResult.box = box;
+    this.traceResult.distance = closest;
+    return this.traceResult;
   }
   tracer(a, b, color = 0xffd69a) {
     if (!this.tracerBatch) {
@@ -692,50 +1097,189 @@ export class World {
     this.tracerBatch.add(a, b, color);
   }
   update(dt, player, reduced) {
-    for (const actor of this.actors) {
-      actor.mixer.update(dt);
-      actor.poseBlend = Math.max(0, actor.poseBlend - dt);
-      if (actor.poseBlend === 0)
-        actor.colliderHeight = actor.state === "cover" ? 0.95 : 1.85;
+    const start = performance.now();
+    let cameraChanged = false;
+    for (let i = 0; i < 32; i++) {
+      const value =
+        i < 16
+          ? this.camera.matrixWorld.elements[i]
+          : this.camera.projectionMatrix.elements[i - 16];
+      if (this.cameraState[i] !== value) {
+        this.cameraState[i] = value;
+        cameraChanged = true;
+      }
+    }
+    if (cameraChanged) {
+      this.cameraRevision++;
+      this.invalidate();
+    }
+    if (!dt && !this.dirty) {
+      this.updateMs = performance.now() - start;
+      this.skippedFrames++;
+      return;
+    }
+    if (dt)
+      for (const actor of this.actors) {
+        actor.mixer.update(dt);
+        actor.poseBlend = Math.max(0, actor.poseBlend - dt);
+        if (actor.poseBlend === 0)
+          actor.colliderHeight = actor.state === "cover" ? 0.95 : 1.85;
+      }
+    if (this.actorShadows?.visible) {
+      let changed =
+        this.actorShadows.count !== Math.min(32, this.actors.length);
+      this.actorShadows.count = Math.min(32, this.actors.length);
+      for (let i = 0; i < this.actorShadows.count; i++) {
+        const actor = this.actors[i],
+          previous = this.shadowTransforms[i];
+        if (
+          previous &&
+          previous.x === actor.position.x &&
+          previous.z === actor.position.z
+        )
+          continue;
+        const record = previous || (this.shadowTransforms[i] = { x: 0, z: 0 });
+        record.x = actor.position.x;
+        record.z = actor.position.z;
+        this.shadowPosition.set(
+          actor.position.x + 0.18,
+          0.035,
+          actor.position.z - 0.1,
+        );
+        this.shadowMatrix.compose(
+          this.shadowPosition,
+          this.shadowRotation,
+          this.shadowScale,
+        );
+        this.actorShadows.setMatrixAt(i, this.shadowMatrix);
+        this.shadowWrites++;
+        changed = true;
+      }
+      if (changed) this.actorShadows.instanceMatrix.needsUpdate = true;
     }
     this.tracerBatch?.update(dt, this.camera);
-    const hits = new Set();
-    if (player) {
-      this.level.updateWorldMatrix(true, true);
-      const direction = new THREE.Vector3()
-        .subVectors(this.camera.position, player.position)
-        .normalize();
-      this.raycaster.set(
-        player.position.clone().add(new THREE.Vector3(0, 1, 0)),
-        direction,
-      );
-      this.raycaster.near = 0;
-      this.raycaster.far = this.camera.position.distanceTo(player.position);
-      for (const hit of this.raycaster.intersectObjects(this.occluders, true))
-        hits.add(hit.object);
-    }
-    for (const root of this.occluders)
-      root.traverse((node) => {
-        if (node.isMesh)
-          for (const material of materialList(node)) {
-            material.transparent = true;
-            material.opacity = hits.has(node) ? 0.22 : 1;
-            material.depthWrite = !hits.has(node);
+    const position = player?.position || this.target,
+      previous = this.fadeState;
+    if (
+      this.occlusionKey === null ||
+      position.x !== previous.x ||
+      position.y !== previous.y ||
+      position.z !== previous.z ||
+      previous.revision !== this.cameraRevision
+    ) {
+      this.occlusionKey = true;
+      previous.x = position.x;
+      previous.y = position.y;
+      previous.z = position.z;
+      previous.revision = this.cameraRevision;
+      const hits = this.fadedMeshes;
+      hits.clear();
+      if (player && !this.inspection) {
+        this.syncCollisionMatrices();
+        this.fadeDirection
+          .subVectors(this.camera.position, player.position)
+          .normalize();
+        this.fadeOrigin.copy(player.position);
+        this.fadeOrigin.y += 1;
+        this.raycaster.set(this.fadeOrigin, this.fadeDirection);
+        this.raycaster.near = 0;
+        this.raycaster.far = this.camera.position.distanceTo(player.position);
+        this.shotRaycaster.set(this.fadeOrigin, this.fadeDirection);
+        for (let i = 0; i < this.solids.length; i++) {
+          const mesh = this.solids[i];
+          if (
+            this.fadeEligible.has(mesh) &&
+            this.meshDistance(mesh, this.fadeOrigin, this.raycaster.far) <
+              Infinity
+          )
+            hits.add(mesh);
+        }
+        this.fadeRaycasts++;
+      }
+      for (let i = 0; i < this.solids.length; i++) {
+        const node = this.solids[i],
+          faded = hits.has(node);
+        if (!this.fadeEligible.has(node)) continue;
+        if (this.fadeMaterials.get(node) === faded) continue;
+        this.fadeMaterials.set(node, faded);
+        const materials = node.material;
+        if (Array.isArray(materials))
+          for (let j = 0; j < materials.length; j++) {
+            materials[j].transparent = true;
+            materials[j].opacity = faded ? 0.22 : 1;
+            materials[j].depthWrite = !faded;
           }
-      });
-    this.buildingBatches?.sync(hits, this.camera);
+        else {
+          materials.transparent = true;
+          materials.opacity = faded ? 0.22 : 1;
+          materials.depthWrite = !faded;
+        }
+      }
+      this.buildingBatches?.sync(hits, this.camera);
+    }
+    this.updateMs = performance.now() - start;
     this.renderer.render(this.scene, this.camera);
+    this.renderedFrames++;
+    this.dirty = false;
   }
   stats() {
     const r = this.renderer.info;
+    let visibleInstances = 0;
+    this.scene.traverseVisible((node) => {
+      if (node.isInstancedMesh) visibleInstances += node.count;
+    });
+    if (
+      !this.textureEstimate ||
+      this.textureEstimate.count !== r.memory.textures
+    ) {
+      const textures = new Set();
+      this.scene.traverse((node) => {
+        if (!node.material) return;
+        for (const material of materialList(node))
+          for (const value of Object.values(material))
+            if (value?.isTexture) textures.add(value);
+      });
+      let bytes = 0;
+      for (const texture of textures) {
+        const image = texture.image;
+        bytes +=
+          (image?.width || 0) *
+          (image?.height || 0) *
+          4 *
+          (texture.generateMipmaps ? 4 / 3 : 1);
+      }
+      this.textureEstimate = {
+        count: r.memory.textures,
+        bytes: Math.ceil(bytes),
+      };
+    }
     return {
+      effects: this.effects.length,
+      persistentGeometries: r.memory.geometries - (this.tracerBatch ? 1 : 0),
       drawCalls: r.render.calls,
+      textureBytesEstimate: this.textureEstimate.bytes,
+      visibleInstances,
+      buildingInstances: this.buildingBatches?.records.length || 0,
+      renderedFrames: this.renderedFrames,
+      skippedFrames: this.skippedFrames,
+      fadeRaycasts: this.fadeRaycasts,
+      shadowWrites: this.shadowWrites,
+      bufferWidth: this.renderer.domElement.width,
+      bufferHeight: this.renderer.domElement.height,
+      inspection: this.inspection,
+      lowSetting: this.lowSetting,
+      adaptiveReduced: this.adaptiveReduced,
+      pixelRatio: this.renderer.getPixelRatio(),
       triangles: r.render.triangles,
       geometries: r.memory.geometries,
       textures: r.memory.textures,
       characters: this.actors.length,
       shadow: this.renderer.shadowMap.enabled,
       dpr: this.renderer.getPixelRatio(),
+      software: this.softwareRenderer,
+      contextLost: this.renderer.getContext().isContextLost(),
     };
   }
 }
+
+World.emptyBoxes = Object.freeze([]);

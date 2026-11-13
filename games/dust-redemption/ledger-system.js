@@ -10,12 +10,20 @@ import { moveCircle } from "./physics.js";
 import {
   planTacticalPath,
   certifyTacticalPath,
-  tacticalSegmentClear,
+  cachedTacticalSegmentClear,
   tacticalGeometryKey,
 } from "./enemy-tactics.js";
 
+const vectorCache = new WeakMap();
 const point = (p) => [p.x, p.z],
-  vector = (p) => new THREE.Vector3(p[0], 0, p[1]),
+  vector = (p) => {
+    let v = vectorCache.get(p);
+    if (!v || v.x !== p[0] || v.z !== p[1]) {
+      v = new THREE.Vector3(p[0], 0, p[1]);
+      vectorCache.set(p, v);
+    }
+    return v;
+  },
   gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const esc = (v) =>
@@ -117,7 +125,10 @@ export class LedgerSystem {
         })),
       }));
     }
-    this.props = createLedgerProps(THREE, world, this.flow, { field, player });
+    this.props = createLedgerProps(world.graphics || THREE, world, this.flow, {
+      field,
+      player,
+    });
     this.borrowedTargets = [];
     for (const key of ["evidence-envelope", "notice-board"]) {
       const node = this.press.parts[key],
@@ -453,6 +464,7 @@ export class LedgerSystem {
     }
   }
   beforeFieldAction(action, dataset = {}) {
+    if (this.field.active?.onward) return true;
     this.interactionNotice = null;
     if (action === "field-close") this.activeInteraction = null;
     this.pendingFieldTask = this.field.active || this.field.traversal?.task;
@@ -624,8 +636,8 @@ export class LedgerSystem {
       actor = this.receiverActor();
     this.requireNear(point(actor.position), def.radius);
     this.requireVisible(actor.object);
-    if (!this.field.complete || this.field.pendingEffects.length)
-      throw Error("先完成三項工作並返回現場，結清原副本工作效果。");
+    if (!this.field.baseComplete || this.field.pendingEffects.length)
+      throw Error("先完成第一階段工作並返回現場，結清原副本工作效果。");
     const kills = this.callbacks.kills?.() ?? this.status.defeatedActors.length;
     if (
       kills !== this.status.defeatedActors.length ||
@@ -695,15 +707,26 @@ export class LedgerSystem {
   }
   interactTraversal() {
     if (!this.handsOccupied || !this.status.localChoices.custody) return false;
-    const dest = this.destination(), copy = this.props.readCopySnapshot();
-    if (!this.near(dest.position, dest.radius) ||
-        Math.hypot(copy.worldPosition[0] - dest.position[0], copy.worldPosition[2] - dest.position[1]) > dest.radius)
+    const dest = this.destination(),
+      copy = this.props.readCopySnapshot();
+    if (
+      !this.near(dest.position, dest.radius) ||
+      Math.hypot(
+        copy.worldPosition[0] - dest.position[0],
+        copy.worldPosition[2] - dest.position[1],
+      ) > dest.radius
+    )
       return false;
     // The authored receiver uses the flow's physical reach. Give its explicit
     // handoff panel first refusal before legacy Field E can release the page.
     // deliver() still verifies the same page, current evidence and the real ray.
-    return this.interact({ type: "mission", kind: "destination",
-      position: dest.position, radius: dest.radius, title: "同一副本／正式交付" });
+    return this.interact({
+      type: "mission",
+      kind: "destination",
+      position: dest.position,
+      radius: dest.radius,
+      title: "同一副本／正式交付",
+    });
   }
   nearest() {
     const entries = [],
@@ -907,13 +930,7 @@ export class LedgerSystem {
     const waypoint = cache.path[0];
     if (
       !waypoint ||
-      !tacticalSegmentClear({
-        from,
-        to: waypoint,
-        colliders,
-        radius: 0.38,
-        bounds: 23,
-      })
+      !cachedTacticalSegmentClear(enemy, from, waypoint, colliders, 0.38)
     ) {
       if (waypoint) delete enemy.ledgerPath;
       this.world.animate(enemy.actor, "idle");
@@ -932,6 +949,7 @@ export class LedgerSystem {
         colliders,
         0.38,
         23,
+        (enemy.moveOut ??= {}),
       );
       from.x = p.x;
       from.z = p.z;

@@ -1,0 +1,2618 @@
+{
+  "broken-water": {
+    "progress": {
+      "version": 1,
+      "missionId": "broken-water",
+      "events": [
+        {
+          "id": "water-event-1",
+          "type": "evidence-observed",
+          "sourceId": "water-meter",
+          "recordId": "inlet-five-v1",
+          "playerPosition": [
+            -16.162918643049064,
+            7.633432964408215
+          ]
+        },
+        {
+          "id": "water-event-2",
+          "type": "evidence-observed",
+          "sourceId": "water-contract",
+          "recordId": "shared-water-minimum-v1",
+          "playerPosition": [
+            15.882735951321047,
+            4.013247194844474
+          ]
+        },
+        {
+          "id": "water-event-3",
+          "type": "evidence-observed",
+          "sourceId": "water-pipe",
+          "recordId": "upstream-split-v1",
+          "playerPosition": [
+            -15.25659458444441,
+            -8.082247034510708
+          ]
+        },
+        {
+          "id": "water-event-4",
+          "type": "part-inspected",
+          "taskId": "water-bypass",
+          "partId": "split-joint",
+          "playerPosition": [
+            -11.04067791600183,
+            4.9845963438649346
+          ]
+        },
+        {
+          "id": "water-event-5",
+          "type": "valve-operated",
+          "valveId": "bypass-wheel",
+          "value": 1,
+          "playerPosition": [
+            -11.04067791600183,
+            4.9845963438649346
+          ]
+        },
+        {
+          "id": "water-event-7",
+          "type": "pressure-tested",
+          "playerPosition": [
+            -11.04067791600183,
+            4.9845963438649346
+          ]
+        },
+        {
+          "id": "water-event-8",
+          "type": "valve-operated",
+          "valveId": "clinic",
+          "value": 1,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-9",
+          "type": "valve-operated",
+          "valveId": "clinic",
+          "value": 2,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-11",
+          "type": "valve-operated",
+          "valveId": "homes",
+          "value": 1,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-13",
+          "type": "valve-operated",
+          "valveId": "homes",
+          "value": 2,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-16",
+          "type": "valve-operated",
+          "valveId": "mine",
+          "value": 1,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-20",
+          "type": "distribution-calibrated",
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-21",
+          "type": "local-choice-committed",
+          "decisionId": "water-routing",
+          "choiceId": "retain-bypass"
+        },
+        {
+          "id": "water-event-22",
+          "type": "valve-operated",
+          "valveId": "maintenance-diverter",
+          "value": 1,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-25",
+          "type": "valve-operated",
+          "valveId": "mine",
+          "value": 0,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-26",
+          "type": "flow-measured",
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ],
+          "valveValues": {
+            "bypass-wheel": 1,
+            "clinic": 2,
+            "homes": 2,
+            "mine": 0,
+            "maintenance-diverter": 1
+          },
+          "meterValues": {
+            "clinic": 0,
+            "settlement": 0,
+            "mine": 0,
+            "bypass": 0
+          }
+        },
+        {
+          "id": "water-event-29",
+          "type": "valve-operated",
+          "valveId": "mine",
+          "value": 1,
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-30",
+          "type": "flow-measured",
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ],
+          "valveValues": {
+            "bypass-wheel": 1,
+            "clinic": 2,
+            "homes": 2,
+            "mine": 1,
+            "maintenance-diverter": 1
+          },
+          "meterValues": {
+            "clinic": 2,
+            "settlement": 1,
+            "mine": 1,
+            "bypass": 1
+          }
+        },
+        {
+          "id": "water-event-31",
+          "type": "minimum-guarantee-published",
+          "guaranteeId": "public-minimum-supply",
+          "playerPosition": [
+            6.799582887600825,
+            12.887561333665865
+          ]
+        },
+        {
+          "id": "water-event-32",
+          "type": "part-inspected",
+          "taskId": "water-reserve",
+          "partId": "reserve-level",
+          "playerPosition": [
+            -8.108849095894538,
+            5.017951331429851
+          ]
+        },
+        {
+          "id": "water-event-33",
+          "type": "valve-operated",
+          "valveId": "reserve-spout",
+          "value": 0,
+          "playerPosition": [
+            -8.108849095894538,
+            5.017951331429851
+          ]
+        },
+        {
+          "id": "water-event-35",
+          "type": "reserve-committed",
+          "choiceId": "keep-first-aid",
+          "playerPosition": [
+            -8.108849095894538,
+            5.017951331429851
+          ]
+        },
+        {
+          "id": "water-event-36",
+          "type": "supply-received",
+          "recipientId": "west-water-witness",
+          "playerPosition": [
+            -13.01949540587599,
+            -7.156625047280499
+          ],
+          "recipientPosition": [
+            -13,
+            -7
+          ],
+          "valveValues": {
+            "bypass-wheel": 1,
+            "clinic": 2,
+            "homes": 2,
+            "mine": 1,
+            "maintenance-diverter": 1
+          },
+          "meterValues": {
+            "clinic": 2,
+            "settlement": 1,
+            "mine": 1,
+            "bypass": 1
+          }
+        }
+      ]
+    },
+    "result": {
+      "version": 1,
+      "missionId": "broken-water",
+      "complete": true,
+      "evidence": {
+        "water-meter": "inlet-five-v1",
+        "water-contract": "shared-water-minimum-v1",
+        "water-pipe": "upstream-split-v1"
+      },
+      "pressureVerified": true,
+      "calibrated": true,
+      "valveValues": {
+        "bypass-wheel": 1,
+        "clinic": 2,
+        "homes": 2,
+        "mine": 1,
+        "maintenance-diverter": 1,
+        "reserve-spout": 0
+      },
+      "revision": 9,
+      "measuredRevision": 9,
+      "flowValid": true,
+      "localChoices": {
+        "routing": "retain-bypass"
+      },
+      "water": {
+        "clinic": 2,
+        "settlement": 1,
+        "mine": 1,
+        "bypass": 1,
+        "inlet": 0
+      },
+      "allocation": {
+        "clinic": 2,
+        "settlement": 1,
+        "mine": 1,
+        "bypass": 1
+      },
+      "routeId": "west-ford",
+      "recipientId": "west-water-witness",
+      "fordOpen": true,
+      "guaranteePublished": true,
+      "response": {
+        "status": "cancelled",
+        "reason": "public-minimum-guarantee",
+        "warned": true,
+        "presented": false,
+        "activated": false
+      },
+      "actors": {
+        "water-1": {
+          "defeated": false,
+          "order": "standby"
+        },
+        "water-2": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "water-3": {
+          "defeated": false,
+          "order": "standby"
+        },
+        "water-4": {
+          "defeated": false,
+          "order": "guard"
+        }
+      },
+      "defeatedActors": [],
+      "reserve": {
+        "entityId": "separate-clean-water-bucket",
+        "units": 1,
+        "choiceId": "keep-first-aid",
+        "stationId": "west-maintenance-trough",
+        "expectedLegacyEffect": {
+          "spout": 0,
+          "fieldHealCharges": 1,
+          "fieldHealAmount": 20,
+          "extractionRewardDelta": 0
+        },
+        "effectOwner": "existing-fieldwork-only"
+      },
+      "receipt": {
+        "id": "canyon-supply-receipt",
+        "recipientId": "west-water-witness",
+        "witness": "inez",
+        "allocation": {
+          "clinic": 2,
+          "settlement": 1,
+          "mine": 1,
+          "bypass": 1
+        },
+        "units": 5,
+        "routeId": "west-ford",
+        "grants": "extraction-clearance"
+      },
+      "rewardDelta": 0,
+      "permanentDecisionDeferred": "water"
+    }
+  },
+  "last-signal": {
+    "progress": {
+      "version": 1,
+      "missionId": "last-signal",
+      "events": [
+        {
+          "id": "signal-event-1",
+          "type": "evidence-observed",
+          "sourceId": "signal-wire",
+          "recordId": "manual-disconnection-17",
+          "playerPosition": [
+            -16.06375684722453,
+            7.790017398246399
+          ]
+        },
+        {
+          "id": "signal-event-2",
+          "type": "evidence-observed",
+          "sourceId": "signal-roster",
+          "recordId": "missing-shift-roster-17",
+          "playerPosition": [
+            16.240843108634795,
+            4.026776459059959
+          ]
+        },
+        {
+          "id": "signal-event-3",
+          "type": "evidence-observed",
+          "sourceId": "signal-code",
+          "recordId": "public-and-standdown-code-17",
+          "playerPosition": [
+            -14.863405422208624,
+            -7.947415504527108
+          ]
+        },
+        {
+          "id": "signal-event-4",
+          "type": "contacts-observed",
+          "contactSnapshot": {
+            "earthSocketId": "open",
+            "earthDistance": 0.22000000000000064,
+            "powerAngle": 0
+          },
+          "playerPosition": [
+            -11.20587648275526,
+            11.968004101947955
+          ]
+        },
+        {
+          "id": "signal-event-5",
+          "type": "contacts-observed",
+          "contactSnapshot": {
+            "earthSocketId": "battery-socket",
+            "earthDistance": 0,
+            "powerAngle": 0
+          },
+          "playerPosition": [
+            -11.20587648275526,
+            11.968004101947955
+          ]
+        },
+        {
+          "id": "signal-event-6",
+          "type": "contacts-observed",
+          "contactSnapshot": {
+            "earthSocketId": "open",
+            "earthDistance": 0.22000000000000064,
+            "powerAngle": 0
+          },
+          "playerPosition": [
+            -11.20587648275526,
+            11.968004101947955
+          ]
+        },
+        {
+          "id": "signal-event-7",
+          "type": "contacts-observed",
+          "contactSnapshot": {
+            "earthSocketId": "earth-socket",
+            "earthDistance": 0,
+            "powerAngle": 0
+          },
+          "playerPosition": [
+            -11.20587648275526,
+            11.968004101947955
+          ]
+        },
+        {
+          "id": "signal-event-8",
+          "type": "contacts-observed",
+          "contactSnapshot": {
+            "earthSocketId": "earth-socket",
+            "earthDistance": 0,
+            "powerAngle": 1.05
+          },
+          "playerPosition": [
+            -11.20587648275526,
+            11.968004101947955
+          ]
+        },
+        {
+          "id": "signal-event-9",
+          "type": "power-verified",
+          "contactSnapshot": {
+            "earthSocketId": "earth-socket",
+            "earthDistance": 0,
+            "powerAngle": 1.05
+          },
+          "playerPosition": [
+            -11.20587648275526,
+            11.968004101947955
+          ]
+        },
+        {
+          "id": "signal-event-10",
+          "type": "roster-verified",
+          "rosterId": "mine-missing-shift-17",
+          "batch": "M17",
+          "memberIds": [
+            "worker-014",
+            "worker-027",
+            "worker-031",
+            "worker-046"
+          ],
+          "playerPosition": [
+            12.847015540489656,
+            5.958930284680849
+          ]
+        },
+        {
+          "id": "signal-event-11",
+          "type": "channel-selected",
+          "choiceId": "ceasefire-line",
+          "selectorAngle": 0.65,
+          "playerPosition": [
+            10.846009614158586,
+            6.484207401713302
+          ]
+        },
+        {
+          "id": "signal-event-12",
+          "type": "message-sent",
+          "messageId": "signal-message-1",
+          "rosterId": "mine-missing-shift-17",
+          "contentIds": [
+            "standdown-order-17"
+          ],
+          "keyAngle": 1.05,
+          "contactSnapshot": {
+            "earthSocketId": "earth-socket",
+            "earthDistance": 0,
+            "powerAngle": 1.05
+          },
+          "endpointSnapshot": {
+            "endpointId": null,
+            "connected": false
+          },
+          "playerPosition": [
+            10.846009614158586,
+            6.484207401713302
+          ]
+        },
+        {
+          "id": "signal-event-13",
+          "type": "pouch-picked-up",
+          "entityId": "complete-roster-pouch",
+          "pouchPosition": [
+            11,
+            5
+          ],
+          "playerPosition": [
+            10.846009614158586,
+            6.484207401713302
+          ]
+        },
+        {
+          "id": "signal-event-14",
+          "type": "pouch-dropped",
+          "entityId": "complete-roster-pouch",
+          "pouchPosition": [
+            10.962060937693916,
+            7.211198024333896
+          ],
+          "playerPosition": [
+            10.997615456039615,
+            7.9765262914642605
+          ]
+        },
+        {
+          "id": "signal-event-15",
+          "type": "pouch-picked-up",
+          "entityId": "complete-roster-pouch",
+          "pouchPosition": [
+            10.962060937693916,
+            7.211198024333896
+          ],
+          "playerPosition": [
+            10.997615456039615,
+            7.9765262914642605
+          ]
+        },
+        {
+          "id": "signal-event-16",
+          "type": "reply-observed",
+          "reply": {
+            "messageId": "signal-message-1",
+            "rosterId": "mine-missing-shift-17",
+            "receiverId": "signal-south-receiver",
+            "revision": 5,
+            "contentIds": [
+              "standdown-order-17"
+            ],
+            "lampAngle": 1.05
+          },
+          "contactSnapshot": {
+            "earthSocketId": "earth-socket",
+            "earthDistance": 0,
+            "powerAngle": 1.05
+          },
+          "endpointSnapshot": {
+            "endpointId": null,
+            "connected": false
+          },
+          "playerPosition": [
+            -10.146621353815005,
+            15.565615183316053
+          ]
+        },
+        {
+          "id": "signal-event-17",
+          "type": "roster-received",
+          "receiverId": "signal-south-receiver",
+          "receiverPosition": [
+            -10,
+            14
+          ],
+          "playerPosition": [
+            -10.146621353815005,
+            15.565615183316053
+          ],
+          "rosterId": "mine-missing-shift-17",
+          "memberIds": [
+            "worker-014",
+            "worker-027",
+            "worker-031",
+            "worker-046"
+          ],
+          "replyTo": "signal-message-1",
+          "pouchPosition": [
+            -8.713572888997225,
+            14.92431018763662
+          ],
+          "contactSnapshot": {
+            "earthSocketId": "earth-socket",
+            "earthDistance": 0,
+            "powerAngle": 1.05
+          },
+          "endpointSnapshot": {
+            "endpointId": null,
+            "connected": false
+          }
+        }
+      ]
+    },
+    "result": {
+      "version": 1,
+      "missionId": "last-signal",
+      "complete": true,
+      "evidence": {
+        "signal-wire": "manual-disconnection-17",
+        "signal-roster": "missing-shift-roster-17",
+        "signal-code": "public-and-standdown-code-17"
+      },
+      "revision": 5,
+      "contactSnapshot": {
+        "earthSocketId": "earth-socket",
+        "earthDistance": 0,
+        "powerAngle": 1.05
+      },
+      "powerVerified": true,
+      "rosterVerified": true,
+      "localChoices": {
+        "channel": "ceasefire-line"
+      },
+      "endpointSnapshot": {
+        "endpointId": null,
+        "connected": false
+      },
+      "traceConnected": true,
+      "transmission": {
+        "messageId": "signal-message-1",
+        "revision": 5,
+        "rosterId": "mine-missing-shift-17",
+        "contentIds": [
+          "standdown-order-17"
+        ],
+        "receiverId": "signal-south-receiver"
+      },
+      "reply": {
+        "messageId": "signal-message-1",
+        "rosterId": "mine-missing-shift-17",
+        "receiverId": "signal-south-receiver",
+        "revision": 5,
+        "contentIds": [
+          "standdown-order-17"
+        ],
+        "lampAngle": 1.05
+      },
+      "pouch": {
+        "carrier": null,
+        "position": [
+          -8.713572888997225,
+          14.92431018763662
+        ],
+        "delivered": true
+      },
+      "receipt": {
+        "id": "complete-roster-receipt-17",
+        "receiverId": "signal-south-receiver",
+        "rosterId": "mine-missing-shift-17",
+        "memberIds": [
+          "worker-014",
+          "worker-027",
+          "worker-031",
+          "worker-046"
+        ],
+        "messageId": "signal-message-1",
+        "revision": 5,
+        "receiveMode": "physical-pouch"
+      },
+      "response": {
+        "status": "prevented",
+        "warned": false,
+        "presented": false,
+        "activated": false,
+        "reason": "standdown-order"
+      },
+      "actors": {
+        "signal-1": {
+          "defeated": false,
+          "order": "standdown"
+        },
+        "signal-2": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "signal-3": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "signal-4": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "signal-5": {
+          "defeated": false,
+          "order": "standdown"
+        }
+      },
+      "defeatedActors": [],
+      "fieldChoices": {
+        "signal-earth": "earth-then-power",
+        "signal-patch": "verify-complete-roster",
+        "signal-relay": "ceasefire-dispatch"
+      },
+      "rewardDelta": 0
+    }
+  },
+  "black-ledger": {
+    "progress": {
+      "version": 1,
+      "missionId": "black-ledger",
+      "events": [
+        {
+          "id": "ledger-event-1",
+          "type": "evidence-observed",
+          "sourceId": "ledger-ticket",
+          "recordId": "night-freight-ticket",
+          "playerPosition": [
+            -16.061384225120612,
+            7.8618857323663
+          ]
+        },
+        {
+          "id": "ledger-event-2",
+          "type": "evidence-observed",
+          "sourceId": "ledger-payment",
+          "recordId": "overwritten-manager-payment",
+          "playerPosition": [
+            16.12148680755917,
+            3.985366951775861
+          ]
+        },
+        {
+          "id": "ledger-event-3",
+          "type": "evidence-observed",
+          "sourceId": "ledger-names",
+          "recordId": "missing-workers-n17",
+          "playerPosition": [
+            -15.217790922612943,
+            -8.083874856771931
+          ]
+        },
+        {
+          "id": "ledger-event-4",
+          "type": "carriage-observed",
+          "carriageSnapshot": {
+            "tagAngle": 0,
+            "frameSlot": "open",
+            "frameDistance": 0.21999999999999975
+          },
+          "playerPosition": [
+            -13.903413979865556,
+            3.5867592082997173
+          ]
+        },
+        {
+          "id": "ledger-event-5",
+          "type": "carriage-observed",
+          "carriageSnapshot": {
+            "tagAngle": 1.5707963267948966,
+            "frameSlot": "open",
+            "frameDistance": 0.21999999999999975
+          },
+          "playerPosition": [
+            -13.903413979865556,
+            3.5867592082997173
+          ]
+        },
+        {
+          "id": "ledger-event-6",
+          "type": "carriage-observed",
+          "carriageSnapshot": {
+            "tagAngle": 3.141592653589793,
+            "frameSlot": "open",
+            "frameDistance": 0.21999999999999975
+          },
+          "playerPosition": [
+            -13.903413979865556,
+            3.5867592082997173
+          ]
+        },
+        {
+          "id": "ledger-event-7",
+          "type": "carriage-observed",
+          "carriageSnapshot": {
+            "tagAngle": 3.141592653589793,
+            "frameSlot": "A17-314",
+            "frameDistance": 0
+          },
+          "playerPosition": [
+            -13.903413979865556,
+            3.5867592082997173
+          ]
+        },
+        {
+          "id": "ledger-event-8",
+          "type": "carriage-verified",
+          "ticket": "A17",
+          "wagon": "314",
+          "batch": "N17",
+          "carriageSnapshot": {
+            "tagAngle": 3.141592653589793,
+            "frameSlot": "A17-314",
+            "frameDistance": 0
+          },
+          "playerPosition": [
+            -13.903413979865556,
+            3.5867592082997173
+          ]
+        },
+        {
+          "id": "ledger-event-9",
+          "type": "original-secured",
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "original-table",
+            "worldPosition": [
+              -13.97,
+              0.6875,
+              2.02
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            -13.903413979865556,
+            3.5867592082997173
+          ]
+        },
+        {
+          "id": "ledger-event-10",
+          "type": "carbon-observed",
+          "carbonSnapshot": {
+            "sheetOffset": 0.5,
+            "lampAngle": 0
+          },
+          "playerPosition": [
+            6.325376682319065,
+            15.678073654931314
+          ]
+        },
+        {
+          "id": "ledger-event-11",
+          "type": "carbon-observed",
+          "carbonSnapshot": {
+            "sheetOffset": 0,
+            "lampAngle": 0
+          },
+          "playerPosition": [
+            6.325376682319065,
+            15.678073654931314
+          ]
+        },
+        {
+          "id": "ledger-event-12",
+          "type": "carbon-observed",
+          "carbonSnapshot": {
+            "sheetOffset": 0,
+            "lampAngle": 1.5707963267948966
+          },
+          "playerPosition": [
+            6.325376682319065,
+            15.678073654931314
+          ]
+        },
+        {
+          "id": "ledger-event-13",
+          "type": "carbon-verified",
+          "payee": "manager",
+          "batch": "N17",
+          "workerIds": [
+            "worker-014",
+            "worker-027",
+            "worker-031",
+            "worker-046"
+          ],
+          "carbonSnapshot": {
+            "sheetOffset": 0,
+            "lampAngle": 1.5707963267948966
+          },
+          "playerPosition": [
+            6.325376682319065,
+            15.678073654931314
+          ]
+        },
+        {
+          "id": "ledger-event-14",
+          "type": "custody-selected",
+          "choiceId": "sealed-courier",
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              11.224767936061173,
+              0.95,
+              -5.194410449034489
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            11.002029299987411,
+            -5.445433356355713
+          ]
+        },
+        {
+          "id": "ledger-event-15",
+          "type": "copy-created",
+          "pressAngle": 1.05,
+          "copySnapshot": {
+            "entityId": "verified-ledger-copy",
+            "parentCarrier": "copy-tray",
+            "worldPosition": [
+              11.35,
+              0.86,
+              -6.9
+            ],
+            "visible": true
+          },
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              11.224767936061173,
+              0.95,
+              -5.194410449034489
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            11.002029299987411,
+            -5.445433356355713
+          ]
+        },
+        {
+          "id": "ledger-event-16",
+          "type": "copy-picked-up",
+          "copySnapshot": {
+            "entityId": "verified-ledger-copy",
+            "parentCarrier": "copy-tray",
+            "worldPosition": [
+              11.35,
+              0.86,
+              -6.9
+            ],
+            "visible": true
+          },
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              11.224767936061173,
+              0.95,
+              -5.194410449034489
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            11.002029299987411,
+            -5.445433356355713
+          ]
+        },
+        {
+          "id": "ledger-event-17",
+          "type": "copy-delivered",
+          "custodianId": "ledger-south-courier",
+          "receiverPosition": [
+            -13,
+            14
+          ],
+          "copySnapshot": {
+            "entityId": "verified-ledger-copy",
+            "parentCarrier": "player",
+            "worldPosition": [
+              -12.567042348833482,
+              0.65,
+              14.61469038905933
+            ],
+            "visible": true
+          },
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              -12.51879981470841,
+              0.95,
+              15.595131633416797
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            -12.741538450782173,
+            15.344108726095572
+          ]
+        },
+        {
+          "id": "ledger-event-18",
+          "type": "clearance-presented",
+          "receiverId": "ledger-south-courier",
+          "receiverPosition": [
+            -13,
+            14
+          ],
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              -12.51879981470841,
+              0.95,
+              15.595131633416797
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            -12.741538450782173,
+            15.344108726095572
+          ]
+        },
+        {
+          "id": "ledger-event-19",
+          "type": "custody-receipt-issued",
+          "receiverId": "ledger-south-courier",
+          "receiverPosition": [
+            -13,
+            14
+          ],
+          "copySnapshot": {
+            "entityId": "verified-ledger-copy",
+            "parentCarrier": "ledger-south-courier",
+            "worldPosition": [
+              -14.25,
+              0.99,
+              14.15
+            ],
+            "visible": true
+          },
+          "originalSnapshot": {
+            "entityId": "original-company-ledger",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              -12.51879981470841,
+              0.95,
+              15.595131633416797
+            ],
+            "visible": true
+          },
+          "playerPosition": [
+            -12.741538450782173,
+            15.344108726095572
+          ]
+        }
+      ]
+    },
+    "result": {
+      "version": 1,
+      "missionId": "black-ledger",
+      "complete": true,
+      "evidence": {
+        "ledger-ticket": "night-freight-ticket",
+        "ledger-payment": "overwritten-manager-payment",
+        "ledger-names": "missing-workers-n17"
+      },
+      "carriageSnapshot": {
+        "tagAngle": 3.141592653589793,
+        "frameSlot": "A17-314",
+        "frameDistance": 0
+      },
+      "carbonSnapshot": {
+        "sheetOffset": 0,
+        "lampAngle": 1.5707963267948966
+      },
+      "shipmentVerified": true,
+      "paymentVerified": true,
+      "original": {
+        "entityId": "original-company-ledger",
+        "carrier": "player-satchel"
+      },
+      "copy": {
+        "created": true,
+        "carrier": "ledger-south-courier",
+        "position": [
+          -13,
+          14
+        ],
+        "delivered": true
+      },
+      "localChoices": {
+        "custody": "sealed-courier"
+      },
+      "clearance": true,
+      "receipt": {
+        "id": "ledger-custody-receipt-n17",
+        "receiverId": "ledger-south-courier",
+        "custodianId": "ledger-south-courier",
+        "originalEntityId": "original-company-ledger",
+        "originalCarrier": "player-satchel",
+        "copyEntityId": "verified-ledger-copy",
+        "scope": "sealed-copy",
+        "fieldRewardDelta": -10,
+        "batch": "N17"
+      },
+      "response": {
+        "status": "prevented",
+        "warned": false,
+        "presented": false,
+        "activated": false,
+        "reason": "sealed-south-courier"
+      },
+      "actors": {
+        "ledger-1": {
+          "defeated": false,
+          "order": "standby"
+        },
+        "ledger-2": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "ledger-3": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "ledger-4": {
+          "defeated": false,
+          "order": "guard"
+        },
+        "ledger-5": {
+          "defeated": false,
+          "order": "standby"
+        }
+      },
+      "defeatedActors": [],
+      "fieldChoices": {
+        "ledger-carriage": "a17-314",
+        "ledger-carbon": "manager-impression",
+        "ledger-copy": "sealed-courier"
+      },
+      "rewardDelta": 0
+    }
+  },
+  "long-night": {
+    "progress": {
+      "version": 1,
+      "missionId": "long-night",
+      "events": [
+        {
+          "id": "night-event-1",
+          "type": "evidence-observed",
+          "clueId": "night-order",
+          "recordId": "expired-road-order-n17",
+          "playerPosition": [
+            -14.460670193195512,
+            7.993933886952467
+          ]
+        },
+        {
+          "id": "night-event-2",
+          "type": "evidence-observed",
+          "clueId": "night-papers",
+          "recordId": "civilian-family-pass-17",
+          "playerPosition": [
+            14.233820566181043,
+            4.446587150377008
+          ]
+        },
+        {
+          "id": "night-event-3",
+          "type": "documents-collected",
+          "snapshot": {
+            "entityId": "family-passage-papers",
+            "batch": "PASS-17",
+            "memberIds": [
+              "night-family-1",
+              "night-family-2",
+              "night-family-3"
+            ],
+            "position": [
+              16,
+              4
+            ],
+            "carrier": "source",
+            "visible": true
+          },
+          "playerPosition": [
+            14.233820566181043,
+            4.446587150377008
+          ]
+        },
+        {
+          "id": "night-event-4",
+          "type": "evidence-observed",
+          "clueId": "night-route",
+          "recordId": "two-evacuation-routes",
+          "playerPosition": [
+            -13.544444743106158,
+            -7.62126555528454
+          ]
+        },
+        {
+          "id": "night-event-5",
+          "type": "route-selected",
+          "choiceId": "west-ford",
+          "snapshot": {
+            "armAngle": -0.65,
+            "waterLevel": 1.000000000000001
+          },
+          "playerPosition": [
+            -11.175614984063145,
+            12.998484572146562
+          ]
+        },
+        {
+          "id": "night-event-6",
+          "type": "brace-observed",
+          "snapshot": {
+            "angle": 1.5707963267948966,
+            "endDistances": [
+              0.37310846948307125,
+              0.3731084694830714
+            ],
+            "boardHeight": 0.04
+          },
+          "playerPosition": [
+            5.008381685813244,
+            6.049700387550255
+          ]
+        },
+        {
+          "id": "night-event-7",
+          "type": "brace-observed",
+          "snapshot": {
+            "angle": 0.7853981633974483,
+            "endDistances": [
+              2.0585049994264977e-05,
+              2.0585049994225726e-05
+            ],
+            "boardHeight": 0.04
+          },
+          "playerPosition": [
+            5.008381685813244,
+            6.049700387550255
+          ]
+        },
+        {
+          "id": "night-event-8",
+          "type": "bridge-tested",
+          "snapshot": {
+            "angle": 0.7853981633974483,
+            "endDistances": [
+              2.0585049994264977e-05,
+              2.0585049994225726e-05
+            ],
+            "boardHeight": 0.015
+          },
+          "fromPosition": [
+            5.008381685813244,
+            6.049700387550255
+          ],
+          "playerPosition": [
+            5.006175416031859,
+            5.7997101812449054
+          ]
+        },
+        {
+          "id": "night-event-9",
+          "type": "bridge-opened",
+          "snapshot": {
+            "gateAngle": 1.05,
+            "brace": {
+              "angle": 0.7853981633974483,
+              "endDistances": [
+                2.0585049994264977e-05,
+                2.0585049994225726e-05
+              ],
+              "boardHeight": 0.015
+            }
+          },
+          "playerPosition": [
+            5.006175416031859,
+            5.7997101812449054
+          ]
+        },
+        {
+          "id": "night-event-10",
+          "type": "clearance-presented",
+          "postId": "north-passage-post",
+          "reason": "expired-order-and-civilians",
+          "documents": {
+            "entityId": "family-passage-papers",
+            "batch": "PASS-17",
+            "memberIds": [
+              "night-family-1",
+              "night-family-2",
+              "night-family-3"
+            ],
+            "position": [
+              12.206171002195548,
+              -3.5479967757915563
+            ],
+            "carrier": "player",
+            "visible": true
+          },
+          "playerPosition": [
+            11.994038967839584,
+            -3.816697352642444
+          ]
+        },
+        {
+          "id": "night-event-11",
+          "type": "escort-started",
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  12.35,
+                  -6.65
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  13,
+                  -7
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  13.65,
+                  -6.65
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 0
+          },
+          "playerPosition": [
+            12.886273397962448,
+            -7.372978735081969
+          ]
+        },
+        {
+          "id": "night-event-12",
+          "type": "escort-checkpoint",
+          "index": 0,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  12.387584970329767,
+                  -6.663920359381396
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  13,
+                  -7
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  13.612415029670233,
+                  -6.663920359381396
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 1
+          },
+          "playerPosition": [
+            12.886273397962448,
+            -7.372978735081969
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-13",
+          "type": "escort-checkpoint",
+          "index": 1,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  11.857725450671794,
+                  -4.652457783088231
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  12.342220948463687,
+                  -5.026662845391062
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  12.80215430700928,
+                  -4.748141048575202
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 2
+          },
+          "playerPosition": [
+            12.72524736012914,
+            -5.204458019160627
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-14",
+          "type": "escort-command",
+          "command": "wait",
+          "coverId": "north-shelter",
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  11.818032813462189,
+                  -4.6475085860476355
+                ],
+                "state": "wait"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  12.302606354510928,
+                  -5.021123536232154
+                ],
+                "state": "wait"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  12.762511178133991,
+                  -4.742809788594927
+                ],
+                "state": "wait"
+              }
+            ],
+            "paused": true,
+            "routeIndex": 2
+          },
+          "playerPosition": [
+            12.72524736012914,
+            -5.204458019160627
+          ]
+        },
+        {
+          "id": "night-event-15",
+          "type": "escort-command",
+          "command": "follow",
+          "coverId": "north-shelter",
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  11.818032813462189,
+                  -4.6475085860476355
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  12.302606354510928,
+                  -5.021123536232154
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  12.762511178133991,
+                  -4.742809788594927
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 2
+          },
+          "playerPosition": [
+            12.72524736012914,
+            -5.204458019160627
+          ]
+        },
+        {
+          "id": "night-event-16",
+          "type": "escort-checkpoint",
+          "index": 2,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  5.1894417847324625,
+                  -3.821002578662302
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  5.687048393587901,
+                  -4.09606998531281
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  6.1421879422185395,
+                  -3.8525000344090055
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 3
+          },
+          "playerPosition": [
+            6.114417033678195,
+            -4.3447313514911485
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-17",
+          "type": "escort-checkpoint",
+          "index": 3,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  4.68827008703167,
+                  4.162482097181002
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  5.084565453850441,
+                  3.8804088711329614
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  5.387869101640014,
+                  4.083479013881503
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 4
+          },
+          "playerPosition": [
+            4.972357706804586,
+            3.8944640757368085
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-18",
+          "type": "escort-checkpoint",
+          "index": 4,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  -12.64052924124753,
+                  5.20549171642438
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  -12.242421888021982,
+                  4.95309935780548
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  -11.935981420089316,
+                  5.205690369368126
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 5
+          },
+          "playerPosition": [
+            -11.242165236118788,
+            4.982695086785193
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-19",
+          "type": "escort-checkpoint",
+          "index": 5,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  -13.38,
+                  12.110000000000001
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  -12.981175695856574,
+                  11.89126290898219
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  -12.615920460090424,
+                  11.96545560141195
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 6
+          },
+          "playerPosition": [
+            -13.010373131714179,
+            11.306824623940722
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-20",
+          "type": "escort-checkpoint",
+          "index": 6,
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  -12.70355861090336,
+                  16.522438326724114
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  -12.030668520113206,
+                  15.86398828729403
+                ],
+                "state": "follow"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  -11.64060514692707,
+                  17.042644836197457
+                ],
+                "state": "follow"
+              }
+            ],
+            "paused": false,
+            "routeIndex": 7
+          },
+          "playerPosition": [
+            -12.004324747391152,
+            15.542555377033299
+          ],
+          "gateAngle": 1.05
+        },
+        {
+          "id": "night-event-21",
+          "type": "arrival-received",
+          "snapshot": {
+            "members": [
+              {
+                "id": "night-family-1",
+                "position": [
+                  -12.70355861090336,
+                  16.522438326724114
+                ],
+                "state": "safe"
+              },
+              {
+                "id": "night-family-2",
+                "position": [
+                  -12.030668520113206,
+                  15.86398828729403
+                ],
+                "state": "safe"
+              },
+              {
+                "id": "night-family-3",
+                "position": [
+                  -11.64060514692707,
+                  17.042644836197457
+                ],
+                "state": "safe"
+              }
+            ],
+            "paused": true,
+            "routeIndex": 7
+          },
+          "documents": {
+            "entityId": "family-passage-papers",
+            "batch": "PASS-17",
+            "memberIds": [
+              "night-family-1",
+              "night-family-2",
+              "night-family-3"
+            ],
+            "position": [
+              -11.792192713035188,
+              15.811255953884187
+            ],
+            "carrier": "player",
+            "visible": true
+          },
+          "playerPosition": [
+            -12.004324747391152,
+            15.542555377033299
+          ]
+        }
+      ]
+    },
+    "result": {
+      "version": 1,
+      "missionId": "long-night",
+      "complete": true,
+      "evidence": [
+        "night-order",
+        "night-papers",
+        "night-route"
+      ],
+      "documentsCollected": true,
+      "routeId": "west-ford",
+      "bridgeTested": true,
+      "bridgeOpen": true,
+      "clearance": true,
+      "started": true,
+      "checkpoint": 6,
+      "paused": true,
+      "party": {
+        "members": [
+          {
+            "id": "night-family-1",
+            "position": [
+              -12.70355861090336,
+              16.522438326724114
+            ],
+            "state": "safe"
+          },
+          {
+            "id": "night-family-2",
+            "position": [
+              -12.030668520113206,
+              15.86398828729403
+            ],
+            "state": "safe"
+          },
+          {
+            "id": "night-family-3",
+            "position": [
+              -11.64060514692707,
+              17.042644836197457
+            ],
+            "state": "safe"
+          }
+        ],
+        "paused": true,
+        "routeIndex": 7
+      },
+      "commands": [
+        {
+          "command": "wait",
+          "coverId": "north-shelter"
+        },
+        {
+          "command": "follow",
+          "coverId": "north-shelter"
+        }
+      ],
+      "receipt": {
+        "id": "three-family-arrival-pass-17",
+        "title": "羅絲、塔文、米洛到達回條",
+        "memberIds": [
+          "night-family-1",
+          "night-family-2",
+          "night-family-3"
+        ],
+        "routeId": "west-ford",
+        "position": [
+          -12,
+          17
+        ]
+      },
+      "mistakes": 1,
+      "response": {
+        "status": "prevented",
+        "warned": false,
+        "presented": false,
+        "activated": false,
+        "reason": "valid-family-papers"
+      },
+      "actors": {
+        "night-1": {
+          "defeated": false,
+          "order": "ordinary"
+        },
+        "night-2": {
+          "defeated": false,
+          "order": "hold"
+        },
+        "night-3": {
+          "defeated": false,
+          "order": "ordinary"
+        },
+        "night-4": {
+          "defeated": false,
+          "order": "ordinary"
+        },
+        "night-5": {
+          "defeated": false,
+          "order": "ordinary"
+        },
+        "night-6": {
+          "defeated": false,
+          "order": "ordinary"
+        }
+      },
+      "defeatedActors": [],
+      "fieldChoices": {
+        "night-route-plan": "west-ford",
+        "night-brace": "diagonal-brace",
+        "night-escort": "count-three"
+      },
+      "rewardDelta": 0
+    }
+  },
+  "dawn-pact": {
+    "progress": {
+      "version": 1,
+      "missionId": "dawn-pact",
+      "events": [
+        {
+          "id": "pact-event-1",
+          "type": "evidence-observed",
+          "sourceId": "pact-shares",
+          "recordId": "mine-shares-released",
+          "playerPosition": [
+            -15.169308281391176,
+            9.458671260390368
+          ]
+        },
+        {
+          "id": "pact-event-2",
+          "type": "approach-observed",
+          "feedSnapshot": {
+            "militaryAngle": 1.05,
+            "militaryPowered": true,
+            "civilianAngle": 1.05,
+            "civilianPowered": true
+          },
+          "playerPosition": [
+            -4.288026919328136,
+            6.953226673985148
+          ]
+        },
+        {
+          "id": "pact-event-3",
+          "type": "response-warning-presented",
+          "responseId": "pact-finite-resupply"
+        },
+        {
+          "id": "pact-event-4",
+          "type": "response-activated",
+          "responseId": "pact-finite-resupply"
+        },
+        {
+          "id": "pact-event-5",
+          "type": "evidence-observed",
+          "sourceId": "pact-wages",
+          "recordId": "joint-unpaid-wages",
+          "playerPosition": [
+            14.755519450649542,
+            4.373790384076108
+          ]
+        },
+        {
+          "id": "pact-event-6",
+          "type": "resupply-received",
+          "actorId": "pact-2",
+          "actorPosition": [
+            9.699544010507859,
+            11.860310205184437
+          ],
+          "pickupPosition": [
+            9.569999980926514,
+            13
+          ],
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11,
+              0,
+              13
+            ],
+            "yaw": 3.141592653589793,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": null,
+            "stock": {
+              "available": 24,
+              "issued": 0,
+              "cover": 0
+            }
+          },
+          "feedSnapshot": {
+            "militaryAngle": 1.05,
+            "militaryPowered": true,
+            "civilianAngle": 1.05,
+            "civilianPowered": true
+          },
+          "roundsBefore": 30
+        },
+        {
+          "id": "pact-event-7",
+          "type": "evidence-observed",
+          "sourceId": "pact-train",
+          "recordId": "last-train-hearing",
+          "playerPosition": [
+            -13.426583933935639,
+            -7.574301865836835
+          ]
+        },
+        {
+          "id": "pact-event-8",
+          "type": "resupply-received",
+          "actorId": "pact-5",
+          "actorPosition": [
+            12.301659241862012,
+            11.86097561754758
+          ],
+          "pickupPosition": [
+            12.430000019073486,
+            13
+          ],
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11,
+              0,
+              13
+            ],
+            "yaw": 3.141592653589793,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": null,
+            "stock": {
+              "available": 18,
+              "issued": 6,
+              "cover": 0
+            }
+          },
+          "feedSnapshot": {
+            "militaryAngle": 1.05,
+            "militaryPowered": true,
+            "civilianAngle": 1.05,
+            "civilianPowered": true
+          },
+          "roundsBefore": 30
+        },
+        {
+          "id": "pact-event-9",
+          "type": "feed-confirmed",
+          "feedSnapshot": {
+            "militaryAngle": 0,
+            "militaryPowered": false,
+            "civilianAngle": 1.05,
+            "civilianPowered": true
+          },
+          "playerPosition": [
+            -12.33580910297054,
+            5.393724809697331
+          ]
+        },
+        {
+          "id": "pact-event-10",
+          "type": "lights-confirmed",
+          "choiceId": "darken-approach",
+          "lightSnapshot": {
+            "lidAngle": 1.05,
+            "battery": {
+              "entityId": "pact-original-battery",
+              "parentCarrier": "salvage-tray",
+              "worldPosition": [
+                -4.1,
+                0.53,
+                11.85
+              ],
+              "visible": true
+            },
+            "beamVisible": false
+          },
+          "playerPosition": [
+            -5.171276936406951,
+            13.49689548348181
+          ]
+        },
+        {
+          "id": "pact-event-11",
+          "type": "siding-selected",
+          "choiceId": "negotiation-siding",
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11,
+              0,
+              13
+            ],
+            "yaw": 3.141592653589793,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": null,
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "playerPosition": [
+            10.879460272443886,
+            14.668136432152194
+          ]
+        },
+        {
+          "id": "pact-event-12",
+          "type": "cart-checkpoint",
+          "index": 0,
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11,
+              0,
+              13
+            ],
+            "yaw": 3.141592653589793,
+            "brakeAngle": 0,
+            "visible": true,
+            "containedBayId": null,
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "playerPosition": [
+            10.995693513331087,
+            15.24452081555305
+          ]
+        },
+        {
+          "id": "pact-event-13",
+          "type": "cart-checkpoint",
+          "index": 1,
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.729605465625779,
+              0,
+              10.076382952948643
+            ],
+            "yaw": 2.897032145118978,
+            "brakeAngle": 0,
+            "visible": true,
+            "containedBayId": null,
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "playerPosition": [
+            11.725298978956866,
+            12.320903768501694
+          ]
+        },
+        {
+          "id": "pact-event-14",
+          "type": "cart-checkpoint",
+          "index": 2,
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.997970801865115,
+              0,
+              5.257884434409451
+            ],
+            "yaw": 3.1287395203891455,
+            "brakeAngle": 0,
+            "visible": true,
+            "containedBayId": "negotiation-siding",
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "playerPosition": [
+            11.993664315196202,
+            7.502405249962502
+          ]
+        },
+        {
+          "id": "pact-event-15",
+          "type": "cart-parked",
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.997970801865115,
+              0,
+              5.257884434409451
+            ],
+            "yaw": 3.1287395203891455,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": "negotiation-siding",
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "playerPosition": [
+            11.993664315196202,
+            7.502405249962502
+          ]
+        },
+        {
+          "id": "pact-event-16",
+          "type": "clearance-presented",
+          "reasonId": "safe-departure-and-hearing",
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.997970801865115,
+              0,
+              5.257884434409451
+            ],
+            "yaw": 3.1287395203891455,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": "negotiation-siding",
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "feedSnapshot": {
+            "militaryAngle": 0,
+            "militaryPowered": false,
+            "civilianAngle": 1.05,
+            "civilianPowered": true
+          },
+          "lightSnapshot": {
+            "lidAngle": 1.05,
+            "battery": {
+              "entityId": "pact-original-battery",
+              "parentCarrier": "salvage-tray",
+              "worldPosition": [
+                -4.1,
+                0.53,
+                11.85
+              ],
+              "visible": true
+            },
+            "beamVisible": false
+          },
+          "playerPosition": [
+            7.813638274860332,
+            3.7180371421679124
+          ],
+          "witnessPosition": [
+            9,
+            1.9
+          ]
+        },
+        {
+          "id": "pact-event-17",
+          "type": "inventory-confirmed",
+          "actorSnapshots": [
+            {
+              "id": "pact-1",
+              "position": [
+                -5.913664010733669,
+                0.2715373408289455
+              ],
+              "hp": 90,
+              "rounds": 16,
+              "magazine": 4,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-2",
+              "position": [
+                3,
+                -6
+              ],
+              "hp": 90,
+              "rounds": 28,
+              "magazine": 6,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-3",
+              "position": [
+                -4.338146624109957,
+                -10.45897987773332
+              ],
+              "hp": 90,
+              "rounds": 9,
+              "magazine": 4,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-4",
+              "position": [
+                8.56097139395674,
+                -11.718744111311251
+              ],
+              "hp": 110,
+              "rounds": 24,
+              "magazine": 6,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-5",
+              "position": [
+                8,
+                -6
+              ],
+              "hp": 90,
+              "rounds": 28,
+              "magazine": 6,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-6",
+              "position": [
+                -10.715102493690452,
+                -2.872838385610966
+              ],
+              "hp": 90,
+              "rounds": 8,
+              "magazine": 3,
+              "order": "surrender"
+            }
+          ],
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.997970801865115,
+              0,
+              5.257884434409451
+            ],
+            "yaw": 3.1287395203891455,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": "negotiation-siding",
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "playerPosition": [
+            7.813638274860332,
+            3.7180371421679124
+          ],
+          "witnessPosition": [
+            9,
+            1.9
+          ]
+        },
+        {
+          "id": "pact-event-18",
+          "type": "deed-collected",
+          "deedSnapshot": {
+            "entityId": "frontier-land-deed",
+            "parentCarrier": "deed-desk",
+            "worldPosition": [
+              9.28,
+              0.855,
+              3.27
+            ],
+            "visible": true
+          },
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.997970801865115,
+              0,
+              5.257884434409451
+            ],
+            "yaw": 3.1287395203891455,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": "negotiation-siding",
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "feedSnapshot": {
+            "militaryAngle": 0,
+            "militaryPowered": false,
+            "civilianAngle": 1.05,
+            "civilianPowered": true
+          },
+          "lightSnapshot": {
+            "lidAngle": 1.05,
+            "battery": {
+              "entityId": "pact-original-battery",
+              "parentCarrier": "salvage-tray",
+              "worldPosition": [
+                -4.1,
+                0.53,
+                11.85
+              ],
+              "visible": true
+            },
+            "beamVisible": false
+          },
+          "playerPosition": [
+            7.813638274860332,
+            3.7180371421679124
+          ],
+          "witnessPosition": [
+            9,
+            1.9
+          ]
+        },
+        {
+          "id": "pact-event-19",
+          "type": "handoff-received",
+          "deedSnapshot": {
+            "entityId": "frontier-land-deed",
+            "parentCarrier": "player-satchel",
+            "worldPosition": [
+              8.054054580463758,
+              0.98,
+              3.9584534477713387
+            ],
+            "visible": true
+          },
+          "cartSnapshot": {
+            "entityId": "pact-original-supply-cart",
+            "worldPosition": [
+              11.997970801865115,
+              0,
+              5.257884434409451
+            ],
+            "yaw": 3.1287395203891455,
+            "brakeAngle": 1.05,
+            "visible": true,
+            "containedBayId": "negotiation-siding",
+            "stock": {
+              "available": 12,
+              "issued": 12,
+              "cover": 0
+            }
+          },
+          "actorSnapshots": [
+            {
+              "id": "pact-1",
+              "position": [
+                -5.913664010733669,
+                0.2715373408289455
+              ],
+              "hp": 90,
+              "rounds": 0,
+              "magazine": 0,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-2",
+              "position": [
+                3,
+                -6
+              ],
+              "hp": 90,
+              "rounds": 0,
+              "magazine": 0,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-3",
+              "position": [
+                -4.338146624109957,
+                -10.45897987773332
+              ],
+              "hp": 90,
+              "rounds": 0,
+              "magazine": 0,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-4",
+              "position": [
+                8.56097139395674,
+                -11.718744111311251
+              ],
+              "hp": 110,
+              "rounds": 0,
+              "magazine": 0,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-5",
+              "position": [
+                8,
+                -6
+              ],
+              "hp": 90,
+              "rounds": 0,
+              "magazine": 0,
+              "order": "surrender"
+            },
+            {
+              "id": "pact-6",
+              "position": [
+                -10.715102493690452,
+                -2.872838385610966
+              ],
+              "hp": 90,
+              "rounds": 0,
+              "magazine": 0,
+              "order": "surrender"
+            }
+          ],
+          "playerPosition": [
+            7.813638274860332,
+            3.7180371421679124
+          ],
+          "witnessPosition": [
+            9,
+            1.9
+          ]
+        }
+      ]
+    },
+    "result": {
+      "version": 1,
+      "missionId": "dawn-pact",
+      "complete": true,
+      "evidence": {
+        "pact-shares": "mine-shares-released",
+        "pact-wages": "joint-unpaid-wages",
+        "pact-train": "last-train-hearing"
+      },
+      "feedCut": true,
+      "localChoices": {
+        "siding": "negotiation-siding",
+        "lighting": "darken-approach"
+      },
+      "cart": {
+        "entityId": "pact-original-supply-cart",
+        "checkpoint": 2,
+        "parked": true,
+        "stock": {
+          "available": 12,
+          "issued": 12,
+          "cover": 0
+        }
+      },
+      "clearance": true,
+      "inventory": {
+        "guardRounds": 113,
+        "actorIds": [
+          "pact-1",
+          "pact-2",
+          "pact-3",
+          "pact-4",
+          "pact-5",
+          "pact-6"
+        ],
+        "cartStock": {
+          "available": 12,
+          "issued": 12,
+          "cover": 0
+        }
+      },
+      "deed": {
+        "entityId": "frontier-land-deed",
+        "carrier": "player-satchel"
+      },
+      "response": {
+        "status": "cancelled",
+        "warned": true,
+        "presented": true,
+        "activated": true,
+        "reason": "verified-surrender"
+      },
+      "actors": {
+        "pact-1": {
+          "defeated": false,
+          "order": "surrender",
+          "issued": 0
+        },
+        "pact-2": {
+          "defeated": false,
+          "order": "surrender",
+          "issued": 6
+        },
+        "pact-3": {
+          "defeated": false,
+          "order": "surrender",
+          "issued": 0
+        },
+        "pact-4": {
+          "defeated": false,
+          "order": "surrender",
+          "issued": 0
+        },
+        "pact-5": {
+          "defeated": false,
+          "order": "surrender",
+          "issued": 6
+        },
+        "pact-6": {
+          "defeated": false,
+          "order": "surrender",
+          "issued": 0
+        }
+      },
+      "defeatedActors": [],
+      "receipt": {
+        "id": "pact-supply-deed-receipt",
+        "witnessId": "inez",
+        "deedId": "frontier-land-deed",
+        "cartId": "pact-original-supply-cart",
+        "siding": "negotiation-siding",
+        "stock": {
+          "available": 12,
+          "issued": 12,
+          "cover": 0
+        },
+        "lighting": "darken-approach"
+      },
+      "fieldChoices": {
+        "pact-feed": "military-only",
+        "pact-cart": "brake-in-siding",
+        "pact-lights": "darken-approach"
+      },
+      "rewardDelta": 0
+    }
+  }
+}

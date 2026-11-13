@@ -1,8 +1,10 @@
+const AXES = ["x", "y", "z"];
+const directionScratch = { x: 0, y: 0, z: 0 };
 // Shared metre-space proxies: identical geometry for movement, line of sight and bullets.
 export function rayBox(origin, direction, box, maxDistance = Infinity) {
   let near = 0,
     far = maxDistance;
-  for (const key of ["x", "y", "z"]) {
+  for (const key of AXES) {
     const lo = box.min[key],
       hi = box.max[key],
       d = direction[key];
@@ -11,7 +13,11 @@ export function rayBox(origin, direction, box, maxDistance = Infinity) {
     } else {
       let a = (lo - origin[key]) / d,
         b = (hi - origin[key]) / d;
-      if (a > b) [a, b] = [b, a];
+      if (a > b) {
+        const temp = a;
+        a = b;
+        b = temp;
+      }
       near = Math.max(near, a);
       far = Math.min(far, b);
       if (near > far) return null;
@@ -19,18 +25,48 @@ export function rayBox(origin, direction, box, maxDistance = Infinity) {
   }
   return near <= maxDistance ? near : null;
 }
-export function firstHit(a, b, boxes) {
-  const delta = { x: b.x - a.x, y: b.y - a.y, z: b.z - a.z };
-  const length = Math.hypot(delta.x, delta.y, delta.z);
+export function firstHit(a, b, boxes, out = {}) {
+  const dx = b.x - a.x,
+    dy = b.y - a.y,
+    dz = b.z - a.z,
+    length = Math.hypot(dx, dy, dz);
   if (!length) return null;
-  const dir = { x: delta.x / length, y: delta.y / length, z: delta.z / length };
-  let hit = null;
-  for (const box of boxes) {
-    const distance = rayBox(a, dir, box, length);
-    if (distance !== null && (!hit || distance < hit.distance))
-      hit = { box, distance };
+  directionScratch.x = dx / length;
+  directionScratch.y = dy / length;
+  directionScratch.z = dz / length;
+  let closest = Infinity,
+    hit = null;
+  for (let i = 0; i < boxes.length; i++) {
+    const distance = rayBox(a, directionScratch, boxes[i], length);
+    if (distance !== null && distance < closest) {
+      hit = boxes[i];
+      closest = distance;
+    }
   }
-  return hit;
+  if (!hit) return null;
+  out.box = hit;
+  out.distance = closest;
+  return out;
+}
+function penetration(x, z, b, radius) {
+  return Math.max(
+    0,
+    Math.min(
+      x + radius - b.min.x,
+      b.max.x + radius - x,
+      z + radius - b.min.z,
+      b.max.z + radius - z,
+    ),
+  );
+}
+function blocked(x, z, position, boxes, radius) {
+  for (let i = 0; i < boxes.length; i++) {
+    const next = penetration(x, z, boxes[i], radius);
+    if (next <= 1e-8) continue;
+    const existing = penetration(position.x, position.z, boxes[i], radius);
+    if (existing <= 1e-8 || next >= existing - 1e-8) return true;
+  }
+  return false;
 }
 export function moveCircle(
   position,
@@ -39,32 +75,16 @@ export function moveCircle(
   boxes,
   radius = 0.34,
   bounds = 23,
+  out = {},
 ) {
-  const penetration = (x, z, b) =>
-    Math.max(
-      0,
-      Math.min(
-        x + radius - b.min.x,
-        b.max.x + radius - x,
-        z + radius - b.min.z,
-        b.max.z + radius - z,
-      ),
-    );
-  const blocked = (x, z) =>
-    boxes.some((b) => {
-      const next = penetration(x, z, b);
-      if (next <= 1e-8) return false;
-      const existing = penetration(position.x, position.z, b);
-      // A dropped object can introduce a small overlap. Only an outward step
-      // that reduces that existing penetration is allowed; new solids still block.
-      return existing <= 1e-8 || next >= existing - 1e-8;
-    });
   let x = Math.max(-bounds, Math.min(bounds, position.x + dx)),
     z = position.z;
-  if (blocked(x, z)) x = position.x;
+  if (blocked(x, z, position, boxes, radius)) x = position.x;
   z = Math.max(-bounds, Math.min(bounds, position.z + dz));
-  if (blocked(x, z)) z = position.z;
-  return { x, z };
+  if (blocked(x, z, position, boxes, radius)) z = position.z;
+  out.x = x;
+  out.z = z;
+  return out;
 }
 export function coverDistance(p, b) {
   return Math.hypot(
