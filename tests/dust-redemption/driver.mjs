@@ -8,6 +8,28 @@ assert.ok(
 );
 export const url = `http://127.0.0.1:${port}/games/dust-redemption/`;
 export const snapshot = (p) => p.evaluate(() => dustDiagnostics());
+export function completedEscortWaypoint(d, target) {
+  const traversal = d.field?.traversal;
+  if (
+    traversal?.type !== "escort" ||
+    !Array.isArray(traversal.route) ||
+    !Number.isInteger(traversal.index) ||
+    traversal.index <= 0
+  )
+    return false;
+  return traversal.route.some(
+    (point, index) =>
+      index < traversal.index &&
+      Math.hypot(point[0] - target.x, point[1] - target.z) <= 0.01,
+  );
+}
+export function needsSupply(d) {
+  const threshold =
+    d.profile?.equipment?.item === "medkit"
+      ? Math.min(45, 65 - 10 * (d.profile.supplies?.medicine || 0))
+      : 45;
+  return d.stats.itemsUsed === 0 && d.player.hp < threshold;
+}
 export function trailingFollowers(d, target) {
   const members = d.field.onward?.following
     ? d.field.onward.members
@@ -137,8 +159,16 @@ function reachedSheet(d, target) {
     d.nightFlow.party.members.every((m) => m.state === "safe")
   );
 }
-export async function walk(p, target, radius = 1.6, replans = 0) {
+export async function walk(p, target, radius = 1.6, replans = 0, onSample) {
   let d = await snapshot(p);
+  if (completedEscortWaypoint(d, target)) {
+    assert.equal(
+      d.mode,
+      "playing",
+      "completed waypoint cannot hide a death or interruption",
+    );
+    return;
+  }
   const from = d.player;
   // The attached cart moves with input. Keep its real collider in the game;
   // omit that one moving body only from this driver's static route search.
@@ -199,10 +229,22 @@ export async function walk(p, target, radius = 1.6, replans = 0) {
         });
         for (let tries = 0; ; tries++) {
           d = await snapshot(p);
+          if (completedEscortWaypoint(d, target)) {
+            assert.equal(
+              d.mode,
+              "playing",
+              "completed waypoint cannot hide a death or interruption",
+            );
+            return;
+          }
           if (reachedSheet(d, target)) return;
           assert.equal(d.mode, "playing");
-          if (d.player.hp < 45 && d.stats.itemsUsed === 0)
-            await p.keyboard.press("KeyF");
+          if (onSample && (await onSample(d))) {
+            await p.mouse.move(cx, cy);
+            await p.mouse.down();
+            d = await snapshot(p);
+          }
+          if (needsSupply(d)) await p.keyboard.press("KeyF");
           if (trailingFollowers(d, waypoint)) {
             clock.observe(d);
             lastMoveSim = d.challenge.activeSeconds;
@@ -251,12 +293,12 @@ export async function walk(p, target, radius = 1.6, replans = 0) {
               await p.waitForTimeout(500);
             }
             await p.mouse.up();
-            return walk(p, target, radius, replans + 1);
+            return walk(p, target, radius, replans + 1, onSample);
           }
           const a = Math.PI / 4 + (d.camera * Math.PI) / 2;
           const pressure = Math.min(
             d.field.traversal?.type === "push" ? 0.4 : 1,
-            Math.max(0.15, gap / 0.9),
+            Math.max(0.12, gap / 1.6),
           );
           await p.mouse.move(
             cx + ((dx * Math.cos(a) - dz * Math.sin(a)) / gap) * r * pressure,
@@ -267,7 +309,24 @@ export async function walk(p, target, radius = 1.6, replans = 0) {
         previous = waypoint;
       }
     } finally {
+      // Neutralize the real stick before releasing capture. A slow software
+      // render can otherwise leave the last deflection active past the sampled
+      // arrival position while the pointer-up command is being delivered.
+      await p.mouse.move(cx, cy);
       await p.mouse.up();
+    }
+    const settled = await snapshot(p),
+      end = path.at(-1);
+    if (
+      settled.mode === "playing" &&
+      !completedEscortWaypoint(settled, target) &&
+      Math.hypot(settled.player.x - end.x, settled.player.z - end.z) > 0.3
+    ) {
+      assert.ok(
+        replans < 2,
+        `native stick release did not settle: ${JSON.stringify({ target, end, player: settled.player, replans })}`,
+      );
+      return walk(p, target, radius, replans + 1, onSample);
     }
     return;
   }
@@ -291,10 +350,18 @@ export async function walk(p, target, radius = 1.6, replans = 0) {
     });
     while (true) {
       d = await snapshot(p);
+      if (completedEscortWaypoint(d, target)) {
+        assert.equal(
+          d.mode,
+          "playing",
+          "completed waypoint cannot hide a death or interruption",
+        );
+        return;
+      }
       if (reachedSheet(d, target)) return;
       assert.equal(d.mode, "playing", `Walking interrupted: ${d.mode}`);
-      if (d.player.hp < 45 && d.stats.itemsUsed === 0)
-        await p.keyboard.press("KeyF");
+      if (onSample && (await onSample(d))) d = await snapshot(p);
+      if (needsSupply(d)) await p.keyboard.press("KeyF");
       if (trailingFollowers(d, waypoint)) {
         clock.observe(d);
         await p.waitForTimeout(500);

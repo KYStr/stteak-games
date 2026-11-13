@@ -1,3 +1,4 @@
+import { prepareNight } from "./campaign.mjs";
 import { installListenerAudit } from "./listener-audit.mjs";
 import { runPhase } from "./phases.mjs";
 import { writeFileSync } from "node:fs";
@@ -178,11 +179,7 @@ try {
   );
   browser = await chromium.launch({
     executablePath: "/usr/bin/google-chrome",
-    args: [
-      "--use-angle=swiftshader",
-      "--enable-unsafe-swiftshader",
-      "--autoplay-policy=no-user-gesture-required",
-    ],
+    args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
   });
   const page = await browser.newPage({
     viewport: { width: 1280, height: 720 },
@@ -239,7 +236,8 @@ try {
   await page.addInitScript(() => {
     const Native = window.AudioContext;
     window.__qaContexts = [];
-    window.__qaBufferDurations = [];
+    window.__qaBufferDurations = new Float32Array(4096);
+    window.__qaSoundIndex = 0;
     const connect = AudioNode.prototype.connect;
     window.__nativeConnect = connect;
     AudioNode.prototype.connect = function (destination, ...args) {
@@ -252,7 +250,8 @@ try {
         const source = super.createBufferSource(),
           start = source.start.bind(source);
         source.start = (...args) => {
-          window.__qaBufferDurations.push(source.buffer?.duration || 0);
+          window.__qaBufferDurations[window.__qaSoundIndex++ % 4096] =
+            source.buffer?.duration || 0;
           return start(...args);
         };
         return source;
@@ -290,6 +289,8 @@ try {
     await page.goto(url);
     await mode(page, "title");
     assert.equal((await snapshot(page)).audio.state, "uninitialized");
+    assert.equal(await page.evaluate(() => __qaContexts.length), 0);
+    assert.equal((await snapshot(page)).audio.voices, 0);
     report.firstLoad = await page.evaluate(() => ({
       bytes: performance
         .getEntriesByType("resource")
@@ -316,7 +317,11 @@ try {
     await page.locator("[data-setting=music]").dispatchEvent("input");
     await action(page, "close-sheet");
     await action(page, "hub");
-    await page.waitForFunction(() => dustDiagnostics().audio.decoded === 11);
+    await page.waitForFunction(
+      () =>
+        dustDiagnostics().audio.decoded === 11 &&
+        dustDiagnostics().audio.state === "running",
+    );
     assert.equal((await snapshot(page)).audio.state, "running");
     assert.deepEqual((await snapshot(page)).audio.errors, []);
     pass("gesture audio unlock, all 11 WAVs decoded, settings applied");
@@ -419,9 +424,10 @@ try {
     );
     for (let i = 1; i < MISSIONS.length; i++) {
       const m = MISSIONS[i];
+      if (m.id === "long-night") await prepareNight(page);
       await action(page, "brief", `[data-id="${m.id}"]`);
       if (m.id === "dawn-pact")
-        await page.selectOption("#loadout-item", "smoke");
+        await page.selectOption("#loadout-item", "medkit");
       await action(page, "deploy");
       await mode(page, "playing");
       await prematureExtraction(page);
@@ -485,6 +491,12 @@ try {
     await page.selectOption("#loadout-item", "smoke");
     await action(page, "deploy");
     await mode(page, "playing");
+    await page.keyboard.press("KeyF");
+    assert.equal(
+      (await snapshot(page)).stats.itemsUsed,
+      1,
+      "native smoke use in alternate-equipment replay",
+    );
     await completeMail(page);
     const replay = (await snapshot(page)).profile;
     assert.equal(replay.wallet, earned.wallet);
@@ -532,7 +544,9 @@ try {
     await mode(page, "playing");
     assert.equal((await snapshot(page)).player.hp, 100);
     assert.equal((await snapshot(page)).profile.completed.length, 6);
-    const sounds = await page.evaluate(() => window.__qaBufferDurations);
+    const sounds = await page.evaluate(() =>
+      Array.from(window.__qaBufferDurations),
+    );
     assert.ok(
       sounds.some((n) => Math.abs(n - 0.3) < 0.001),
       "decoded rifle effect actually started",

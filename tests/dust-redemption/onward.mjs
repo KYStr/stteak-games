@@ -32,6 +32,7 @@ export async function completeOnward(
 ) {
   let d = await snapshot(p);
   if (d.field.onward.complete) return;
+  const originalPartyIds = d.field.onward.members.map((m) => m.id).sort();
   assert.equal(
     d.field.onward.ready,
     true,
@@ -79,7 +80,66 @@ export async function completeOnward(
         if (stopAfterProbe) return;
       }
       const destination = (await snapshot(p)).field.onward.target;
-      await walk(p, { x: destination[0], z: destination[1] }, 0.1);
+      let cornerPaused = false;
+      await walk(
+        p,
+        { x: destination[0], z: destination[1] },
+        0.1,
+        0,
+        async (state) => {
+          if (
+            cornerPaused ||
+            f.party !== "family" ||
+            !s.id.startsWith("rendezvous") ||
+            Math.hypot(
+              state.player.x - destination[0],
+              state.player.z - destination[1],
+            ) < 5 ||
+            state.field.onward.members.every(
+              (m) =>
+                Math.hypot(
+                  m.position[0] - destination[0],
+                  m.position[1] - destination[1],
+                ) < 3,
+            )
+          )
+            return false;
+          const nearCorner = state.field.onward.members.some((m) =>
+            state.colliders.some((b) =>
+              [b.min.x - 0.3, b.max.x + 0.3].some((x) =>
+                [b.min.z - 0.3, b.max.z + 0.3].some(
+                  (z) => Math.hypot(m.position[0] - x, m.position[1] - z) < 0.3,
+                ),
+              ),
+            ),
+          );
+          if (!nearCorner) return false;
+          cornerPaused = true;
+          await p.mouse.up();
+          await p.keyboard.press("Escape");
+          await mode(p, "paused");
+          const stopped = (await snapshot(p)).field.onward.members;
+          await p.waitForTimeout(250);
+          assert.deepEqual((await snapshot(p)).field.onward.members, stopped);
+          await action(p, "resume");
+          await mode(p, "playing");
+          await p.keyboard.press("KeyE");
+          await mode(p, "field");
+          await action(p, "field-onward-wait");
+          assert.equal((await snapshot(p)).field.onward.following, false);
+          const waiting = (await snapshot(p)).field.onward.members;
+          await p.waitForTimeout(250);
+          assert.deepEqual((await snapshot(p)).field.onward.members, waiting);
+          await action(p, "field-onward-act");
+          await mode(p, "playing");
+          assert.deepEqual(
+            (await snapshot(p)).field.onward.members.map((m) => m.id).sort(),
+            members.map((m) => m.id).sort(),
+          );
+          console.log(`Corner pause/wait/resume: ${s.id}`);
+          return true;
+        },
+      );
       await waitForProgress(
         p,
         (state) =>
@@ -214,6 +274,11 @@ export async function completeOnward(
       after.field.onward.index,
       index + 1,
       `${s.id}: ${await p.locator("#overlay").innerText()}`,
+    );
+    assert.deepEqual(
+      after.field.onward.members.map((m) => m.id).sort(),
+      originalPartyIds,
+      "signed handoff retains original party",
     );
     console.log(`Onward ${d.mission}: ${index + 1}/${f.steps.length} ${s.id}`);
   }

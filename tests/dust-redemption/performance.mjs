@@ -1,3 +1,4 @@
+import { coldPerformanceGate } from "./cold-performance.mjs";
 import { activeCombat } from "./combat-performance.mjs";
 import { traversalPerformance } from "./traversal-performance.mjs";
 import {
@@ -76,7 +77,11 @@ export async function renderedRebuilds(
   return cycle;
 }
 export async function performanceGate(page, evidence, pass) {
+  const cold = await coldPerformanceGate(page, evidence, pass);
   const client = await page.context().newCDPSession(page);
+  await page.bringToFront();
+  if ((await snapshot(page)).mode === "paused") await action(page, "resume");
+  await mode(page, "playing");
   await page.waitForTimeout(5000);
   await page.waitForFunction(
     () =>
@@ -107,14 +112,26 @@ export async function performanceGate(page, evidence, pass) {
         dustDiagnostics().audio.decoded === 11 &&
         document.fonts.status === "loaded",
     );
+    await page.evaluate(() => {
+      window.__frames ??= new Float64Array(18000);
+    });
     const before = await resourceSnapshot(page, client);
     await page.evaluate(() => {
-      window.__frames = [];
+      window.__frameCount = 0;
+      window.__frameIndex = 0;
       window.__measuring = true;
       let last = 0;
       function measure(t) {
         if (!window.__measuring) return;
-        if (last) window.__frames.push(t - last);
+        if (last) {
+          window.__frames[window.__frameIndex] = t - last;
+          window.__frameIndex =
+            (window.__frameIndex + 1) % window.__frames.length;
+          window.__frameCount = Math.min(
+            window.__frameCount + 1,
+            window.__frames.length,
+          );
+        }
         last = t;
         requestAnimationFrame(measure);
       }
@@ -126,7 +143,7 @@ export async function performanceGate(page, evidence, pass) {
     }
     const intervals = await page.evaluate(() => {
       window.__measuring = false;
-      return window.__frames;
+      return Array.from(window.__frames.subarray(0, window.__frameCount));
     });
     await page.waitForFunction(() => __raf.pending === 1);
     const after = await resourceSnapshot(page, client);
@@ -234,6 +251,7 @@ export async function performanceGate(page, evidence, pass) {
     "three fixed 180-second resource/JS windows; ten rendered rebuilds; live combat and real carry/escort identities; one RAF; quality setting",
   );
   return {
+    cold,
     readiness:
       "decoded audio, loaded fonts, initial five seconds, ten native rendered rebuilds",
     warmup,

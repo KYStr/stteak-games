@@ -1,4 +1,5 @@
 // Reusable visibility planner. Point/box workspaces grow only with scene capacity.
+export const ESCORT_MOVEMENT_EPSILON = 0.001;
 const inside = (x, z, b) =>
   x > b.minX && x < b.maxX && z > b.minZ && z < b.maxZ;
 function intersects(ax, az, bx, bz, b) {
@@ -139,7 +140,8 @@ export class EscortRouting {
       Math.hypot(
         from.x - route.points[route.index].x,
         from.z - route.points[route.index].z,
-      ) < 0.12
+      ) < 0.12 &&
+      this.clear(from, route.points[route.index + 1])
     )
       route.index++;
     if (

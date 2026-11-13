@@ -176,10 +176,13 @@ import { SIGNAL_FLOW } from "../../games/dust-redemption/signal-flow.js";
 import { LEDGER_FLOW } from "../../games/dust-redemption/ledger-flow.js";
 import { NIGHT_FLOW } from "../../games/dust-redemption/night-flow.js";
 import { PACT_FLOW } from "../../games/dust-redemption/pact-flow.js";
-export async function clues(p) {
+export async function clues(p, order) {
   const d = await snapshot(p),
     m = MISSIONS.find((m) => m.id === d.mission);
-  for (const c of m.clues) {
+  const ordered = order
+    ? order.map((id) => m.clues.find((c) => c.id === id))
+    : m.clues;
+  for (const c of ordered) {
     if ((await snapshot(p)).clues.includes(c.id)) continue;
     await walk(p, { x: c.position[0], z: c.position[1] });
     await p.keyboard.press("KeyE");
@@ -482,18 +485,52 @@ export async function completeLedger(p, custody = "sealed-courier") {
   assert.ok((await snapshot(p)).ledgerFlow.status.receipt);
   await extract(p, custody === "notice-copy" ? "public" : undefined);
 }
+export async function prepareNight(p) {
+  let profile = (await snapshot(p)).profile;
+  if ((profile.supplies?.medicine || 0) === 3) return;
+  const costs = [50, 80, 120];
+  await action(p, "supplies");
+  while ((profile.supplies?.medicine || 0) < 3) {
+    const level = profile.supplies?.medicine || 0,
+      wallet = profile.wallet;
+    assert.ok(
+      wallet >= costs[level],
+      "earned funds cover the chosen medicine build",
+    );
+    await action(p, "buy-supply", "[data-id=medicine]");
+    await p.waitForTimeout(550);
+    profile = (await snapshot(p)).profile;
+    assert.equal(profile.supplies.medicine, level + 1);
+    assert.equal(profile.wallet, wallet - costs[level]);
+  }
+  await action(p, "hub");
+  console.log(
+    "Night build: three medicine upgrades purchased with earned funds",
+  );
+}
+
 export async function completeNight(
   p,
   route = "west-ford",
   { onEscort, onwardProbe, stopAfterProbe = false } = {},
 ) {
-  await clues(p);
+  // Read the two west-bank records and plan the route while nearby.
+  // Collect/present papers before the brace (which requires them) and escort;
+  // avoid a second long exposed crossing of the same field.
+  await clues(p, ["night-order", "night-route"]);
   await open(p, "night-route-plan");
   await inspect(p, "read-water");
   await adjust(p, "point-route", route === "west-ford" ? -1 : 1);
   await choose(p, route);
   await done(p, "night-route-plan");
   await close(p);
+  await clues(p, ["night-papers"]);
+  await go(p, [12, -4]);
+  await p.keyboard.press("KeyE");
+  await action(p, "night-papers", "[data-reason=expired-order-and-civilians]");
+  await action(p, "night-close");
+  assert.equal((await snapshot(p)).nightFlow.status.clearance, true);
+  console.log("Night: efficient west-bank preparation, then legal passage");
   await open(p, "night-brace", { x: 5, z: 6.3 });
   await action(p, "field-seat", "[data-step=seat-brace]");
   assert.ok(
@@ -510,12 +547,11 @@ export async function completeNight(
   await choose(p, "diagonal-brace");
   await done(p, "night-brace");
   await close(p);
-  await go(p, [12, -4]);
-  await p.keyboard.press("KeyE");
-  await action(p, "night-papers", "[data-reason=expired-order-and-civilians]");
-  await action(p, "night-close");
   await open(p, "night-escort", { x: 13, z: -7.8 });
   await action(p, "field-step", "[data-step=group-follows]");
+  const originalFamilyIds = (await snapshot(p)).nightFlow.party.members
+    .map((m) => m.id)
+    .sort();
   if (onEscort) {
     await onEscort(p);
     if (stopAfterProbe) return;
@@ -548,6 +584,22 @@ export async function completeNight(
           ),
       },
     );
+    const checkpoint = await snapshot(p);
+    assert.deepEqual(
+      checkpoint.nightFlow.party.members.map((m) => m.id).sort(),
+      originalFamilyIds,
+    );
+    if (checkpoint.field.traversal && checkpoint.field.traversal.index > i) {
+      // Real game advancement within its legitimate radius can precede the
+      // driver's precise target. Finishing that old target must release input.
+      await walk(p, { x: point[0], z: point[1] }, 1.5);
+      const returned = await snapshot(p);
+      assert.ok(
+        returned.challenge.activeSeconds - checkpoint.challenge.activeSeconds <
+          1,
+        "completed escort point returns promptly instead of waiting on the old target",
+      );
+    }
     console.log(`Escort checkpoint ${i + 1}`);
     if (i === 1) {
       await p.keyboard.press("Escape");
@@ -569,6 +621,15 @@ export async function completeNight(
     }
   }
   await mode(p, "field");
+  // The route sheet opens within 3m; the final count has its original 2.3m
+  // physical interaction range. Step beside the actual middle family member
+  // before confirming, with no change to anyone's position or arrival rules.
+  const arrived = (await snapshot(p)).nightFlow.party.members[1].position;
+  await action(p, "field-close");
+  await go(p, { x: arrived[0], z: arrived[1] - 0.6 }, 0.05);
+  await p.keyboard.press("KeyE");
+  await mode(p, "field");
+  assert.equal((await snapshot(p)).field.active, "night-escort");
   await action(p, "field-step", "[data-step=group-safe]");
   if ((await snapshot(p)).mode === "playing") {
     await go(p, NIGHT_FLOW["long-night"].arrival.position, 0.5);
@@ -577,10 +638,23 @@ export async function completeNight(
   await choose(p, "count-three");
   await done(p, "night-escort");
   await close(p);
-  await go(p, NIGHT_FLOW["long-night"].arrival.position, 0.8);
+  const atReceipt = await snapshot(p),
+    receipt = NIGHT_FLOW["long-night"].arrival;
+  if (
+    Math.hypot(
+      atReceipt.player.x - receipt.position[0],
+      atReceipt.player.z - receipt.position[1],
+    ) >
+    receipt.playerRadius - 0.1
+  )
+    await go(p, receipt.position, 0.8);
   await p.keyboard.press("KeyE");
   await action(p, "night-receipt");
   assert.ok((await snapshot(p)).nightFlow.status.receipt);
+  assert.deepEqual(
+    (await snapshot(p)).nightFlow.party.members.map((m) => m.id).sort(),
+    originalFamilyIds,
+  );
   if (onwardProbe) {
     await completeOnward(p, undefined, {
       onEscort: onwardProbe,
@@ -591,13 +665,14 @@ export async function completeNight(
   await extract(p, route === "east-ridge" ? "east-ridge" : undefined);
 }
 export async function completePact(p, siding = "negotiation-siding") {
-  await clues(p);
+  await clues(p, ["pact-wages"]);
   await open(p, "pact-feed", { x: -12, z: 5.6 });
   await inspect(p, "trace-feeds");
   await adjust(p, "disconnect-military", -1);
   await choose(p, "military-only");
   await done(p, "pact-feed");
   await close(p);
+  await clues(p, ["pact-shares"]);
   await open(p, "pact-lights", { x: -5, z: 13.6 });
   await adjust(p, "inspect-battery", 1);
   if (siding === "negotiation-siding") {
@@ -611,6 +686,7 @@ export async function completePact(p, siding = "negotiation-siding") {
   }
   await done(p, "pact-lights");
   await close(p);
+  await clues(p, ["pact-train"]);
   await open(p, "pact-cart", { x: 11, z: 14.4 });
   await action(p, "pact-siding", `[data-choice="${siding}"]`);
   await adjust(p, "release-brake", -1);
@@ -618,7 +694,7 @@ export async function completePact(p, siding = "negotiation-siding") {
   assert.equal((await snapshot(p)).field.traversal, null);
   assert.match(await p.locator("#overlay").innerText(), /後退半步/);
   await close(p);
-  await open(p, "pact-cart", { x: 11, z: 15.25 }, 0.05);
+  await open(p, "pact-cart", { x: 11, z: 15.3 }, 0.05);
   const grip = await snapshot(p);
   await action(p, "field-step", "[data-step=push-cart]");
   const attached = await snapshot(p);
@@ -635,7 +711,8 @@ export async function completePact(p, siding = "negotiation-siding") {
         (grip.pactFlow.cart.worldPosition[2] - grip.player.z),
     ) < 1e-6,
   );
-  await p.keyboard.press("KeyF");
+  if ((await snapshot(p)).profile.equipment.item === "smoke")
+    await p.keyboard.press("KeyF");
   const route = PACT_FLOW["dawn-pact"].bays[siding].route;
   for (let i = 0; i < route.length; i++) {
     const d = await snapshot(p),

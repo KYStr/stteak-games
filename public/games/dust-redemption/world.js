@@ -1,3 +1,4 @@
+import { FieldPropLibrary } from "./field-prop-library.js";
 import * as THREE from "./vendor/three.module.js";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
 import { clone } from "./vendor/SkeletonUtils.js";
@@ -49,6 +50,7 @@ export class World {
     this.graphics = this.softwareRenderer
       ? { ...THREE, MeshStandardMaterial: DiffuseMaterial }
       : THREE;
+    this.fieldProps = new FieldPropLibrary(this.graphics);
     this.lowQuality = this.softwareRenderer;
     this.lowSetting = false;
     this.adaptiveReduced = false;
@@ -136,6 +138,8 @@ export class World {
     this.buildingBatches = null;
     this.tracerBatch = null;
     this.sharedTextures = new Set();
+    this.environmentCache = new Map();
+    this.activeEnvironment = null;
     this.resize();
   }
   async load() {
@@ -335,7 +339,8 @@ export class World {
     // Dispose only lights owned by these roots; the scene sun has its own owner.
     for (const shadow of shadows) shadow.dispose();
     for (const skeleton of skeletons) skeleton.dispose();
-    for (const geometry of geometries) geometry.dispose();
+    for (const geometry of geometries)
+      if (!this.fieldProps?.geometries.has(geometry)) geometry.dispose();
     for (const material of materials) material.dispose();
     for (const texture of maps) texture.dispose();
   }
@@ -345,7 +350,12 @@ export class World {
     this.textureEstimate = null;
     // Helpers own and detach their GPU resources before the generic scene sweep.
     // Building sources are restored, then disposed exactly once with the level.
-    this.buildingBatches?.dispose();
+    if (this.activeEnvironment) {
+      // Only roots captured at build completion belong to this static cache.
+      // Mission controllers/fieldwork are added later and remain scene-owned.
+      for (const root of this.activeEnvironment.roots) root.removeFromParent();
+    } else this.buildingBatches?.dispose();
+    this.activeEnvironment = null;
     this.buildingBatches = null;
     this.tracerBatch?.dispose();
     this.tracerBatch = null;
@@ -369,6 +379,14 @@ export class World {
   dispose() {
     this.clear();
     this.disposeObjects([...this.templates.values()]);
+    this.fieldProps.dispose();
+    for (const record of this.environmentCache.values()) {
+      for (const root of record.roots) this.level.add(root);
+      record.buildingBatches?.dispose();
+      this.disposeObjects([this.level]);
+      this.level.clear();
+    }
+    this.environmentCache.clear();
     for (const texture of this.sharedTextures) texture.dispose();
     this.sharedTextures.clear();
     this.templates.clear();
@@ -429,6 +447,24 @@ export class World {
     const p = palettes[sceneName] || palettes.station;
     this.scene.background = new THREE.Color(p.sky);
     this.scene.fog = new THREE.Fog(p.sky, 70, 140);
+    const environmentKey = JSON.stringify([sceneName, points]);
+    const cached = this.environmentCache.get(environmentKey);
+    if (cached) {
+      for (const root of cached.roots) this.level.add(root);
+      this.colliders = cached.colliders.slice();
+      this.solids = cached.solids.slice();
+      this.occluders = cached.occluders.slice();
+      this.solidBoxes = new WeakMap(cached.boxes);
+      this.buildingBatches = cached.buildingBatches;
+      this.groundShadows = cached.groundShadows;
+      this.groundShadows.visible = this.lowQuality;
+      this.shadowMatrix = cached.shadowMatrix;
+      this.shadowRotation = cached.shadowRotation;
+      this.addActorShadows(this.groundShadows.material);
+      this.activeEnvironment = cached;
+      this.level.updateMatrixWorld(true);
+      return;
+    }
     const ground = this.box(58, 0.4, 58, p.ground, 0, -0.22, 0);
     ground.castShadow = false;
     this.solid(ground, null, { occludes: false });
@@ -564,6 +600,22 @@ export class World {
       this.buildingBatches.sync(new Set(), this.camera);
     }
     this.addGroundShadows();
+    // Six authored mission layouts plus town; never retain unbounded variants.
+    if (this.environmentCache.size < 8) {
+      const record = {
+        roots: this.level.children.slice(),
+        colliders: this.colliders.slice(),
+        solids: this.solids.slice(),
+        occluders: this.occluders.slice(),
+        boxes: this.solids.map((mesh) => [mesh, this.solidBoxes.get(mesh)]),
+        buildingBatches: this.buildingBatches,
+        groundShadows: this.groundShadows,
+        shadowMatrix: this.shadowMatrix,
+        shadowRotation: this.shadowRotation,
+      };
+      this.environmentCache.set(environmentKey, record);
+      this.activeEnvironment = record;
+    }
   }
   addGroundShadows() {
     // One draw call supplies stylized contact shadows when dynamic maps are off.
@@ -594,6 +646,11 @@ export class World {
     });
     this.groundShadows.visible = this.lowQuality;
     this.level.add(this.groundShadows);
+    this.shadowMatrix = matrix;
+    this.shadowRotation = rotation;
+    this.addActorShadows(material);
+  }
+  addActorShadows(material) {
     this.actorShadows = new THREE.InstancedMesh(
       new THREE.CircleGeometry(1, 16),
       material.clone(),
@@ -603,8 +660,6 @@ export class World {
     this.actorShadows.visible = this.lowQuality;
     this.shadowTransforms.length = 0;
     this.dynamic.add(this.actorShadows);
-    this.shadowMatrix = matrix;
-    this.shadowRotation = rotation;
   }
   dressGround(p, sceneName, points) {
     const matrix = new THREE.Matrix4(),

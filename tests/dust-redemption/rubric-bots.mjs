@@ -1,3 +1,4 @@
+import { prepareNight } from "./campaign.mjs";
 // Actual-input calibration. Chapter access fixtures are labelled, never reported
 // as earned story progress. No clock mutation, teleport or accelerated simulation.
 import assert from "node:assert/strict";
@@ -80,14 +81,24 @@ async function install(page, profile) {
   }, profile);
   await page.reload();
   await mode(page, "title");
+  assert.equal((await snapshot(page)).audio.state, "uninitialized");
+  assert.equal((await snapshot(page)).audio.voices, 0);
   await action(page, "hub");
+  await page.waitForFunction(
+    () =>
+      dustDiagnostics().audio.state === "running" &&
+      dustDiagnostics().audio.decoded === 11,
+    undefined,
+    { timeout: 10000 },
+  );
 }
 async function deploy(page, id, seed = 17) {
+  if (id === "long-night") await prepareNight(page);
   await action(page, "brief", `[data-id="${id}"]`);
   await page.selectOption("#loadout-difficulty", "standard");
   if (await page.locator("#loadout-seed").isEditable())
     await page.locator("#loadout-seed").fill(String(seed));
-  if (id === "dawn-pact") await page.selectOption("#loadout-item", "smoke");
+  if (id === "dawn-pact") await page.selectOption("#loadout-item", "medkit");
   await action(page, "deploy");
   await mode(page, "playing");
 }
@@ -137,11 +148,7 @@ try {
   }
   browser = await chromium.launch({
     executablePath: "/usr/bin/google-chrome",
-    args: [
-      "--use-angle=swiftshader",
-      "--enable-unsafe-swiftshader",
-      "--autoplay-policy=no-user-gesture-required",
-    ],
+    args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
   });
   page = await browser.newPage({
     viewport: { width: 1280, height: 720 },

@@ -1,3 +1,4 @@
+import { prepareNight } from "./campaign.mjs";
 import assert from "node:assert/strict";
 import { writeFile, readFile } from "node:fs/promises";
 import { url, snapshot, action, mode } from "./driver.mjs";
@@ -33,6 +34,7 @@ export async function traversalPerformance(
     await page.reload();
     await mode(page, "title");
     await action(page, "hub");
+    if (kind === "escort") await prepareNight(page);
     await action(
       page,
       "brief",

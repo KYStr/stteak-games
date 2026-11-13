@@ -1,7 +1,7 @@
 import * as THREE from "./vendor/three.module.js";
 import { moveCircle, makeBox } from "./physics.js";
 import { createFieldProp } from "./field-props.js";
-import { EscortRouting } from "./escort-routing.js";
+import { EscortRouting, ESCORT_MOVEMENT_EPSILON } from "./escort-routing.js";
 import { tetherPosition } from "./cargo-tether.js";
 import {
   FIELD_WORK,
@@ -562,10 +562,9 @@ export class FieldSystem {
       task.anchor = task.marker;
       return;
     }
-    const object = createFieldProp(
-      baseKinds[task.id],
-      this.world.graphics || THREE,
-    );
+    const object = this.world.fieldProps
+      ? this.world.fieldProps.create(baseKinds[task.id])
+      : createFieldProp(baseKinds[task.id], this.world.graphics || THREE);
     object.name = `task-${task.id}`;
     object.position.copy(position(task.position));
     task.object = object;
@@ -870,7 +869,9 @@ export class FieldSystem {
         task.parts[step.target] = plaque;
       }
       if (step.kind === "checkpoint-operate" && !task.parts[step.target]) {
-        const relay = createFieldProp("signal", this.world.graphics || THREE);
+        const relay = this.world.fieldProps
+          ? this.world.fieldProps.create("signal")
+          : createFieldProp("signal", this.world.graphics || THREE);
         relay.scale.setScalar(0.65);
         relay.position.copy(position(step.position));
         relay.name = `${task.id}-${step.target}`;
@@ -2356,7 +2357,7 @@ export class FieldSystem {
         const dx = target.x - member.position.x,
           dz = target.z - member.position.z,
           length = Math.hypot(dx, dz);
-        if (length > 0.03) {
+        if (length > ESCORT_MOVEMENT_EPSILON) {
           const amount = Math.min(length, Math.max(0, dt) * 2.4);
           this.moveSafe(
             member.object,

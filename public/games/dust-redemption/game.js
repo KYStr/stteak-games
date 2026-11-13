@@ -203,7 +203,9 @@ let previousMode = "hub",
   stepTime = 0,
   toastTimer,
   warningAt = 0,
-  frameTimes = [],
+  frameTimes = new Float32Array(18000),
+  frameTimeIndex = 0,
+  frameTimeCount = 0,
   frameSamples = 0,
   frameSum = 0,
   lastTime = 0;
@@ -917,14 +919,23 @@ function restart() {
     retry();
   } else showHub();
 }
+const fieldInteractionAdapters = new WeakMap();
 function nearby() {
   if (!player || !mission) return null;
   const p = player.position;
   let found = null,
-    d = 2.4;
-  for (const o of [...clues.filter((c) => !c.read), ...objectives]) {
+    d = Infinity;
+  for (const o of clues) {
+    if (o.read) continue;
     const distance = Math.hypot(p.x - o.position[0], p.z - o.position[1]);
-    if (distance < d) {
+    if (distance < 2.4 && distance < d) {
+      found = o;
+      d = distance;
+    }
+  }
+  for (const o of objectives) {
+    const distance = Math.hypot(p.x - o.position[0], p.z - o.position[1]);
+    if (distance < 2.4 && distance < d) {
       found = o;
       d = distance;
     }
@@ -934,7 +945,11 @@ function nearby() {
     const point = field.taskPoint(work);
     const distance = Math.hypot(p.x - point.x, p.z - point.z);
     if (distance < d) {
-      found = { ...work, type: "field", task: work };
+      found = fieldInteractionAdapters.get(work);
+      if (!found) {
+        found = { ...work, type: "field", task: work };
+        fieldInteractionAdapters.set(work, found);
+      }
       d = distance;
     }
   }
@@ -2835,9 +2850,9 @@ function layoutHudNotifications(notices, width, height, fixed, actors) {
   return placed;
 }
 function combineHudRects(out, a, b) {
-  out.length = 0;
-  for (let i = 0; i < a.length; i++) out.push(a[i]);
-  for (let i = 0; i < b.length; i++) out.push(b[i]);
+  out.length = a.length + b.length;
+  for (let i = 0; i < a.length; i++) out[i] = a[i];
+  for (let i = 0; i < b.length; i++) out[a.length + i] = b[i];
   return out;
 }
 function renderWorldLabels(labels) {
@@ -3432,8 +3447,9 @@ function frame(time) {
   frameSamples++;
   frameSum += raw;
   if (frameSamples % 4 === 0) {
-    frameTimes.push(raw * 1000);
-    if (frameTimes.length > 18000) frameTimes.shift();
+    frameTimes[frameTimeIndex] = raw * 1000;
+    frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
+    frameTimeCount = Math.min(frameTimeCount + 1, frameTimes.length);
   }
   if (mode === "playing") {
     world.noteFrame(raw);
@@ -4195,10 +4211,10 @@ window.dustDiagnostics = () => ({
     updateMs: Array.from(
       updateTimes.subarray(0, Math.min(updateTimeIndex, updateTimes.length)),
     ),
-    samples: frameTimes.length,
+    samples: frameTimeCount,
     p95:
-      [...frameTimes].sort((a, b) => a - b)[
-        Math.floor(frameTimes.length * 0.95)
+      frameTimes.slice(0, frameTimeCount).sort()[
+        Math.floor(frameTimeCount * 0.95)
       ] || 0,
     meanMs: frameSamples ? (frameSum / frameSamples) * 1000 : 0,
   },

@@ -1,3 +1,4 @@
+import { prepareNight } from "./campaign.mjs";
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import { url, action, mode, snapshot } from "./driver.mjs";
@@ -68,8 +69,9 @@ export async function alternateRoutes(page, evidence, pass) {
     await page.reload();
     await mode(page, "title");
     await action(page, "hub");
+    if (id === "long-night") await prepareNight(page);
     await action(page, "brief", `[data-id="${id}"]`);
-    if (id === "dawn-pact") await page.selectOption("#loadout-item", "smoke");
+    if (id === "dawn-pact") await page.selectOption("#loadout-item", "medkit");
     await action(page, "deploy");
     await mode(page, "playing");
     await fn(page, route);

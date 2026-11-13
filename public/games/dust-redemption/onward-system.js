@@ -8,6 +8,7 @@ import {
   canonicalOnward,
   recordOnward,
 } from "./onward-content.js";
+import { ESCORT_MOVEMENT_EPSILON } from "./escort-routing.js";
 const point = (p) => [p.x, p.z];
 const gap = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 const esc = (s) =>
@@ -648,7 +649,7 @@ export class OnwardSystem {
         dx = next.x - member.position.x,
         dz = next.z - member.position.z,
         len = Math.hypot(dx, dz);
-      if (len > 0.08) {
+      if (len > ESCORT_MOVEMENT_EPSILON) {
         const amount = Math.min(len, dt * 2.4);
         this.field.moveSafe(
           member.object,

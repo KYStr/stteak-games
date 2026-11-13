@@ -1,3 +1,5 @@
+import { prepareNight } from "./campaign.mjs";
+import { coldPerformanceGate } from "./cold-performance.mjs";
 import assert from "node:assert/strict";
 import { readFile, writeFile, copyFile } from "node:fs/promises";
 import { url, action, mode, snapshot } from "./driver.mjs";
@@ -14,6 +16,7 @@ import { regressions } from "./regressions.mjs";
 export async function runPhase(phase, page, evidence, pass, report) {
   assert.ok(
     [
+      "cold",
       "campaign",
       "alternatives",
       "variants",
@@ -24,6 +27,10 @@ export async function runPhase(phase, page, evidence, pass, report) {
     ].includes(phase),
     "DUST_PHASE: campaign, alternatives, variants, performance, lifecycle, rebuilds",
   );
+  if (phase === "cold") {
+    report.performance = await coldPerformanceGate(page, evidence, pass);
+    return;
+  }
   if (phase === "campaign") {
     await page.goto(url + "?touch=1");
     await mode(page, "title");
@@ -50,9 +57,10 @@ export async function runPhase(phase, page, evidence, pass, report) {
     let d = await snapshot(page);
     for (let i = d.profile.completed.length; i < 6; i++) {
       const m = MISSIONS[i];
+      if (m.id === "long-night") await prepareNight(page);
       await action(page, "brief", `[data-id="${m.id}"]`);
       if (m.id === "dawn-pact")
-        await page.selectOption("#loadout-item", "smoke");
+        await page.selectOption("#loadout-item", "medkit");
       await action(page, "deploy");
       await mode(page, "playing");
       await campaignFunctions[i](page);
