@@ -528,6 +528,39 @@
         "maxSimultaneousInstances": 12
       },
       "dependencies": []
+    },
+    {
+      "id": "hollow-crown.audio.guard",
+      "version": "1.0.0",
+      "kind": "sound",
+      "source": "audio/generate.mjs",
+      "runtime": [
+        "assets/audio/guard.wav"
+      ],
+      "sha256": {
+        "assets/audio/guard.wav": "62e87806e6fee2e8537b114710e5a3ec918e4be5fa45fb8ea38aab76d39930d2"
+      },
+      "provenance": {
+        "method": "original-procedural",
+        "creator": "Hollow Crown Maker",
+        "createdAt": "2026-10-25",
+        "tool": "Node.js additive synthesis",
+        "rights": "Original project composition; no third-party samples",
+        "referenceSources": []
+      },
+      "spec": {
+        "sampleRate": 22050,
+        "channels": 1,
+        "format": "PCM16 WAV",
+        "duration": 0.08997732426303855,
+        "loop": false,
+        "peakTargetDb": -7
+      },
+      "budget": {
+        "runtimeBytes": 4012,
+        "maxSimultaneousInstances": 12
+      },
+      "dependencies": []
     }
   ]
 }

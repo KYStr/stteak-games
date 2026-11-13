@@ -11,7 +11,7 @@ export const COLLIDERS = Object.fromEntries(ACTOR_IDS.map(id => [id, { shape: 'v
 export function createKit(T, options={}) {
   const shared = { materials: new Map(), geometries: new Map(), textures:[] };
   const mat = (name, color, metalness = .2, roughness = .7, extra = {}) => {
-    if (!shared.materials.has(name)) { const m = new T.MeshStandardMaterial({ color, metalness, roughness, ...extra }); m.name = name; shared.materials.set(name, m); }
+    if (!shared.materials.has(name)) { const m = options.simpleLighting ? new T.MeshLambertMaterial({ color, ...extra }) : new T.MeshStandardMaterial({ color, metalness, roughness, ...extra }); m.name = name; shared.materials.set(name, m); }
     return shared.materials.get(name);
   };
   const materials = {
@@ -33,7 +33,7 @@ export function createKit(T, options={}) {
     };
     const load=(file,srgb=false)=>{const t=loader.load(new URL(file,options.textureBaseUrl).href,undefined,undefined,()=>failure(file));t.wrapS=t.wrapT=T.RepeatWrapping;t.colorSpace=srgb?T.SRGBColorSpace:T.NoColorSpace;t.anisotropy=4;shared.textures.push(t);return t;};
     const base=load('ruin-stone-basecolor.png',true),normal=load('ruin-stone-normal.png'),rough=load('ruin-stone-roughness.png');
-    if(!failed)for(const m of stoneMaterials){m.map=base;m.normalMap=normal;m.normalScale.set(.75,.75);m.roughnessMap=rough;m.roughness=1;}
+    if(!failed)for(const m of stoneMaterials){m.map=base;if(!options.simpleLighting){m.normalMap=normal;m.normalScale.set(.75,.75);m.roughnessMap=rough;m.roughness=1;}}
   }
   const geo = (key, make) => { if (!shared.geometries.has(key)) shared.geometries.set(key,make()); return shared.geometries.get(key); };
   const box = () => geo('box',()=>new T.BoxGeometry(1,1,1));
@@ -42,7 +42,7 @@ export function createKit(T, options={}) {
   const cone = (n=6) => geo('cone'+n,()=>new T.ConeGeometry(1,1,n));
   const sphere = () => geo('sphere',()=>new T.SphereGeometry(1,10,6));
   function mesh(parent,name,geometry,material,pos=[0,0,0],scale=[1,1,1],rot=[0,0,0]) {
-    if(geometry===box()&&(material===materials.stone||material===materials.ash))geometry=stoneBlock();
+    if(!options.simpleGeometry&&geometry===box()&&(material===materials.stone||material===materials.ash))geometry=stoneBlock();
     const m = new T.Mesh(geometry,material); m.name=name; m.position.set(...pos); m.scale.set(...scale);m.rotation.set(...rot);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
   }
   function bone(parent,name,pos) { const b=new T.Bone();b.name=name;b.position.set(...pos);parent.add(b);return b; }

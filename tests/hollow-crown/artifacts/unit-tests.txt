@@ -1,0 +1,396 @@
+
+> @stteak/hollow-crown@1.0.0 test
+> node --test ../../tests/games/hollow-crown/*.test.js
+
+TAP version 13
+# Subtest: unlock followed synchronously by pause stays silent after delayed context resume
+ok 1 - unlock followed synchronously by pause stays silent after delayed context resume
+  ---
+  duration_ms: 1.702937
+  ...
+# Subtest: unlock cannot reactivate a disposed Soundscape after delayed context resume
+ok 2 - unlock cannot reactivate a disposed Soundscape after delayed context resume
+  ---
+  duration_ms: 14.92484
+  ...
+# Subtest: dispose during delayed fetch prevents late buffer publication or music
+ok 3 - dispose during delayed fetch prevents late buffer publication or music
+  ---
+  duration_ms: 18.422401
+  ...
+# Subtest: dispose during delayed body prevents late buffer publication or music
+ok 4 - dispose during delayed body prevents late buffer publication or music
+  ---
+  duration_ms: 0.960586
+  ...
+# Subtest: dispose during delayed decode prevents late buffer publication or music
+ok 5 - dispose during delayed decode prevents late buffer publication or music
+  ---
+  duration_ms: 1.125897
+  ...
+# Subtest: dispose suppresses a late fetch failure notification
+ok 6 - dispose suppresses a late fetch failure notification
+  ---
+  duration_ms: 4.405924
+  ...
+# Subtest: dispose suppresses a late decode failure notification
+ok 7 - dispose suppresses a late decode failure notification
+  ---
+  duration_ms: 0.96895
+  ...
+# Subtest: successful concurrent unlocks load once, keep one music track and cap effects at twelve
+ok 8 - successful concurrent unlocks load once, keep one music track and cap effects at twelve
+  ---
+  duration_ms: 11.827215
+  ...
+# Subtest: pause while decoding permits caching but never starts music until explicit resume
+ok 9 - pause while decoding permits caching but never starts music until explicit resume
+  ---
+  duration_ms: 1.358289
+  ...
+# Subtest: current loading failure still reports the existing recoverable error once
+ok 10 - current loading failure still reports the existing recoverable error once
+  ---
+  duration_ms: 1.129257
+  ...
+# Subtest: a later explicit unlock survives an older cancelled unlock completing out of order
+ok 11 - a later explicit unlock survives an older cancelled unlock completing out of order
+  ---
+  duration_ms: 12.803384
+  ...
+# Subtest: explicit resume stays inactive when rejected, and a pending resume cannot defeat a later pause
+ok 12 - explicit resume stays inactive when rejected, and a pending resume cannot defeat a later pause
+  ---
+  duration_ms: 0.587901
+  ...
+# Subtest: dispose is terminal and idempotent even while explicit resume is pending
+ok 13 - dispose is terminal and idempotent even while explicit resume is pending
+  ---
+  duration_ms: 0.664057
+  ...
+# Subtest: disposing before a gesture never creates an AudioContext or fetches sounds
+ok 14 - disposing before a gesture never creates an AudioContext or fetches sounds
+  ---
+  duration_ms: 0.245777
+  ...
+# Subtest: checkpoint validation rejects corrupted rest amounts before they can produce NaN health
+ok 15 - checkpoint validation rejects corrupted rest amounts before they can produce NaN health
+  ---
+  duration_ms: 14.350479
+  ...
+# Subtest: checkpoint validation rejects swapped or missing reward kinds
+ok 16 - checkpoint validation rejects swapped or missing reward kinds
+  ---
+  duration_ms: 4.365061
+  ...
+# Subtest: valid stored rest offers and legacy talent offers keep their original effects
+ok 17 - valid stored rest offers and legacy talent offers keep their original effects
+  ---
+  duration_ms: 2.658296
+  ...
+# Subtest: active enemy checkpoints reject missing attacks instead of crashing on step
+ok 18 - active enemy checkpoints reject missing attacks instead of crashing on step
+  ---
+  duration_ms: 5.492389
+  ...
+# Subtest: active enemy checkpoints reject malformed attack geometry, timing and projectile counts
+ok 19 - active enemy checkpoints reject malformed attack geometry, timing and projectile counts
+  ---
+  duration_ms: 1.4955
+  ...
+# Subtest: all real enemy and boss attacks remain restorable in both phases and active states
+ok 20 - all real enemy and boss attacks remain restorable in both phases and active states
+  ---
+  duration_ms: 34.654885
+  ...
+# Subtest: serialized profile loading cannot admit corrupt reward or active-attack checkpoints
+ok 21 - serialized profile loading cannot admit corrupt reward or active-attack checkpoints
+  ---
+  duration_ms: 1.369703
+  ...
+# Subtest: static prop batching preserves world positions, UVs, normals and triangle count
+ok 22 - static prop batching preserves world positions, UVs, normals and triangle count
+  ---
+  duration_ms: 6.906023
+  ...
+# Subtest: sustained slow rendering lowers resolution without unbounded storage or oscillation
+ok 23 - sustained slow rendering lowers resolution without unbounded storage or oscillation
+  ---
+  duration_ms: 14.508835
+  ...
+# Subtest: render budgeting ignores invalid timings and isolated scheduling stalls
+ok 24 - render budgeting ignores invalid timings and isolated scheduling stalls
+  ---
+  duration_ms: 1.477297
+  ...
+# Subtest: pacing follow-up: six templates retain later waves and perilous adds one second-wave enemy without delay
+ok 25 - pacing follow-up: six templates retain later waves and perilous adds one second-wave enemy without delay
+  ---
+  duration_ms: 64.176804
+  ...
+# Subtest: pacing follow-up: talent healing grants the displayed 12 or 18 once and caps at maximum HP
+ok 26 - pacing follow-up: talent healing grants the displayed 12 or 18 once and caps at maximum HP
+  ---
+  duration_ms: 9.944425
+  ...
+# Subtest: pacing follow-up: full slots require valid replacement before healing
+ok 27 - pacing follow-up: full slots require valid replacement before healing
+  ---
+  duration_ms: 0.690613
+  ...
+# Subtest: pacing follow-up: saved healing offers survive reload and legacy rewards grant zero new healing
+ok 28 - pacing follow-up: saved healing offers survive reload and legacy rewards grant zero new healing
+  ---
+  duration_ms: 5.493777
+  ...
+# Subtest: pacing follow-up: dedicated rest stays 32 or 45 with no talent healing added
+ok 29 - pacing follow-up: dedicated rest stays 32 or 45 with no talent healing added
+  ---
+  duration_ms: 6.59953
+  ...
+# Subtest: pacing follow-up: corrupt added healing amounts are rejected while old missing fields remain valid
+ok 30 - pacing follow-up: corrupt added healing amounts are rejected while old missing fields remain valid
+  ---
+  duration_ms: 2.496993
+  ...
+# Subtest: content contains six distinct rooms, five enemy classes, two three-move bosses, twelve talents and six starts
+ok 31 - content contains six distinct rooms, five enemy classes, two three-move bosses, twelve talents and six starts
+  ---
+  duration_ms: 0.219768
+  ...
+# Subtest: fixed seed, input and room choices produce the same entire state
+ok 32 - fixed seed, input and room choices produce the same entire state
+  ---
+  duration_ms: 331.567888
+  ...
+# Subtest: light thrust works with zero energy, hits once, and ends its active window
+ok 33 - light thrust works with zero energy, hits once, and ends its active window
+  ---
+  duration_ms: 2.559416
+  ...
+# Subtest: charge consumes energy and breaks frontal shields; normal thrust must flank
+ok 34 - charge consumes energy and breaks frontal shields; normal thrust must flank
+  ---
+  duration_ms: 1.728858
+  ...
+# Subtest: empty energy converts an otherwise valid charge into a normal thrust
+ok 35 - empty energy converts an otherwise valid charge into a normal thrust
+  ---
+  duration_ms: 6.337282
+  ...
+# Subtest: same-frame dodge wins twenty times against every close-range enemy and boss pattern
+ok 36 - same-frame dodge wins twenty times against every close-range enemy and boss pattern
+  ---
+  duration_ms: 31.643648
+  ...
+# Subtest: every weapon shape has repeatable inner, outer, side and annulus boundaries
+ok 37 - every weapon shape has repeatable inner, outer, side and annulus boundaries
+  ---
+  duration_ms: 1.426722
+  ...
+# Subtest: parry requires a fresh frontal guard; held guard chips and cannot loop free healing
+ok 38 - parry requires a fresh frontal guard; held guard chips and cannot loop free healing
+  ---
+  duration_ms: 0.867244
+  ...
+# Subtest: obstacles stop movement, player spear hits, hostile strikes and projectile segments
+ok 39 - obstacles stop movement, player spear hits, hostile strikes and projectile segments
+  ---
+  duration_ms: 1.100285
+  ...
+# Subtest: all six rooms preserve valid movement and obstruction across their corners
+ok 40 - all six rooms preserve valid movement and obstruction across their corners
+  ---
+  duration_ms: 22.587531
+  ...
+# Subtest: ten mixed enemy groups, three repeats never exceed two committed melee attackers
+ok 41 - ten mixed enemy groups, three repeats never exceed two committed melee attackers
+  ---
+  duration_ms: 521.027075
+  ...
+# Subtest: boss moves cycle through three readable attacks and second phase has a safe transition
+ok 42 - boss moves cycle through three readable attacks and second phase has a safe transition
+  ---
+  duration_ms: 51.031747
+  ...
+# Subtest: each talent modifier is composed once, bounded to four slots, with three schools supported
+ok 43 - each talent modifier is composed once, bounded to four slots, with three schools supported
+  ---
+  duration_ms: 0.672173
+  ...
+# Subtest: burn and mercy effects are finite and charged burn combinations cannot produce recursive damage
+ok 44 - burn and mercy effects are finite and charged burn combinations cannot produce recursive damage
+  ---
+  duration_ms: 15.103378
+  ...
+# Subtest: reward confirmation, four-slot replacement, three story choices and four-room routing form a closed loop
+ok 45 - reward confirmation, four-slot replacement, three story choices and four-room routing form a closed loop
+  ---
+  duration_ms: 9.589487
+  ...
+# Subtest: single-school challenges enforce talent restrictions and daily seeds override user seeds
+ok 46 - single-school challenges enforce talent restrictions and daily seeds override user seeds
+  ---
+  duration_ms: 0.978
+  ...
+# Subtest: save restores room-entry seed, equipment and health instead of farming combat progress
+ok 47 - save restores room-entry seed, equipment and health instead of farming combat progress
+  ---
+  duration_ms: 157.535829
+  ...
+# Subtest: clear-room rewards persist identically through ten restores and grant only once
+ok 48 - clear-room rewards persist identically through ten restores and grant only once
+  ---
+  duration_ms: 19.162147
+  ...
+# Subtest: malformed, missing, unknown-version and non-finite saves safely return null
+ok 49 - malformed, missing, unknown-version and non-finite saves safely return null
+  ---
+  duration_ms: 1.194502
+  ...
+# Subtest: twenty telegraph pauses keep enemy and player timing exactly unchanged
+ok 50 - twenty telegraph pauses keep enemy and player timing exactly unchanged
+  ---
+  duration_ms: 0.443322
+  ...
+# Subtest: death, victory and restart each repeat ten times without duplicate final events
+ok 51 - death, victory and restart each repeat ten times without duplicate final events
+  ---
+  duration_ms: 8.362726
+  ...
+# Subtest: tutorial advances by actual movement, light hit, dodge, parry and defeat
+ok 52 - tutorial advances by actual movement, light hit, dodge, parry and defeat
+  ---
+  duration_ms: 7.116065
+  ...
+# Subtest: slow frames preserve input edges and attack damage while zero and invalid deltas do nothing
+ok 53 - slow frames preserve input edges and attack damage while zero and invalid deltas do nothing
+  ---
+  duration_ms: 0.728662
+  ...
+# Subtest: hitstop freezes simulation briefly and preserves a dodge pressed during the frozen frame
+ok 54 - hitstop freezes simulation briefly and preserves a dodge pressed during the frozen frame
+  ---
+  duration_ms: 8.538077
+  ...
+# Subtest: enemy navigation crosses around a pillar instead of oscillating forever
+ok 55 - enemy navigation crosses around a pillar instead of oscillating forever
+  ---
+  duration_ms: 89.87983
+  ...
+# Subtest: all twelve talents change their promised live combat or movement outcome
+ok 56 - all twelve talents change their promised live combat or movement outcome
+  ---
+  duration_ms: 3.310417
+  ...
+# Subtest: rules-only simulation: both routes complete with each of the three starting schools
+ok 57 - rules-only simulation: both routes complete with each of the three starting schools
+  ---
+  duration_ms: 1971.124986
+  ...
+# ash/fleet-ash: 75s simulation, 30 kills, 2 hits, 2 parries, 120.0 HP
+# ash/wide-oath: 84s simulation, 30 kills, 0 hits, 1 parries, 120.0 HP
+# ash/kindling: 74s simulation, 30 kills, 0 hits, 1 parries, 120.0 HP
+# ivory/fleet-ash: 71s simulation, 30 kills, 2 hits, 0 parries, 120.0 HP
+# ivory/wide-oath: 79s simulation, 30 kills, 0 hits, 1 parries, 120.0 HP
+# ivory/kindling: 69s simulation, 30 kills, 0 hits, 1 parries, 120.0 HP
+# Subtest: rules-only configured-loadout simulation: nine mixed builds spanning all twelve talents can complete
+ok 58 - rules-only configured-loadout simulation: nine mixed builds spanning all twelve talents can complete
+  ---
+  duration_ms: 2088.332996
+  ...
+# ash: fleet-ash + deep-breath + wide-oath + kindling: 73s, 2 hits
+# ivory: long-stride + returning-wind + steady-guard + furnace-tip: 84s, 1 hits
+# ash: fleet-ash + returning-wind + coal-heart + mercy-ember: 75s, 2 hits
+# ivory: wide-oath + thorn-vow + long-stride + kindling: 79s, 1 hits
+# ash: steady-guard + mercy-ember + deep-breath + furnace-tip: 84s, 1 hits
+# ivory: thorn-vow + mercy-ember + returning-wind + last-light: 77s, 1 hits
+# ash: kindling + furnace-tip + wide-oath + fleet-ash: 69s, 2 hits
+# ivory: coal-heart + last-light + long-stride + thorn-vow: 83s, 1 hits
+# ash: kindling + coal-heart + mercy-ember + deep-breath: 78s, 1 hits
+# Subtest: Twin Crown expedition visits all six arenas and wins both three-move bosses through live combat
+ok 59 - Twin Crown expedition visits all six arenas and wins both three-move bosses through live combat
+  ---
+  duration_ms: 595.739371
+  ...
+# ash: 133s, 49 kills, 2 hits
+# ivory: 133s, 49 kills, 2 hits
+# Subtest: Twin Crown saves restore every reward, room entry and the second throne without skipping a crown
+ok 60 - Twin Crown saves restore every reward, room entry and the second throne without skipping a crown
+  ---
+  duration_ms: 12.293659
+  ...
+# Subtest: guard cancels a held charge instead of firing a charged thrust on the release edge
+ok 61 - guard cancels a held charge instead of firing a charged thrust on the release edge
+  ---
+  duration_ms: 0.65838
+  ...
+# Subtest: new profile and preferences are versioned and round-trip
+ok 62 - new profile and preferences are versioned and round-trip
+  ---
+  duration_ms: 2.702565
+  ...
+# Subtest: damaged primary restores last valid backup with visible notice
+ok 63 - damaged primary restores last valid backup with visible notice
+  ---
+  duration_ms: 4.594541
+  ...
+# Subtest: invalid primary without backup safely rebuilds
+ok 64 - invalid primary without backup safely rebuilds
+  ---
+  duration_ms: 0.181485
+  ...
+# Subtest: damaged primary and backup rebuild without misreporting storage denial
+ok 65 - damaged primary and backup rebuild without misreporting storage denial
+  ---
+  duration_ms: 1.572712
+  ...
+# Subtest: successful retry clears a stale write failure without losing progress
+ok 66 - successful retry clears a stale write failure without losing progress
+  ---
+  duration_ms: 0.284247
+  ...
+# Subtest: primary read denial remains distinct from damaged save data
+ok 67 - primary read denial remains distinct from damaged save data
+  ---
+  duration_ms: 0.294158
+  ...
+# Subtest: backup read denial remains a storage access failure
+ok 68 - backup read denial remains a storage access failure
+  ---
+  duration_ms: 0.215042
+  ...
+# Subtest: storage denial is visible and does not throw or lose in-memory progress
+ok 69 - storage denial is visible and does not throw or lose in-memory progress
+  ---
+  duration_ms: 0.159958
+  ...
+# Subtest: settlement is idempotent per run ID and retry is a distinct run
+ok 70 - settlement is idempotent per run ID and retry is a distinct run
+  ---
+  duration_ms: 0.299795
+  ...
+# Subtest: failed optional challenge does not earn challenge completion
+ok 71 - failed optional challenge does not earn challenge completion
+  ---
+  duration_ms: 0.181872
+  ...
+# Subtest: v0 preferences migrate without accepting unknown version
+ok 72 - v0 preferences migrate without accepting unknown version
+  ---
+  duration_ms: 0.272817
+  ...
+# Subtest: values and arrays are bounded; mandatory starting choices stay available
+ok 73 - values and arrays are bounded; mandatory starting choices stay available
+  ---
+  duration_ms: 0.262774
+  ...
+1..73
+# tests 73
+# suites 0
+# pass 73
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6426.50543

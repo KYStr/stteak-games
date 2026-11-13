@@ -1,6 +1,6 @@
 // Versioned, bounded local-only storage. A damaged primary falls back to the last valid backup.
 export const SAVE_KEY = 'stteak.hollow-crown.v1';
-export const DEFAULT_SETTINGS = Object.freeze({ music: 0.35, effects: 0.65, quality: 'high', autoAim: true, reducedMotion: false, flash: false, shake: false, practiceWindow: 0.32 });
+export const DEFAULT_SETTINGS = Object.freeze({ music: 0.35, effects: 0.65, muted: false, quality: 'auto', autoAim: true, reducedMotion: false, reducedMotionExplicit: false, flash: false, shake: false, practiceWindow: 0.32 });
 export const freshProfile = () => ({ schemaVersion: 1, revision: 0, settings: { ...DEFAULT_SETTINGS }, tutorialDone: false, runs: 0, wins: 0, embers: 0, totalParries: 0, totalRooms: 0, flawlessRooms: 0, unlocked: ['fleet-ash','wide-oath'], skins: ['ivory'], selectedSkin: 'ivory', completed: [], challengeWins: [], best: null, checkpoint: null });
 const finite = (n, fallback, max = 1e7) => Number.isFinite(n) ? Math.min(max, Math.max(0, n)) : fallback;
 export function validateProfile(value) {
@@ -10,8 +10,9 @@ export function validateProfile(value) {
   p.tutorialDone = value.tutorialDone === true;
   const s = value.settings || {};
   p.settings.music = finite(s.music, 0.35, 1); p.settings.effects = finite(s.effects, 0.65, 1);
-  p.settings.quality = s.quality === 'low' ? 'low' : 'high';
-  for (const key of ['autoAim', 'reducedMotion', 'flash', 'shake']) if (typeof s[key] === 'boolean') p.settings[key] = s[key];
+  p.settings.quality = ['auto','low','high'].includes(s.quality) ? s.quality : s.quality === undefined ? 'auto' : 'high';
+  for (const key of ['autoAim', 'reducedMotion', 'flash', 'shake', 'muted']) if (typeof s[key] === 'boolean') p.settings[key] = s[key];
+  p.settings.reducedMotionExplicit = typeof s.reducedMotionExplicit === 'boolean' ? s.reducedMotionExplicit : typeof s.reducedMotion === 'boolean';
   p.settings.practiceWindow = [0.18, 0.32, 0.5].includes(s.practiceWindow) ? s.practiceWindow : 0.32;
   for (const key of ['unlocked', 'skins', 'completed', 'challengeWins']) p[key] = Array.isArray(value[key]) ? [...new Set(value[key].filter(x => typeof x === 'string' && /^[\w-]{1,80}$/.test(x)))].slice(-150) : p[key];
   for (const id of ['fleet-ash','wide-oath']) if (!p.unlocked.includes(id)) p.unlocked.unshift(id);

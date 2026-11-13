@@ -19,7 +19,7 @@
         "assets/models/guardian.glb"
       ],
       "sha256": {
-        "assets/models/guardian.glb": "f812f67b8b0a8a79499b4aedc6460d784be78c52fcd15fe82307663ac4ca4d3b"
+        "assets/models/guardian.glb": "1ba7edda734ab3110c1c2246a64969f6de872fbe215d62b3c35b6aa825166e02"
       },
       "provenance": {
         "method": "original-procedural",
@@ -185,7 +185,7 @@
         "assets/models/infantry.glb"
       ],
       "sha256": {
-        "assets/models/infantry.glb": "59ce99d98c6fb9a30fe53f756562df6c6cf45031c5f658aeb7e1e8249d1a09c3"
+        "assets/models/infantry.glb": "4e083104e3fc3a888dcede6e753109fb3ec2de42dbd2b27a88bb35866c1fab9e"
       },
       "provenance": {
         "method": "original-procedural",
@@ -352,7 +352,7 @@
         "assets/models/lancer.glb"
       ],
       "sha256": {
-        "assets/models/lancer.glb": "c821e2839c993f12ce5bde4c02e079693fc2bf1be979ac53cfb321dba3ba09c5"
+        "assets/models/lancer.glb": "1a75642cc50b42a3290d045ef41ea2f68cd6a4aeae8d13d958346cbd008f24d7"
       },
       "provenance": {
         "method": "original-procedural",
@@ -494,7 +494,7 @@
         }
       },
       "budget": {
-        "runtimeBytes": 42984,
+        "runtimeBytes": 42980,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -520,7 +520,7 @@
         "assets/models/arbalest.glb"
       ],
       "sha256": {
-        "assets/models/arbalest.glb": "939bf2a46d37cd950ea56a7b690eb0b8728484b8aebf64a54045d420982883f1"
+        "assets/models/arbalest.glb": "48a193323b6da940a780a799914791d2cbadd4c31330812ea1f92747768baec7"
       },
       "provenance": {
         "method": "original-procedural",
@@ -687,7 +687,7 @@
         "assets/models/cinderbug.glb"
       ],
       "sha256": {
-        "assets/models/cinderbug.glb": "c29dfac0f686d37108bd92f963ecff779b4b5c74d38f6d74a1324e3b24c1da2f"
+        "assets/models/cinderbug.glb": "c2f3ca04b7ef2874884a1d366392496135c1fd83231536f611514900ce06f405"
       },
       "provenance": {
         "method": "original-procedural",
@@ -851,7 +851,7 @@
         "assets/models/shieldguard.glb"
       ],
       "sha256": {
-        "assets/models/shieldguard.glb": "36d68347c9232021bc39c94f735a32be2e109c42179f8b0a694486ba3d61d597"
+        "assets/models/shieldguard.glb": "20f3f3862372c66446fd5a06cd7fb01d17061ed229d788e9858961266cc89f24"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1018,7 +1018,7 @@
         "assets/models/crown.glb"
       ],
       "sha256": {
-        "assets/models/crown.glb": "4f6f79c1b439386197903c41889c458edeb3b98e06b51de159b2c69b0c9f8f47"
+        "assets/models/crown.glb": "20e89fd589c213d316dfc26fd0c94fec50c898745e2b3690bb94ad3e3eb4231e"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1185,7 +1185,7 @@
         "assets/models/bellwarden.glb"
       ],
       "sha256": {
-        "assets/models/bellwarden.glb": "37bb4e66a0bb4582d639ef3ecb999a3f9976760b3354ec141e9134b3a6510c82"
+        "assets/models/bellwarden.glb": "e8a1a1c21de59f8a49ffdff421be627df334997a3cbf02b4e4301b4fbc76944e"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1326,7 +1326,7 @@
         }
       },
       "budget": {
-        "runtimeBytes": 44436,
+        "runtimeBytes": 44432,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1352,7 +1352,7 @@
         "assets/models/pillar.glb"
       ],
       "sha256": {
-        "assets/models/pillar.glb": "a0a14d65fd7e47019a756454d1416c5e0e29933d1a6fff9eb44732c9e4a12f31"
+        "assets/models/pillar.glb": "609dd486b4ff6f75b4bb5f2e4f6dfeb7eeaf3b08427f32f6228ed317d0aa60a5"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1406,7 +1406,7 @@
         }
       },
       "budget": {
-        "runtimeBytes": 283564,
+        "runtimeBytes": 283720,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1432,7 +1432,7 @@
         "assets/models/altar.glb"
       ],
       "sha256": {
-        "assets/models/altar.glb": "f5e7f76641b5b86e5d0adf110798c7e15f0633f24ca82ca7f9d298a4cc5aa6a4"
+        "assets/models/altar.glb": "0fd37ccd1dd14b34c03d1ca64dcbb2649fb6d90fd9707430a222f60735234419"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1488,7 +1488,7 @@
         }
       },
       "budget": {
-        "runtimeBytes": 283852,
+        "runtimeBytes": 284008,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1514,7 +1514,7 @@
         "assets/models/candelabrum.glb"
       ],
       "sha256": {
-        "assets/models/candelabrum.glb": "ac2480d60f7dadc195b372786052a4230a38ebbfb036dad3a17177a2cf670451"
+        "assets/models/candelabrum.glb": "13020626da84fca33824e6dbb3276ac32402c41b290d350ca1a46034c5617e1f"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1583,7 +1583,7 @@
         "assets/models/wall.glb"
       ],
       "sha256": {
-        "assets/models/wall.glb": "ab7bd08805cf8954d9845e360069ae7cd1f6d34e87a41262608c2d51b9f4404a"
+        "assets/models/wall.glb": "9c6a437e964b14eee9c7d7decb67123549ca139195100b09d78ed04d9e38f497"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1637,7 +1637,7 @@
         }
       },
       "budget": {
-        "runtimeBytes": 280580,
+        "runtimeBytes": 280740,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1663,7 +1663,7 @@
         "assets/models/banner.glb"
       ],
       "sha256": {
-        "assets/models/banner.glb": "c47b4ced263ba5410b8ba5c7ba31947d08f15c54b47124fc2c1bdb99b2b17372"
+        "assets/models/banner.glb": "fa01c5f26f96e9dee98f7511ab274892f8c7bf0b78594d98266cb3a22ce796d5"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1732,7 +1732,7 @@
         "assets/models/floor-tile.glb"
       ],
       "sha256": {
-        "assets/models/floor-tile.glb": "57d64ea5b25395fc503aaef83b9207598d4a850a85d0dcce12798d55bb2ccc6a"
+        "assets/models/floor-tile.glb": "7b38b3ad5c1eeb265c049ab7f40766a1d2986daa700e3b1c6f55c93e01491d20"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1773,7 +1773,7 @@
         "collision": null
       },
       "budget": {
-        "runtimeBytes": 279188,
+        "runtimeBytes": 279348,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1799,7 +1799,7 @@
         "assets/models/rubble.glb"
       ],
       "sha256": {
-        "assets/models/rubble.glb": "357b8b308b7b1524b2f0e90d9c26765e32901c291841c601111bc14c766b47f6"
+        "assets/models/rubble.glb": "da0c0a6e559889372686a6a5555ccde3033275ea4ee88cf4d200ba87ca28d63c"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1841,7 +1841,7 @@
         "collision": null
       },
       "budget": {
-        "runtimeBytes": 280772,
+        "runtimeBytes": 280928,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1867,7 +1867,7 @@
         "assets/models/brazier.glb"
       ],
       "sha256": {
-        "assets/models/brazier.glb": "b4373da620c1391fe9fb2d61250b2934d80fad81c94a7f99b786419bf8d37b21"
+        "assets/models/brazier.glb": "105e7bb687e61f7fc50411f56a7f80c7deab5401e1a933be5fa8ea62b008a916"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1911,7 +1911,7 @@
         "collision": null
       },
       "budget": {
-        "runtimeBytes": 13404,
+        "runtimeBytes": 13400,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -1937,7 +1937,7 @@
         "assets/models/pillar-low.glb"
       ],
       "sha256": {
-        "assets/models/pillar-low.glb": "2eabf9070669f13598750e042809f91df3811da2f8641f494b3030858be63075"
+        "assets/models/pillar-low.glb": "96786c72813b5564e16f7da5ba0ffe7036f411e8c2f84b612920887391051dad"
       },
       "provenance": {
         "method": "original-procedural",
@@ -1991,7 +1991,7 @@
         }
       },
       "budget": {
-        "runtimeBytes": 282144,
+        "runtimeBytes": 282304,
         "maxSimultaneousInstances": 12
       },
       "reuse": {
@@ -2059,7 +2059,7 @@
         "assets/models/kit.js"
       ],
       "sha256": {
-        "assets/models/kit.js": "62dc735b6f1f0f3594d8c9381fca92f80c84f3505f6e705c11e8d57a0f8a6f8d"
+        "assets/models/kit.js": "8bbc46d7e0b95a6212c1b8bf85afef006e4eab7f4ce3803c3b57aedf1d65f204"
       },
       "provenance": {
         "method": "original-procedural",
@@ -2085,7 +2085,7 @@
         ]
       },
       "budget": {
-        "runtimeBytes": 18908,
+        "runtimeBytes": 19036,
         "maxSimultaneousInstances": 1
       },
       "reuse": {
@@ -2110,7 +2110,7 @@
         "assets/textures/ruin-stone-basecolor.png"
       ],
       "sha256": {
-        "assets/textures/ruin-stone-basecolor.png": "5bd50be7e08458cdc536007dae4157bc76cf5590259a5d9f122f3878ab817540"
+        "assets/textures/ruin-stone-basecolor.png": "3178b29b5b1dc0f54d98f089a5fbfbce4c204e3a84293caddcf064443cad7535"
       },
       "provenance": {
         "method": "original-procedural",
@@ -2131,7 +2131,7 @@
         "normalConvention": null
       },
       "budget": {
-        "runtimeBytes": 76203,
+        "runtimeBytes": 76221,
         "decodedBytes": 262144,
         "maxSimultaneousInstances": 1
       },
@@ -2157,7 +2157,7 @@
         "assets/textures/ruin-stone-normal.png"
       ],
       "sha256": {
-        "assets/textures/ruin-stone-normal.png": "cca0005e6e6bdd83c2dc8698e76978c95dd0631139b8edad2dd56efd11b9f03f"
+        "assets/textures/ruin-stone-normal.png": "099b80babf3c7d63e2cca6277a0765f0eae807714f6f65f8f7e02dcd15793cb6"
       },
       "provenance": {
         "method": "original-procedural",
@@ -2178,7 +2178,7 @@
         "normalConvention": "OpenGL +Y"
       },
       "budget": {
-        "runtimeBytes": 144979,
+        "runtimeBytes": 145114,
         "decodedBytes": 262144,
         "maxSimultaneousInstances": 1
       },

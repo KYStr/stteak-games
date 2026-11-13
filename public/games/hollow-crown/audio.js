@@ -1,4 +1,4 @@
-const FILES=['camp','combat','boss','light','charge','hit','metal','stone','hurt','parry','dodge','death','win','loss','ui','warning'];
+export const FILES=['camp','combat','boss','light','charge','hit','metal','stone','hurt','parry','dodge','death','win','loss','ui','warning','guard'];
 export class Soundscape {
   constructor(settings,onError){this.settings=settings;this.onError=onError;this.ctx=null;this.buffers=new Map();this.voices=[];this.track=null;this.theme='camp';this.active=false;this.failed=false;this.loading=null;this.activation=0;this.disposed=false;}
   async unlock(){
@@ -18,11 +18,19 @@ export class Soundscape {
     })).then(()=>{if(!this.disposed)this.playTheme();}).catch(()=>{if(this.disposed)return;this.failed=true;this.onError('部分聲音載入失敗；可在暫停選單重新載入頁面。');});
     await this.loading;if(!this.disposed)this.playTheme();
   }
-  update(settings){this.settings=settings;if(this.ctx){this.music.gain.setTargetAtTime(settings.music*.7,this.ctx.currentTime,.04);this.fx.gain.setTargetAtTime(settings.effects,this.ctx.currentTime,.02);}}
+  update(settings){
+    this.settings=settings;if(!this.ctx)return;const now=this.ctx.currentTime;
+    this.music.gain.cancelScheduledValues?.(now);this.fx.gain.cancelScheduledValues?.(now);
+    if(settings.muted){
+      // Mute is immediate even when an audio device advances its clock slowly.
+      this.music.gain.value=0;this.fx.gain.value=0;
+      this.music.gain.setValueAtTime?.(0,now);this.fx.gain.setValueAtTime?.(0,now);
+    }else{this.music.gain.setTargetAtTime(settings.music*.7,now,.04);this.fx.gain.setTargetAtTime(settings.effects,now,.02);}
+  }
   setTheme(theme){if(this.theme!==theme){this.theme=theme;this.stopTrack();}this.playTheme();}
   playTheme(){if(this.disposed||!this.ctx||!this.active||this.track||!this.buffers.has(this.theme))return;const s=this.ctx.createBufferSource();s.buffer=this.buffers.get(this.theme);s.loop=true;s.connect(this.music);s.start();this.track=s;}
   stopTrack(){if(this.track){try{this.track.stop();}catch{}this.track.disconnect();this.track=null;}}
-  cue(type,material){if(type==='hit'&&material==='metal')type='metal';if(type==='hit'&&material==='stone')type='stone';if(type==='room-clear')type='win';if(!this.active||!this.ctx||!this.buffers.has(type))return;
+  cue(type,material){if(type==='charge-ready'||type==='objective')type='parry';if(type==='hazard')type='warning';if(type==='ui')type=material==='phase'||material==='wave'?'warning':'ui';if(type==='hit'&&material==='metal')type='metal';if(type==='hit'&&material==='stone')type='stone';if(type==='room-clear')type='win';if(!this.active||!this.ctx||!this.buffers.has(type))return;
     if(this.voices.length>=12){const old=this.voices.shift();try{old.stop();}catch{}}
     const s=this.ctx.createBufferSource();s.buffer=this.buffers.get(type);s.connect(this.fx);s.onended=()=>{s.disconnect();const i=this.voices.indexOf(s);if(i>=0)this.voices.splice(i,1);};this.voices.push(s);s.start();
   }

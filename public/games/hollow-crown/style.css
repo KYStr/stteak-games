@@ -12,3 +12,29 @@
 .cue-windup{clip-path:polygon(50% 0,100% 100%,0 100%,50% 0,50% 30%,22% 84%,78% 84%,50% 30%)} /* 空心三角對應已提交的蓄勢扇形。 */
 .cue-strike{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)} /* 實心菱形對應已提交出招，不提示最佳按鍵。 */
 @media(max-width:560px){#warning-cue{font-size:14px;padding:6px 8px;gap:8px}} /* 手機保持固定行高及不擠壓原觸控按鈕。 */
+/* The expedition HUD stays outside the player's fighting space. */
+#journey{position:fixed;bottom:45px;right:28px;text-align:right;pointer-events:none;color:#e3d4b4}#journey .eyebrow{font-size:10px;letter-spacing:.15em}#journey small{font-size:11px;color:#c3c6b9}.journey-nodes{display:flex;gap:7px;justify-content:flex-end;margin:10px 0}.journey-nodes span{height:29px;width:29px;display:grid;place-items:center;font:13px Georgia,"PMingLiU",serif;border:1px solid #aba88760;background:#101b18e6;color:#a0aaa0}.journey-nodes .done{color:#d9c9a5;background:#344133;border-color:#718569}.journey-nodes .current{color:#151e18;background:#e5d4ab;border-color:#ffedc5;box-shadow:0 0 18px #d1a65c24}
+#action-feedback{position:fixed;bottom:112px;left:50%;transform:translateX(-50%);width:230px;padding:12px 16px;text-align:center;border:1px solid #bfa47766;background:#111d19ed;font-size:13px;color:#e6d3a7;pointer-events:none}#action-feedback[data-ready=true]{border-color:#e7c88d;color:#ffe8bc}#charge-track{height:4px;margin-top:9px}#charge-fill{background:#edc17c}#action-feedback:has(#charge-track[hidden]){width:auto;min-width:180px}
+.choice-grid.rewards{grid-template-columns:repeat(4,1fr)}.rewards .choice{padding:20px 15px}.tiny{font-size:12px}.room-label>span:last-child{font-size:12px}#combat-tip{font-size:12px}#build-label{font-size:10px;color:#a4afa2}#boss-move{font-size:13px}.subnote{font-size:12px}.menu-links button{font-size:13px}.config label{font-size:12px}#overlay[role=dialog]{z-index:5}#toast{top:24%;font-size:14px}#warning-cue{font-size:14px}
+@media(min-width:801px) and (max-height:780px){.camp-panel h1{font-size:64px}.brand-mark{width:37px;height:37px;margin-bottom:20px}.brand-mark span{font-size:25px}.camp-panel h1{margin-bottom:16px}.camp-panel .intro{margin-bottom:15px}.camp-stat{margin:16px 0 10px;padding-top:12px}.menu-main{margin-top:15px}.panel.camp-panel{padding:12px 20px}.camp-panel>.eyebrow{margin-bottom:8px}}
+@media(max-width:800px){.choice-grid.rewards{grid-template-columns:repeat(2,1fr)}#journey{right:17px;bottom:23px}#journey small{display:none}#action-feedback{bottom:140px}#journey .eyebrow{font-size:9px}}
+@media(max-width:560px){#journey{top:148px;bottom:auto;right:15px}#journey .eyebrow{display:none}.journey-nodes{gap:4px}.journey-nodes span{width:23px;height:23px;font-size:11px}#action-feedback{bottom:200px;font-size:12px;padding:8px 12px}#toast{top:32%;max-width:90%;width:max-content}.choice-grid.rewards{grid-template-columns:1fr}.rewards .choice{padding:13px}.room-label>span:last-child{font-size:11px}}
+@media(min-width:801px) and (max-height:780px){.camp-panel>.subnote:last-child{font-size:11px;line-height:1.5;margin-top:6px}.camp-stat{margin:12px 0 6px;padding-top:10px}.camp-stat strong{font-size:23px}.camp-panel .intro{font-size:13px;line-height:1.7}.camp-panel h1{font-size:60px}.brand-mark{margin-bottom:17px}}
+#toast{top:120px;left:28px;transform:none;text-align:left;max-width:300px;padding:11px 16px}body[data-menu=true] #toast{top:auto;bottom:22px;left:50%;transform:translateX(-50%);text-align:center;max-width:80%}@media(max-width:560px){#toast{top:210px;left:15px;max-width:220px;width:auto;font-size:12px}body[data-menu=true] #toast{bottom:18px;max-width:90%;width:max-content}}
+@media(min-width:801px) and (max-height:780px){.camp-panel h1{margin-bottom:10px}.camp-panel .intro{margin-bottom:11px}.brand-mark{margin-bottom:12px}}
+
+.journey-nodes.extended{display:grid;grid-template-columns:repeat(7,29px);justify-content:end;gap:5px 7px}#journey{padding:10px 12px;background:linear-gradient(115deg,#101b18bb,#101b18ee);border:1px solid #d9c9a52a;border-radius:3px}#journey[hidden]{display:none}.build-comparison{font-size:12px!important;color:#d9c9a5!important;border-top:1px solid #d9c9a52a;padding-top:8px}
+@media(max-width:560px){.journey-nodes.extended{grid-template-columns:repeat(7,23px);gap:3px}#journey{padding:5px;top:137px;right:12px}.journey-nodes{margin:4px 0}}
+
+@media(max-width:560px){#journey .eyebrow{display:block;font-size:9px;letter-spacing:.05em}#journey{top:132px}}
+
+/* Training feedback sits beside its instructions at every supported aspect ratio. */
+body[data-tutorial="true"] #action-feedback,body[data-tutorial="true"] #action-feedback:has(#charge-track[hidden]){left:28px;right:auto;bottom:110px;top:auto;transform:none;width:230px}
+@media(max-width:800px){body[data-tutorial="true"] #action-feedback,body[data-tutorial="true"] #action-feedback:has(#charge-track[hidden]){left:15px;right:auto;top:124px;bottom:auto;transform:none;width:230px;max-width:calc(100vw - 30px)}}
+@media(max-height:500px){body[data-tutorial="true"] #action-feedback,body[data-tutorial="true"] #action-feedback:has(#charge-track[hidden]){left:auto;right:15px;top:65px;bottom:auto;width:180px}}
+@media(min-width:801px) and (max-height:780px){.panel.camp-panel{padding:4px 20px}.camp-panel .menu-links button{min-height:32px}.camp-panel h1{margin-bottom:6px}}
+
+/* Touch sticks need their own portrait clearance beneath the training card. */
+@media (max-width:560px) and (min-height:501px) {
+  body[data-tutorial="true"]:has(#touch-controls:not([hidden])) #tutorial { bottom:196px; }
+}

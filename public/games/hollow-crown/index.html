@@ -14,6 +14,8 @@
     <div id="tutorial-copy"></div> <!-- 原公開試煉正文仍由原HUD更新。 -->
     <p id="warning-cue" role="status" aria-live="polite" aria-atomic="true"><span id="warning-cue-shape" class="warning-cue-shape cue-none" aria-hidden="true"></span><span id="warning-cue-text">觀察場上動作</span></p> <!-- 文字與ARIA同義，形狀不依賴紅色。 -->
   </div> <!-- 中性列也占相同行高，不透過顯示閃動暗示時間。 -->
+  <aside id="journey" hidden aria-label="遠征進度"></aside>
+  <div id="action-feedback" hidden role="status"><span id="action-label"></span><div id="charge-track" class="meter"><i id="charge-fill"></i></div></div>
   <aside id="loadout" hidden></aside>
   <div id="combat-tip" hidden>WASD 移動 <b>·</b> 左鍵刺擊／長按蓄力 <b>·</b> 右鍵格擋 <b>·</b> Space 閃避</div>
   <div id="touch-controls" hidden>
@@ -23,6 +25,6 @@
   <main id="overlay" aria-live="polite"><div class="panel loading"><p class="eyebrow">HOLLOW CROWN</p><h1>餘燼之冠</h1><p>正在點亮無王之座…</p></div></main>
   <div id="toast" role="status" hidden></div>
   <div id="save-notice" role="status" hidden></div>
-  <footer id="build-label">1.0 候選製作中 · 本機存檔</footer>
+  <footer id="build-label">HOLLOW CROWN 1.4 · 本機存檔</footer>
   <script type="module" src="./boot.js"></script>
 </body></html>
