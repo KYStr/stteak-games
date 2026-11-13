@@ -1,3 +1,4 @@
+import {getControlsNumericView,CONTROL_VALUE as C} from './input.js';
 import { TRACKS,CARS,PRACTICE_TRACK,FIXED_DT,PHYSICS_VERSION,TRACK_VERSION,sampleTrackInto,ROAD_SAMPLE,TRACK_SAMPLE,sampleTrackBufferAt,roadStatusBufferAt,resolveTourTrack } from './content.js';
 
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
@@ -7,7 +8,16 @@ const finite=(v,fallback=0)=>Number.isFinite(v)?v:fallback;
 const histories=new WeakMap(),numeric=new WeakMap();
 // Stable numeric indices; public enumerable accessors preserve serialization and tooling.
 const N=Object.freeze({"sensitivity":0,"seed":1,"s":2,"lateral":3,"yaw":4,"velocityYaw":5,"speed":6,"steer":7,"x":8,"y":9,"z":10,"heading":11,"pitch":12,"elapsed":13,"countdown":14,"lap":15,"lapTime":16,"lapStart":17,"nextCheckpoint":18,"checkpointCount":19,"lastLegalS":20,"lastLegalCheckpoint":21,"score":22,"pendingScore":23,"combo":24,"driftTime":25,"driftAngle":26,"cleanDriftTime":27,"bestLap":28,"ghostTime":29,"penalty":30,"timeRemaining":31,"collisions":32,"resets":33,"wallCooldown":34,"offTrackTime":35,"wrongWayTime":36,"eventId":37,"ticks":38,"lapTicks":39,"accumulator":40,"forwardProgress":41,"scoredProgress":42,"driftRelease":43});
+export const RACE_VALUE=N;
+// Internal presentation view; never exported through browser diagnostics.
+export function getRaceNumericView(state){return numeric.get(state);}
 const numericDescriptors=Object.fromEntries(Object.keys(N).map(key=>{const index=N[key];return [key,{enumerable:true,configurable:false,get(){return numeric.get(this)[index];},set(value){numeric.get(this)[index]=value;}}];}));
+// Shared history accessors keep serialization callbacks stable across races.
+// Histories remain separate, keyed by the actual race identity.
+const historyDescriptors={
+  ghostSamples:{enumerable:true,configurable:true,get(){return histories.get(this).samples.rows();},set(rows){histories.get(this).samples.load(rows);}},
+  ghostInputs:{enumerable:true,configurable:true,get(){return histories.get(this).inputs.rows();},set(rows){histories.get(this).inputs.load(rows);}},
+};
 const VEHICLE=Object.freeze({acceleration:0,brake:1,drag:2,topSpeed:3,steerRate:4,grip:5,driftGrip:6,cornerGrip:7});
 const scratch=new WeakMap(),validatedGhosts=new WeakSet(),ghostPoses=new WeakMap();
 const driftReasons=['','乾淨漂移 ×1 · 放開手煞車、反打出彎','乾淨漂移 ×2 · 放開手煞車、反打出彎','乾淨漂移 ×3 · 放開手煞車、反打出彎','乾淨漂移 ×4 · 放開手煞車、反打出彎'];
@@ -21,7 +31,7 @@ export function createRace({trackId='harbor',carId='comet',mode='time',sensitivi
     s:0,lateral:0,yaw:0,velocityYaw:0,speed:0,steer:0,x:0,y:0,z:0,heading:0,pitch:0,
     elapsed:0,countdown:3,lap:1,lapTime:0,lapStart:0,lapTimes:[],nextCheckpoint:1,checkpointCount:0,
     lastLegalS:0,lastLegalCheckpoint:0,score:0,pendingScore:0,combo:1,driftTime:0,drifting:false,driftAngle:0,
-    cleanDriftTime:0,reason:'起跑準備',finished:false,result:null,get ghostSamples(){return history.samples.rows();},set ghostSamples(rows){history.samples.load(rows);},get ghostInputs(){return history.inputs.rows();},set ghostInputs(rows){history.inputs.load(rows);},completedGhost:null,
+    cleanDriftTime:0,reason:'起跑準備',finished:false,result:null,ghostSamples:undefined,ghostInputs:undefined,completedGhost:null,
     bestLap:Infinity,ghost:validGhost(ghost,track.id,track.layoutId)?ghost:null,ghostTime:0,sectors:[],lapSectors:[],checkpointTimes:[],
     penalty:0,timeRemaining:mode==='tutorial'?90:120,collisions:0,resets:0,wallCooldown:0,offTrackTime:0,
     wrongWayTime:0,lastEvent:null,eventId:0,ticks:0,lapTicks:0,accumulator:0,forwardProgress:0,scoredProgress:0,
@@ -29,8 +39,8 @@ export function createRace({trackId='harbor',carId='comet',mode='time',sensitivi
   };
   const numbers=new Float64Array(Object.keys(N).length);
   for(const key of Object.keys(N))numbers[N[key]]=state[key];
-  numeric.set(state,numbers);Object.defineProperties(state,numericDescriptors);histories.set(state,history);
-  scratch.set(state,{p:new Float64Array(8),next:new Float64Array(8),pose:new Float64Array(8),road:new Float64Array(4),step:new Float64Array(8),historyRow:new Int32Array(5),vehicle:Float64Array.from(Object.keys(VEHICLE),key=>car[key]),course:Float64Array.of(track.length,track.width)});updatePose(state);return state;
+  numeric.set(state,numbers);histories.set(state,history);Object.defineProperties(state,historyDescriptors);Object.defineProperties(state,numericDescriptors);
+  scratch.set(state,{p:new Float64Array(8),next:new Float64Array(8),pose:new Float64Array(8),road:new Float64Array(4),step:new Float64Array(8),historyRow:new Int32Array(5),vehicle:Float64Array.from(Object.keys(VEHICLE),key=>car[key]),course:Float64Array.of(track.length,track.width),checkpoints:Float64Array.from(track.checkpoints),controlFallback:new Float64Array(3)});updatePose(state);return state;
 }
 
 function event(state,type,text) {
@@ -94,12 +104,12 @@ function recordLap(state) {
 
 /** Checkpoints only accept continuous forward crossings within a legal corridor. */
 function advanceCheckpoints(state,work) {
-  const n=numeric.get(state),before=work.step[0],after=n[N.s],legal=work.road[ROAD_SAMPLE.legal];
+  const n=numeric.get(state),before=work.step[0],after=n[N.s],legal=work.road[ROAD_SAMPLE.legal]!==0;
   if(!legal||after<=before||after-before>3)return;
-  const length=state.track.length;
+  const length=work.course[0];
   const ordinal=n[N.checkpointCount]+1;
-  const lapIndex=Math.floor(ordinal/8),index=ordinal%8;
-  const expected=lapIndex*length+state.track.checkpoints[index];
+  const lapIndex=Math.floor(ordinal/8),index=(ordinal%8)|0;
+  const expected=lapIndex*length+work.checkpoints[index];
   if(before<=expected&&after>=expected) {
     n[N.checkpointCount]++;n[N.lastLegalS]=expected;n[N.lastLegalCheckpoint]=index;
     const lapElapsed=n[N.elapsed]-n[N.lapStart];
@@ -134,8 +144,13 @@ function tick(state,input) {
 function integrateTick(state,work,input){
   const n=numeric.get(state),dt=FIXED_DT;
   const p=sampleTrackBufferAt(state.track,n,N.s,work.p),car=work.vehicle;
-  const throttle=Math.min(1,Math.max(0,(Number.isFinite(input.throttle)?input.throttle:0))),brake=Math.min(1,Math.max(0,(Number.isFinite(input.brake)?input.brake:0)));
-  const steer=Math.min(1,Math.max(-1,(Number.isFinite(input.steer)?input.steer:0))),handbrake=Boolean(input.handbrake);
+  let controls=getControlsNumericView(input);
+  if(!controls){controls=work.controlFallback;controls[0]=controls[1]=controls[2]=0;if(typeof input.throttle==='number')controls[0]=input.throttle;if(typeof input.brake==='number')controls[1]=input.brake;if(typeof input.steer==='number')controls[2]=input.steer;}
+  work.step[3]=work.step[4]=work.step[5]=0;
+  if(controls[C.throttle]===controls[C.throttle]&&controls[C.throttle]!==Infinity&&controls[C.throttle]!==-Infinity)work.step[3]=Math.min(1,Math.max(0,controls[C.throttle]));
+  if(controls[C.brake]===controls[C.brake]&&controls[C.brake]!==Infinity&&controls[C.brake]!==-Infinity)work.step[4]=Math.min(1,Math.max(0,controls[C.brake]));
+  if(controls[C.steer]===controls[C.steer]&&controls[C.steer]!==Infinity&&controls[C.steer]!==-Infinity)work.step[5]=Math.min(1,Math.max(-1,controls[C.steer]));
+  const throttle=work.step[3],brake=work.step[4],steer=work.step[5],handbrake=Boolean(input.handbrake);
   n[N.steer]+=(steer-n[N.steer])*(1-Math.exp(-11*dt));
   const absSpeed=Math.abs(n[N.speed]),sensitivity=n[N.sensitivity]===0?.78:n[N.sensitivity]===2?1.22:1;
   const activeHandbrake=handbrake&&n[N.speed]>7;
@@ -194,35 +209,35 @@ function resolveWallTick(state,work){
 
 function scoreTick(state,work){
   const n=numeric.get(state),dt=FIXED_DT;
-  const before=work.step[0],forward=work.step[1],activeHandbrake=!!work.step[2],status=work.road;
+  const before=work.step[0],forward=work.step[1],activeHandbrake=work.step[2]!==0,status=work.road;
   n[N.forwardProgress]+=Math.max(0,n[N.s]-before);
   n[N.wrongWayTime]=forward<-.5?n[N.wrongWayTime]+dt:0;
   n[N.driftAngle]=Math.abs(Math.atan2(Math.sin(n[N.yaw]-n[N.velocityYaw]),Math.cos(n[N.yaw]-n[N.velocityYaw])));
-  const validDrift=n[N.speed]>11&&n[N.driftAngle]>.12&&n[N.driftAngle]<1.15&&forward>5&&n[N.wallCooldown]===0&&status[ROAD_SAMPLE.legal]&&n[N.s]>n[N.scoredProgress];
-  state.drifting=validDrift;
+  const validDrift=n[N.speed]>11&&n[N.driftAngle]>.12&&n[N.driftAngle]<1.15&&forward>5&&n[N.wallCooldown]===0&&status[ROAD_SAMPLE.legal]!==0&&n[N.s]>n[N.scoredProgress];
+  state.drifting=!!validDrift;
   if(validDrift) {
     n[N.cleanDriftTime]+=dt;n[N.driftTime]+=dt;n[N.combo]=Math.min(4,1+Math.floor(n[N.cleanDriftTime]/1.8));
     // Reject momentary slip spikes from steering into a barrier. A sustained 0.4 s clean slide qualifies.
     if(n[N.cleanDriftTime]>=.4)n[N.pendingScore]+=n[N.speed]*n[N.driftAngle]*8*n[N.combo]*dt;
     n[N.scoredProgress]=n[N.s];n[N.driftRelease]=0;
-    state.reason=driftReasons[n[N.combo]];
+    state.reason=driftReasons[n[N.combo]|0];
     state.tutorial.entry=true;if(n[N.cleanDriftTime]>=2)state.tutorial.control=true;
   }else {
     n[N.driftRelease]+=dt;
-    if(n[N.pendingScore]&&n[N.driftRelease]>.75) {bankDrift(state);if(state.tutorial.entry)state.tutorial.exit=true;}
-    if(n[N.wallCooldown]===0)state.reason=n[N.wrongWayTime]>.5?'逆行 · 煞停後回正':n[N.speed]<11?'加速至 40 km/h 以上才能漂移計分':activeHandbrake?'轉向入彎 · 維持側滑角度':status[ROAD_SAMPLE.shortcut]?'風險捷徑 · 路窄抓地較低':'循線加速 · 彎前煞車';
+    if(n[N.pendingScore]>0&&n[N.driftRelease]>.75) {bankDrift(state);if(state.tutorial.entry)state.tutorial.exit=true;}
+    if(n[N.wallCooldown]===0)state.reason=n[N.wrongWayTime]>.5?'逆行 · 煞停後回正':n[N.speed]<11?'加速至 40 km/h 以上才能漂移計分':activeHandbrake?'轉向入彎 · 維持側滑角度':status[ROAD_SAMPLE.shortcut]!==0?'風險捷徑 · 路窄抓地較低':'循線加速 · 彎前煞車';
   }
   if(n[N.speed]>11)state.tutorial.accelerate=true;
 }
 
 function recordHistoryTick(state,work){
   const n=numeric.get(state),dt=FIXED_DT;
-  const throttle=work.step[3],brake=work.step[4],steer=work.step[5],handbrake=!!work.step[6];
+  const throttle=work.step[3],brake=work.step[4],steer=work.step[5],handbrake=work.step[6]!==0;
   // 20 Hz pose samples are tied to fixed ticks; compressed input changes retain exact tick timing.
   const history=histories.get(state);
   const row=work.historyRow;
-  if(n[N.lapTicks]%6===0){row[0]=Math.round(n[N.lapTime]*10000);row[1]=Math.round((((n[N.s]%work.course[0])+work.course[0])%work.course[0])*10000);row[2]=Math.round(n[N.lateral]*10000);row[3]=Math.round(n[N.yaw]*10000);row[4]=Math.round(n[N.speed]*10000);history.samples.appendFrom(row);}
-  const a=(Math.round(throttle*10000)|0),b=(Math.round(brake*10000)|0),c=(Math.round(steer*10000)|0),d=handbrake?1:0,store=history.inputs,inputIndex=(store.count-1)*5;
+  if(n[N.lapTicks]%6===0){row[0]=Math.round(n[N.lapTime]*10000)|0;row[1]=Math.round((((n[N.s]%work.course[0])+work.course[0])%work.course[0])*10000)|0;row[2]=Math.round(n[N.lateral]*10000)|0;row[3]=Math.round(n[N.yaw]*10000)|0;row[4]=Math.round(n[N.speed]*10000)|0;history.samples.appendFrom(row);}
+  const a=(Math.round(throttle*10000)|0),b=(Math.round(brake*10000)|0),c=(Math.round(steer*10000)|0),d=handbrake?1:0,store=history.inputs,inputIndex=((store.count-1)*5)|0;
   if(!store.count||a!==store.data[inputIndex+1]||b!==store.data[inputIndex+2]||c!==store.data[inputIndex+3]||d!==store.data[inputIndex+4]){row[0]=n[N.lapTicks];row[1]=a;row[2]=b;row[3]=c;row[4]=d;store.appendFrom(row);}
 }
 
@@ -233,6 +248,15 @@ export function stepRace(state,input=neutral,frameDt=FIXED_DT) {
   while(n[N.accumulator]+1e-10>=FIXED_DT&&!state.finished) {
     n[N.accumulator]-=FIXED_DT;tick(state,input);
   }
+  return state;
+}
+
+// Presentation supplies a retained buffer, avoiding a boxed floating argument at
+// this deliberately separate fixed-step boundary. Public/session semantics match.
+export function stepRaceFrom(state,input,buffer,index){
+  const n=numeric.get(state);if(state.finished||state.paused)return state;
+  const dt=buffer[index];n[N.accumulator]+=Math.min(.25,Math.max(0,typeof dt==='number'&&dt===dt&&dt!==Infinity&&dt!==-Infinity?dt:0));
+  while(n[N.accumulator]+1e-10>=FIXED_DT&&!state.finished){n[N.accumulator]-=FIXED_DT;tick(state,input);}
   return state;
 }
 

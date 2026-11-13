@@ -1,3 +1,4 @@
+import {returnToGarage} from './ui-navigation.mjs';
 import assert from 'node:assert/strict';
 import {legalRecordFixture} from './fixture.mjs';
 import {spawn} from 'node:child_process';
@@ -61,13 +62,13 @@ async function newPage(){
   const down=page.keyboard.down.bind(page.keyboard),up=page.keyboard.up.bind(page.keyboard);
   page.keyboard.down=async key=>{heldKeys.add(key);await down(key);};page.keyboard.up=async key=>{heldKeys.delete(key);await up(key);};
   await page.addInitScript(()=>{
-    window.__audio=[];window.__meters=[];window.__policy=[];
+    window.__audio=[];window.__meters=[];window.__policy=[];window.__audioConnections=new WeakMap();
     const nativeConnect=AudioNode.prototype.connect;
-    AudioNode.prototype.connect=function(destination,...args){if(destination===this.context.destination){const meter=this.context.createAnalyser();nativeConnect.call(this,meter);__meters.push(meter);}return nativeConnect.call(this,destination,...args);};
+    AudioNode.prototype.connect=function(destination,...args){__audioConnections.set(this,destination);if(destination===this.context.destination){const meter=this.context.createAnalyser();nativeConnect.call(this,meter);__meters.push(meter);}return nativeConnect.call(this,destination,...args);};
     const Native=window.AudioContext;window.AudioContext=class extends Native{constructor(...args){super(...args);__audio.push(this);}};
     document.addEventListener('securitypolicyviolation',e=>__policy.push(e.violatedDirective));
     const nativeRAF=window.requestAnimationFrame.bind(window),kinds=new WeakMap();window.__raf={pending:0,max:0};
-    window.requestAnimationFrame=function(callback){let game=kinds.get(callback);if(game===undefined){game=new Error().stack.includes('/game.js');kinds.set(callback,game);}if(game){__raf.pending++;__raf.max=Math.max(__raf.max,__raf.pending);}return nativeRAF(time=>{if(game)__raf.pending--;callback(time);});};
+    window.requestAnimationFrame=function(callback){let record=kinds.get(callback);if(!record){const game=new Error().stack.includes('/game.js');record={game,invoke:time=>{if(game)__raf.pending--;callback(time);}};kinds.set(callback,record);}if(record.game){__raf.pending++;__raf.max=Math.max(__raf.max,__raf.pending);}return nativeRAF(record.invoke);};
   });
   const controller=await build({entryPoints:[root+'tests/neon-drift/controller.js'],bundle:true,write:false,format:'iife'});
   await page.addInitScript({content:controller.outputFiles[0].text});
@@ -77,7 +78,7 @@ async function newPage(){
   await page.goto(url);await waitFor(()=>window.neonDrift?.snapshot().renderer.loadedCarAsset);assert.equal(await page.evaluate(()=>__audio.length),0,'Audio must be absent before gesture');
 }
 async function idle(ms){await page.waitForTimeout(ms);await resumeSchedulingGap();}
-async function garage(){await page.evaluate(()=>__pilot=false);const s=await snap();if(s.phase==='running')await page.keyboard.press('Escape');if((await snap()).phase!=='menu')await page.locator('[data-action="garage"]').click();}
+async function garage(){await page.evaluate(()=>__pilot=false);await returnToGarage(page);}
 async function clearAll(){await settings();await page.locator('[data-action="confirm-reset"]').click();await page.locator('[data-action="delete-save"]').click();}
 async function settings(){if(await page.locator('#modal[open] [data-action="resume"]').count())await page.locator('[data-action="resume"]').click();await page.locator('#settings-button').click();}
 async function volume(value){for(const key of ['volume','musicVolume'])await page.locator(`[data-setting="${key}"]`).evaluate((el,v)=>{el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));},value);}
@@ -127,7 +128,9 @@ async function seedRangeRestore(){
 }
 async function schoolSuccess(fromTour=false){
   if(fromTour){await garage();await clearAll();await page.locator('#tour-seed').fill('1');await page.locator('#tour-launch').click();await page.locator('[data-action="tour-start"]').click();await waitFor(()=>neonDrift.snapshot().elapsed>0);await page.locator('#help-button').click();assert.match(await page.locator('[data-action="tutorial"]').textContent(),/放棄巡迴/);await page.locator('[data-action="tutorial"]').click();assert.equal((await snap()).tour,null);assert.equal((await snap()).mode,'tutorial');assert.equal(await page.evaluate(()=>neonDrift.events().at(-1).raceTrackId),'practice');await waitFor(()=>neonDrift.snapshot().elapsed>=5);await page.keyboard.press('Escape');await reload();await waitFor(()=>window.neonDrift?.snapshot().resumable);assert.equal(await page.locator('#continue-race').isVisible(),true);await page.locator('#continue-race').click();assert.equal((await snap()).tour,null);assert.equal((await snap()).phase,'paused');assert.equal((await snap()).mode,'tutorial');assert.equal(await page.evaluate(()=>neonDrift.events().find(e=>e.type==='start')?.raceTrackId),'practice');await page.locator('[data-action="resume"]').click();}
-  else await page.locator('#tutorial-button').click();await page.evaluate(()=>{
+  else await page.locator('#tutorial-button').click();
+  if(fromTour){await page.evaluate(()=>__pilot=true);await waitFor(()=>{const t=neonDrift.snapshot().tutorial;return t.control&&t.exit;},null,90000);await page.evaluate(()=>__pilot=false);await page.keyboard.press('KeyR');}
+  else await page.evaluate(()=>{
     const held=new Set(),key=(code,down)=>{if(held.has(code)===down)return;if(down)held.add(code);else held.delete(code);document.body.dispatchEvent(new KeyboardEvent(down?'keydown':'keyup',{code,bubbles:true,cancelable:true}));};
     let brakingAt=null,startedAt=null;function school(){const s=neonDrift.snapshot({renderer:false});if(s.phase!=='running')return;startedAt??=s.elapsed;const elapsed=s.elapsed-startedAt;
       if(!s.tutorial.control){key('KeyW',true);key('KeyA',elapsed>=4&&elapsed<4.8);key('Space',elapsed>=4);}
@@ -181,10 +184,11 @@ async function contextAndProfile(){
   await page.locator('#launch').click();await waitFor(()=>neonDrift.snapshot().elapsed>1);await page.evaluate(()=>(window.__loss=document.querySelector('#world').getContext('webgl2').getExtension('WEBGL_lose_context')).loseContext());await waitFor(()=>document.querySelector('#modal-title').textContent.includes('顯示裝置'));await page.keyboard.press('Escape');assert.equal((await snap()).phase,'paused');await page.evaluate(()=>__loss.restoreContext());await waitFor(()=>document.querySelector('[data-action="resume"]'));await page.locator('[data-action="resume"]').click();assert.equal((await snap()).phase,'running');await garage();
   // Static screens stop rendering while their one RAF continues polling gamepad Start.
   await page.waitForTimeout(800);const renders=(await snap()).renderer.renderedFrames;await page.waitForTimeout(400);assert.equal((await snap()).renderer.renderedFrames,renders);await page.locator('#launch').click();await page.evaluate(()=>__pad.buttons[9].pressed=true);await waitFor(()=>neonDrift.snapshot().phase==='paused');await page.evaluate(()=>__pad.buttons[9].pressed=false);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await page.evaluate(()=>__pad.buttons[9].pressed=true);await waitFor(()=>neonDrift.snapshot().phase==='running');await page.evaluate(()=>__pad.buttons[9].pressed=false);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await garage();
-  report.policyViolations.push(...await page.evaluate(()=>__policy));await settle();await page.goto(url+'?profile=1');await waitFor(()=>window.neonDrift?.snapshot().renderer.loadedCarAsset);await page.locator('#launch').click();await page.evaluate(()=>__pilot=true);await waitFor(()=>neonDrift.snapshot().elapsed>30,null,120000);const p=await page.evaluate(()=>neonDrift.performance());assert.equal(p.renderer.profilingEnabled,true);assert.ok(p.renderer.cpuTiming.samples.length>100);report.profiling={overhead:'Separate run with CPU rows, browser observers and sparse GPU timer queries enabled; test pilot adds its own RAF.',...frameMetrics(p.frames),renderer:p.renderer};await writeFile(join(output,'profile-on.json'),JSON.stringify(report.profiling,null,2));await pass('context loss/restore; static rendering freezes; gamepad Start; separate opt-in profile');
+  report.policyViolations.push(...await page.evaluate(()=>__policy));await settle();await page.goto(url+'?profile=1');await waitFor(()=>window.neonDrift?.snapshot().renderer.loadedCarAsset);await page.locator('#launch').click();await page.evaluate(()=>__pilot=true);await waitFor(()=>neonDrift.snapshot().elapsed>30,null,120000);const p=await page.evaluate(()=>neonDrift.performance());assert.equal(p.renderer.profilingEnabled,true);assert.ok(p.renderer.cpuTiming.samples.length>100);report.profiling={overhead:'Separate run with CPU rows, browser observers and sparse GPU timer queries enabled; test pilot adds its own RAF.',...frameMetrics(p.frames),renderer:p.renderer};await writeFile(join(output,'profile-on.json'),JSON.stringify(report.profiling,null,2));
+  await page.locator('#settings-button').click();await page.locator('#modal details').evaluate(el=>el.open=true);const download=page.waitForEvent('download');await page.locator('[data-action="export-diagnostics"]').click();const file=await download;await file.saveAs(join(output,'diagnostics-profile.json'));const diagnostic=JSON.parse(await readFile(join(output,'diagnostics-profile.json'),'utf8'));const submits=new Map(diagnostic.renderer.cpuTiming.samples.map(row=>[row.hostFrameSeq,row]));const columns=diagnostic.frameProfile.columns,seq=columns.indexOf('frameSeq'),elapsed=columns.indexOf('elapsed'),cpu=columns.indexOf('totalCpuMs');const nonRender=diagnostic.frameProfile.rows.filter(row=>row[elapsed]>=10&&submits.has(row[seq])).map(row=>{const r=submits.get(row[seq]);return {frameSeq:row[seq],ms:row[cpu]-r.submitMs-r.gpuPollMs};});assert.ok(nonRender.length>100);const times=nonRender.map(row=>row.ms).sort((a,b)=>a-b);report.completeNonRender={count:times.length,p95:times[Math.floor((times.length-1)*.95)],max:Math.max(...times),rows:nonRender};assert.ok(report.completeNonRender.p95<=6);await pass('context loss/restore; static rendering freezes; gamepad Start; separate opt-in profile');
 }
 try{
-  const contract=createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).update(JSON.stringify(await hashes(root+'tests/games/neon-drift'))).update(await readFile(root+'tests/neon-drift/controller.js')).update(await readFile(root+'tests/neon-drift/performance.mjs')).digest('hex');
+  const contract=createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).update(JSON.stringify(await hashes(root+'tests/games/neon-drift'))).update(JSON.stringify(await hashes(root+'tests/neon-drift'))).update(await readFile(root+'tests/neon-drift/controller.js')).update(await readFile(root+'tests/neon-drift/performance.mjs')).update(await readFile(root+'tests/neon-drift/ui-navigation.mjs')).digest('hex');
   await reproducible();
   if(prior?.testContract===contract&&prior&&prior.cases==='all'&&prior.rebuild?.passed&&(!prior.exception||prior.interrupted)&&['consoleErrors','failedRequests','policyViolations','performanceFailures'].every(k=>Array.isArray(prior[k])&&!prior[k].length)){
     let same=false;try{assert.deepEqual(prior.rebuild.hashes,report.rebuild.hashes);same=true;}catch{}
@@ -203,17 +207,19 @@ try{
   server=spawn('python3',['-m','http.server',String(port),'--bind','127.0.0.1','--directory',root+'public'],{stdio:'ignore'});await sleep(500);assert.equal(server.exitCode,null,`Port ${port} must be free`);assert.equal((await fetch(url)).status,200);
   browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});await newPage();await shot('menu-720');report.firstLoadBytes=await page.evaluate(()=>performance.getEntriesByType('resource').reduce((n,r)=>n+r.transferSize,0));assert.ok(report.firstLoadBytes<=30*1024*1024);
   const cases=process.env.NEON_CASES||'all';
-  if((cases==='all'||cases==='core')&&!report.completedPhases?.includes('core')){await focusChecks();await resetChecks();await audioAndLifecycle();await seedRangeRestore();await schoolSuccess();await schoolSuccess(true);for(const motion of ['normal','system','app'])await eventExpiry(motion);await round3();await schoolFailure();await checkpointPhase('core');}
+  if(cases==='feedback'){await garageNavigationChecks();await controlFeedbackChecks();}
+  if(cases==='school'){await schoolSuccess();await schoolSuccess(true);}
+  if((cases==='all'||cases==='core')&&!report.completedPhases?.includes('core')){await garageNavigationChecks();await focusChecks();await resetChecks();await audioAndLifecycle();await controlFeedbackChecks();await seedRangeRestore();await schoolSuccess();await schoolSuccess(true);for(const motion of ['normal','system','app'])await eventExpiry(motion);await round3();await schoolFailure();await checkpointPhase('core');}
   if((cases==='all'||cases==='tour')&&!report.completedPhases?.includes('tour')){await tourCompletion();await checkpointPhase('tour');}
   if(cases==='all'||cases==='matrix'){if(!report.completedPhases?.includes('matrix')){await benchmarkMatrix();await checkpointPhase('matrix');}if(!report.completedPhases?.includes('drift')){await driftAndRestore();await checkpointPhase('drift');}if(!report.completedPhases?.includes('context')){await contextAndProfile();await checkpointPhase('context');}}
   report.policyViolations.push(...await page.evaluate(()=>__policy));assert.deepEqual(report.consoleErrors,[]);assert.deepEqual(report.failedRequests,[]);assert.deepEqual(report.policyViolations,[]);report.complete=true;
   assert.deepEqual(report.performanceFailures,[],'Hardware-independent resource/update budgets');report.passed=true;console.log('PASS complete acceptance');
-}catch(error){report.complete=false;report.exception=error.stack;console.error(error);process.exitCode=1;try{await shot('failure');report.partialSnapshot=await snap();report.partialEvents=await page.evaluate(()=>neonDrift.events());report.localStorage=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));report.partialPerformance=await page.evaluate(()=>neonDrift.performance());report.policyViolations.push(...await page.evaluate(()=>__policy));}catch{}}
+}catch(error){report.complete=false;report.exception=error.stack;console.error(error);process.exitCode=1;try{await shot('failure');report.partialSnapshot=await snap();report.partialControlFeedback=await page.evaluate(()=>window.__feedback||null);report.partialEvents=await page.evaluate(()=>neonDrift.events());report.localStorage=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));report.partialPerformance=await page.evaluate(()=>neonDrift.performance());report.policyViolations.push(...await page.evaluate(()=>__policy));}catch{}}
 finally{report.interrupted=interrupted;report.finishedAt=new Date().toISOString();await writeFile(join(output,'acceptance.json'),JSON.stringify(report,null,2));await browser?.close();server?.kill();console.log('Artifacts:',output,'passed:',report.passed,'complete:',report.complete);}
 
 async function round3(){
  await garage();await page.emulateMedia({reducedMotion:'no-preference'});await settings();await page.locator('[data-setting="reducedMotion"]').uncheck();await page.keyboard.press('Escape');await page.locator('#launch').click();await page.keyboard.down('KeyW');assert.equal(await page.locator('#control-state').textContent(),'油門');await waitFor(()=>neonDrift.snapshot().speed>1);await page.emulateMedia({reducedMotion:'reduce'});await waitFor(()=>document.body.classList.contains('reduced-motion'));assert.equal((await snap()).renderer.reducedMotion,true);await page.emulateMedia({reducedMotion:'no-preference'});await waitFor(()=>!document.body.classList.contains('reduced-motion'));await page.keyboard.up('KeyW');await garage();
- await page.locator('[data-track="skyway"]').click();await page.locator('[data-mode="drift"]').click();await page.locator('#launch').click();await page.evaluate(()=>__pilot=false);await waitFor(()=>neonDrift.snapshot().phase==='result',null,140000);const loss=await snap();assert.equal(loss.result.success,false);assert.equal(loss.result.score,0);assert.match(await page.locator('#modal-title').textContent(),/未達/);report.idleDrift=loss.result;await page.locator('[data-action="retry"]').click();assert.equal((await snap()).elapsed,0);assert.ok((await snap()).countdown>0);await garage();
+ await page.locator('[data-track="skyway"]').click();await page.locator('[data-mode="drift"]').click();await page.locator('#launch').click();await page.evaluate(()=>__pilot=false);await waitFor(()=>neonDrift.snapshot().phase==='result',null,140000);const loss=await snap();assert.equal(loss.result.success,false);assert.equal(loss.result.score,0);assert.match(await page.locator('#modal-title').textContent(),/未達/);report.idleDrift=loss.result;await garage();await pass('r5 result to Garage via atomic navigation');await page.locator('#launch').click();await page.evaluate(()=>__pilot=false);await waitFor(()=>neonDrift.snapshot().phase==='result',null,140000);await page.locator('[data-action="retry"]').click();assert.equal((await snap()).elapsed,0);assert.ok((await snap()).countdown>0);await garage();
  await page.locator('#launch').click();await page.evaluate(()=>{__bot='random';__pilot=true;});await waitFor(()=>neonDrift.snapshot().phase==='result',null,140000);report.randomDrift=(await snap()).result;assert.equal(report.randomDrift.success,false);await page.evaluate(()=>{__pilot=false;__bot='competent';});await garage();
  await page.locator('#launch').click();await page.evaluate(()=>{__target=23;__pilot=true;});await waitFor(()=>neonDrift.snapshot().phase==='result',null,140000);report.skyway23=(await snap()).result;assert.equal(report.skyway23.success,true);assert.ok(report.skyway23.score>=50);await garage();await page.evaluate(()=>delete window.__target);await pass('r4 Skyway COMET 23m/s wins bronze; idle/random lose at target 50');
  for(const seed of [1,2,1]){await page.locator('#tour-seed').fill(String(seed));await page.locator('#tour-launch').click();assert.match(await page.locator('#modal-content').textContent(),new RegExp(`種子 ${seed}`));await page.locator('[data-action="tour-start"]').click();const s=await snap();(report.seedLayouts??=[]).push({seed,layoutId:s.layoutId});await garage();}
@@ -237,4 +243,76 @@ async function tourCompletion(){
    if(i<5)await page.locator('[data-action="tour-next"]').click();
  }
  const t=(await snap()).tour;assert.equal(t.status,'complete');assert.ok(t.activeSeconds>=600,`Tour active time ${t.activeSeconds}`);assert.equal(t.results.length,6);if(report.randomDrift)assert.ok(report.randomDrift.score<report.tourStages[1].score);report.tour=t;delete report.partialTourCheckpoint;await page.evaluate(()=>(window.__tourLoss=document.querySelector('#world').getContext('webgl2').getExtension('WEBGL_lose_context')).loseContext());await waitFor(()=>document.querySelector('#modal-title').textContent.includes('顯示裝置'));await page.evaluate(()=>__tourLoss.restoreContext());await waitFor(()=>document.querySelector('#modal-title').textContent.includes('巡迴完成'));assert.equal((await snap()).tour.results.length,6);await garage();await reload();await waitFor(()=>window.neonDrift?.snapshot().renderer.loadedCarAsset);assert.ok(await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('stteak:neon-drift:save')).tourBests).length));const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('stteak:neon-drift:save')));report.tourUnlocks=saved.unlocks;assert.equal(saved.unlocks.medals,6);for(let attempt=0;attempt<2;attempt++){await page.locator('#customize-button').click();assert.equal(await page.locator('[data-color]:not(:disabled)').count(),6);assert.equal(await page.locator('[data-decal]:not(:disabled)').count(),4);await page.keyboard.press('Escape');if(attempt===0){await reload();await waitFor(()=>window.neonDrift?.snapshot().renderer.loadedCarAsset);}}await page.locator('#tour-seed').fill('7');await page.locator('#tour-launch').click();assert.match(await page.locator('.tour-best').textContent(),/最佳駕駛時間.*該次總分.*種子 7/);await garage();await pass('six-stage uninterrupted Tour >=600 active seconds; mirrored routes; boundary reload; final best persists');
+}
+
+async function garageNavigationChecks(){
+  await garage();
+  await page.locator('#launch').click();await garage();
+  for(const blur of [true,false]){
+    await page.locator('#launch').click();
+    if(blur)await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
+    else await page.locator('#pause-button').click();
+    assert.equal((await snap()).phase,'paused');
+    const before=await page.evaluate(()=>neonDrift.events().filter(e=>e.type==='resume').length);
+    await garage();assert.equal(await page.evaluate(()=>neonDrift.events().filter(e=>e.type==='resume').length),before);
+  }
+  await page.locator('#launch').click();const press=page.keyboard.press;
+  page.keyboard.press=async function(key,...args){if(key==='Escape')await page.evaluate(()=>window.dispatchEvent(new Event('blur')));return press.call(this,key,...args);};
+  try{await garage();}finally{page.keyboard.press=press;}
+  await pass('r5 atomic Garage: menu/running/blur-paused/manual-paused/intervening blur; no unintended resume');
+}
+
+async function controlFeedbackChecks(){
+  await garage();await page.locator('#launch').click();await waitFor(()=>neonDrift.snapshot().elapsed>1&&neonDrift.snapshot().audio.state==='running');
+  await page.evaluate(()=>{
+    const connections=__audioConnections,targets=new WeakMap(),connect=AudioNode.prototype.connect,start=OscillatorNode.prototype.start,set=AudioParam.prototype.setValueAtTime;
+    window.__feedback={samples:[],pending:null,starts:0,sources:[]};
+    AudioNode.prototype.connect=function(destination,...args){connections.set(this,destination);return connect.call(this,destination,...args);};
+    AudioParam.prototype.setValueAtTime=function(value,...args){targets.set(this,value);return set.call(this,value,...args);};
+    const text=Object.getOwnPropertyDescriptor(Node.prototype,'textContent'),control=document.querySelector('#control-state');
+    Object.defineProperty(Node.prototype,'textContent',{...text,set(value){text.set.call(this,value);const p=__feedback.pending;if(this===control&&p){p.hudMs=performance.now()-p.at;p.hud=value;}}});
+    OscillatorNode.prototype.start=function(...args){
+      const result=start.apply(this,args),gain=connections.get(this),bus=gain&&connections.get(gain),frequency=targets.get(this.frequency),volume=gain&&targets.get(gain.gain);
+      __feedback.sources.push({type:this.type,frequency,volume,gain:gain?.constructor.name,bus:bus?.constructor.name});
+      if(this.type==='triangle'&&[110,85,160].includes(frequency)&&gain instanceof GainNode&&[.025,.0125].includes(volume)){
+        __feedback.starts++;const p=__feedback.pending;
+        if(p){p.audioMs=performance.now()-p.at;p.frequency=frequency;p.sfxVolume=targets.get(bus.gain)??bus.gain.value;p.sfxCurrentValue=bus.gain.value;p.sharedBus=connections.get(bus) instanceof GainNode;__feedback.samples.push(p);__feedback.pending=null;}
+      }
+      return result;
+    };
+    const capture=e=>{if(['KeyW','KeyS','Space'].includes(e.code))__feedback.pending={kind:'keyboard',edge:e.type,code:e.code,at:performance.now()};};
+    window.addEventListener('keydown',capture,true);window.addEventListener('keyup',capture,true);
+    for(const type of ['pointerdown','pointerup'])window.addEventListener(type,e=>{if(e.target.closest('[data-control="brake"]'))__feedback.pending={kind:'touch',edge:type,at:performance.now()};},true);
+  });
+  for(let trial=0;trial<30;trial++){
+    const key=['KeyW','KeyS','Space'][trial%3];
+    for(const edge of ['down','up']){
+      const before=await page.evaluate(()=>__feedback.samples.length);await page.keyboard[edge](key);
+      await page.waitForFunction(count=>__feedback.samples.length===count+1,before);
+    }
+  }
+  report.controlFeedback=await page.evaluate(()=>({samples:__feedback.samples.slice()}));
+  const samples=report.controlFeedback.samples;assert.equal(samples.length,60);
+  for(const s of samples){assert.ok(s.audioMs<=100,JSON.stringify(s));assert.ok(s.hudMs<=50,JSON.stringify(s));assert.equal(s.sharedBus,true);assert.equal(s.hud,s.edge==='keyup'?'滑行':s.code==='KeyW'?'油門':s.code==='KeyS'?'煞車':'手煞車 · 漂移');}
+  const percentile=(values,p)=>values.sort((a,b)=>a-b)[Math.floor((values.length-1)*p)];
+  Object.assign(report.controlFeedback,{count:60,trials:30,audioP95:percentile(samples.map(s=>s.audioMs),.95),audioMax:Math.max(...samples.map(s=>s.audioMs)),hudMax:Math.max(...samples.map(s=>s.hudMs))});
+  await settings();for(const [key,value] of [['touchControls',true],['autoThrottle',false]])await page.locator(`[data-setting="${key}"]`).evaluate((el,v)=>{el.checked=v;el.dispatchEvent(new Event('input',{bubbles:true}));},value);await page.keyboard.press('Escape');
+  const brake=page.locator('[data-control="brake"]');const box=await brake.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  for(const edge of ['down','up']){const count=await page.evaluate(()=>__feedback.samples.length);await page.mouse[edge]();await page.waitForFunction(n=>__feedback.samples.length===n+1,count);}
+  // Pad timing starts when the browser polls the changed pedal, excluding time
+  // before the device sample exists. This is the same input.sample onChange path.
+  await page.evaluate(()=>{window.__feedbackPad=structuredClone(__pad);Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[__feedbackPad]});});
+  for(const value of [1,0]){
+    const count=await page.evaluate(()=>__feedback.samples.length);
+    await page.evaluate(value=>new Promise(resolve=>{const native=navigator.getGamepads;Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>{Object.defineProperty(navigator,'getGamepads',{configurable:true,value:native});__feedbackPad.buttons[6].value=value;__feedbackPad.buttons[6].pressed=!!value;const p=__feedback.pending={kind:'gamepad',edge:value?'down':'up',at:performance.now()};queueMicrotask(resolve);return [__feedbackPad];}});}),value);
+    await page.waitForFunction(n=>__feedback.samples.length===n+1,count);
+  }
+  await page.evaluate(()=>Object.defineProperty(navigator,'getGamepads',{configurable:true,value:()=>[__pad]}));
+  report.controlFeedback.equivalent=await page.evaluate(()=>__feedback.samples.slice(60));assert.equal(report.controlFeedback.equivalent.length,4);for(const s of report.controlFeedback.equivalent){assert.ok(s.audioMs<=100);assert.ok(s.hudMs<=50);}
+  await settings();await volume(0);await page.keyboard.press('Escape');await waitFor(()=>__audio[0].state==='running');
+  await waitFor(()=>{const x=new Float32Array(2048);__meters[0].getFloatTimeDomainData(x);return x.every(v=>Math.abs(v)<1e-6);},null,10000);
+  const count=await page.evaluate(()=>__feedback.samples.length);await page.keyboard.down('KeyW');await page.waitForFunction(n=>__feedback.samples.length===n+1,count);await page.keyboard.up('KeyW');await page.waitForFunction(n=>__feedback.samples.length===n+2,count);const muted=await page.evaluate(()=>__feedback.samples.slice(-2));assert.ok(muted.every(s=>s.sfxVolume===0));report.controlFeedback.muted=muted;const mutedAt=await page.evaluate(()=>__audio[0].currentTime);await waitFor(at=>{const x=new Float32Array(2048);__meters[0].getFloatTimeDomainData(x);return __audio[0].currentTime>=at+.1&&x.every(v=>Math.abs(v)<1e-6);},mutedAt,10000);
+  await page.keyboard.down('KeyW');const starts=await page.evaluate(()=>__feedback.starts);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));assert.equal(await page.evaluate(()=>__feedback.starts),starts);await page.keyboard.up('KeyW');await page.keyboard.press('KeyW');await page.waitForTimeout(150);assert.equal(await page.evaluate(()=>__feedback.starts),starts);
+  await garage();await settings();await volume(.3);for(const [key,value] of [['touchControls',false],['autoThrottle',true]])await page.locator(`[data-setting="${key}"]`).evaluate((el,v)=>{el.checked=v;el.dispatchEvent(new Event('input',{bubbles:true}));},value);await page.keyboard.press('Escape');
+  await pass('r5 30 sequential press/release trials (60 real pedal edges): HUD <=50ms / source scheduling <=100ms; touch/pad/mute/blur');
 }

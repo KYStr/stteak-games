@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createInput} from '../../../games/neon-drift/src/input.js';
+import {createInput,getControlsNumericView,CONTROL_VALUE as C} from '../../../games/neon-drift/src/input.js';
 
 function fixture({dialog=false,editable=false}={}){
   const listeners=new Map(),old={};
@@ -18,4 +18,8 @@ for(const target of [{dialog:true},{editable:true},{dialog:true,editable:true}])
 });
 test('distinct Escape presses retain their own pause actions',()=>{
   const f=fixture();try{f.send(false);f.send(true);f.send(false);assert.equal(f.pauses,2);assert.equal(f.prevented,1);}finally{f.close();}
+});
+
+test('control numeric storage retains one view with the existing enumerable number interface',()=>{
+  const f=fixture();try{const controls=f.input.sample(),view=getControlsNumericView(controls);assert.ok(view instanceof Float64Array);assert.equal(view,getControlsNumericView(controls));controls.throttle=.375;controls.brake=.125;controls.steer=-.123456789;assert.equal(view[C.throttle],.375);assert.equal(view[C.brake],.125);assert.equal(view[C.steer],-.123456789);assert.deepEqual(JSON.parse(JSON.stringify(controls)),{throttle:.375,brake:.125,steer:-.123456789,handbrake:false});assert.equal(f.input.sample(),controls);}finally{f.close();}
 });

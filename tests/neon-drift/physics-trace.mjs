@@ -3,7 +3,7 @@ import inspector from 'node:inspector';
 import {writeFile,readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
-import {createRace,stepRace} from '../../games/neon-drift/src/physics.js';
+import {createRace,stepRace,stepRaceFrom} from '../../games/neon-drift/src/physics.js';
 import {CARS,TRACKS,resolveTourTrack} from '../../games/neon-drift/src/content.js';
 import {driveInput,driftInput} from '../games/neon-drift/driver.js';
 const cases=[];const results=[];
@@ -14,7 +14,8 @@ for(const car of CARS)for(const district of TRACKS)for(const seed of [0,7])for(c
 }
 const session=new inspector.Session();session.connect();const send=(method,params={})=>new Promise((resolve,reject)=>session.post(method,params,(e,r)=>e?reject(e):resolve(r)));
 await send('HeapProfiler.startSampling',{samplingInterval:32768,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true});
-for(const {options,tape} of cases){const race=createRace(options),crossings=[];let last=0;for(const input of tape){stepRace(race,input,1/30);if(race.checkpointCount!==last){crossings.push([race.checkpointCount,race.lastLegalCheckpoint,race.ticks]);last=race.checkpointCount;}}
+const frameDelta=Float64Array.of(1/30);
+for(const {options,tape} of cases){const race=createRace(options),crossings=[];let last=0;for(const input of tape){stepRaceFrom(race,input,frameDelta,0);if(race.checkpointCount!==last){crossings.push([race.checkpointCount,race.lastLegalCheckpoint,race.ticks]);last=race.checkpointCount;}}
  results.push({car:race.carId,layout:race.layoutId,mode:race.mode,ticks:race.ticks,checkpoints:crossings,score:race.score,collisions:race.collisions,penalty:race.penalty,result:race.result});}
 const profile=await send('HeapProfiler.stopSampling');session.disconnect();
 const out=process.env.NEON_TRACE_OUT||'/tmp/neon-physics-trace';await writeFile(out+'.json',JSON.stringify(profile));
